@@ -19,7 +19,7 @@ Quy ước tiêu chí nghiệm thu (AC): mọi task phải thỏa Definition of 
 | [x] T-003 | Supabase client (`@supabase/ssr`) server/client/middleware; trang đăng nhập; layout app; `PropertySwitcher`; bảo vệ route | AG | T-002 | Đăng nhập/đăng xuất; chuyển KS; route lạ → 404; chưa đăng nhập → /login |
 | [x] T-004 | `vi.ts`, `errors.vi.ts`, thành phần chung (`DocStatusBadge`, `MoneyText`, `DataTable`, `EmptyState`, `ErrorState`, `ConfirmPostDialog`, `PinDialog`) | AG | T-003 | Storybook hoặc trang `/dev/components` hiển thị đủ trạng thái |
 | [x] T-005 | Quản trị người dùng: Edge Function `admin-create-user` (service role), RPC `admin_*` (mục 9 `09-API-RPC.md`), đặt PIN, khóa tài khoản | CC | T-003 | Tạo user không cần email thật; `ERR_SELF_GRANT`, `ERR_LAST_ADMIN` có test |
-| [ ] T-005b | Màn hình phân quyền `06-UI-UX.md` mục 6: danh sách vai trò, sao chép, so sánh, **ma trận quyền tích chọn theo module**, gán vai trò theo KS/bộ phận/kho có thời hạn, quyền riêng cho/chặn, khối quyền hiệu lực có nguồn, cảnh báo tổ hợp xung đột; hook `useCan` | AG | T-005 | Bỏ tích 1 quyền → người giữ vai trò bị chặn ngay ở lần gọi RPC kế tiếp; nút tương ứng mờ sau khi làm mới quyền |
+| [x] T-005b | Màn hình phân quyền `06-UI-UX.md` mục 6: danh sách vai trò, sao chép, so sánh, **ma trận quyền tích chọn theo module**, gán vai trò theo KS/bộ phận/kho có thời hạn, quyền riêng cho/chặn, khối quyền hiệu lực có nguồn, cảnh báo tổ hợp xung đột; hook `useCan` | AG | T-005 | Bỏ tích 1 quyền → người giữ vai trò bị chặn ngay ở lần gọi RPC kế tiếp; nút tương ứng mờ sau khi làm mới quyền |
 | [ ] T-006 | `settings` + `approval_rules` + `alert_rules` + màn hình quản trị cấu hình | AG | T-005 | Đổi ngưỡng có hiệu lực không cần deploy |
 
 ## Giai đoạn MVP-A — Danh mục & sổ cái (tuần 3–4)
