@@ -7,11 +7,13 @@ Quy ước tiêu chí nghiệm thu (AC): mọi task phải thỏa Definition of 
 ## Giai đoạn 0 — Nền móng (tuần 1–2)
 
 > T-001 đang triển khai: scaffold Next.js, Supabase CLI và CI đã tạo; Supabase hosted đã được cấu hình với public key cho Vercel và có thể truy cập. Bản production đã deploy trực tiếp bằng Vercel CLI. Chưa xác nhận `supabase start` vì Docker daemon không chạy; chưa đổi được Git integration vì Vercel chưa có quyền truy cập repository tổ chức. Cần cấp quyền GitHub App để tự động deploy từ repo này.
+>
+> T-002 hoàn tất trên Supabase hosted: hai migration đã áp dụng; sinh types từ remote; 30 assertion pgTAP chạy qua `supabase db query` trong transaction và toàn bộ đạt. `supabase test db --remote` vẫn đòi Docker nên không dùng. Fixture/test extension đã rollback, seed mẫu chỉ giữ cho local và không chạy trên production. Vercel production deploy Ready và HTTP smoke test trả 200.
 
 | # | Task | Agent | Phụ thuộc | AC chính |
 |---|---|---|---|---|
 | [ ] T-001 | Khởi tạo repo Next.js + TS strict + Tailwind + shadcn + ESLint/Prettier + pnpm; Supabase CLI `supabase init`; cấu trúc thư mục theo AGENTS.md | CC | — | `pnpm dev` chạy; `supabase start` chạy; CI GitHub Actions chạy lint + typecheck |
-| [ ] T-002 | Migration 01 + 02: extension, tiện ích, audit, tổ chức & truy cập, **phân quyền động** (`permissions`, `roles`, `role_permissions`, `user_property_roles` có phạm vi, `user_permission_overrides`), `has_perm`, `require_perm`, `my_property_ids`, `my_permissions`; seed danh mục quyền + vai trò mẫu + dữ liệu mẫu (2 pháp nhân, 2 KS) | CC | T-001 | pgTAP mục 11 `04-SECURITY-RLS.md`: deny thắng allow; hết hạn mất quyền; phạm vi kho đúng; user KS A không thấy KS B |
+| [x] T-002 | Migration 01 + 02: extension, tiện ích, audit, tổ chức & truy cập, **phân quyền động** (`permissions`, `roles`, `role_permissions`, `user_property_roles` có phạm vi, `user_permission_overrides`), `has_perm`, `require_perm`, `my_property_ids`, `my_permissions`; seed danh mục quyền + vai trò mẫu + dữ liệu mẫu (2 pháp nhân, 2 KS) | CC | T-001 | pgTAP mục 11 `04-SECURITY-RLS.md`: deny thắng allow; hết hạn mất quyền; phạm vi kho đúng; user KS A không thấy KS B |
 | [ ] T-003 | Supabase client (`@supabase/ssr`) server/client/middleware; trang đăng nhập; layout app; `PropertySwitcher`; bảo vệ route | AG | T-002 | Đăng nhập/đăng xuất; chuyển KS; route lạ → 404; chưa đăng nhập → /login |
 | [ ] T-004 | `vi.ts`, `errors.vi.ts`, thành phần chung (`DocStatusBadge`, `MoneyText`, `DataTable`, `EmptyState`, `ErrorState`, `ConfirmPostDialog`, `PinDialog`) | AG | T-003 | Storybook hoặc trang `/dev/components` hiển thị đủ trạng thái |
 | [ ] T-005 | Quản trị người dùng: Edge Function `admin-create-user` (service role), RPC `admin_*` (mục 9 `09-API-RPC.md`), đặt PIN, khóa tài khoản | CC | T-003 | Tạo user không cần email thật; `ERR_SELF_GRANT`, `ERR_LAST_ADMIN` có test |

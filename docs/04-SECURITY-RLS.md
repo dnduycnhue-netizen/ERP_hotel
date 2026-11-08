@@ -15,7 +15,7 @@
 | `permissions` | `code` (PK, vd `po.approve`), `module`, `name_vi`, `description_vi`, `risk_level` (`normal`,`sensitive`,`critical`), `sort_order` | Seed bởi migration. Chỉ đọc với mọi người |
 | `roles` | `id`, `org_id`, `code`, `name_vi`, `description`, `is_system`, `active`, `copied_from_id` | Người dùng tạo/sửa |
 | `role_permissions` | `role_id`, `permission_code` | PK 2 cột. Ma trận tích chọn |
-| `user_property_roles` | `id`, `user_id`, `role_id`, `property_id?` (null = toàn chuỗi), `outlet_ids uuid[]?`, `warehouse_ids uuid[]?` (null = mọi outlet/kho của KS), `valid_from`, `valid_to`, `granted_by` | Gán vai trò có phạm vi và thời hạn |
+| `user_property_roles` | `id`, `user_id`, `role_id`, `property_id?` (null = cấp chuỗi), `outlet_ids uuid[]?`, `warehouse_ids uuid[]?` (cả hai null = mọi KS/kho; có mảng = chỉ các KS/kho khớp), `valid_from`, `valid_to`, `granted_by` | Gán vai trò có phạm vi và thời hạn |
 | `user_permission_overrides` | `id`, `user_id`, `property_id?`, `permission_code`, `effect` (`allow`,`deny`), `valid_from`, `valid_to`, `reason`, `granted_by` | Quyền riêng từng người; `deny` thắng mọi `allow` |
 | `permission_change_log` | (dùng `audit_log` chung) | Mọi thay đổi 4 bảng trên đều ghi audit + alert |
 
@@ -25,7 +25,7 @@ Thứ tự đánh giá quyền của một người tại khách sạn P:
 3. Có ít nhất một vai trò còn hạn, `active`, tại P hoặc toàn chuỗi, chứa quyền đó → có quyền.
 4. Ngược lại → không có quyền.
 
-Phạm vi bộ phận/kho: quyền thao tác chứng từ của một kho chỉ có hiệu lực nếu `warehouse_ids` (hoặc `outlet_ids`) của lần gán vai trò bao phủ kho đó — ví dụ bếp trưởng chỉ duyệt hủy hàng của kho bếp mình.
+Phạm vi bộ phận/kho: quyền thao tác chứng từ của một kho chỉ có hiệu lực nếu `warehouse_ids` (hoặc `outlet_ids`) của lần gán vai trò bao phủ kho đó — ví dụ bếp trưởng chỉ duyệt hủy hàng của kho bếp mình. Gán cấp chuỗi nhưng có mảng phạm vi chỉ mở các KS chứa kho/bộ phận được liệt kê; kiểm tra quyền toàn chuỗi (`has_perm(null, ...)`) chỉ áp dụng cho gán cấp chuỗi không giới hạn phạm vi.
 
 ## 2. Hàm phân quyền
 
