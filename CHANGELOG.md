@@ -13,3 +13,24 @@ Ghi theo task. Mỗi dòng: ngày — mã task — agent — tóm tắt.
 - 2026-11-08 — T-002 — Copilot SDK — Deploy production lên Vercel (`dpl_Eci578a9ciwM4qkTxL6QURX1wm48`), trạng thái Ready; alias production trả HTTP 200.
 - 2026-11-08 — T-003 — Copilot SDK — Thêm đăng nhập email/mật khẩu và đăng xuất qua Supabase Auth; bảo vệ route bằng proxy và kiểm tra lại trong server components/actions; chỉ cho phép khách sạn từ `my_property_ids()`, lưu lựa chọn cuối bằng cookie HttpOnly; bổ sung trạng thái tài khoản, lỗi và 404 bằng tiếng Việt.
 - 2026-11-08 — Bootstrap — Copilot SDK — Thêm quy trình khởi tạo production một lần, vai trò kiểm thử không có quyền quản trị/critical, callback lời mời và đặt mật khẩu ban đầu; migration đã áp dụng, 22 assertion pgTAP transactional đạt, types đã sinh lại. Deploy production Ready tại `https://erphotel.vercel.app`, callback smoke test trả HTTP 200. Gửi lời mời gặp `over_email_send_rate_limit`; function đã rollback, xác minh production còn 0 tổ chức/Auth user, đồng thời xóa secret/endpoint tạm. Cần nâng giới hạn email hoặc cấu hình SMTP riêng trước khi thử lại.
+
+### Bàn giao — bootstrap tài khoản production (2026-11-08)
+
+**Đã triển khai**
+- `supabase/migrations/20261108145100_bootstrap_initial_org.sql`: RPC `bootstrap_initial_org` chỉ cấp `EXECUTE` cho `service_role`, chỉ chạy khi chưa có tổ chức, khóa đồng thời bằng advisory lock, yêu cầu đúng ba Auth user ID riêng biệt; tạo organization, legal entity, property, role `sys_admin` và role `business_test_broad`. Hai admin được gán quyền quản trị ở cấp chuỗi; tài khoản kiểm thử chỉ được gán tại property đầu tiên và nhận các quyền không thuộc module Quản trị, không ở mức `critical`. Chạy xong migration này trên Supabase production.
+- `supabase/tests/bootstrap_initial_org_test.sql`: 22 assertion kiểm tra quyền gọi RPC, chống dùng trùng user/chạy bootstrap lần hai, dữ liệu và role được tạo, giới hạn quyền test, phạm vi property, `has_perm` và audit. Đã chạy thành công bằng `supabase db query` trong transaction; transaction rollback nên fixture không còn trên production.
+- `supabase/functions/bootstrap-initial-org/index.ts`: endpoint bootstrap một lần, kiểm tra token, POST, trạng thái database và email khác nhau; gửi lời mời Auth, gọi RPC bằng service role và dọn user tạo dở nếu có lỗi. Bản chẩn đoán cuối trả lỗi Auth đã loại email khỏi nội dung trả về. Endpoint và secret bootstrap đều là tạm thời, hiện đã xóa khỏi Supabase; không triển khai endpoint này như quy trình quản trị người dùng thường xuyên.
+- `src/app/auth/callback/page.tsx`, `src/app/(auth)/set-password/page.tsx`, `src/app/(auth)/set-password/actions.ts`: xử lý callback lời mời theo PKCE/token hash, cho người nhận tự đặt mật khẩu tối thiểu 12 ký tự. `proxy.ts` cho phép callback chưa đăng nhập; chuỗi giao diện nằm trong `src/i18n/vi.ts`.
+- Sinh lại `src/lib/database.types.ts` từ production. Cập nhật tài liệu kiến trúc/RPC, roadmap và changelog. T-005 (quản trị người dùng đầy đủ) **chưa hoàn thành**.
+
+**Kiểm tra và triển khai**
+- `pnpm lint`, `pnpm typecheck`, `pnpm build` và kiểm tra Prettier đạt.
+- Supabase production migration `20261108145100` đã áp dụng; kiểm thử bootstrap 22/22 đạt. Không dùng Docker.
+- Vercel production deploy `dpl_Bb5SV4uEXioSxaknptTrgK39kYZv` ở trạng thái `READY`; `/login`, `/auth/callback`, `/set-password` đều smoke test HTTP 200.
+- Các thay đổi đã push lên `main`: `3353a89` (bootstrap), `5b90e5d` (dọn user tạo dở), `a32948d` (chẩn đoán giới hạn email).
+
+**Trạng thái hiện tại / việc cần làm tiếp**
+- Lời mời thất bại với mã Auth `over_email_send_rate_limit`. Chưa tạo tổ chức, pháp nhân, property, profile hoặc Auth user; truy vấn xác nhận production có 0 organization, 0 Auth user, 0 profile. Không có tài khoản nào sẵn sàng đăng nhập.
+- Trước lần thử tiếp theo, cấu hình SMTP production riêng hoặc kiểm tra giới hạn gửi email trong Supabase Auth; xác nhận sender/recipient policy, Site URL và allowlist có `https://erphotel.vercel.app/auth/callback`. Tham khảo https://supabase.com/docs/guides/auth/auth-smtp và https://supabase.com/docs/guides/auth/rate-limits.
+- Chỉ sau khi email sẵn sàng, triển khai lại Edge Function một lần với token ngẫu nhiên mới được lưu kín; dùng chính ba email đã được người dùng cung cấp trước đó trong lịch sử hội thoại (không chép thông tin nhạy cảm vào log/code), kiểm tra kết quả gửi và quyền role. Dù thành công hay thất bại, xóa token và function tạm sau đó; xác minh lại số user/property bằng truy vấn chỉ đọc.
+- Tài khoản kiểm thử được duyệt quyền rộng nhưng không có quyền quản trị hoặc quyền `critical`; hai admin là hai người riêng biệt. Không dùng user test để hoàn tất SoD thay cho cùng người tạo/duyệt chứng từ.
