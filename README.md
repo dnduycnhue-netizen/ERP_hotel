@@ -1,34 +1,61 @@
-# Mini-ERP Chuỗi khách sạn — Bộ tài liệu phát triển
+# Mini-ERP Chuỗi khách sạn
 
-Bộ tài liệu này là **nguồn sự thật** để các AI agent (Claude Code, Antigravity, Muse) viết code. Code phải khớp tài liệu; khi đổi hành vi thì sửa tài liệu trước.
+Ứng dụng nội bộ quản lý thu mua, kho, F&B, buồng phòng và chi phí vận hành cho chuỗi khách sạn. Đặc tả nghiệp vụ là nguồn sự thật trong thư mục [`docs/`](./docs/); tiến độ triển khai theo [`docs/10-ROADMAP-TASKS.md`](./docs/10-ROADMAP-TASKS.md).
 
-## Danh mục tài liệu
+## Công nghệ
 
-| File | Nội dung | Ai đọc |
-|---|---|---|
-| `AGENTS.md` | Quy tắc bắt buộc, stack, cấu trúc thư mục, Definition of Done | Mọi agent, luôn luôn |
-| `CLAUDE.md` | Phần riêng cho Claude Code (import AGENTS.md) | Claude Code |
-| `docs/01-PRD.md` | Bài toán, người dùng, phạm vi MVP / P2 / P3 | Mọi agent |
-| `docs/02-ARCHITECTURE.md` | Kiến trúc Vercel + Supabase, đa pháp nhân, offline, job định kỳ | Mọi agent |
-| `docs/03-DATA-MODEL.md` | Bảng, cột, quan hệ, SQL lõi (sổ cái, giá vốn, đánh số chứng từ) | Backend |
-| `docs/04-SECURITY-RLS.md` | Vai trò, RLS, tách biệt nhiệm vụ (SoD), cơ chế "mù" | Backend |
-| `docs/05-BUSINESS-RULES.md` | Công thức, ngưỡng, trạng thái chứng từ, quy tắc hạch toán | Mọi agent |
-| `docs/06-UI-UX.md` | Sơ đồ màn hình, màn hình mobile hiện trường, quy ước giao diện | Frontend |
-| `docs/07-IMPORT-MIGRATION.md` | Nhập dữ liệu từ Excel hiện tại, làm sạch, mẫu file | Backend |
-| `docs/08-REPORTS-ALERTS.md` | Báo cáo, cảnh báo, Flash 8h | Mọi agent |
-| `docs/09-API-RPC.md` | Danh sách RPC, tham số, mã lỗi | Mọi agent |
-| `docs/10-ROADMAP-TASKS.md` | Task chia nhỏ theo giai đoạn, tiêu chí nghiệm thu | Mọi agent |
-| `docs/11-TESTING.md` | Chiến lược test, ca test bắt buộc, dữ liệu mẫu | Mọi agent |
-| `docs/12-DEPLOY.md` | Môi trường, biến môi trường, quy trình đưa lên Vercel/Supabase | Người triển khai |
-| `docs/13-AI-WORKFLOW.md` | Cách phối hợp Antigravity + Muse + Claude Code | dnduy |
-| `docs/modules/*.md` | Đặc tả chi tiết từng phân hệ MVP | Agent làm module đó |
-| `docs/GLOSSARY.md` | Thuật ngữ Việt – Anh – mã trong code | Mọi agent |
-| `docs/OPEN-QUESTIONS.md` | Câu hỏi còn chờ khách chốt | dnduy |
-| `docs/decisions/` | ADR — quyết định kiến trúc | Mọi agent |
+- Next.js App Router, React, TypeScript strict
+- Tailwind CSS và shadcn/ui
+- Supabase local: PostgreSQL, Auth, Storage, RLS và RPC
+- pnpm
 
-## Bắt đầu nhanh
+## Yêu cầu
 
-1. Tạo repo, chép toàn bộ thư mục này vào gốc repo.
-2. Giao Task `T-001` trong `docs/10-ROADMAP-TASKS.md` cho Claude Code (khởi tạo dự án + Supabase local).
-3. Làm lần lượt theo roadmap; mỗi task một nhánh `task/T-xxx-ten-ngan`.
-# ERP_hotel
+- Node.js 22+
+- pnpm 12+
+- Docker Desktop đang chạy để sử dụng Supabase local
+
+## Chạy lần đầu
+
+```bash
+pnpm install
+pnpm dev
+```
+
+Mở [http://localhost:3000](http://localhost:3000).
+
+Để chạy Supabase local trong terminal khác:
+
+```bash
+pnpm exec supabase start
+```
+
+Các migration, seed và kiểm thử cơ sở dữ liệu sẽ được bổ sung theo roadmap. Không dùng khóa production trong môi trường local.
+
+## Kết nối Supabase hosted
+
+Đặt `NEXT_PUBLIC_SUPABASE_URL` và `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` trong `.env.local` khi phát triển, và trong Environment Variables của Vercel cho Production, Preview và Development. Client SSR dùng cookie qua `src/lib/supabase/`; không đưa secret/service-role key vào trình duyệt. Secret key đã lộ cần được thu hồi và thay mới trong Supabase.
+
+Project Vercel đích: [erp_hotel](https://vercel.com/dnduys-projects/erp_hotel). Chỉ triển khai sau khi xác nhận repository Git được kết nối là repository dự án này.
+
+## Kiểm tra
+
+```bash
+pnpm lint
+pnpm typecheck
+pnpm format:check
+pnpm build
+```
+
+GitHub Actions chạy lint và type-check cho pull request, `main` và `develop`.
+
+## Tài liệu dự án
+
+- [`AGENTS.md`](./AGENTS.md): quy tắc kiến trúc, nghiệp vụ và code bắt buộc.
+- [`docs/01-PRD.md`](./docs/01-PRD.md): mục tiêu và phạm vi MVP/P2/P3.
+- [`docs/02-ARCHITECTURE.md`](./docs/02-ARCHITECTURE.md): kiến trúc hệ thống.
+- [`docs/03-DATA-MODEL.md`](./docs/03-DATA-MODEL.md), [`docs/04-SECURITY-RLS.md`](./docs/04-SECURITY-RLS.md), [`docs/05-BUSINESS-RULES.md`](./docs/05-BUSINESS-RULES.md): dữ liệu, bảo mật và nghiệp vụ.
+- [`docs/10-ROADMAP-TASKS.md`](./docs/10-ROADMAP-TASKS.md): task và tiêu chí nghiệm thu.
+- [`docs/decisions/ADR-002-supabase-ssr-client.md`](./docs/decisions/ADR-002-supabase-ssr-client.md): tích hợp Supabase SSR và xử lý khóa.
+
+Mọi giao diện người dùng phải dùng tiếng Việt; chuỗi giao diện được quản lý trong [`src/i18n/vi.ts`](./src/i18n/vi.ts).

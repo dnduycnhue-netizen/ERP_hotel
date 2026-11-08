@@ -6,6 +6,8 @@ Quy ước tiêu chí nghiệm thu (AC): mọi task phải thỏa Definition of 
 
 ## Giai đoạn 0 — Nền móng (tuần 1–2)
 
+> T-001 đang triển khai: scaffold Next.js, Supabase CLI và CI đã tạo; Supabase hosted đã được cấu hình với public key cho Vercel và có thể truy cập. Chưa xác nhận `supabase start` vì Docker daemon không chạy. Vercel project hiện đang liên kết với một GitHub repository khác; chờ xác nhận trước khi thay đổi liên kết hoặc deploy production.
+
 | # | Task | Agent | Phụ thuộc | AC chính |
 |---|---|---|---|---|
 | [ ] T-001 | Khởi tạo repo Next.js + TS strict + Tailwind + shadcn + ESLint/Prettier + pnpm; Supabase CLI `supabase init`; cấu trúc thư mục theo AGENTS.md | CC | — | `pnpm dev` chạy; `supabase start` chạy; CI GitHub Actions chạy lint + typecheck |

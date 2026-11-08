@@ -105,3 +105,13 @@ pnpm dev | pnpm lint | pnpm typecheck | pnpm test | pnpm e2e
 
 - Đặc tả thiếu → tìm trong `docs/05-BUSINESS-RULES.md`; vẫn thiếu → hỏi, ghi câu hỏi vào `docs/OPEN-QUESTIONS.md`.
 - Không tự "đơn giản hóa" quy tắc chống gian lận (nhận hàng mù, đếm mù, SoD, sổ cái bất biến) vì thấy phức tạp. Đó là lý do tồn tại của sản phẩm.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+## This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->
