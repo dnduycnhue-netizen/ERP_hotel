@@ -27,9 +27,14 @@ export async function proxy(request: NextRequest) {
     },
   });
 
-  const { error } = await supabase.auth.getClaims();
+  const { data, error } = await supabase.auth.getClaims();
   if (error) {
     throw error;
+  }
+
+  const pathname = request.nextUrl.pathname;
+  if (!data?.claims && pathname !== "/login" && !pathname.startsWith("/api/")) {
+    return NextResponse.redirect(new URL("/login", request.url));
   }
 
   return response;
