@@ -3,6 +3,7 @@
 Ghi theo task. Mỗi dòng: ngày — mã task — agent — tóm tắt.
 
 ## [Chưa phát hành]
+- 2026-11-08 — T-004 — Muse — Thành phần dùng chung: `errors.vi.ts` (dịch mã lỗi RPC), mở rộng `vi.ts` (chuỗi component + trang dev), `DocStatusBadge`, `MoneyText`, `DataTable` (4 trạng thái + phân trang server), `EmptyState`, `ErrorState`, `ConfirmPostDialog`, `PinDialog` (6 chữ số) và trang `/dev/components` hiển thị đủ trạng thái. `pnpm lint`, `pnpm typecheck`, `pnpm build` (env public giả) đạt; `pnpm format:check` còn báo file sinh sẵn `src/lib/database.types.ts` (có từ trước, không sửa tay).
 - 2026-11-08 — DOCS — Khởi tạo bộ tài liệu phát triển (AGENTS.md, docs/01–13, modules, ADR-001).
 - 2026-11-08 — DOCS — Chuyển sang phân quyền động: vai trò/quyền cấu hình trên giao diện (ma trận tích chọn, phạm vi KS/bộ phận/kho, thời hạn, quyền riêng cho/chặn), `has_perm`/`require_perm`/`my_permissions`, rào chắn tự cấp quyền, RPC `admin_*`, task T-005b.
 - 2026-11-08 — T-001 (đang triển khai) — Copilot SDK — Dựng Next.js 16 + TypeScript strict, Tailwind/shadcn, Supabase CLI và CI; lint, typecheck, format, build và dev smoke test đạt. Chưa xác nhận `supabase start` vì Docker daemon không chạy trong môi trường.
