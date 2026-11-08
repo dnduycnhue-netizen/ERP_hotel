@@ -213,10 +213,20 @@ Deno.serve(async (request) => {
 
     if (error || !data.user) {
       await removeCreatedUsers(supabase, createdUsers);
+      const errorMessage = error?.message ?? "No user returned.";
       console.error("Bootstrap invitation failed.", {
-        message: error?.message ?? "No user returned.",
+        code: error?.code,
+        status: error?.status,
+        message: errorMessage,
       });
-      return jsonResponse(502, { error: "invitation_failed" });
+      return jsonResponse(502, {
+        error: "invitation_failed",
+        detail: errorMessage
+          .replace(/[^\s@]+@[^\s@]+\.[^\s@]+/g, "[email]")
+          .slice(0, 240),
+        code: error?.code ?? null,
+        status: error?.status ?? null,
+      });
     }
   }
 
