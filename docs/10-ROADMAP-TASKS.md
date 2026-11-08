@@ -6,7 +6,7 @@ Quy ước tiêu chí nghiệm thu (AC): mọi task phải thỏa Definition of 
 
 ## Giai đoạn 0 — Nền móng (tuần 1–2)
 
-> T-001 đang triển khai: scaffold Next.js, Supabase CLI và CI đã tạo; Supabase hosted đã được cấu hình với public key cho Vercel và có thể truy cập. Chưa xác nhận `supabase start` vì Docker daemon không chạy. Vercel project hiện đang liên kết với một GitHub repository khác; chờ xác nhận trước khi thay đổi liên kết hoặc deploy production.
+> T-001 đang triển khai: scaffold Next.js, Supabase CLI và CI đã tạo; Supabase hosted đã được cấu hình với public key cho Vercel và có thể truy cập. Bản production đã deploy trực tiếp bằng Vercel CLI. Chưa xác nhận `supabase start` vì Docker daemon không chạy; chưa đổi được Git integration vì Vercel chưa có quyền truy cập repository tổ chức. Cần cấp quyền GitHub App để tự động deploy từ repo này.
 
 | # | Task | Agent | Phụ thuộc | AC chính |
 |---|---|---|---|---|

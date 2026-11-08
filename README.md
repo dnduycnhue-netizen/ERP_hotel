@@ -36,7 +36,7 @@ Các migration, seed và kiểm thử cơ sở dữ liệu sẽ được bổ su
 
 Đặt `NEXT_PUBLIC_SUPABASE_URL` và `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` trong `.env.local` khi phát triển, và trong Environment Variables của Vercel cho Production, Preview và Development. Client SSR dùng cookie qua `src/lib/supabase/`; không đưa secret/service-role key vào trình duyệt. Secret key đã lộ cần được thu hồi và thay mới trong Supabase.
 
-Project Vercel đích: [erp_hotel](https://vercel.com/dnduys-projects/erp_hotel). Chỉ triển khai sau khi xác nhận repository Git được kết nối là repository dự án này.
+Project Vercel đích: [erp_hotel](https://vercel.com/dnduys-projects/erp_hotel). Bản hiện tại được deploy trực tiếp bằng Vercel CLI; tự động deploy theo Git đang chờ cấp quyền Vercel GitHub App cho repository `dnduycnhue-netizen/ERP_hotel`. Deployment protection SSO hiện được giữ bật.
 
 ## Kiểm tra
 
