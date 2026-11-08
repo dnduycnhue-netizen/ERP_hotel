@@ -209,6 +209,8 @@ Deno.serve(async (request) => {
       },
     );
 
+    if (data.user) createdUsers.push({ id: data.user.id });
+
     if (error || !data.user) {
       await removeCreatedUsers(supabase, createdUsers);
       console.error("Bootstrap invitation failed.", {
@@ -216,8 +218,6 @@ Deno.serve(async (request) => {
       });
       return jsonResponse(502, { error: "invitation_failed" });
     }
-
-    createdUsers.push({ id: data.user.id });
   }
 
   const { data: bootstrapResult, error: bootstrapError } = await supabase.rpc(

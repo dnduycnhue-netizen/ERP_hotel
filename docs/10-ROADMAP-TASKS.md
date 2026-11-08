@@ -10,7 +10,7 @@ Quy ước tiêu chí nghiệm thu (AC): mọi task phải thỏa Definition of 
 >
 > T-002 hoàn tất trên Supabase hosted: hai migration đã áp dụng; sinh types từ remote; 30 assertion pgTAP chạy qua `supabase db query` trong transaction và toàn bộ đạt. `supabase test db --remote` vẫn đòi Docker nên không dùng. Fixture/test extension đã rollback, seed mẫu chỉ giữ cho local và không chạy trên production. Vercel production deploy Ready và HTTP smoke test trả 200.
 >
-> Bootstrap ban đầu đã có migration và Edge Function giới hạn `service_role`; migration bootstrap đã áp dụng lên production, 22 assertion pgTAP transactional đạt, và types đã sinh lại. Tổ chức, khách sạn và tài khoản chưa được tạo; còn chờ xác nhận cấu hình redirect Auth/SMTP trước khi gửi thư mời. T-005 vẫn chưa hoàn tất.
+> Bootstrap ban đầu: migration đã áp dụng lên production, 22 assertion pgTAP transactional đạt, types đã sinh lại; callback đã deploy. Lần gửi lời mời thất bại, function đã rollback các tài khoản được tạo một phần; xác minh production vẫn có 0 tổ chức và 0 Auth user. Secret tạm và Edge Function đã được xóa. Cần xem log/Auth email delivery để xử lý trước khi thử lại. T-005 vẫn chưa hoàn tất.
 
 | # | Task | Agent | Phụ thuộc | AC chính |
 |---|---|---|---|---|
