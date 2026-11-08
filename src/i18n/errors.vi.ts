@@ -24,6 +24,8 @@ export const rpcErrorMessages: Record<string, string> = {
     "Giá vượt giá trần. Hãy nhập lý do vượt trần rồi gửi lại.",
   ERR_PHOTO_REQUIRED: "Thiếu ảnh bắt buộc. Hãy chụp ảnh rồi gửi lại.",
   ERR_PIN_INVALID: "Mã PIN không đúng. Vui lòng thử lại.",
+  ERR_INVALID_PIN: "Mã PIN phải gồm 4–6 chữ số.",
+  ERR_REASON_REQUIRED: "Vui lòng nhập lý do cho thao tác này.",
   ERR_ADVANCE_OVERDUE_BLOCK:
     "Bạn đang có tạm ứng quá hạn chưa quyết toán nên chưa được ứng thêm.",
   ERR_TEMP_ITEM_EXPIRED:

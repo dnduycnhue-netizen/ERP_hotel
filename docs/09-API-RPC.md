@@ -124,6 +124,8 @@ Khởi tạo production trước khi có quản trị viên là ngoại lệ v�
 | `ERR_OVER_CEILING_NO_REASON` | Vượt giá trần chưa có lý do |
 | `ERR_PHOTO_REQUIRED` | Thiếu ảnh bắt buộc |
 | `ERR_PIN_INVALID` | Sai PIN |
+| `ERR_INVALID_PIN` | Mã PIN mới không đúng định dạng 4–6 chữ số |
+| `ERR_REASON_REQUIRED` | Thao tác quản trị thiếu lý do bắt buộc |
 | `ERR_ADVANCE_OVERDUE_BLOCK` | Có tạm ứng quá hạn, không được ứng mới |
 | `ERR_TEMP_ITEM_EXPIRED` | Mã tạm quá 72h |
 | `ERR_POS_IMPORT_REQUIRED` | Chưa tải file POS của ca |
