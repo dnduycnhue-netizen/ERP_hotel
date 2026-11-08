@@ -49,6 +49,7 @@ organizations (chuỗi)
 ## 4. Xác thực
 
 - Supabase Auth, email + mật khẩu, **không cho tự đăng ký**. `sys_admin` tạo tài khoản (qua Edge Function dùng service role).
+- Trước khi có `sys_admin` đầu tiên, chỉ Edge Function bootstrap dùng một lần được tạo chuỗi, pháp nhân, khách sạn, hai tài khoản quản trị và tài khoản kiểm thử. RPC bootstrap chỉ cho `service_role`; vai trò kiểm thử không có quyền quản trị hoặc quyền nghiệp vụ mức `critical`.
 - Nhân viên không có email: tạo email nội bộ dạng `<ma_nv>@<org>.local` (không gửi thư), đăng nhập bằng mã NV + mật khẩu.
 - Phiên làm việc trên điện thoại dùng chung (ví dụ máy nhận hàng ca sáng): bắt buộc **mã PIN 4–6 số theo người** khi ký chứng từ (`profiles.pin_hash`) — để biết ai nhận, ai đếm.
 

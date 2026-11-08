@@ -9,6 +9,8 @@ Quy ước tiêu chí nghiệm thu (AC): mọi task phải thỏa Definition of 
 > T-001 đang triển khai: scaffold Next.js, Supabase CLI và CI đã tạo; Supabase hosted đã được cấu hình với public key cho Vercel và có thể truy cập. Bản production đã deploy trực tiếp bằng Vercel CLI. Chưa xác nhận `supabase start` vì Docker daemon không chạy; chưa đổi được Git integration vì Vercel chưa có quyền truy cập repository tổ chức. Cần cấp quyền GitHub App để tự động deploy từ repo này.
 >
 > T-002 hoàn tất trên Supabase hosted: hai migration đã áp dụng; sinh types từ remote; 30 assertion pgTAP chạy qua `supabase db query` trong transaction và toàn bộ đạt. `supabase test db --remote` vẫn đòi Docker nên không dùng. Fixture/test extension đã rollback, seed mẫu chỉ giữ cho local và không chạy trên production. Vercel production deploy Ready và HTTP smoke test trả 200.
+>
+> Bootstrap ban đầu đã có migration và Edge Function giới hạn `service_role`; migration bootstrap đã áp dụng lên production, 22 assertion pgTAP transactional đạt, và types đã sinh lại. Tổ chức, khách sạn và tài khoản chưa được tạo; còn chờ xác nhận cấu hình redirect Auth/SMTP trước khi gửi thư mời. T-005 vẫn chưa hoàn tất.
 
 | # | Task | Agent | Phụ thuộc | AC chính |
 |---|---|---|---|---|

@@ -104,6 +104,8 @@ Mọi RPC dưới đây yêu cầu `admin.roles.manage` hoặc `admin.users.mana
 | `admin_sod_conflict_check(p_user_id \| p_role_id)` | `admin.users.manage` | Trả danh sách cặp quyền xung đột |
 | `my_permissions(p_property_id)` | đăng nhập | UI dùng cho `useCan` |
 
+Khởi tạo production trước khi có quản trị viên là ngoại lệ vận hành một lần: `bootstrap_initial_org(...)` chỉ được gọi từ Edge Function bằng `service_role`, chỉ chạy khi chưa có tổ chức, và tạo hai tài khoản `sys_admin` cùng một tài khoản kiểm thử bị giới hạn ở khách sạn đầu tiên. Tài khoản kiểm thử không nhận quyền quản trị hoặc quyền `critical`. Sau bootstrap, tạo và quản lý người dùng theo các RPC quản trị ở trên; không cấp `service_role` cho client.
+
 ## 10. Mã lỗi (UI dịch trong `errors.vi.ts`)
 
 | Mã | Nghĩa |

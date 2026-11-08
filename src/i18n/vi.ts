@@ -14,6 +14,21 @@ export const vi = {
     passwordLabel: "Mật khẩu",
     signIn: "Đăng nhập",
     signOut: "Đăng xuất",
+    callbackTitle: "Đang xác minh lời mời",
+    callbackErrorTitle: "Liên kết không còn hợp lệ",
+    callbackErrorDescription:
+      "Liên kết có thể đã hết hạn hoặc đã được sử dụng. Hãy nhờ quản trị viên gửi lời mời mới.",
+    setPasswordTitle: "Tạo mật khẩu",
+    setPasswordDescription:
+      "Tạo mật khẩu riêng có ít nhất 12 ký tự để hoàn tất kích hoạt tài khoản.",
+    confirmPasswordLabel: "Nhập lại mật khẩu",
+    setPasswordAction: "Lưu mật khẩu và tiếp tục",
+    passwordErrors: {
+      tooShort: "Mật khẩu phải có ít nhất 12 ký tự.",
+      mismatch: "Hai mật khẩu không khớp.",
+      updateFailed:
+        "Chưa thể lưu mật khẩu. Vui lòng thử lại hoặc liên hệ quản trị viên.",
+    },
     accountUnavailable: "Tài khoản chưa được kích hoạt",
     accountUnavailableDescription:
       "Tài khoản không còn quyền truy cập hệ thống. Hãy liên hệ quản trị viên.",

@@ -12,6 +12,31 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "14.18"
   }
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          extensions?: Json
+          operationName?: string
+          query?: string
+          variables?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
   public: {
     Tables: {
       audit_log: {
@@ -804,6 +829,19 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      bootstrap_initial_org: {
+        Args: {
+          p_admin_one: string
+          p_admin_two: string
+          p_legal_entity_code: string
+          p_legal_entity_name: string
+          p_org_name: string
+          p_property_code: string
+          p_property_name: string
+          p_test_user: string
+        }
+        Returns: Json
+      }
       has_perm: {
         Args: { p_perm: string; p_property: string; p_warehouse?: string }
         Returns: boolean
@@ -944,6 +982,9 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
   public: {
     Enums: {},
   },

@@ -33,7 +33,12 @@ export async function proxy(request: NextRequest) {
   }
 
   const pathname = request.nextUrl.pathname;
-  if (!data?.claims && pathname !== "/login" && !pathname.startsWith("/api/")) {
+  if (
+    !data?.claims &&
+    pathname !== "/login" &&
+    pathname !== "/auth/callback" &&
+    !pathname.startsWith("/api/")
+  ) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
