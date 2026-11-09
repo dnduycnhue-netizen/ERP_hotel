@@ -120,6 +120,7 @@ create table public.purchase_request_lines (
   created_by uuid references auth.users(id) default auth.uid(),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
+  unique (id, org_id),
   foreign key (pr_id, org_id) references public.purchase_requests(id, org_id) on delete cascade,
   foreign key (item_id, org_id) references public.items(id, org_id),
   check (item_id is not null or (description is not null and btrim(description) <> ''))
@@ -171,6 +172,7 @@ create table public.purchase_order_lines (
   created_by uuid references auth.users(id) default auth.uid(),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
+  unique (id, org_id),
   foreign key (po_id, org_id) references public.purchase_orders(id, org_id) on delete cascade,
   foreign key (pr_line_id, org_id) references public.purchase_request_lines(id, org_id),
   foreign key (item_id, org_id) references public.items(id, org_id),
@@ -197,6 +199,7 @@ create table public.approvals (
   updated_at timestamptz not null default now(),
   foreign key (approver_role_id, org_id) references public.roles(id, org_id),
   check ((approver_role_id is null) <> (approver_user_id is null)),
+  unique (id, org_id),
   unique (doc_type, doc_id, step)
 );
 
@@ -214,6 +217,7 @@ create table public.approval_delegations (
   created_by uuid references auth.users(id) default auth.uid(),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
+  unique (id, org_id),
   check (from_user <> to_user),
   check (valid_to >= valid_from)
 );
