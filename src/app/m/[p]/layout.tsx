@@ -2,6 +2,7 @@ import type { Viewport } from "next";
 import type { ReactNode } from "react";
 import { notFound, redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { OfflineBanner } from "@/components/common/offline-banner";
 import { vi } from "@/i18n/vi";
 import { PermissionsProvider } from "@/lib/permissions/permissions-provider";
 import { listAccessibleProperties } from "@/lib/supabase/access";
@@ -94,7 +95,12 @@ export default async function MobilePropertyLayout({
             </span>
           </div>
         </header>
-        <main className="mx-auto max-w-2xl px-4 py-6">{children}</main>
+        <main className="mx-auto max-w-2xl px-4 py-6">
+          <div className="mb-4">
+            <OfflineBanner />
+          </div>
+          {children}
+        </main>
       </div>
     </PermissionsProvider>
   );

@@ -2,19 +2,28 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ConfirmPostDialog } from "@/components/common/confirm-post-dialog";
 import { PinDialog } from "@/components/common/pin-dialog";
-import { postReceivingAction } from "@/features/receiving/actions";
+import {
+  getReceivingLineAction,
+  postReceivingAction,
+} from "@/features/receiving/actions";
 import type {
   ReceiptLineRow,
   ReceiptRow,
   ReceivingTaskDetail,
 } from "@/features/receiving/queries";
 import { vi } from "@/i18n/vi";
+import { enqueueOfflineJob } from "@/lib/offline/db";
+import { useOfflineSync } from "@/lib/offline/use-offline-sync";
 import { useCan } from "@/lib/permissions/permissions-provider";
-import { MobileLineForm, formatQty } from "./mobile-line-form";
+import {
+  MobileLineForm,
+  formatQty,
+  type QueuedRecordSummary,
+} from "./mobile-line-form";
 
 function interpolate(
   template: string,
@@ -67,10 +76,82 @@ export function MobileReceiveWorkspace({
   const canPerform = useCan("receiving.perform");
   const canPost = useCan("receiving.post");
   const [lines, setLines] = useState<ReceiptLineRow[]>(receipt.lines);
+  const linesRef = useRef(lines);
+  useEffect(() => {
+    linesRef.current = lines;
+  }, [lines]);
+  const [queuedRecords, setQueuedRecords] = useState<
+    Record<string, QueuedRecordSummary>
+  >({});
+  const [queuedPost, setQueuedPost] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [pinOpen, setPinOpen] = useState(false);
   const [pinError, setPinError] = useState<string | null>(null);
   const [posting, setPosting] = useState(false);
+
+  function handleRecorded(line: ReceiptLineRow) {
+    setLines((prev) => {
+      const next = prev.filter((item) => item.po_line_id !== line.po_line_id);
+      return [...next, line];
+    });
+    setQueuedRecords((prev) => {
+      if (!line.po_line_id) {
+        return prev;
+      }
+      const next = { ...prev };
+      delete next[line.po_line_id];
+      return next;
+    });
+  }
+
+  function handleQueued(summary: QueuedRecordSummary) {
+    setQueuedRecords((prev) => ({ ...prev, [summary.poLineId]: summary }));
+  }
+
+  // Dong bo offline (T-025): job ghi dong xong thi doc lai dong tren
+  // server de cap nhat UI; job ghi so xong thi ve danh sach.
+  useOfflineSync({
+    onRecordSynced: ({ grId, poLineId }) => {
+      if (grId !== receipt.id) {
+        return;
+      }
+      void (async () => {
+        const refreshed = await getReceivingLineAction(grId, poLineId);
+        if (refreshed.ok && refreshed.data) {
+          handleRecorded(refreshed.data);
+        }
+        setQueuedRecords((prev) => {
+          const next = { ...prev };
+          delete next[poLineId];
+          return next;
+        });
+      })();
+    },
+    onOverrideSynced: ({ grId, grLineId }) => {
+      if (grId !== receipt.id) {
+        return;
+      }
+      void (async () => {
+        const poLineId = linesRef.current.find(
+          (line) => line.id === grLineId,
+        )?.po_line_id;
+        if (!poLineId) {
+          return;
+        }
+        const refreshed = await getReceivingLineAction(grId, poLineId);
+        if (refreshed.ok && refreshed.data) {
+          handleRecorded(refreshed.data);
+        }
+      })();
+    },
+    onPostSynced: (grId) => {
+      if (grId !== receipt.id) {
+        return;
+      }
+      setQueuedPost(false);
+      router.push(`/m/${propertyId}/receive?posted=1`);
+    },
+  });
 
   const storedByPoLine = useMemo(() => {
     const map = new Map<string, ReceiptLineRow>();
@@ -88,16 +169,39 @@ export function MobileReceiveWorkspace({
   const needsReweighCount = task.lines.filter(
     (line) => storedByPoLine.get(line.po_line_id)?.needs_reweigh,
   ).length;
-  const canPostNow = recordedCount > 0 && needsReweighCount === 0;
-
-  function handleRecorded(line: ReceiptLineRow) {
-    setLines((prev) => {
-      const next = prev.filter((item) => item.po_line_id !== line.po_line_id);
-      return [...next, line];
-    });
-  }
+  const queuedCount = Object.keys(queuedRecords).length;
+  // Dong cho dong bo cung tinh la da ghi (server se kiem tra lai luc
+  // dong bo; neu can can lai thi job post se loi va banner bao loi).
+  const canPostNow = recordedCount + queuedCount > 0 && needsReweighCount === 0;
 
   async function handlePinSubmit(pin: string) {
+    // Offline (T-025): xep hang ghi so — PIN luu trong job tren may cho
+    // toi khi dong bo xong (xoa ngay sau khi gui); xem Q23.
+    if (!navigator.onLine) {
+      setPosting(true);
+      setPinError(null);
+      try {
+        await enqueueOfflineJob({
+          propertyId,
+          grId: receipt.id,
+          kind: "post",
+          clientUuid: null,
+          payload: {
+            kind: "post",
+            input: { grId: receipt.id, pin },
+          },
+          createdAt: Date.now(),
+        });
+      } catch {
+        setPosting(false);
+        setPinError("Không lưu được thao tác offline. Hãy thử lại.");
+        return;
+      }
+      setPosting(false);
+      setPinOpen(false);
+      setQueuedPost(true);
+      return;
+    }
     setPosting(true);
     setPinError(null);
     const res = await postReceivingAction({ grId: receipt.id, pin });
@@ -130,7 +234,17 @@ export function MobileReceiveWorkspace({
       <ul className="flex flex-col gap-4">
         {task.lines.map((line) => {
           const stored = storedByPoLine.get(line.po_line_id) ?? null;
-          const isRecorded = stored !== null && !stored.needs_reweigh;
+          const queued = queuedRecords[line.po_line_id] ?? null;
+          // Dong vuot PO chua duyet thi hien form duyet thay vi ban tom
+          // tat (T-025 — sua loi T-024: form duyet vuot trong
+          // MobileLineForm khong bao gio hien vi workspace chi hien
+          // tom tat khi dong da ghi).
+          const needsOverride =
+            stored !== null &&
+            !stored.needs_reweigh &&
+            stored.over_po_qty_stock > 0;
+          const isRecorded =
+            stored !== null && !stored.needs_reweigh && !needsOverride;
           return (
             <li
               key={line.po_line_id}
@@ -161,7 +275,22 @@ export function MobileReceiveWorkspace({
                 ) : null}
               </div>
 
-              {isRecorded && stored ? (
+              {queued ? (
+                <div className="mt-3 flex flex-col gap-1 border-t border-amber-200 bg-amber-50 p-3 text-sm">
+                  <p role="status" className="font-medium text-amber-800">
+                    {vi.offline.queuedRecord}
+                    {queued.weighCount > 1 ? ` — ${vi.receiving.reweigh}` : ""}
+                  </p>
+                  <p className="text-amber-700">
+                    {vi.receiving.netQty}: {formatQty(queued.netQty)}{" "}
+                    {queued.uom} · {vi.receiving.photoTaken}:{" "}
+                    {queued.photoCount}
+                  </p>
+                  <p className="text-amber-700">
+                    {vi.offline.queuedRecordHint}
+                  </p>
+                </div>
+              ) : isRecorded && stored ? (
                 <div className="mt-3 flex flex-col gap-1 border-t pt-3 text-sm">
                   <p>
                     {vi.receiving.netQty}: {formatQty(stored.net_qty)}{" "}
@@ -185,6 +314,7 @@ export function MobileReceiveWorkspace({
                     stored={stored}
                     canPerform={canPerform}
                     onRecorded={handleRecorded}
+                    onQueued={handleQueued}
                   />
                 </div>
               )}
@@ -212,10 +342,15 @@ export function MobileReceiveWorkspace({
             {vi.receiving.noPostPermission}
           </p>
         ) : null}
+        {queuedPost ? (
+          <p role="status" className="text-sm font-medium text-amber-700">
+            {vi.offline.queuedPost}
+          </p>
+        ) : null}
         <Button
           size="lg"
           className="h-14 text-base"
-          disabled={!canPost || !canPostNow || posting}
+          disabled={!canPost || !canPostNow || posting || queuedPost}
           onClick={() => {
             setConfirmOpen(true);
           }}

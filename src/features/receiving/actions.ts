@@ -216,6 +216,20 @@ export async function getReceivingLineAction(
   };
 }
 
+/** Trang thai 1 phieu nhan (T-025): dong bo offline dung de xac nhan job
+ * `post` — ghi so co the da chay xong nhung mat phan hoi do rot mang
+ * giua chung; neu phieu da `posted` thi coi nhu dong bo xong, khong gui
+ * lai. */
+export async function getReceivingReceiptStatusAction(
+  grId: string,
+): Promise<ReceivingActionResult<{ status: string }>> {
+  const res = await getReceipt(grId);
+  if (!res.ok) {
+    return { ok: false, error: res.error };
+  }
+  return { ok: true, data: { status: res.data.status } };
+}
+
 /** Danh sach phieu nhan co loc (RPC `receiving_list_receipts`, T-023). */
 export async function listReceiptsAction(
   input: ReceivingListReceiptsInput,
