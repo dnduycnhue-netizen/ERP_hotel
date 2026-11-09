@@ -48,6 +48,7 @@ export const rpcErrorMessages: Record<string, string> = {
     "Đơn hàng còn dòng chưa có đơn giá. Hãy nhập giá cho các dòng giá tay trước khi gửi duyệt.",
   ERR_CHANNEL_NOT_ALLOWED: "Mặt hàng này không được mua theo kênh đã chọn.",
   ERR_PHOTO_REQUIRED: "Thiếu ảnh bắt buộc. Hãy chụp ảnh rồi gửi lại.",
+  ERR_LOT_REQUIRED: "Mặt hàng theo lô bắt buộc phải có số lô và hạn sử dụng.",
   ERR_ATTACHMENT_IMMUTABLE:
     "Ảnh chứng từ không được sửa hoặc xóa. Hãy tải ảnh mới thay thế.",
   ERR_ATTACHMENT_INVALID_SHA: "Mã SHA-256 của ảnh không hợp lệ.",
