@@ -83,6 +83,8 @@ export const rpcErrorMessages: Record<string, string> = {
     "Đã có hợp đồng khung khác của cùng nhà cung cấp còn hiệu lực trong khoảng thời gian này cho cùng vật tư và đơn vị tính.",
   ERR_INVALID_VALUE:
     "Dữ liệu không hợp lệ. Hãy kiểm tra lại các trường đã nhập.",
+  ERR_INSUFFICIENT_STOCK:
+    "Tồn kho minibar tổng không đủ để bổ sung. Hãy kiểm tra tồn kho tổng trước.",
   ERR_SUPPLIER_HAS_BANK_ACCOUNTS:
     "Nhà cung cấp đã có tài khoản ngân hàng nên không thể xóa. Hãy tạm ngưng hoặc cấm nhà cung cấp thay vì xóa.",
 } as const;
