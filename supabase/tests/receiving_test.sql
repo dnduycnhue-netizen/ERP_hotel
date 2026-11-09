@@ -980,8 +980,8 @@ select ok(
 );
 select is(
   (select count(*) from public.stock_moves
-   where doc_type = 'goods_receipt'
-     and doc_id = (select id from t023_ctx where key = 'gr4')),
+   where source_doc_type = 'goods_receipt'
+     and source_doc_id = (select id from t023_ctx where key = 'gr4')),
   3::bigint, 'direct issue creates 3 moves'
 );
 select public._t023_as('d0230000-0000-4000-8000-000000000a07');
@@ -1043,7 +1043,7 @@ select is(
 );
 select is(
   (select count(*) from public.stock_moves
-   where doc_type = 'supplier_return' and qty = -2 and unit_cost = 5000),
+   where source_doc_type = 'supplier_return' and qty = -2 and unit_cost = 5000),
   1::bigint, 'return_out move at original cost 5000'
 );
 select throws_ok(
