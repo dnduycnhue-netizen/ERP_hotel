@@ -39,8 +39,8 @@ export type PoRow = {
   doc_no: string;
   kind: "stock" | "service";
   channel: "contract" | "quote" | "market";
-  supplier_id: string;
-  supplier_name: string;
+  supplier_id: string | null;
+  supplier_name: string | null;
   order_date: string;
   expected_date: string | null;
   total_amount: number;
@@ -92,6 +92,93 @@ export type ApprovalStepRow = {
 };
 
 type ListResult<T> = { total: number; rows: T[] };
+
+export type AdvanceRow = {
+  id: string;
+  doc_no: string;
+  employee_id: string;
+  employee_name: string | null;
+  amount: number;
+  purpose: string;
+  status: string;
+  requested_at: string;
+  decided_by: string | null;
+  decided_at: string | null;
+  decide_reason: string | null;
+  disbursed_at: string | null;
+  due_settle_at: string | null;
+  created_at: string;
+  po_id: string | null;
+  po_doc_no: string | null;
+  po_status: string | null;
+};
+
+export type AdvanceDetail = {
+  advance: AdvanceRow & {
+    legal_entity_id: string;
+    property_id: string;
+    disbursed_note: string | null;
+    settled_at: string | null;
+    created_by: string;
+    updated_at: string;
+  };
+  po: {
+    id: string;
+    doc_no: string;
+    status: string;
+    total_amount: number;
+    channel: string;
+  } | null;
+};
+
+/** Danh sách tạm ứng qua RPC `advance_list` (T-022). */
+export async function listAdvances(
+  propertyId: string,
+  opts: {
+    status?: string;
+    search?: string;
+    page?: number;
+    pageSize?: number;
+  } = {},
+): Promise<ProcurementActionResult<ListResult<AdvanceRow>>> {
+  const supabase = await createClient();
+  const page = Math.max(1, opts.page ?? 1);
+  const pageSize = Math.min(100, Math.max(1, opts.pageSize ?? 20));
+  const res = await callProcurementRpc<ListResult<AdvanceRow>>(
+    supabase,
+    "advance_list",
+    {
+      p_property_id: propertyId,
+      p_status: opts.status ?? null,
+      p_search: opts.search ?? null,
+      p_limit: pageSize,
+      p_offset: (page - 1) * pageSize,
+    },
+  );
+  if (!res.ok) {
+    return res;
+  }
+  return {
+    ok: true,
+    data: { total: res.data.total ?? 0, rows: res.data.rows ?? [] },
+  };
+}
+
+/** Chi tiết tạm ứng + PO liên kết qua RPC `advance_get` (T-022). */
+export async function getAdvance(
+  propertyId: string,
+  advanceId: string,
+): Promise<ProcurementActionResult<AdvanceDetail>> {
+  const supabase = await createClient();
+  const res = await callProcurementRpc<AdvanceDetail>(supabase, "advance_get", {
+    p_property_id: propertyId,
+    p_advance_id: advanceId,
+  });
+  if (!res.ok) {
+    return res;
+  }
+  return { ok: true, data: res.data };
+}
 
 /** Danh sách PR qua RPC `pr_list` (T-020). */
 export async function listPrs(

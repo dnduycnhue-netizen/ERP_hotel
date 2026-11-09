@@ -174,7 +174,7 @@ export function PoDetail({
             <DocStatusBadge status={po.status} />
           </div>
           <p className="mt-1 text-sm text-muted-foreground">
-            {po.supplier_name} ·{" "}
+            {po.supplier_name ?? vi.procurement.po.marketSupplier} ·{" "}
             {po.channel === "contract"
               ? vi.procurement.po.channelContract
               : po.channel === "quote"
@@ -217,7 +217,9 @@ export function PoDetail({
               </Button>
             </>
           ) : null}
-          {po.status === "approved" && canPoCreate ? (
+          {po.status === "approved" &&
+          po.channel !== "market" &&
+          canPoCreate ? (
             <Button size="sm" onClick={handleSend} disabled={busy}>
               {vi.procurement.po.send}
             </Button>

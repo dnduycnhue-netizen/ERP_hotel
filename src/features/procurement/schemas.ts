@@ -144,6 +144,76 @@ export const itemSearchSchema = z.object({
   search: z.string().trim().max(100, "Từ khóa tối đa 100 ký tự."),
 });
 
+/** Dong lenh mua cho (T-022): giong dong PO nhung khong co gia bat buoc. */
+const marketOrderLineSchema = z.object({
+  itemId: uuidSchema.optional().nullable(),
+  description: z
+    .string()
+    .trim()
+    .max(500, "Mô tả tối đa 500 ký tự.")
+    .optional()
+    .nullable(),
+  qty: z.number().positive("Số lượng phải lớn hơn 0."),
+  uom: z.string().trim().min(1, "Đơn vị tính không được để trống."),
+  unitPrice: z
+    .number()
+    .nonnegative("Đơn giá không được âm.")
+    .optional()
+    .nullable(),
+  expenseCategoryId: uuidSchema.optional().nullable(),
+  costCenterId: uuidSchema.optional().nullable(),
+});
+
+/** Tao lenh mua cho + tam ung trong 1 giao dich (RPC `market_order_create`, T-022). */
+export const marketOrderCreateSchema = z.object({
+  propertyId: uuidSchema,
+  lines: z.array(marketOrderLineSchema).min(1, "Cần ít nhất một dòng hàng."),
+  advanceAmount: z.number().positive("Số tiền tạm ứng phải lớn hơn 0."),
+  purpose: z
+    .string()
+    .trim()
+    .min(1, "Mục đích tạm ứng không được để trống.")
+    .max(500, "Mục đích tối đa 500 ký tự."),
+  expectedDate: dateSchema.optional().nullable(),
+});
+
+/** De nghi tam ung doc lap (RPC `advance_request`, T-022). */
+export const advanceRequestSchema = z.object({
+  propertyId: uuidSchema,
+  amount: z.number().positive("Số tiền tạm ứng phải lớn hơn 0."),
+  purpose: z
+    .string()
+    .trim()
+    .min(1, "Mục đích tạm ứng không được để trống.")
+    .max(500, "Mục đích tối đa 500 ký tự."),
+});
+
+/** Duyet/tu choi tam ung (RPC `advance_decide`, T-022). Tu choi can ly do
+ * (server chan bang `ERR_REASON_REQUIRED` neu thieu). */
+export const advanceDecideSchema = z.object({
+  propertyId: uuidSchema,
+  advanceId: uuidSchema,
+  approved: z.boolean(),
+  reason: z
+    .string()
+    .trim()
+    .max(1000, "Lý do tối đa 1000 ký tự.")
+    .optional()
+    .nullable(),
+});
+
+/** Chi tien tam ung (RPC `advance_disburse`, T-022). */
+export const advanceDisburseSchema = z.object({
+  propertyId: uuidSchema,
+  advanceId: uuidSchema,
+  note: z
+    .string()
+    .trim()
+    .max(1000, "Ghi chú tối đa 1000 ký tự.")
+    .optional()
+    .nullable(),
+});
+
 export const approvalDelegationSaveSchema = z.object({
   orgId: uuidSchema,
   id: uuidSchema.optional(),
@@ -175,3 +245,7 @@ export type ApprovalDelegationSaveInput = z.infer<
   typeof approvalDelegationSaveSchema
 >;
 export type ItemSearchInput = z.infer<typeof itemSearchSchema>;
+export type MarketOrderCreateInput = z.infer<typeof marketOrderCreateSchema>;
+export type AdvanceRequestInput = z.infer<typeof advanceRequestSchema>;
+export type AdvanceDecideInput = z.infer<typeof advanceDecideSchema>;
+export type AdvanceDisburseInput = z.infer<typeof advanceDisburseSchema>;

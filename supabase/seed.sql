@@ -350,4 +350,20 @@ values
    '00000000-0000-4000-8000-000000000501', 'po.approve')
 on conflict do nothing;
 
+-- T-022: gan quyen nhan alert ADVANCE_OVERDUE cho vai tro mau (ma quyen da
+-- co san trong catalog, chua gan vai tro nao). Join theo ma vai tro.
+insert into public.role_permissions (role_id, permission_code)
+select r.id, rp.permission_code
+from (
+  values
+    ('gm', 'alert.receive.advance_overdue'),
+    ('chief_accountant', 'alert.receive.advance_overdue'),
+    ('cost_controller', 'alert.receive.advance_overdue')
+) as rp(role_code, permission_code)
+join public.roles r
+  on r.org_id = '00000000-0000-4000-8000-000000000001'
+ and r.code = rp.role_code
+join public.permissions p on p.code = rp.permission_code
+on conflict do nothing;
+
 commit;

@@ -23,7 +23,12 @@ export default async function ProcurementLayout({
     perms.has("pr.create") ||
     perms.has("pr.approve") ||
     perms.has("po.create") ||
-    perms.has("po.view");
+    perms.has("po.view") ||
+    perms.has("market.order.create") ||
+    perms.has("advance.request") ||
+    perms.has("advance.approve") ||
+    perms.has("advance.disburse") ||
+    perms.has("advance.settle");
 
   if (!canAccess) {
     notFound();

@@ -45,7 +45,7 @@ Quy ước tiêu chí nghiệm thu (AC): mọi task phải thỏa Definition of 
 |---|---|---|---|---|
 | [x] T-020 | Migration 06 thu mua + RPC PR/PO/duyệt (`approval_rules` sinh bước) | CC | T-013 | pgTAP: PO 30 triệu có đủ 3 bước; người tạo không duyệt được — **xong 09/11/2026, chưa chạy pgTAP trên DB thật (VM không Docker); chờ verify sau khi merge + db push** |
 | [x] T-021 | Màn hình PR, PO, timeline duyệt, duyệt nhanh trên mobile | AG | T-020 | Vượt giá trần không submit được khi thiếu lý do — **xong 09/11/2026, chưa chạy end-to-end trên DB thật (VM không Docker); chờ verify sau khi merge + db push + deploy. Không có migration mới; UI dùng RPC T-020. Q18 (tên người tạo) còn mở.** |
-| [ ] T-022 | Lệnh mua chợ + tạm ứng (đề nghị, duyệt, chi) | CC + AG | T-020 | Có tạm ứng quá hạn → `ERR_ADVANCE_OVERDUE_BLOCK` |
+| [x] T-022 | Lệnh mua chợ + tạm ứng (đề nghị, duyệt, chi) | CC + AG | T-020 | Có tạm ứng quá hạn → `ERR_ADVANCE_OVERDUE_BLOCK` (đã code 09/11/2026, pgTAP 56 assertion chưa chạy — VM không có Docker) |
 | [ ] T-023 | Migration 07 nhận hàng + RPC mù (`receiving_list_tasks`, `get_task`, `record_line`, `post`) | CC | T-020, T-016 | pgTAP: role receiver SELECT `purchase_order_lines` = 0 dòng; lệch 6% → `needs_reweigh`; vượt PO bị chặn trần |
 | [ ] T-024 | Màn hình nhận hàng mobile (`/m/[p]/receive`) + NumPad + QC + PIN | AG | T-023 | Thao tác 1 tay; không hiện số PO/giá ở bất kỳ request nào (kiểm tra tab Network) |
 | [ ] T-025 | Offline cho nhận hàng: Dexie queue, `client_uuid`, đồng bộ lại, ảnh chờ tải | CC | T-024 | Tắt mạng nhận 3 dòng → bật mạng tự gửi, không trùng |
