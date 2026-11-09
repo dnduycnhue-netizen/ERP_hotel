@@ -17,13 +17,18 @@ type RpcClient = SupabaseClient<Database>;
  * Gọi RPC quản trị mới (T-005). `database.types.ts` chỉ sinh lại được khi
  * có DB local (Docker) nên các hàm `admin_*` chưa có trong type sinh sẵn;
  * ép kiểu có chủ đích tại đúng một chỗ này thay vì rải khắp nơi.
+ *
+ * LƯU Ý: `supabase.rpc` đọc `this.rest` nên KHÔNG được tách method ra
+ * khỏi client (`const caller = supabase.rpc` làm mất `this` và nổ
+ * `TypeError: Cannot read properties of undefined (reading 'rest')`
+ * ở production — lỗi ERROR755103700 ngày 09/11/2026). Phải `.bind`.
  */
 export async function callAdminRpc<T>(
   supabase: RpcClient,
   fn: string,
   args: Record<string, unknown>,
 ): Promise<AdminActionResult<T>> {
-  const caller = supabase.rpc as unknown as (
+  const caller = supabase.rpc.bind(supabase) as unknown as (
     fn: string,
     args: Record<string, unknown>,
   ) => Promise<{

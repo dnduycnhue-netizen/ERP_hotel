@@ -101,12 +101,17 @@ function todayVn(): string {
  * Người dùng có quyền quản trị toàn chuỗi không (`p_property = null`)?
  * Type sinh sẵn khai `p_property: string` nên truyền `null` cần ép kiểu
  * tại đúng một chỗ này.
+ *
+ * LƯU Ý: `supabase.rpc` đọc `this.rest` nên KHÔNG được tách method ra
+ * khỏi client (`const caller = supabase.rpc` làm mất `this` và nổ
+ * `TypeError: Cannot read properties of undefined (reading 'rest')`
+ * ở production — lỗi ERROR755103700 ngày 09/11/2026). Phải `.bind`.
  */
 export async function hasChainPerm(
   supabase: Client,
   perm: string,
 ): Promise<boolean> {
-  const caller = supabase.rpc as unknown as (
+  const caller = supabase.rpc.bind(supabase) as unknown as (
     fn: string,
     args: { p_property: string | null; p_perm: string },
   ) => Promise<{ data: boolean | null; error: unknown }>;
