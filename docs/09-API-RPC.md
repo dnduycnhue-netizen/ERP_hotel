@@ -77,13 +77,15 @@ Các RPC danh mục dưới đây thuộc các task sau, chưa được triển 
 
 | RPC | Ghi chú |
 |---|---|
-| `count_open(p_warehouse_id, p_kind, p_business_date, p_shift)` | `shift_key` yêu cầu có `pos_imports`; `monthly_full` đặt cờ đóng băng kho |
-| `count_record_line(p_count_id, p_item_id, p_detail jsonb, p_bottle_weight_g, p_client_uuid)` | Ghi `counted_qty_1` hoặc `_2` |
-| `count_submit(p_count_id, p_pins text[])` | Tính `book/theoretical/variance`; trả `{recount_line_ids: [...]}` — **không trả số** |
-| `count_lock(p_count_id)` | Sau lần 2; lý do bắt buộc cho dòng đỏ |
-| `count_adjust_post(p_count_id)` | gm duyệt → `adjust_count` |
-| `day_lock(p_warehouse_id, p_date)` / `day_unlock(...)` | Unlock → alert `UNLOCK` |
-| `period_close(p_entity_id, p_year, p_month)` / `period_reopen` | Kiểm điều kiện mục 10 của `05-BUSINESS-RULES.md` |
+| `count_open(p_warehouse_id, p_kind, p_business_date, p_shift, p_counter_ids, p_client_uuid)` | `shift_key` yêu cầu có `pos_imports` (`ERR_POS_IMPORT_REQUIRED`); `monthly_full` cần ≥2 người đếm, 1 người độc lập (`ERR_SOD_COUNT_INDEPENDENT`), 1 đợt mở/kho; mở đợt = đóng băng kho (`ERR_COUNT_FREEZE`); không mở vào ngày đã khóa (`ERR_DAY_LOCKED`) hay kỳ đã đóng (`ERR_PERIOD_CLOSED`); trả `{ok, id, doc_no, lines_created}` |
+| `count_record_line(p_count_id, p_item_id, p_detail jsonb, p_bottle_weight_g, p_client_uuid)` | Ghi `counted_qty_1` hoặc `_2` (2 người đếm khác nhau); `p_detail` là 1 object hoặc mảng nhiều UOM, quy đổi qua `item_purchase_units` (`ERR_UOM_UNKNOWN`); cân chai `(cân − tare_g)/density_g_ml`; trả `{ok, counted_qty}` |
+| `count_submit(p_count_id, p_pins text[])` | Tính `book/theoretical/variance`; 1 PIN/người đếm (thứ tự tùy ý); trả `{ok, round, recount_line_ids, red_line_ids}` — **không trả số**; dòng lệch ≤5% → `recount`, >5% → `red` |
+| `count_lock(p_count_id, p_reasons jsonb)` | Sau lần 2; lý do bắt buộc cho mọi dòng đỏ (`ERR_REASON_REQUIRED`, `ERR_REASON_CODE_INVALID`); quyền `count.lock` |
+| `count_adjust_post(p_count_id)` | gm duyệt (`count.adjust.approve`) → `adjust_count` theo giá bình quân (FIFO dùng giá lớp); dòng chênh 0 không ghi move nhưng vẫn mở đóng băng |
+| `count_add_counter(p_count_id, p_user_id)` | Thêm người đếm vào đợt đang mở; quyền `count.open` |
+| `count_cancel(p_count_id, p_reason)` | Hủy đợt trước khi khóa; lý do bắt buộc; quyền `count.open` |
+| `day_lock(p_warehouse_id, p_date, p_shift)` / `day_unlock(p_lock_id, p_reason)` | Khóa theo kho + ngày (+ ca); khóa trùng là upsert lũy đẳng; mở khóa cần lý do (`ERR_REASON_REQUIRED`, `ERR_LOCK_NOT_FOUND`); Unlock → alert `UNLOCK` |
+| `period_close(p_entity_id, p_year, p_month)` / `period_reopen(p_period_id, p_reason)` | Kiểm điều kiện mục 10 của `05-BUSINESS-RULES.md`: mọi kho của pháp nhân có đợt `monthly_full` tháng đó ở `locked`/`adjusted` (`ERR_COUNT_NOT_LOCKED`), không PO `partially_received` quá hạn >30 ngày (`ERR_PO_UNRESOLVED`), không tạm ứng `overdue` (`ERR_ADVANCE_OVERDUE`); đóng trùng → `ERR_PERIOD_ALREADY_CLOSED` |
 
 ## 6. Buồng phòng & minibar
 
@@ -162,6 +164,16 @@ Khởi tạo production trước khi có quản trị viên là ngoại lệ v�
 | `ERR_NEGATIVE_STOCK` | Không đủ tồn |
 | `ERR_PERIOD_CLOSED` / `ERR_DAY_LOCKED` | Kỳ/ngày đã khóa |
 | `ERR_COUNT_FREEZE` | Kho đang kiểm kê |
+| `ERR_COUNT_NOT_LOCKED` | Kỳ chưa đóng được vì có kho chưa có đợt kiểm kê tháng ở trạng thái `locked`/`adjusted` |
+| `ERR_COUNT_ALREADY_OPEN` | Đã có đợt kiểm kê tháng đang mở cho kho này |
+| `ERR_COUNT_INCOMPLETE` | Có dòng chưa đủ 2 lượt đếm khi nộp đợt |
+| `ERR_PO_UNRESOLVED` | Còn PO `partially_received` quá hạn >30 ngày, kỳ chưa đóng được |
+| `ERR_ADVANCE_OVERDUE` | Còn tạm ứng `overdue`, kỳ chưa đóng được |
+| `ERR_SOD_COUNT_INDEPENDENT` | Đội đếm kiểm kê tháng không có người độc lập (không đếm ở ca) |
+| `ERR_REASON_CODE_INVALID` | Mã lý do chênh lệch không nằm trong danh sách chuẩn |
+| `ERR_PERIOD_ALREADY_CLOSED` | Kỳ đã đóng rồi |
+| `ERR_DAY_LOCKED` | Ngày đã khóa (theo kho) |
+| `ERR_LOCK_NOT_FOUND` | Không tìm thấy bản ghi khóa ngày |
 | `ERR_OVER_CEILING_NO_REASON` | Vượt giá trần chưa có lý do |
 | `ERR_PHOTO_REQUIRED` | Thiếu ảnh bắt buộc |
 | `ERR_PIN_INVALID` | Sai PIN |
