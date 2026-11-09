@@ -26,8 +26,8 @@ insert into public.uoms (code, name_vi) values ('kg', 'Ký'), ('cai', 'Cái')
 on conflict do nothing;
 
 insert into public.item_groups (id, org_id, code_prefix, name, kind) values
-  ('d0220000-0200-4000-8000-000000000301', 'd0220000-0200-4000-8000-000000000001', 'GAO', 'Gạo', 'key'),
-  ('d0220000-0200-4000-8000-000000000302', 'd0220000-0200-4000-8000-000000000001', 'THIT', 'Thịt', 'key')
+  ('d0220000-0200-4000-8000-000000000301', 'd0220000-0200-4000-8000-000000000001', 'GAO', 'Gạo', 'food'),
+  ('d0220000-0200-4000-8000-000000000302', 'd0220000-0200-4000-8000-000000000001', 'THIT', 'Thịt', 'food')
 on conflict do nothing;
 
 insert into public.items (id, org_id, code, name, group_id, stock_uom, is_key_item, allowed_channels) values
