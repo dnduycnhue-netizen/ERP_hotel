@@ -1109,6 +1109,25 @@ export const vi = {
     receiptTitle: "Phiếu nhận hàng",
     temperatureHint: "Nhiệt độ đo được lúc nhận (°C).",
   },
+  offline: {
+    bannerOfflineTitle: "Bạn đang ngoại tuyến",
+    bannerOfflineHint:
+      "Các thao tác ghi nhận sẽ được lưu trên máy và tự đồng bộ khi có mạng trở lại.",
+    pendingCount: "{count} thao tác chờ đồng bộ",
+    syncing: "Đang đồng bộ {count} thao tác…",
+    failedCount: "{count} thao tác đồng bộ lỗi: {error}",
+    retry: "Thử đồng bộ lại",
+    discardFailed: "Hủy thao tác lỗi",
+    syncNow: "Đồng bộ ngay",
+    queuedRecord: "Đã xếp hàng chờ đồng bộ",
+    queuedRecordHint:
+      "Dòng này sẽ tự gửi lên máy chủ khi có mạng. Không cần ghi lại.",
+    queuedPost: "Đã xếp hàng ghi sổ — sẽ tự gửi khi có mạng.",
+    queuedOverride: "Đã xếp hàng duyệt vượt — sẽ tự gửi khi có mạng.",
+    photoPending: "Ảnh chờ tải lên",
+    startNeedsOnline:
+      "Cần có mạng để mở phiếu nhận mới. Phiếu đã mở vẫn ghi dòng offline được.",
+  },
   errors: {
     pageTitle: "Không thể tải trang",
     pageDescription:

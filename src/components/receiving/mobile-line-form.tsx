@@ -19,6 +19,7 @@ import type {
   ReceivingTaskLineRow,
 } from "@/features/receiving/queries";
 import { vi } from "@/i18n/vi";
+import { enqueueOfflineJob, type QueuedPhoto } from "@/lib/offline/db";
 import { useCan } from "@/lib/permissions/permissions-provider";
 import { cn } from "@/lib/utils";
 
@@ -28,12 +29,24 @@ export function formatQty(value: number): string {
   }).format(value);
 }
 
+/** Tóm tắt dòng đã xếp hàng chờ đồng bộ (T-025) — workspace hiện thẻ chờ. */
+export type QueuedRecordSummary = {
+  poLineId: string;
+  netQty: number;
+  uom: string;
+  weighCount: number;
+  photoCount: number;
+};
+
 type QcStatus = "pass" | "fail" | "conditional";
 type ActiveField = "gross" | "tare" | "temp";
 
-type UploadedPhoto = {
-  attachmentId: string;
+type FormPhoto = {
+  localId: string;
+  attachmentId: string | null;
   url: string;
+  /** Anh chup luc offline — chua tai len, nam trong job dong bo (T-025). */
+  pending: CapturedPhoto | null;
 };
 
 /** Checklist QC trong `qc_templates` là mảng tự do: chuỗi, hoặc object có label/text/title/name. */
@@ -84,6 +97,7 @@ export function MobileLineForm({
   stored,
   canPerform,
   onRecorded,
+  onQueued,
 }: {
   line: ReceivingTaskLineRow;
   grId: string;
@@ -92,6 +106,8 @@ export function MobileLineForm({
   stored: ReceiptLineRow | null;
   canPerform: boolean;
   onRecorded: (line: ReceiptLineRow) => void;
+  /** Ghi dòng lúc offline: xếp hàng chờ đồng bộ thay vì gọi server. */
+  onQueued: (summary: QueuedRecordSummary) => void;
 }) {
   const canOverride = useCan("receiving.override_over_po");
   const checklistItems = useMemo(
@@ -108,13 +124,14 @@ export function MobileLineForm({
   const [lot, setLot] = useState("");
   const [expiry, setExpiry] = useState("");
   const [failReason, setFailReason] = useState("");
-  const [photos, setPhotos] = useState<UploadedPhoto[]>([]);
+  const [photos, setPhotos] = useState<FormPhoto[]>([]);
   const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [overrideReason, setOverrideReason] = useState("");
   const [overriding, setOverriding] = useState(false);
   const [overrideError, setOverrideError] = useState<string | null>(null);
+  const [overrideQueued, setOverrideQueued] = useState(false);
   const [shortWarning, setShortWarning] = useState(false);
 
   const isReweigh = stored?.needs_reweigh === true;
@@ -137,6 +154,21 @@ export function MobileLineForm({
     (qcStatus !== "fail" || failReason.trim() !== "");
 
   async function handleCaptured(photo: CapturedPhoto) {
+    // Offline (T-025): giữ blob trên máy, tải lên lúc đồng bộ cùng job ghi
+    // dòng — không chặn người dùng chụp tiếp khi mất mạng.
+    if (!navigator.onLine) {
+      const url = URL.createObjectURL(photo.blob);
+      setPhotos((prev) => [
+        ...prev,
+        {
+          localId: crypto.randomUUID(),
+          attachmentId: null,
+          url,
+          pending: photo,
+        },
+      ]);
+      return;
+    }
     setUploading(true);
     setError(null);
     const res = await uploadCapturedPhoto({
@@ -151,7 +183,50 @@ export function MobileLineForm({
       return;
     }
     const url = URL.createObjectURL(photo.blob);
-    setPhotos((prev) => [...prev, { attachmentId: res.data.id, url }]);
+    setPhotos((prev) => [
+      ...prev,
+      {
+        localId: crypto.randomUUID(),
+        attachmentId: res.data.id,
+        url,
+        pending: null,
+      },
+    ]);
+  }
+
+  /** Tải các ảnh còn chờ (chụp lúc offline) trước khi ghi dòng online. */
+  async function uploadPendingPhotos(): Promise<string[] | null> {
+    const uploadedIds: string[] = [];
+    for (const photo of photos) {
+      if (photo.attachmentId) {
+        uploadedIds.push(photo.attachmentId);
+        continue;
+      }
+      if (!photo.pending) {
+        continue;
+      }
+      const res = await uploadCapturedPhoto({
+        propertyId,
+        docType: "receiving",
+        docId: grId,
+        photo: photo.pending,
+      });
+      if (!res.ok) {
+        setError(res.error);
+        return null;
+      }
+      uploadedIds.push(res.data.id);
+      const attachmentId = res.data.id;
+      const localId = photo.localId;
+      setPhotos((prev) =>
+        prev.map((item) =>
+          item.localId === localId
+            ? { ...item, attachmentId, pending: null }
+            : item,
+        ),
+      );
+    }
+    return uploadedIds;
   }
 
   async function handleSubmit() {
@@ -160,6 +235,70 @@ export function MobileLineForm({
     }
     setSubmitting(true);
     setError(null);
+    const qcPayload = {
+      status: qcStatus,
+      checklist: checked,
+      temperature_c: tempNum,
+      reason: failReason.trim() || null,
+    };
+    // Offline (T-025): xếp hàng chờ đồng bộ với clientUuid cố định —
+    // gửi lại cùng key, server (T-023) trả về dòng đã ghi thay vì tạo
+    // trùng. Cân lại lần 2 cũng dùng key mới, giống gọi online.
+    if (!navigator.onLine) {
+      const clientUuid = crypto.randomUUID();
+      const queuedPhotos: QueuedPhoto[] = photos.map((photo) => ({
+        blob: photo.pending ? photo.pending.blob : null,
+        sha256: photo.pending ? photo.pending.sha256 : "",
+        width: photo.pending ? photo.pending.width : 0,
+        height: photo.pending ? photo.pending.height : 0,
+        deviceTime: photo.pending ? photo.pending.deviceTime : "",
+        attachmentId: photo.attachmentId,
+      }));
+      try {
+        await enqueueOfflineJob({
+          propertyId,
+          grId,
+          kind: "record",
+          clientUuid,
+          payload: {
+            kind: "record",
+            input: {
+              grId,
+              poLineId: line.po_line_id,
+              itemId: line.item_id,
+              gross: grossNum,
+              tare: tareNum,
+              uom: line.uom,
+              qc: qcPayload,
+              lot: lot.trim() || null,
+              expiry: expiry || null,
+              photoIds: [],
+              clientUuid,
+            },
+            photos: queuedPhotos,
+          },
+          createdAt: Date.now(),
+        });
+      } catch {
+        setSubmitting(false);
+        setError("Không lưu được thao tác offline. Hãy thử lại.");
+        return;
+      }
+      setSubmitting(false);
+      onQueued({
+        poLineId: line.po_line_id,
+        netQty: grossNum - tareNum,
+        uom: line.uom,
+        weighCount: isReweigh ? 2 : 1,
+        photoCount: photos.length,
+      });
+      return;
+    }
+    const photoIds = await uploadPendingPhotos();
+    if (photoIds === null) {
+      setSubmitting(false);
+      return;
+    }
     const res = await recordReceivingLineAction({
       grId,
       poLineId: line.po_line_id,
@@ -167,15 +306,10 @@ export function MobileLineForm({
       gross: grossNum,
       tare: tareNum,
       uom: line.uom,
-      qc: {
-        status: qcStatus,
-        checklist: checked,
-        temperature_c: tempNum,
-        reason: failReason.trim() || null,
-      },
+      qc: qcPayload,
       lot: lot.trim() || null,
       expiry: expiry || null,
-      photoIds: photos.map((photo) => photo.attachmentId),
+      photoIds,
       clientUuid: crypto.randomUUID(),
     });
     if (!res.ok) {
@@ -205,6 +339,33 @@ export function MobileLineForm({
 
   async function handleOverride() {
     if (!stored || overriding || overrideReason.trim() === "") {
+      return;
+    }
+    // Offline (T-025): xếp hàng duyệt vượt — gr_line_id đã có trên server
+    // vì dòng này ghi online trước đó; gửi lại không tạo trùng (RPC chỉ
+    // cập nhật dòng, over_po về 0).
+    if (!navigator.onLine) {
+      setOverriding(true);
+      setOverrideError(null);
+      try {
+        await enqueueOfflineJob({
+          propertyId,
+          grId,
+          kind: "override",
+          clientUuid: null,
+          payload: {
+            kind: "override",
+            input: { grLineId: stored.id, reason: overrideReason.trim() },
+          },
+          createdAt: Date.now(),
+        });
+      } catch {
+        setOverriding(false);
+        setOverrideError("Không lưu được thao tác offline. Hãy thử lại.");
+        return;
+      }
+      setOverriding(false);
+      setOverrideQueued(true);
       return;
     }
     setOverriding(true);
@@ -260,6 +421,18 @@ export function MobileLineForm({
 
   // --- Che do duyet vuot PO: dong da ghi, bi chan tran, cho duyet. ---
   if (isOverPo && stored) {
+    if (overrideQueued) {
+      return (
+        <div className="flex flex-col gap-3">
+          <p role="status" className="text-sm font-medium text-amber-700">
+            {vi.offline.queuedOverride}
+          </p>
+          <p className="text-sm text-muted-foreground">
+            {vi.offline.queuedRecordHint}
+          </p>
+        </div>
+      );
+    }
     return (
       <div className="flex flex-col gap-3">
         <p role="alert" className="text-sm font-medium text-amber-700">
@@ -391,22 +564,26 @@ export function MobileLineForm({
         {photos.length > 0 ? (
           <div className="flex flex-wrap gap-2">
             {photos.map((photo) => (
-              <span key={photo.attachmentId} className="relative">
+              <span key={photo.localId} className="relative">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={photo.url}
                   alt={vi.receiving.photoTaken}
                   className="h-20 w-20 rounded-md border object-cover"
                 />
+                {photo.pending ? (
+                  <span className="absolute inset-x-0 bottom-0 rounded-b-md bg-amber-600/90 px-1 py-0.5 text-center text-[10px] font-medium text-white">
+                    {vi.offline.photoPending}
+                  </span>
+                ) : null}
                 <button
                   type="button"
-                  onClick={() =>
+                  onClick={() => {
+                    URL.revokeObjectURL(photo.url);
                     setPhotos((prev) =>
-                      prev.filter(
-                        (item) => item.attachmentId !== photo.attachmentId,
-                      ),
-                    )
-                  }
+                      prev.filter((item) => item.localId !== photo.localId),
+                    );
+                  }}
                   disabled={submitting}
                   className="absolute -top-1.5 -right-1.5 rounded-full border bg-background p-0.5"
                   aria-label={vi.common.close}

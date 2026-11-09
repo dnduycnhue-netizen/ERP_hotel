@@ -10,6 +10,7 @@ import { startReceivingAction } from "@/features/receiving/actions";
 import type { ReceivingTaskRow } from "@/features/receiving/queries";
 import type { WarehouseRow } from "@/features/master/queries";
 import { vi } from "@/i18n/vi";
+import { useOfflineSync } from "@/lib/offline/use-offline-sync";
 import { useCan } from "@/lib/permissions/permissions-provider";
 
 /** "2026-11-09" → "09/11/2026" (tách chuỗi, không qua Date để tránh lệch múi giờ). */
@@ -54,6 +55,10 @@ export function MobileTaskList({
 }) {
   const router = useRouter();
   const canPerform = useCan("receiving.perform");
+  // Mo phieu moi can server (workspace can du lieu server) nen khong
+  // xep hang offline duoc — chi ghi dong / duyet vuot / ghi so tren
+  // phieu da mo moi offline (T-025).
+  const { online } = useOfflineSync();
   const [selected, setSelected] = useState<ReceivingTaskRow | null>(null);
   const [warehouseId, setWarehouseId] = useState("");
   const [directIssueWarehouseId, setDirectIssueWarehouseId] = useState("");
@@ -88,6 +93,10 @@ export function MobileTaskList({
 
   async function handleStart() {
     if (!selected || !warehouseId || starting) {
+      return;
+    }
+    if (!online) {
+      setStartError(vi.offline.startNeedsOnline);
       return;
     }
     setStarting(true);
@@ -241,6 +250,11 @@ export function MobileTaskList({
                       {startError}
                     </p>
                   ) : null}
+                  {!online ? (
+                    <p className="text-sm text-amber-700">
+                      {vi.offline.startNeedsOnline}
+                    </p>
+                  ) : null}
                 </div>
                 <div className="mt-6 flex justify-end gap-2">
                   <Button
@@ -251,7 +265,7 @@ export function MobileTaskList({
                     {vi.common.cancel}
                   </Button>
                   <Button
-                    disabled={starting || !warehouseId}
+                    disabled={starting || !warehouseId || !online}
                     onClick={() => void handleStart()}
                   >
                     {starting ? vi.common.loading : vi.receiving.startReceipt}
