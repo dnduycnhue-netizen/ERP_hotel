@@ -202,6 +202,11 @@ create temp table t023_ctx (key text primary key, id uuid);
 -- Bang tam giu response JSON cua cac lan goi RPC (goi 1 lan, assert nhieu truong).
 create temp table t023_resp (key text primary key, resp jsonb);
 
+-- Hai bang tam tao duoi role postgres, nhung tu lenh 'set local role
+-- authenticated' tro di moi lenh INSERT/SELECT deu chay duoi authenticated
+-- (khong co quyen ghi bang cua role khac) -> cap quyen truoc khi doi role.
+grant all on t023_ctx, t023_resp to authenticated;
+
 -- Helper doi user: dat lai JWT claim (mau T-020).
 create or replace function public._t023_as(p_user uuid)
 returns void
