@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { callReceivingRpc, type ReceivingActionResult } from "./rpc";
+import { getReceipt, type ReceiptLineRow } from "./queries";
 import {
   qcTemplateDeleteSchema,
   qcTemplateSaveSchema,
@@ -195,6 +196,24 @@ export async function deleteQcTemplateAction(
   return callReceivingRpc(supabase, "admin_qc_template_delete", {
     p_template_id: parsed.data.templateId,
   });
+}
+
+/** Lay 1 dong phieu nhan vua ghi (T-024): sau `receiving_record_line`,
+ * doc lai dong da luu de hien so chap nhan / vuot PO theo don vi luu kho
+ * (response cua record chi tra `accepted_qty_stock_capped`, khong du de
+ * biet co vuot PO hay khong khi don vi nhap khac don vi luu kho). */
+export async function getReceivingLineAction(
+  grId: string,
+  poLineId: string,
+): Promise<ReceivingActionResult<ReceiptLineRow | null>> {
+  const res = await getReceipt(grId);
+  if (!res.ok) {
+    return { ok: false, error: res.error };
+  }
+  return {
+    ok: true,
+    data: res.data.lines.find((line) => line.po_line_id === poLineId) ?? null,
+  };
 }
 
 /** Danh sach phieu nhan co loc (RPC `receiving_list_receipts`, T-023). */

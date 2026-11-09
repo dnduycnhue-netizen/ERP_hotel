@@ -33,6 +33,7 @@ export function PinDialog({
   title = vi.components.pinDialog.title,
   description = vi.components.pinDialog.description,
   length = 6,
+  minLength,
   error,
   submitting = false,
   onSubmit,
@@ -43,6 +44,12 @@ export function PinDialog({
   description?: string;
   /** Số chữ số của PIN. Mặc định 6. */
   length?: number;
+  /**
+   * Số chữ số tối thiểu phải nhập (mặc định bằng `length`).
+   * PIN nhận hàng dài 4–6 chữ số nên màn T-024 dùng `length={6}`
+   * kèm `minLength={4}`: nhập 4 số là đủ gửi, ô còn trống không bắt buộc.
+   */
+  minLength?: number;
   /** Thông báo lỗi từ server (vd. ERR_PIN_INVALID đã dịch). */
   error?: string | null;
   submitting?: boolean;
@@ -60,8 +67,11 @@ export function PinDialog({
     onOpenChange(next);
   }
 
+  const effectiveMinLength = Math.min(Math.max(minLength ?? length, 1), length);
   const pin = digits.join("");
-  const complete = digits.every((digit) => digit !== "");
+  const complete = digits
+    .slice(0, effectiveMinLength)
+    .every((digit) => digit !== "");
 
   function setDigit(index: number, value: string) {
     const digit = value.replace(/\D/g, "").slice(-1);
@@ -154,7 +164,11 @@ export function PinDialog({
           ) : null}
           {!complete && !error ? (
             <p className="mt-3 text-center text-sm text-muted-foreground">
-              {interpolate(vi.components.pinDialog.incomplete, { length })}
+              {effectiveMinLength < length
+                ? interpolate(vi.components.pinDialog.incompleteMin, {
+                    minLength: effectiveMinLength,
+                  })
+                : interpolate(vi.components.pinDialog.incomplete, { length })}
             </p>
           ) : null}
           <div className="mt-6 flex justify-end gap-2">
