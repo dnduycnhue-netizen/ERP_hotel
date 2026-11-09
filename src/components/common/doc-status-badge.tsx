@@ -50,7 +50,11 @@ export type DocStatus =
   | "settling"
   | "in_transit"
   | "issued"
-  | "locked";
+  | "locked"
+  | "open"
+  | "counting"
+  | "recount"
+  | "adjusted";
 
 type DocStatusMeta = {
   label: string;
@@ -207,6 +211,30 @@ const STATUS_META: Record<DocStatus, DocStatusMeta> = {
     label: vi.components.docStatus.locked,
     className: "bg-muted text-muted-foreground",
     Icon: Lock,
+  },
+  open: {
+    label: vi.components.docStatus.open,
+    className:
+      "bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-200",
+    Icon: CircleDashed,
+  },
+  counting: {
+    label: vi.components.docStatus.counting,
+    className:
+      "bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-200",
+    Icon: Clock,
+  },
+  recount: {
+    label: vi.components.docStatus.recount,
+    className:
+      "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-200",
+    Icon: AlertTriangle,
+  },
+  adjusted: {
+    label: vi.components.docStatus.adjusted,
+    className:
+      "bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-200",
+    Icon: FileCheck,
   },
 };
 

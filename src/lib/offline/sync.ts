@@ -1,6 +1,7 @@
 "use client";
 
 import { uploadCapturedPhoto } from "@/features/attachments/upload-client";
+import { recordCountLineAction } from "@/features/count/actions";
 import {
   getReceivingReceiptStatusAction,
   overrideReceivingLineAction,
@@ -42,6 +43,7 @@ export type SyncListener = {
   onRecordSynced?: (info: { grId: string; poLineId: string }) => void;
   onOverrideSynced?: (info: { grId: string; grLineId: string }) => void;
   onPostSynced?: (grId: string) => void;
+  onCountRecordSynced?: (info: { countId: string; itemId: string }) => void;
 };
 
 let state: OfflineSyncState = initialSyncState;
@@ -167,37 +169,54 @@ export async function discardFailedJobs(): Promise<void> {
 type JobResult = { ok: true } | { ok: false; error: string };
 
 async function processJob(job: OfflineJob): Promise<JobResult> {
+  // Job nhận hàng bắt buộc có grId; job kiểm kê bắt buộc có countId.
+  if (job.payload.kind !== "count_record" && !job.grId) {
+    return { ok: false, error: "Thiếu mã phiếu nhận." };
+  }
+  if (job.payload.kind === "count_record" && !job.countId) {
+    return { ok: false, error: "Thiếu mã đợt kiểm kê." };
+  }
   switch (job.payload.kind) {
     case "record":
       return processRecordJob(job);
+    case "count_record":
+      return processCountRecordJob(job);
     case "override": {
+      const grId = job.grId;
+      if (!grId) {
+        return { ok: false, error: "Thiếu mã phiếu nhận." };
+      }
       const res = await overrideReceivingLineAction(job.payload.input);
       if (!res.ok) {
         return { ok: false, error: res.error };
       }
       for (const listener of syncListeners) {
         listener.onOverrideSynced?.({
-          grId: job.grId,
+          grId,
           grLineId: job.payload.input.grLineId,
         });
       }
       return { ok: true };
     }
     case "post": {
+      const grId = job.grId;
+      if (!grId) {
+        return { ok: false, error: "Thiếu mã phiếu nhận." };
+      }
       const res = await postReceivingAction(job.payload.input);
       if (res.ok) {
         for (const listener of syncListeners) {
-          listener.onPostSynced?.(job.grId);
+          listener.onPostSynced?.(grId);
         }
         return { ok: true };
       }
       // Ghi sổ có thể đã chạy xong nhưng mất phản hồi (rớt mạng giữa
       // chừng): kiểm tra trạng thái phiếu — đã posted thì coi như xong,
       // không đánh lỗi và không gửi lại.
-      const statusRes = await getReceivingReceiptStatusAction(job.grId);
+      const statusRes = await getReceivingReceiptStatusAction(grId);
       if (statusRes.ok && statusRes.data.status === "posted") {
         for (const listener of syncListeners) {
-          listener.onPostSynced?.(job.grId);
+          listener.onPostSynced?.(grId);
         }
         return { ok: true };
       }
@@ -206,9 +225,39 @@ async function processJob(job: OfflineJob): Promise<JobResult> {
   }
 }
 
+/**
+ * Ghi 1 dòng đếm xếp hàng (T-033): gửi lại cùng clientUuid, server
+ * (`count_record_line`, T-032) trả về dòng đã ghi thay vì tạo trùng.
+ */
+async function processCountRecordJob(job: OfflineJob): Promise<JobResult> {
+  if (job.payload.kind !== "count_record") {
+    return { ok: false, error: "Loại thao tác không hợp lệ." };
+  }
+  const countId = job.countId;
+  if (!countId) {
+    return { ok: false, error: "Thiếu mã đợt kiểm kê." };
+  }
+  const { input } = job.payload;
+  const res = await recordCountLineAction({
+    ...input,
+    clientUuid: job.clientUuid,
+  });
+  if (!res.ok) {
+    return { ok: false, error: res.error };
+  }
+  for (const listener of syncListeners) {
+    listener.onCountRecordSynced?.({ countId, itemId: input.itemId });
+  }
+  return { ok: true };
+}
+
 async function processRecordJob(job: OfflineJob): Promise<JobResult> {
   if (job.payload.kind !== "record") {
     return { ok: false, error: "Loại thao tác không hợp lệ." };
+  }
+  const grId = job.grId;
+  if (!grId) {
+    return { ok: false, error: "Thiếu mã phiếu nhận." };
   }
   const { input } = job.payload;
   // Bản sao để cập nhật tiến trình tải ảnh ngay trong job: gửi lại lần sau
@@ -232,7 +281,7 @@ async function processRecordJob(job: OfflineJob): Promise<JobResult> {
     const uploaded = await uploadCapturedPhoto({
       propertyId: job.propertyId,
       docType: "receiving",
-      docId: job.grId,
+      docId: grId,
       photo: {
         blob: photo.blob,
         sha256: photo.sha256,
@@ -264,7 +313,7 @@ async function processRecordJob(job: OfflineJob): Promise<JobResult> {
     return { ok: false, error: res.error };
   }
   for (const listener of syncListeners) {
-    listener.onRecordSynced?.({ grId: job.grId, poLineId: input.poLineId });
+    listener.onRecordSynced?.({ grId, poLineId: input.poLineId });
   }
   return { ok: true };
 }

@@ -25,6 +25,11 @@ export function InventoryNav({ propertyId }: { propertyId: string }) {
   const canWasteApproveLarge = useCan("waste.approve.large");
   const canStockQty = useCan("stock.view_qty");
   const canStockValue = useCan("stock.view_value");
+  const canCountOpen = useCan("count.open");
+  const canCountPerform = useCan("count.perform");
+  const canCountViewVariance = useCan("count.view_variance");
+  const canCountLock = useCan("count.lock");
+  const canCountAdjustApprove = useCan("count.adjust.approve");
 
   const canRequisition =
     canRequisitionCreate ||
@@ -35,6 +40,12 @@ export function InventoryNav({ propertyId }: { propertyId: string }) {
   const canIssue = canPurposeIssuePost || canPurposeIssueReverse;
   const canWaste = canWastePropose || canWasteApprove || canWasteApproveLarge;
   const canStock = canStockQty || canStockValue;
+  const canCount =
+    canCountOpen ||
+    canCountPerform ||
+    canCountViewVariance ||
+    canCountLock ||
+    canCountAdjustApprove;
 
   const links: { href: string; label: string }[] = [];
   if (canRequisition) {
@@ -59,6 +70,12 @@ export function InventoryNav({ propertyId }: { propertyId: string }) {
     links.push({
       href: `/${propertyId}/inventory/waste`,
       label: vi.inventory.nav.waste,
+    });
+  }
+  if (canCount) {
+    links.push({
+      href: `/${propertyId}/inventory/counts`,
+      label: vi.inventory.nav.counts,
     });
   }
   if (canStock) {

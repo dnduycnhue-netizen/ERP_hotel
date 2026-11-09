@@ -184,6 +184,7 @@ export function MobileReceiveWorkspace({
         await enqueueOfflineJob({
           propertyId,
           grId: receipt.id,
+          countId: null,
           kind: "post",
           clientUuid: null,
           payload: {

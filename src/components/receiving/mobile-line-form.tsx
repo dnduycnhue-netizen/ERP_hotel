@@ -258,6 +258,7 @@ export function MobileLineForm({
         await enqueueOfflineJob({
           propertyId,
           grId,
+          countId: null,
           kind: "record",
           clientUuid,
           payload: {
@@ -351,6 +352,7 @@ export function MobileLineForm({
         await enqueueOfflineJob({
           propertyId,
           grId,
+          countId: null,
           kind: "override",
           clientUuid: null,
           payload: {
