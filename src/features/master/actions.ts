@@ -5,8 +5,10 @@ import { createClient } from "@/lib/supabase/server";
 import {
   getPropertyOrgId,
   listPurchaseUnits,
+  searchMergeTargets,
   type PurchaseUnitRow,
   type AssessmentWarning,
+  type MergeTargetRow,
   listSupplierBankAccounts,
   type SupplierBankAccountRow,
   listPriceAgreementLines,
@@ -32,6 +34,9 @@ import {
   priceAgreementSaveSchema,
   priceAgreementLineSaveSchema,
   ceilingPriceSaveSchema,
+  tempItemCreateSchema,
+  itemMergeSchema,
+  mergeTargetSearchSchema,
 } from "./schemas";
 
 export type MasterActionResult<T = unknown> =
@@ -1056,4 +1061,80 @@ export async function deleteCeilingPriceAction(
   if (error) return { ok: false, error: mapDbError(error) };
   revalidatePath(`/${propertyId}/master/prices`);
   return { ok: true, data: { id: ceilingId } };
+}
+
+// 12. Ma tam + gop ma (T-015)
+export async function createTempItemAction(
+  input: unknown,
+): Promise<MasterActionResult<{ id: string; code: string }>> {
+  const parsed = tempItemCreateSchema.safeParse(input);
+  if (!parsed.success) {
+    return {
+      ok: false,
+      error: parsed.error.issues[0]?.message ?? "Dữ liệu không hợp lệ.",
+    };
+  }
+  const supabase = await createClient();
+  const res = await callMasterRpc<{ ok: boolean; id: string; code: string }>(
+    supabase,
+    "item_create_temp",
+    {
+      p_property_id: parsed.data.propertyId,
+      p_name: parsed.data.name,
+      p_group_id: parsed.data.groupId,
+      p_stock_uom: parsed.data.stockUom,
+    },
+  );
+  if (!res.ok) return res;
+  revalidatePath(`/${parsed.data.propertyId}/master/items`);
+  return { ok: true, data: { id: res.data.id, code: res.data.code } };
+}
+
+export async function mergeItemAction(
+  input: unknown,
+): Promise<
+  MasterActionResult<{ from_id: string; into_id: string; moved_count: number }>
+> {
+  const parsed = itemMergeSchema.safeParse(input);
+  if (!parsed.success) {
+    return {
+      ok: false,
+      error: parsed.error.issues[0]?.message ?? "Dữ liệu không hợp lệ.",
+    };
+  }
+  const supabase = await createClient();
+  const res = await callMasterRpc<{
+    ok: boolean;
+    from_id: string;
+    into_id: string;
+    moved_count: number;
+  }>(supabase, "item_merge", {
+    p_property_id: parsed.data.propertyId,
+    p_from_id: parsed.data.fromId,
+    p_into_id: parsed.data.intoId,
+  });
+  if (!res.ok) return res;
+  revalidatePath(`/${parsed.data.propertyId}/master/items`);
+  return {
+    ok: true,
+    data: {
+      from_id: res.data.from_id,
+      into_id: res.data.into_id,
+      moved_count: res.data.moved_count,
+    },
+  };
+}
+
+export async function searchMergeTargetsAction(
+  input: unknown,
+): Promise<MasterActionResult<{ targets: MergeTargetRow[] }>> {
+  const parsed = mergeTargetSearchSchema.safeParse(input);
+  if (!parsed.success) {
+    return {
+      ok: false,
+      error: parsed.error.issues[0]?.message ?? "Dữ liệu không hợp lệ.",
+    };
+  }
+  const targets = await searchMergeTargets(parsed.data);
+  return { ok: true, data: { targets } };
 }

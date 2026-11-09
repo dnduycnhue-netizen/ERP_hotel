@@ -36,6 +36,8 @@ export type ItemRow = {
   tare_g: number | null;
   density_g_ml: number | null;
   is_temp: boolean;
+  temp_created_at: string | null;
+  merged_into_id: string | null;
   status: string;
   created_at: string;
   updated_at: string;
@@ -71,7 +73,7 @@ export async function listItems({
       id, code, name, name_norm, name_en, group_id, stock_uom, recipe_uom,
       stock_to_recipe, is_key_item, abc_class, track_lot, shelf_life_days,
       storage_condition, vat_rate, allowed_channels, tare_g, density_g_ml,
-      is_temp, status, created_at, updated_at,
+      is_temp, temp_created_at, merged_into_id, status, created_at, updated_at,
       group:item_groups(name)
     `,
       { count: "exact" },
@@ -129,6 +131,8 @@ export async function listItems({
     tare_g: number | null;
     density_g_ml: number | null;
     is_temp: boolean;
+    temp_created_at: string | null;
+    merged_into_id: string | null;
     status: string;
     created_at: string;
     updated_at: string;
@@ -156,12 +160,54 @@ export async function listItems({
     tare_g: row.tare_g ? Number(row.tare_g) : null,
     density_g_ml: row.density_g_ml ? Number(row.density_g_ml) : null,
     is_temp: row.is_temp,
+    temp_created_at: row.temp_created_at,
+    merged_into_id: row.merged_into_id,
     status: row.status,
     created_at: row.created_at,
     updated_at: row.updated_at,
   }));
 
   return { items, total: count ?? 0 };
+}
+
+export type MergeTargetRow = {
+  id: string;
+  code: string;
+  name: string;
+  stock_uom: string;
+};
+
+/**
+ * Tim ma dich de gop ma tam (T-015): chi ma chinh (khong phai ma tam)
+ * dang dung, cung to chuc; gioi han 10 ket qua.
+ */
+export async function searchMergeTargets({
+  propertyId,
+  search,
+}: {
+  propertyId: string;
+  search: string;
+}): Promise<MergeTargetRow[]> {
+  const orgId = await getPropertyOrgId(propertyId);
+  if (!orgId) return [];
+
+  const supabase = await createClient();
+  let query = supabase
+    .from("items")
+    .select("id, code, name, stock_uom")
+    .eq("org_id", orgId)
+    .eq("is_temp", false)
+    .eq("status", "active");
+
+  const term = search.trim();
+  if (term) {
+    const pattern = `%${term}%`;
+    query = query.or(`name.ilike.${pattern},code.ilike.${pattern}`);
+  }
+
+  const { data } = await query.order("code", { ascending: true }).limit(10);
+
+  return (data as unknown as MergeTargetRow[]) ?? [];
 }
 
 export type ItemGroupRow = {

@@ -36,7 +36,7 @@ Quy ước tiêu chí nghiệm thu (AC): mọi task phải thỏa Definition of 
 | [x] T-012 | Màn hình danh mục: vật tư (lọc nhóm, mã tạm, thiếu quy đổi), nhóm hàng, đơn vị, quy cách mua, kho, phòng, outlet, khoản mục | AG | T-010 | CRUD qua RLS; tạo trùng tên → báo lỗi tiếng Việt |
 | [x] T-013 | NCC + thẩm định + đổi STK 2 người + hợp đồng khung + giá trần | AG + CC (RPC) | T-012 | SoD STK; alert `BANK_ACCOUNT_CHANGE` tạo ra |
 | [x] T-014 | Import Excel 4 bước (01.10) cho vật tư & NCC theo `07-IMPORT-MIGRATION.md`; chạy thử với file `Lst_2020_DL_Buffet.xlsx` | CC | T-012 | Đã đo trên file thật bằng helper import (Node): DUP_CODE 11 ✓, ĐVT 54→33 ✓, NO_FACTOR **282** (lệch 1 so với AC 281 — xem ADR-004). pgTAP 47 assertion CHƯA chạy (không Docker); types chưa sinh lại; chưa chạy end-to-end trên DB thật — chờ `db push` sau hòa giải wip/T-013 |
-| [ ] T-015 | Mã tạm + gộp mã (`item_create_temp`, `item_merge`) + cron mã tạm quá hạn | CC | T-011 | Mã tạm > 72h bị chặn dùng |
+| [x] T-015 | Mã tạm + gộp mã (`item_create_temp`, `item_merge`) + cron mã tạm quá hạn | CC | T-011 | Mã tạm > 72h bị chặn dùng. Migration `20261109190000`. pgTAP 29 assertion **chưa chạy** (không Docker trên VM); `database.types.ts` chưa sinh lại; pg_cron cần bật trong Supabase Dashboard (migration vẫn chạy được nếu chưa bật, gọi tay `temp_code_maintenance()` cho tới lúc đó). |
 | [ ] T-016 | Storage `evidence` + `attachments` + `CameraCapture` (getUserMedia, nén, SHA-256) + `AttachmentGallery` (signed URL) | AG + CC | T-004 | Không có lựa chọn ảnh từ thư viện; ảnh trùng hash → alert `PHOTO_REUSED` |
 
 ## Giai đoạn MVP-B — Thu mua & nhận hàng (tuần 5–7)

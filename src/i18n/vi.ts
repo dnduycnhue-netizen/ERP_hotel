@@ -403,6 +403,30 @@ export const vi = {
       emptyList: "Chưa có vật tư nào phù hợp với bộ lọc.",
       savedSuccess: "Đã lưu thông tin vật tư.",
       deletedSuccess: "Đã xóa vật tư.",
+      tempBadge: "Mã tạm",
+      tempAgeHours: "Mã tạm · {hours} giờ",
+      tempExpired: "Mã tạm quá hạn 72 giờ",
+      tempMerged: "Đã gộp",
+      createTemp: "Tạo mã tạm",
+      createTempTitle: "Tạo mã tạm",
+      createTempDescription:
+        "Mã tạm dùng ngay khi mua chợ / nhận hàng chưa có mã chính thức. Sau 24 giờ hệ thống nhắc, sau 72 giờ mã bị chặn dùng và phải gộp vào mã chính.",
+      createTempSuccess: "Đã tạo mã tạm {code}.",
+      createTempSubmit: "Tạo mã tạm",
+      merge: "Gộp mã",
+      mergeTitle: "Gộp mã tạm vào mã chính",
+      mergeDescription:
+        "Toàn bộ tồn kho của mã tạm chuyển sang mã chính theo đúng giá vốn từng lô. Mã tạm chuyển sang trạng thái Đã gộp và không dùng được nữa.",
+      mergeSource: "Mã tạm cần gộp",
+      mergeTarget: "Mã chính nhận tồn",
+      mergeTargetPlaceholder: "Tìm theo mã hoặc tên mã chính…",
+      mergeTargetEmpty: "Không tìm thấy mã chính phù hợp.",
+      mergeUomMismatch:
+        "Mã chính phải cùng đơn vị tính lưu kho với mã tạm khi mã tạm còn tồn.",
+      mergeSuccess: "Đã gộp {from} vào {into} ({count} kho đã chuyển).",
+      mergeSubmit: "Gộp mã",
+      mergeConfirm:
+        "Gộp mã tạm {from} vào mã chính {into}? Tồn kho sẽ chuyển sang mã chính và không thể hoàn tác.",
     },
     itemGroups: {
       title: "Nhóm hàng",
