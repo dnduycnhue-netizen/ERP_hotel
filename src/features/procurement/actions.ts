@@ -3,9 +3,13 @@
 import { createClient } from "@/lib/supabase/server";
 import { callProcurementRpc, type ProcurementActionResult } from "./rpc";
 import {
+  advanceDecideSchema,
+  advanceDisburseSchema,
+  advanceRequestSchema,
   approvalDecideSchema,
   approvalDelegationSaveSchema,
   itemSearchSchema,
+  marketOrderCreateSchema,
   poCancelSchema,
   poCloseSchema,
   poCreateFromPrSchema,
@@ -16,9 +20,13 @@ import {
   prDecideSchema,
   prSaveDraftSchema,
   prSubmitSchema,
+  type AdvanceDecideInput,
+  type AdvanceDisburseInput,
+  type AdvanceRequestInput,
   type ApprovalDecideInput,
   type ApprovalDelegationSaveInput,
   type ItemSearchInput,
+  type MarketOrderCreateInput,
   type PoCancelInput,
   type PoCloseInput,
   type PoCreateFromPrInput,
@@ -325,4 +333,100 @@ export async function saveApprovalDelegationAction(
       },
     },
   );
+}
+
+export type MarketOrderCreateResult = {
+  po_id: string;
+  po_doc_no: string;
+  advance_id: string;
+  advance_doc_no: string;
+  status: string;
+  lines: number;
+  total_amount: number;
+};
+
+export type AdvanceResult = {
+  id: string;
+  doc_no: string;
+  status: string;
+  due_settle_at?: string | null;
+};
+
+/** Tạo lệnh mua chợ + tạm ứng (RPC `market_order_create`, T-022). */
+export async function createMarketOrderAction(
+  input: MarketOrderCreateInput,
+): Promise<ProcurementActionResult<MarketOrderCreateResult>> {
+  const parsed = marketOrderCreateSchema.safeParse(input);
+  if (!parsed.success) {
+    return validationError(parsed.error.issues);
+  }
+  const supabase = await createClient();
+  return callProcurementRpc<MarketOrderCreateResult>(
+    supabase,
+    "market_order_create",
+    {
+      p_property_id: parsed.data.propertyId,
+      p_lines: parsed.data.lines.map((line) => ({
+        item_id: line.itemId ?? null,
+        description: line.description ?? null,
+        qty: line.qty,
+        uom: line.uom,
+        unit_price: line.unitPrice ?? null,
+        expense_category_id: line.expenseCategoryId ?? null,
+        cost_center_id: line.costCenterId ?? null,
+      })),
+      p_advance_amount: parsed.data.advanceAmount,
+      p_purpose: parsed.data.purpose,
+      p_expected_date: parsed.data.expectedDate ?? null,
+    },
+  );
+}
+
+/** Đề nghị tạm ứng độc lập (RPC `advance_request`, T-022). */
+export async function requestAdvanceAction(
+  input: AdvanceRequestInput,
+): Promise<ProcurementActionResult<AdvanceResult>> {
+  const parsed = advanceRequestSchema.safeParse(input);
+  if (!parsed.success) {
+    return validationError(parsed.error.issues);
+  }
+  const supabase = await createClient();
+  return callProcurementRpc<AdvanceResult>(supabase, "advance_request", {
+    p_property_id: parsed.data.propertyId,
+    p_amount: parsed.data.amount,
+    p_purpose: parsed.data.purpose,
+  });
+}
+
+/** Duyệt/từ chối tạm ứng (RPC `advance_decide`, T-022). */
+export async function decideAdvanceAction(
+  input: AdvanceDecideInput,
+): Promise<ProcurementActionResult<AdvanceResult>> {
+  const parsed = advanceDecideSchema.safeParse(input);
+  if (!parsed.success) {
+    return validationError(parsed.error.issues);
+  }
+  const supabase = await createClient();
+  return callProcurementRpc<AdvanceResult>(supabase, "advance_decide", {
+    p_property_id: parsed.data.propertyId,
+    p_advance_id: parsed.data.advanceId,
+    p_approved: parsed.data.approved,
+    p_reason: parsed.data.reason ?? null,
+  });
+}
+
+/** Chi tiền tạm ứng (RPC `advance_disburse`, T-022). */
+export async function disburseAdvanceAction(
+  input: AdvanceDisburseInput,
+): Promise<ProcurementActionResult<AdvanceResult>> {
+  const parsed = advanceDisburseSchema.safeParse(input);
+  if (!parsed.success) {
+    return validationError(parsed.error.issues);
+  }
+  const supabase = await createClient();
+  return callProcurementRpc<AdvanceResult>(supabase, "advance_disburse", {
+    p_property_id: parsed.data.propertyId,
+    p_advance_id: parsed.data.advanceId,
+    p_note: parsed.data.note ?? null,
+  });
 }

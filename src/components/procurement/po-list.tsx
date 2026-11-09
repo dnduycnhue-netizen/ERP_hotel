@@ -105,7 +105,11 @@ export function PoList({
     {
       key: "supplier_name",
       header: vi.procurement.po.supplier,
-      cell: (row) => <span className="font-medium">{row.supplier_name}</span>,
+      cell: (row) => (
+        <span className="font-medium">
+          {row.supplier_name ?? vi.procurement.po.marketSupplier}
+        </span>
+      ),
     },
     {
       key: "channel",
