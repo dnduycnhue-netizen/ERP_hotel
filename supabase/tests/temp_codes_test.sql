@@ -31,7 +31,8 @@ insert into public.warehouses (id, property_id, code, name, kind) values
   ('d0150000-1500-4000-8000-000000000302', 'd0150000-1500-4000-8000-000000000202', 'KHO015B', 'Kho chinh T-015 B', 'main');
 
 insert into public.uoms (code, name_vi) values
-  ('kg', 'Kilôgam'), ('cai', 'Cái');
+  ('kg', 'Kilôgam'), ('cai', 'Cái')
+on conflict do nothing;
 
 insert into public.item_groups (id, org_id, code_prefix, name, kind) values
   ('d0150000-1500-4000-8000-000000000401', 'd0150000-1500-4000-8000-000000000001', 'RAU', 'Rau củ', 'food');

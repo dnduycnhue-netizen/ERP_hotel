@@ -26,7 +26,8 @@ insert into public.properties (id, org_id, legal_entity_id, code, name, sod_prof
 
 insert into public.uoms (code, name_vi) values
   ('kg', 'Kilôgam'),
-  ('cai', 'Cái');
+  ('cai', 'Cái')
+on conflict do nothing;
 
 insert into public.item_groups (id, org_id, code_prefix, name, kind) values
   ('d0230000-0000-4000-8000-000000000401', 'd0230000-0000-4000-8000-000000000001', 'GAO', 'Gạo', 'food'),

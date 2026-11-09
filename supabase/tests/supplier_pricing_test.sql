@@ -20,7 +20,8 @@ insert into public.properties (id, org_id, legal_entity_id, code, name) values
 
 insert into public.uoms (code, name_vi) values
   ('kg', 'Kilôgam'),
-  ('lon', 'Lon');
+  ('lon', 'Lon')
+on conflict do nothing;
 
 insert into public.item_groups (id, org_id, code_prefix, name, kind) values
   ('d0130000-1300-4000-8000-000000000401', 'd0130000-1300-4000-8000-000000000001', 'GAO', 'Gạo', 'food');
