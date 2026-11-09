@@ -247,9 +247,9 @@ select is(
 );
 
 -- 2. Guard: ghi truc tiep vao bang nhan hang bi chan (chay truoc khi doi
---    role authenticated). Phien SQL Editor khong phai superuser nen
---    RLS/quyen chan truoc khi trigger kip chay -> 42501 permission denied
---    (run 12); y nghia kiem tra van giu nguyen: ghi truc tiep bi chan.
+--    role authenticated). Phien chay duoi postgres (bypassrls) nen RLS
+--    khong chan; trigger write-guard nem P0001 ERR_WRITE_GUARD (diag14
+--    dong 6-7: run 12 bao 42501 la chep nham).
 select throws_ok(
   $q$insert into public.goods_receipt_lines (gr_id, org_id, property_id, item_id, gross_qty, uom, net_qty_stock, qc_status) values (
     'd0230000-0000-4000-8000-000000000e01',
@@ -258,7 +258,7 @@ select throws_ok(
     'd0230000-0000-4000-8000-000000000501',
     10, 'kg', 10, 'pass'
   )$q$,
-  '42501', 'permission denied for relation goods_receipt_lines',
+  'P0001', 'ERR_WRITE_GUARD',
   'Direct goods_receipt_lines insert is blocked'
 );
 
@@ -276,7 +276,7 @@ select set_config('app.receiving_guard_bypass', 'off', true);
 
 select throws_ok(
   $q$update public.goods_receipts set status = 'posted' where id = 'd0230000-0000-4000-8000-000000000e01'$q$,
-  '42501', 'permission denied for relation goods_receipts',
+  'P0001', 'ERR_WRITE_GUARD',
   'Direct goods_receipts status change is blocked'
 );
 
@@ -1183,10 +1183,13 @@ select ok(
   'admin deletes QC template'
 );
 select public._t023_as('d0230000-0000-4000-8000-000000000a06');
+-- get_task xay lines bang jsonb_agg nen cot qc_template NULL thanh JSON
+-- null trong JSON; '->' tra jsonb 'null' (khong phai SQL NULL) nen
+-- 'is null' luon false. Chi '->>' moi tra SQL NULL (diag15 dong 32-33).
 select ok(
   (select (public.receiving_get_task(
     'd0230000-0000-4000-8000-000000000b01'
-  ) -> 'lines' -> 0 -> 'qc_template') is null),
+  ) -> 'lines' -> 0 ->> 'qc_template') is null),
   'get_task returns null QC template after delete'
 );
 
