@@ -3,7 +3,7 @@ import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { vi } from "@/i18n/vi";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getAuthenticatedUser } from "@/lib/supabase/server";
 import { signIn } from "./actions";
 
 export const metadata: Metadata = {
@@ -51,11 +51,8 @@ async function LoginContent({
   searchParams: Promise<{ error?: string | string[] }>;
 }) {
   const supabase = await createClient();
-  const { data, error } = await supabase.auth.getUser();
-  if (error && error.name !== "AuthSessionMissingError") {
-    throw error;
-  }
-  if (data.user) {
+  const user = await getAuthenticatedUser(supabase);
+  if (user) {
     redirect("/");
   }
 

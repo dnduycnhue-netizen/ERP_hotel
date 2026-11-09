@@ -1,7 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getAuthenticatedUser } from "@/lib/supabase/server";
 
 export async function setInitialPassword(formData: FormData) {
   const password = formData.get("password");
@@ -15,11 +15,8 @@ export async function setInitialPassword(formData: FormData) {
   }
 
   const supabase = await createClient();
-  const { data: userData, error: userError } = await supabase.auth.getUser();
-  if (userError && userError.name !== "AuthSessionMissingError") {
-    throw userError;
-  }
-  if (!userData.user) {
+  const user = await getAuthenticatedUser(supabase);
+  if (!user) {
     redirect("/login");
   }
 

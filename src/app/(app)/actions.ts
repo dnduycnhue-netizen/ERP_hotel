@@ -6,7 +6,7 @@ import {
   listAccessibleProperties,
   selectedPropertyCookie,
 } from "@/lib/supabase/access";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getAuthenticatedUser } from "@/lib/supabase/server";
 
 export async function switchProperty(formData: FormData) {
   const propertyIdValue = formData.get("propertyId");
@@ -15,11 +15,8 @@ export async function switchProperty(formData: FormData) {
   }
 
   const supabase = await createClient();
-  const { data: userData, error: userError } = await supabase.auth.getUser();
-  if (userError && userError.name !== "AuthSessionMissingError") {
-    throw userError;
-  }
-  if (!userData.user) {
+  const user = await getAuthenticatedUser(supabase);
+  if (!user) {
     redirect("/login");
   }
 

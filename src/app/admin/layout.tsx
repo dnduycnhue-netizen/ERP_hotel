@@ -6,7 +6,7 @@ import { hasChainPerm } from "@/features/admin";
 import { hasAdminConfigPermission } from "@/features/admin";
 import { vi } from "@/i18n/vi";
 import { listAccessibleProperties } from "@/lib/supabase/access";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getAuthenticatedUser } from "@/lib/supabase/server";
 
 /**
  * Mọi trang quản trị đều đọc session + quyền qua cookies() nên không thể
@@ -19,11 +19,8 @@ export default async function AdminLayout({
   children,
 }: Readonly<{ children: ReactNode }>) {
   const supabase = await createClient();
-  const { data: userData, error: userError } = await supabase.auth.getUser();
-  if (userError && userError.name !== "AuthSessionMissingError") {
-    throw userError;
-  }
-  if (!userData.user) {
+  const user = await getAuthenticatedUser(supabase);
+  if (!user) {
     redirect("/login");
   }
 

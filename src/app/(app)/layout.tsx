@@ -3,7 +3,7 @@ import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { vi } from "@/i18n/vi";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getAuthenticatedUser } from "@/lib/supabase/server";
 import { signOut } from "../(auth)/login/actions";
 import AppLoading from "./loading";
 
@@ -21,18 +21,15 @@ async function AuthenticatedApp({
   children,
 }: Readonly<{ children: ReactNode }>) {
   const supabase = await createClient();
-  const { data: userData, error: userError } = await supabase.auth.getUser();
-  if (userError && userError.name !== "AuthSessionMissingError") {
-    throw userError;
-  }
-  if (!userData.user) {
+  const user = await getAuthenticatedUser(supabase);
+  if (!user) {
     redirect("/login");
   }
 
   const { data: profile, error: profileError } = await supabase
     .from("profiles")
     .select("active")
-    .eq("id", userData.user.id)
+    .eq("id", user.id)
     .maybeSingle();
 
   if (profileError) {

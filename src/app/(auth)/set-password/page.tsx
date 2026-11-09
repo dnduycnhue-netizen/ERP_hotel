@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { vi } from "@/i18n/vi";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getAuthenticatedUser } from "@/lib/supabase/server";
 import { setInitialPassword } from "./actions";
 
 function getErrorMessage(errorCode: string | undefined) {
@@ -42,11 +42,8 @@ async function SetPasswordContent({
   searchParams: Promise<{ error?: string | string[] }>;
 }) {
   const supabase = await createClient();
-  const { data, error } = await supabase.auth.getUser();
-  if (error && error.name !== "AuthSessionMissingError") {
-    throw error;
-  }
-  if (!data.user) {
+  const user = await getAuthenticatedUser(supabase);
+  if (!user) {
     redirect("/login");
   }
 
