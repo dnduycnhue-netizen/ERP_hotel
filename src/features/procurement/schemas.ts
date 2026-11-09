@@ -139,6 +139,11 @@ export const poCancelSchema = z.object({
   reason: z.string().trim().min(1, "Lý do hủy không được để trống."),
 });
 
+export const itemSearchSchema = z.object({
+  propertyId: uuidSchema,
+  search: z.string().trim().max(100, "Từ khóa tối đa 100 ký tự."),
+});
+
 export const approvalDelegationSaveSchema = z.object({
   orgId: uuidSchema,
   id: uuidSchema.optional(),
@@ -169,3 +174,4 @@ export type PoCancelInput = z.infer<typeof poCancelSchema>;
 export type ApprovalDelegationSaveInput = z.infer<
   typeof approvalDelegationSaveSchema
 >;
+export type ItemSearchInput = z.infer<typeof itemSearchSchema>;
