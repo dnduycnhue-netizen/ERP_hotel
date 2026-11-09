@@ -55,7 +55,7 @@ Quy ước tiêu chí nghiệm thu (AC): mọi task phải thỏa Definition of 
 
 | # | Task | Agent | Phụ thuộc | AC chính |
 |---|---|---|---|---|
-| [ ] T-030 | Migration 08: phiếu lĩnh 2 bước, điều chuyển, xuất mục đích, hủy + RPC | CC | T-011 | pgTAP từng loại move; SoD hủy |
+| [x] T-030 | Migration 08: phiếu lĩnh 2 bước, điều chuyển, xuất mục đích, hủy + RPC | CC | T-011 | pgTAP từng loại move; SoD hủy |
 | [ ] T-031 | Màn hình chứng từ kho + tồn kho + thẻ kho | AG | T-030 | Thẻ kho khớp tổng `stock_moves` |
 | [ ] T-032 | Migration 09: kiểm kê tháng mù, điều chỉnh, khóa ngày/kỳ + view `v_count_sheet` | CC | T-030 | Người đếm không đọc được `book_qty`; kho đang kiểm → `ERR_COUNT_FREEZE` |
 | [ ] T-033 | Màn hình kiểm kê mobile (đa quy cách, đếm lại) + biên bản chênh lệch + offline | AG + CC | T-032 | Biên bản xuất Excel |
