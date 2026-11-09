@@ -30,6 +30,7 @@ export type DocStatus =
   | "pending"
   | "approved"
   | "rejected"
+  | "converted"
   | "sent"
   | "partially_received"
   | "received"
@@ -85,6 +86,12 @@ const STATUS_META: Record<DocStatus, DocStatusMeta> = {
     label: vi.components.docStatus.rejected,
     className: "bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-200",
     Icon: FileX2,
+  },
+  converted: {
+    label: vi.components.docStatus.converted,
+    className:
+      "bg-teal-100 text-teal-800 dark:bg-teal-900/40 dark:text-teal-200",
+    Icon: PackageCheck,
   },
   sent: {
     label: vi.components.docStatus.sent,

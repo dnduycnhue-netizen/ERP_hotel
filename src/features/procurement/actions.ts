@@ -5,6 +5,7 @@ import { callProcurementRpc, type ProcurementActionResult } from "./rpc";
 import {
   approvalDecideSchema,
   approvalDelegationSaveSchema,
+  itemSearchSchema,
   poCancelSchema,
   poCloseSchema,
   poCreateFromPrSchema,
@@ -17,6 +18,7 @@ import {
   prSubmitSchema,
   type ApprovalDecideInput,
   type ApprovalDelegationSaveInput,
+  type ItemSearchInput,
   type PoCancelInput,
   type PoCloseInput,
   type PoCreateFromPrInput,
@@ -28,6 +30,7 @@ import {
   type PrSaveDraftInput,
   type PrSubmitInput,
 } from "./schemas";
+import { listItems } from "@/features/master/queries";
 
 export type PrPoResult = {
   id: string;
@@ -256,6 +259,45 @@ export async function cancelPoAction(
     p_po_id: parsed.data.poId,
     p_reason: parsed.data.reason,
   });
+}
+
+export type ItemSearchResult = {
+  id: string;
+  code: string;
+  name: string;
+  stockUom: string;
+  allowedChannels: string[];
+};
+
+/**
+ * Tìm vật tư cho form yêu cầu mua (T-021): gọi `listItems` của danh mục
+ * (bảng `items` đã có trong `database.types.ts`, không phải bảng thu mua).
+ * Chỉ trả vật tư chưa bị gộp mã; giới hạn 10 kết quả cho ô tìm kiếm.
+ */
+export async function searchItemsAction(
+  input: ItemSearchInput,
+): Promise<ProcurementActionResult<ItemSearchResult[]>> {
+  const parsed = itemSearchSchema.safeParse(input);
+  if (!parsed.success) {
+    return validationError(parsed.error.issues);
+  }
+  const { items } = await listItems({
+    propertyId: parsed.data.propertyId,
+    search: parsed.data.search,
+    pageSize: 10,
+  });
+  return {
+    ok: true,
+    data: items
+      .filter((item) => !item.merged_into_id)
+      .map((item) => ({
+        id: item.id,
+        code: item.code,
+        name: item.name,
+        stockUom: item.stock_uom,
+        allowedChannels: item.allowed_channels ?? [],
+      })),
+  };
 }
 
 /** Tạo/sửa ủy quyền duyệt (RPC `admin_approval_delegation_save`, T-020). */
