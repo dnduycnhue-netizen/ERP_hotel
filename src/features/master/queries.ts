@@ -451,3 +451,228 @@ export async function listExpenseCategories(
 
   return data ?? [];
 }
+
+export type SupplierRow = {
+  id: string;
+  code: string;
+  name: string;
+  tax_code: string | null;
+  kind: "company" | "household" | "individual_no_invoice";
+  phone: string | null;
+  address: string | null;
+  payment_terms_days: number | null;
+  food_safety_cert_until: string | null;
+  status: "pending" | "active" | "suspended" | "banned";
+  approved_by: string | null;
+  created_by: string;
+  created_at: string;
+};
+
+export async function listSuppliers({
+  propertyId,
+  search,
+  status,
+}: {
+  propertyId: string;
+  search?: string;
+  status?: string;
+}): Promise<SupplierRow[]> {
+  const orgId = await getPropertyOrgId(propertyId);
+  if (!orgId) return [];
+
+  const supabase = await createClient();
+  let query = supabase
+    .from("suppliers")
+    .select(
+      "id, code, name, tax_code, kind, phone, address, payment_terms_days, food_safety_cert_until, status, approved_by, created_by, created_at",
+    )
+    .eq("org_id", orgId);
+
+  if (search && search.trim()) {
+    const term = `%${search.trim()}%`;
+    query = query.or(`name.ilike.${term},code.ilike.${term},tax_code.ilike.${term}`);
+  }
+
+  if (status) {
+    query = query.eq("status", status);
+  }
+
+  const { data } = await query.order("code", { ascending: true });
+  return (data as SupplierRow[]) ?? [];
+}
+
+export type SupplierBankAccountRow = {
+  id: string;
+  supplier_id: string;
+  bank_name: string;
+  account_no: string;
+  account_name: string;
+  status: "pending" | "active" | "revoked";
+  requested_by: string;
+  approved_by: string | null;
+  approved_at: string | null;
+  created_at: string;
+};
+
+export async function listSupplierBankAccounts(
+  supplierId: string,
+): Promise<SupplierBankAccountRow[]> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("supplier_bank_accounts")
+    .select(
+      "id, supplier_id, bank_name, account_no, account_name, status, requested_by, approved_by, approved_at, created_at",
+    )
+    .eq("supplier_id", supplierId)
+    .order("created_at", { ascending: false });
+
+  return (data as SupplierBankAccountRow[]) ?? [];
+}
+
+export type PriceAgreementRow = {
+  id: string;
+  supplier_id: string;
+  supplier_name?: string;
+  supplier_code?: string;
+  valid_from: string;
+  valid_to: string;
+  status: string;
+};
+
+export async function listPriceAgreements(
+  propertyId: string,
+): Promise<PriceAgreementRow[]> {
+  const orgId = await getPropertyOrgId(propertyId);
+  if (!orgId) return [];
+
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("price_agreements")
+    .select("id, supplier_id, valid_from, valid_to, status, supplier:suppliers(code, name)")
+    .eq("org_id", orgId)
+    .order("valid_from", { ascending: false });
+
+  type RawAgreement = {
+    id: string;
+    supplier_id: string;
+    valid_from: string;
+    valid_to: string;
+    status: string;
+    supplier: { code: string; name: string } | null;
+  };
+
+  return (
+    (data as unknown as RawAgreement[])?.map((row) => ({
+      id: row.id,
+      supplier_id: row.supplier_id,
+      supplier_code: row.supplier?.code,
+      supplier_name: row.supplier?.name,
+      valid_from: row.valid_from,
+      valid_to: row.valid_to,
+      status: row.status,
+    })) ?? []
+  );
+}
+
+export type PriceAgreementLineRow = {
+  id: string;
+  agreement_id: string;
+  item_id: string;
+  item_code?: string;
+  item_name?: string;
+  uom: string;
+  unit_price: number;
+  warn_pct: number | null;
+  lock_pct: number | null;
+};
+
+export async function listPriceAgreementLines(
+  agreementId: string,
+): Promise<PriceAgreementLineRow[]> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("price_agreement_lines")
+    .select("id, agreement_id, item_id, uom, unit_price, warn_pct, lock_pct, item:items(code, name)")
+    .eq("agreement_id", agreementId)
+    .order("item_id", { ascending: true });
+
+  type RawLine = {
+    id: string;
+    agreement_id: string;
+    item_id: string;
+    uom: string;
+    unit_price: number;
+    warn_pct: number | null;
+    lock_pct: number | null;
+    item: { code: string; name: string } | null;
+  };
+
+  return (
+    (data as unknown as RawLine[])?.map((row) => ({
+      id: row.id,
+      agreement_id: row.agreement_id,
+      item_id: row.item_id,
+      item_code: row.item?.code,
+      item_name: row.item?.name,
+      uom: row.uom,
+      unit_price: Number(row.unit_price),
+      warn_pct: row.warn_pct ? Number(row.warn_pct) : null,
+      lock_pct: row.lock_pct ? Number(row.lock_pct) : null,
+    })) ?? []
+  );
+}
+
+export type CeilingPriceRow = {
+  id: string;
+  property_id: string | null;
+  item_id: string;
+  item_code?: string;
+  item_name?: string;
+  uom: string;
+  price: number;
+  valid_from: string;
+  valid_to: string;
+  set_by: string;
+};
+
+export async function listCeilingPrices(
+  propertyId: string,
+): Promise<CeilingPriceRow[]> {
+  const orgId = await getPropertyOrgId(propertyId);
+  if (!orgId) return [];
+
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("ceiling_prices")
+    .select("id, property_id, item_id, uom, price, valid_from, valid_to, set_by, item:items(code, name)")
+    .eq("org_id", orgId)
+    .or(`property_id.is.null,property_id.eq.${propertyId}`)
+    .order("valid_from", { ascending: false });
+
+  type RawCeiling = {
+    id: string;
+    property_id: string | null;
+    item_id: string;
+    uom: string;
+    price: number;
+    valid_from: string;
+    valid_to: string;
+    set_by: string;
+    item: { code: string; name: string } | null;
+  };
+
+  return (
+    (data as unknown as RawCeiling[])?.map((row) => ({
+      id: row.id,
+      property_id: row.property_id,
+      item_id: row.item_id,
+      item_code: row.item?.code,
+      item_name: row.item?.name,
+      uom: row.uom,
+      price: Number(row.price),
+      valid_from: row.valid_from,
+      valid_to: row.valid_to,
+      set_by: row.set_by,
+    })) ?? []
+  );
+}

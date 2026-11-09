@@ -39,6 +39,12 @@ export const rpcErrorMessages: Record<string, string> = {
     "Vật tư đã có phát sinh giao dịch kho, không thể xóa (chỉ có thể chuyển sang ngừng hoạt động).",
   ERR_ITEM_UOM_CHANGE_FORBIDDEN:
     "Không thể đổi đơn vị tính lưu kho của vật tư đã có giao dịch kho.",
+  ERR_SOD_SUPPLIER_CREATOR_APPROVER:
+    "Người thẩm định/duyệt nhà cung cấp không được là người tạo hồ sơ.",
+  ERR_SOD_BANK_ACCOUNT:
+    "Người duyệt tài khoản ngân hàng không được là người yêu cầu (quy tắc SoD 2 người).",
+  ERR_SUPPLIER_NOT_FOUND: "Không tìm thấy nhà cung cấp.",
+  ERR_BANK_ACCOUNT_NOT_FOUND: "Không tìm thấy tài khoản ngân hàng.",
   ERR_COUNT_FREEZE:
     "Kho đang kiểm kê nên tạm dừng ghi nhận xuất nhập ở kho này.",
   ERR_OVER_CEILING_NO_REASON:

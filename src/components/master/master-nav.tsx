@@ -11,6 +11,14 @@ export function MasterNav({ propertyId }: { propertyId: string }) {
   const links = [
     { href: `/${propertyId}/master/items`, label: vi.master.nav.items },
     {
+      href: `/${propertyId}/master/suppliers`,
+      label: vi.master.nav.suppliers,
+    },
+    {
+      href: `/${propertyId}/master/prices`,
+      label: vi.master.nav.prices,
+    },
+    {
       href: `/${propertyId}/master/item-groups`,
       label: vi.master.nav.itemGroups,
     },
