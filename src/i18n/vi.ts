@@ -76,6 +76,37 @@ export const vi = {
       incomplete: "Vui lòng nhập đủ {length} chữ số.",
       errorTitle: "Mã PIN không đúng",
     },
+    cameraCapture: {
+      openCamera: "Chụp ảnh",
+      starting: "Đang mở camera…",
+      capture: "Chụp",
+      previewTitle: "Xem lại ảnh vừa chụp",
+      confirm: "Dùng ảnh này",
+      retake: "Chụp lại",
+      cancel: "Hủy",
+      tryAgain: "Thử lại",
+      noCamera:
+        "Không tìm thấy camera trên thiết bị này. Hãy dùng thiết bị có camera rồi thử lại.",
+      permissionDenied:
+        "Quyền camera bị từ chối. Hãy bật quyền camera cho trình duyệt rồi thử lại.",
+      notSupported:
+        "Thiết bị hoặc trình duyệt này không hỗ trợ chụp ảnh trong app. Hãy dùng trình duyệt khác hoặc thiết bị có camera.",
+      captureFailed: "Không chụp được ảnh. Hãy thử lại.",
+    },
+    attachmentGallery: {
+      title: "Ảnh chứng từ",
+      emptyTitle: "Chưa có ảnh chứng từ",
+      emptyDescription:
+        "Chứng từ này chưa có ảnh nào. Hãy chụp ảnh bằng camera trong app.",
+      loadError: "Không thể tải ảnh chứng từ",
+      refresh: "Tải lại",
+      photoAlt: "Ảnh chứng từ chụp lúc",
+      takenAt: "Chụp lúc",
+      reusedBadge: "Dùng lại",
+      reusedHint:
+        "Ảnh này trùng với ảnh đã dùng cho chứng từ khác (cùng mã SHA-256). Cần hậu kiểm trước khi chấp nhận.",
+      close: "Đóng",
+    },
   },
   dev: {
     componentsTitle: "Thành phần dùng chung",
@@ -97,6 +128,13 @@ export const vi = {
     pinOpen: "Mở hộp nhập PIN",
     pinDone: "Đã nhập PIN (bản demo, không kiểm tra thật).",
     rpcErrorsTitle: "Mã lỗi RPC (errors.vi.ts)",
+    cameraTitle: "Chụp ảnh chứng từ (CameraCapture)",
+    cameraDescription:
+      "Bấm “Chụp ảnh” để mở camera trong app (không có nút chọn ảnh từ thư viện). Ảnh chụp xong hiện mã SHA-256; bản demo chưa tải lên Storage.",
+    cameraCaptured: "Đã chụp xong (bản demo, chưa tải lên).",
+    galleryTitle: "Thư viện ảnh chứng từ (AttachmentGallery)",
+    galleryDescription:
+      "Thư viện tải ảnh qua signed URL hết hạn sau 5 phút; ảnh trùng SHA-256 hiện huy hiệu “Dùng lại”. Bản demo dùng mã ngẫu nhiên nên chưa có ảnh thật.",
   },
   admin: {
     title: "Quản trị hệ thống",

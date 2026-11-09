@@ -44,6 +44,11 @@ export const rpcErrorMessages: Record<string, string> = {
   ERR_OVER_CEILING_NO_REASON:
     "Giá vượt giá trần. Hãy nhập lý do vượt trần rồi gửi lại.",
   ERR_PHOTO_REQUIRED: "Thiếu ảnh bắt buộc. Hãy chụp ảnh rồi gửi lại.",
+  ERR_ATTACHMENT_IMMUTABLE:
+    "Ảnh chứng từ không được sửa hoặc xóa. Hãy tải ảnh mới thay thế.",
+  ERR_ATTACHMENT_INVALID_SHA: "Mã SHA-256 của ảnh không hợp lệ.",
+  ERR_ATTACHMENT_PATH_MISMATCH:
+    "Đường dẫn ảnh không thuộc khách sạn đang chọn.",
   ERR_PIN_INVALID: "Mã PIN không đúng. Vui lòng thử lại.",
   ERR_INVALID_PIN: "Mã PIN phải gồm 4–6 chữ số.",
   ERR_REASON_REQUIRED: "Vui lòng nhập lý do cho thao tác này.",
