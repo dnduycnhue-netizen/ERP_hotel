@@ -5,6 +5,7 @@ import { FrontdeskLink } from "@/components/common/frontdesk-link";
 import { HousekeepingLink } from "@/components/common/housekeeping-link";
 import { InventoryLink } from "@/components/common/inventory-link";
 import { MasterLink } from "@/components/common/master-link";
+import { PmsDailyLink } from "@/components/common/pms-daily-link";
 import { ProcurementLink } from "@/components/common/procurement-link";
 import { ReceivingLink } from "@/components/common/receiving-link";
 import { PropertySwitcher } from "@/components/common/property-switcher";
@@ -60,6 +61,7 @@ export default async function PropertyLayout({
               <ReceivingLink propertyId={currentProperty.id} />
               <InventoryLink propertyId={currentProperty.id} />
               <FrontdeskLink propertyId={currentProperty.id} />
+              <PmsDailyLink propertyId={currentProperty.id} />
               <HousekeepingLink propertyId={currentProperty.id} />
               <AdminLink />
               <PropertySwitcher

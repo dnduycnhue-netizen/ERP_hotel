@@ -3,8 +3,8 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
 /**
- * Khu lễ tân — minibar (T-035).
- * Chặn người không có quyền minibar nào của lễ tân ở tầng layout.
+ * Khu lễ tân — minibar (T-035) + số liệu PMS ngày (T-036).
+ * Chặn người không có quyền lễ tân nào ở tầng layout.
  */
 export default async function FrontdeskLayout({
   children,
@@ -25,7 +25,8 @@ export default async function FrontdeskLayout({
     perms.has("minibar.request_check") ||
     perms.has("minibar.charge.confirm") ||
     perms.has("minibar.waive.request") ||
-    perms.has("minibar.waive.approve");
+    perms.has("minibar.waive.approve") ||
+    perms.has("pms.input");
 
   if (!canAccess) {
     notFound();
