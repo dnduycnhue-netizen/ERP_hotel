@@ -144,6 +144,7 @@ insert into public.role_permissions (role_id, permission_code) values
   ('d0230000-0000-4000-8000-000000000607', 'attachment.upload'),
   ('d0230000-0000-4000-8000-000000000607', 'attachment.view'),
   ('d0230000-0000-4000-8000-000000000608', 'admin.settings.manage'),
+  ('d0230000-0000-4000-8000-000000000608', 'receiving.view'),
   ('d0230000-0000-4000-8000-000000000609', 'receiving.view');
 
 insert into public.user_property_roles (user_id, role_id, property_id) values
