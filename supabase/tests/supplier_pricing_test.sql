@@ -40,7 +40,11 @@ values
 insert into public.profiles (id, employee_code, full_name, phone) values
   ('d0130000-1300-4000-8000-000000000a01', 'NV01301', 'Nhan vien mua hang', '0901111111'),
   ('d0130000-1300-4000-8000-000000000a02', 'NV01302', 'Giam doc', '0902222222'),
-  ('d0130000-1300-4000-8000-000000000a03', 'NV01303', 'Ke toan truong', '0903333333');
+  ('d0130000-1300-4000-8000-000000000a03', 'NV01303', 'Ke toan truong', '0903333333')
+on conflict (id) do update set
+  employee_code = excluded.employee_code,
+  full_name = excluded.full_name,
+  phone = excluded.phone;
 
 insert into public.roles (id, org_id, code, name_vi) values
   ('d0130000-1300-4000-8000-000000000601', 'd0130000-1300-4000-8000-000000000001', 'r_pur013', 'Mua hang'),
