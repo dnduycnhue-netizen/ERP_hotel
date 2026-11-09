@@ -1,4 +1,7 @@
 -- T-013: NCC + tham dinh + doi STK 2 nguoi + hop dong khung + gia tran.
+-- RECONCILIATION 09/11/2026: production already had the parallel wip
+-- migration's alerts table / policies / RPCs (version collision on
+-- 20261109150000 — see the preamble before `alter table public.suppliers`).
 --
 -- Decisions (spec silent or ambiguous; see CHANGELOG T-013):
 --   1. The `alerts` table is defined by docs/03-DATA-MODEL.md table A10 and is
@@ -53,6 +56,66 @@
 --      already seeded as permission codes (20261108141000_org_access.sql).
 --      `seed.sql` is updated to mirror these assignments.
 
+-- ---------------------------------------------------------------------------
+-- Reconciliation with production (09/11/2026): a parallel suppliers
+-- implementation (wip/local-2026-11-09, migration file
+-- 20261109150000_suppliers_and_prices.sql) was already applied to production
+-- under version 20261109150000 — the same version as the H1 grants migration
+-- 20261109150000_master_data_role_permissions.sql, which db push therefore
+-- skipped (that is why its 6 grants never landed; the is_system theory was
+-- wrong). Production already has B's `alerts` table + policies + 3 RPC
+-- overloads. This preamble removes B's conflicting objects first so the
+-- statements below can apply. It is a no-op on a fresh database: every DROP
+-- uses IF EXISTS (the alerts policy drop is guarded by the table existing,
+-- because DROP POLICY errors when the table itself is absent), and the
+-- ALTERs run only if the table already exists.
+-- Do NOT drop B's 3 select policies (price_agreements_select,
+-- price_agreement_lines_select, ceiling_prices_select): this migration does
+-- not redefine them and they are compatible with the definitions below.
+-- ---------------------------------------------------------------------------
+drop function if exists public.supplier_approve(uuid, text);
+drop function if exists public.supplier_bank_request(uuid, text, text, text);
+drop function if exists public.supplier_bank_approve(uuid, text);
+
+drop policy if exists suppliers_insert on public.suppliers;
+drop policy if exists suppliers_update on public.suppliers;
+drop policy if exists suppliers_delete on public.suppliers;
+drop policy if exists price_agreements_insert on public.price_agreements;
+drop policy if exists price_agreements_update on public.price_agreements;
+drop policy if exists price_agreements_delete on public.price_agreements;
+drop policy if exists price_agreement_lines_insert on public.price_agreement_lines;
+drop policy if exists price_agreement_lines_update on public.price_agreement_lines;
+drop policy if exists price_agreement_lines_delete on public.price_agreement_lines;
+drop policy if exists ceiling_prices_insert on public.ceiling_prices;
+drop policy if exists ceiling_prices_update on public.ceiling_prices;
+drop policy if exists ceiling_prices_delete on public.ceiling_prices;
+
+-- B's `alerts` table lacks the columns A's helpers need and forces org_id
+-- NOT NULL. Add the missing columns, drop B's select policy (A redefines
+-- it below with the per-code alert.receive.<code> check), and relax org_id
+-- (chain-wide alerts have no property, hence no org). Guarded: runs only
+-- when the table already exists (production); on a fresh database the
+-- CREATE TABLE below defines the full shape, org_id included.
+do $$
+begin
+  if exists (
+    select 1 from information_schema.tables
+    where table_schema = 'public' and table_name = 'alerts'
+  ) then
+    drop policy if exists alerts_select on public.alerts;
+    alter table public.alerts
+      add column if not exists created_by uuid references auth.users(id) default auth.uid(),
+      add column if not exists updated_at timestamptz not null default now();
+    if exists (
+      select 1 from information_schema.columns
+      where table_schema = 'public' and table_name = 'alerts'
+        and column_name = 'org_id'
+    ) then
+      alter table public.alerts alter column org_id drop not null;
+    end if;
+  end if;
+end $$;
+
 alter table public.suppliers
   add column if not exists approved_at timestamptz,
   add column if not exists bank_changed_at timestamptz;
@@ -70,6 +133,10 @@ comment on column public.suppliers.bank_changed_at is
 -- ---------------------------------------------------------------------------
 create table if not exists public.alerts (
   id uuid primary key default gen_random_uuid(),
+  -- org_id is kept (nullable) for compatibility with the reconciled wip
+  -- table on production; A10 does not define it, and _create_alert fills
+  -- it from the property (NULL when chain-wide).
+  org_id uuid references public.organizations(id),
   property_id uuid references public.properties(id),
   code text not null check (btrim(code) <> ''),
   severity text not null check (severity in ('info', 'warn', 'red')),
@@ -143,11 +210,18 @@ set search_path = public, auth, pg_temp
 as $$
 declare
   v_id uuid;
+  v_org_id uuid;
 begin
+  -- Resolve the org from the property; chain-wide alerts (no property)
+  -- have no org. Production's alerts table (from the reconciled wip
+  -- migration) carries org_id, now nullable — see the preamble.
+  select p.org_id into v_org_id
+  from public.properties p
+  where p.id = p_property_id;
   insert into public.alerts
-    (property_id, code, severity, title, payload, doc_type, doc_id)
+    (org_id, property_id, code, severity, title, payload, doc_type, doc_id)
   values
-    (p_property_id, p_code, p_severity, p_title, p_payload, p_doc_type, p_doc_id)
+    (v_org_id, p_property_id, p_code, p_severity, p_title, p_payload, p_doc_type, p_doc_id)
   returning id into v_id;
   return v_id;
 end;
@@ -159,7 +233,8 @@ revoke all on function public._create_alert(uuid, text, text, text, jsonb, text,
 -- SoD guard (docs/04-SECURITY-RLS.md §6). Call AFTER the caller has
 -- established that the acting user is the same person as the first actor.
 -- A valid sod_exceptions row lets the action pass and records an
--- SOD_EXCEPTION_USED alert; otherwise raises ERR_SOD_<rule_code>.
+-- SOD_EXCEPTION_USED alert; otherwise raises ERR_<rule_code> (e.g.
+-- ERR_SOD_BANK_ACCOUNT when p_rule_code is 'SOD_BANK_ACCOUNT').
 create or replace function public._sod_check(
   p_property_id uuid,
   p_rule_code text
@@ -187,7 +262,7 @@ begin
     );
     return;
   end if;
-  raise exception 'ERR_SOD_%', p_rule_code;
+  raise exception 'ERR_%', p_rule_code;
 end;
 $$;
 
@@ -1049,10 +1124,15 @@ grant insert, update, delete on public.ceiling_prices to authenticated;
 -- ---------------------------------------------------------------------------
 -- Sample role assignments (idempotent; mirrored in supabase/seed.sql).
 -- Join on role code ALONE, mirroring supabase/seed.sql. Do NOT add an
--- `r.is_system = true` filter: migration 20261109150000 used it and matched
--- zero rows in production (the roles there have is_system false/NULL), so
--- its 6 grants silently never applied even though the migration is recorded
--- as applied in supabase_migrations.
+-- `r.is_system = true` filter: keep the grant join minimal (code only) so
+-- it cannot silently match zero rows if role flags ever differ.
+-- NOTE (09/11/2026): the earlier claim that migration 20261109150000
+-- matched zero rows because of the is_system filter was WRONG. Production
+-- roles are all is_system = true; the real cause was a version collision —
+-- the wip migration 20261109150000_suppliers_and_prices.sql was already
+-- applied under version 20261109150000, so db push skipped the H1 file
+-- (same version). The 6 grants were restored by
+-- 20261109170000_role_grants_repair.sql.
 -- ---------------------------------------------------------------------------
 insert into public.role_permissions (role_id, permission_code)
 select r.id, v.permission_code
