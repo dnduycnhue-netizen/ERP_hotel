@@ -12,6 +12,11 @@ import { EmptyState } from "@/components/common/empty-state";
 import { ErrorState } from "@/components/common/error-state";
 import { MoneyText } from "@/components/common/money-text";
 import { PinDialog } from "@/components/common/pin-dialog";
+import { AttachmentGallery } from "@/components/common/attachment-gallery";
+import {
+  CameraCapture,
+  type CapturedPhoto,
+} from "@/components/common/camera-capture";
 import { getRpcErrorMessage } from "@/i18n/errors.vi";
 import { vi } from "@/i18n/vi";
 
@@ -123,6 +128,13 @@ export default function DevComponentsPage() {
   const [confirmDone, setConfirmDone] = useState(false);
   const [pinOpen, setPinOpen] = useState(false);
   const [pinDone, setPinDone] = useState(false);
+  const [capturedPhoto, setCapturedPhoto] = useState<CapturedPhoto | null>(
+    null,
+  );
+  // Ma demo co dinh (khong dung randomUUID o day: trang nay duoc prerender
+  // o build time, gia tri random se khac nhau moi lan render).
+  const demoDocId = "d0160000-1600-4000-8000-000000000701";
+  const demoPropertyId = "d0160000-1600-4000-8000-000000000201";
 
   const pagedRows = SAMPLE_ORDERS.slice(
     (page - 1) * PAGE_SIZE,
@@ -286,6 +298,35 @@ export default function DevComponentsPage() {
             setPinOpen(false);
             setPinDone(true);
           }}
+        />
+      </Section>
+
+      <Section title={vi.dev.cameraTitle}>
+        <p className="mb-4 text-sm text-muted-foreground">
+          {vi.dev.cameraDescription}
+        </p>
+        <CameraCapture onCaptured={setCapturedPhoto} />
+        {capturedPhoto ? (
+          <div className="mt-2 text-sm">
+            <p className="text-green-700">{vi.dev.cameraCaptured}</p>
+            <p className="break-all text-xs text-muted-foreground">
+              SHA-256: {capturedPhoto.sha256}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              {capturedPhoto.width}×{capturedPhoto.height}px
+            </p>
+          </div>
+        ) : null}
+      </Section>
+
+      <Section title={vi.dev.galleryTitle}>
+        <p className="mb-4 text-sm text-muted-foreground">
+          {vi.dev.galleryDescription}
+        </p>
+        <AttachmentGallery
+          propertyId={demoPropertyId}
+          docType="receiving"
+          docId={demoDocId}
         />
       </Section>
 

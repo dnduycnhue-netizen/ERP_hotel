@@ -275,4 +275,48 @@ where r.org_id = '00000000-0000-4000-8000-000000000001'
   and r.code = 'sys_admin'
 on conflict do nothing;
 
+-- T-016: quyen dinh kem anh + nhan alert PHOTO_REUSED (giong mau grant theo
+-- ma vai tro o tren; owner duoc gan vi has_perm khong co dac cach owner).
+insert into public.role_permissions (role_id, permission_code)
+select r.id, rp.permission_code
+from (
+  values
+    ('owner', 'attachment.upload'),
+    ('owner', 'attachment.view'),
+    ('owner', 'alert.receive.photo_reused'),
+    ('gm', 'attachment.view'),
+    ('gm', 'alert.receive.photo_reused'),
+    ('chief_accountant', 'attachment.view'),
+    ('chief_accountant', 'alert.receive.photo_reused'),
+    ('cost_controller', 'attachment.view'),
+    ('cost_controller', 'alert.receive.photo_reused'),
+    ('accountant', 'attachment.view'),
+    ('internal_audit', 'attachment.view'),
+    ('receiver', 'attachment.upload'),
+    ('receiver', 'attachment.view'),
+    ('storekeeper', 'attachment.upload'),
+    ('storekeeper', 'attachment.view'),
+    ('purchaser', 'attachment.upload'),
+    ('purchaser', 'attachment.view'),
+    ('outlet_head', 'attachment.upload'),
+    ('outlet_head', 'attachment.view'),
+    ('chef', 'attachment.upload'),
+    ('chef', 'attachment.view'),
+    ('bartender', 'attachment.upload'),
+    ('bartender', 'attachment.view'),
+    ('engineer', 'attachment.upload'),
+    ('engineer', 'attachment.view'),
+    ('hk_supervisor', 'attachment.upload'),
+    ('hk_supervisor', 'attachment.view'),
+    ('hk_attendant', 'attachment.upload'),
+    ('hk_attendant', 'attachment.view'),
+    ('front_desk', 'attachment.upload'),
+    ('front_desk', 'attachment.view')
+) as rp(role_code, permission_code)
+join public.roles r
+  on r.org_id = '00000000-0000-4000-8000-000000000001'
+ and r.code = rp.role_code
+join public.permissions p on p.code = rp.permission_code
+on conflict do nothing;
+
 commit;
