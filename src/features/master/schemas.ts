@@ -387,3 +387,35 @@ export const ceilingPriceSaveSchema = z
   });
 
 export type CeilingPriceSaveInput = z.infer<typeof ceilingPriceSaveSchema>;
+
+// ---------------------------------------------------------------------------
+// T-015: Ma tam + gop ma
+// ---------------------------------------------------------------------------
+
+export const tempItemCreateSchema = z.object({
+  propertyId: z.string().uuid(),
+  name: z
+    .string()
+    .trim()
+    .min(1, "Tên vật tư không được để trống")
+    .max(200, "Tên vật tư tối đa 200 ký tự"),
+  groupId: z.string().uuid("Vui lòng chọn nhóm hàng"),
+  stockUom: z.string().trim().min(1, "Vui lòng chọn đơn vị tính kho"),
+});
+
+export type TempItemCreateInput = z.infer<typeof tempItemCreateSchema>;
+
+export const itemMergeSchema = z.object({
+  propertyId: z.string().uuid(),
+  fromId: z.string().uuid(),
+  intoId: z.string().uuid(),
+});
+
+export type ItemMergeInput = z.infer<typeof itemMergeSchema>;
+
+export const mergeTargetSearchSchema = z.object({
+  propertyId: z.string().uuid(),
+  search: z.string().trim().max(100),
+});
+
+export type MergeTargetSearchInput = z.infer<typeof mergeTargetSearchSchema>;

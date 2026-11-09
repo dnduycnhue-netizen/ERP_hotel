@@ -21,6 +21,19 @@ import {
 } from "@/features/master/actions";
 import { ItemFormDialog } from "./item-form-dialog";
 import { PurchaseUnitsDialog } from "./purchase-units-dialog";
+import { TempItemCreateDialog } from "./temp-item-create-dialog";
+import { ItemMergeDialog } from "./item-merge-dialog";
+
+/** Nhãn badge mã tạm: quá 72h thì báo hết hạn, còn lại hiện số giờ tuổi. */
+function tempBadgeText(row: ItemRow): string | null {
+  if (!row.is_temp) return null;
+  if (!row.temp_created_at) return vi.master.items.tempBadge;
+  const ageHours = Math.floor(
+    (Date.now() - new Date(row.temp_created_at).getTime()) / 3_600_000,
+  );
+  if (ageHours >= 72) return vi.master.items.tempExpired;
+  return vi.master.items.tempAgeHours.replace("{hours}", String(ageHours));
+}
 
 export function ItemsList({
   propertyId,
@@ -47,9 +60,15 @@ export function ItemsList({
 }) {
   const router = useRouter();
   const canManage = useCan("item.manage");
+  const canCreateTemp = useCan("item.temp.create");
+  const canMerge = useCan("item.temp.normalize");
 
   const [formOpen, setFormOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<ItemRow | null>(null);
+
+  const [tempCreateOpen, setTempCreateOpen] = useState(false);
+  const [mergeOpen, setMergeOpen] = useState(false);
+  const [mergingItem, setMergingItem] = useState<ItemRow | null>(null);
 
   const [unitsOpen, setUnitsOpen] = useState(false);
   const [activeItemForUnits, setActiveItemForUnits] = useState<ItemRow | null>(
@@ -131,7 +150,7 @@ export function ItemsList({
             ) : null}
             {row.is_temp ? (
               <span className="rounded bg-destructive/10 px-1.5 py-0.5 text-[10px] font-semibold text-destructive">
-                Mã tạm
+                {tempBadgeText(row)}
               </span>
             ) : null}
           </div>
@@ -191,7 +210,9 @@ export function ItemsList({
         >
           {row.status === "active"
             ? vi.master.items.statusActive
-            : vi.master.items.statusInactive}
+            : row.status === "merged"
+              ? vi.master.items.tempMerged
+              : vi.master.items.statusInactive}
         </span>
       ),
     },
@@ -209,6 +230,19 @@ export function ItemsList({
           >
             ĐVT Mua
           </Button>
+          {row.is_temp && row.status === "active" && canMerge ? (
+            <Button
+              variant="outline"
+              size="sm"
+              className="text-xs h-7 px-2"
+              onClick={() => {
+                setMergingItem(row);
+                setMergeOpen(true);
+              }}
+            >
+              {vi.master.items.merge}
+            </Button>
+          ) : null}
           {canManage ? (
             <>
               <Button
@@ -306,17 +340,28 @@ export function ItemsList({
           </button>
         </div>
 
-        {canManage ? (
-          <Button
-            size="sm"
-            onClick={() => {
-              setEditingItem(null);
-              setFormOpen(true);
-            }}
-          >
-            + {vi.master.items.addItem}
-          </Button>
-        ) : null}
+        <div className="flex gap-2">
+          {canCreateTemp ? (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setTempCreateOpen(true)}
+            >
+              + {vi.master.items.createTemp}
+            </Button>
+          ) : null}
+          {canManage ? (
+            <Button
+              size="sm"
+              onClick={() => {
+                setEditingItem(null);
+                setFormOpen(true);
+              }}
+            >
+              + {vi.master.items.addItem}
+            </Button>
+          ) : null}
+        </div>
       </div>
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -387,6 +432,30 @@ export function ItemsList({
             setEditingItem(null);
             router.refresh();
           }}
+        />
+      ) : null}
+
+      {tempCreateOpen ? (
+        <TempItemCreateDialog
+          propertyId={propertyId}
+          groups={groups}
+          uoms={uoms}
+          open={tempCreateOpen}
+          onClose={() => setTempCreateOpen(false)}
+          onSuccess={() => router.refresh()}
+        />
+      ) : null}
+
+      {mergeOpen && mergingItem ? (
+        <ItemMergeDialog
+          propertyId={propertyId}
+          item={mergingItem}
+          open={mergeOpen}
+          onClose={() => {
+            setMergeOpen(false);
+            setMergingItem(null);
+          }}
+          onSuccess={() => router.refresh()}
         />
       ) : null}
 
