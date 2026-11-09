@@ -33,6 +33,10 @@ export function MasterNav({ propertyId }: { propertyId: string }) {
       href: `/${propertyId}/master/prices`,
       label: vi.master.nav.prices,
     },
+    {
+      href: `/${propertyId}/master/import`,
+      label: vi.master.nav.import,
+    },
   ];
 
   return (

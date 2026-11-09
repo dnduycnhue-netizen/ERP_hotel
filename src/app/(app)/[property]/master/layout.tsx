@@ -21,6 +21,7 @@ export default async function MasterLayout({
   const canAccess =
     perms.has("item.view") ||
     perms.has("item.manage") ||
+    perms.has("item.import") ||
     perms.has("warehouse.manage") ||
     perms.has("room.manage") ||
     perms.has("supplier.view") ||
