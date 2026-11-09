@@ -270,7 +270,7 @@ alter table public.qc_templates enable row level security;
 
 create policy goods_receipts_select on public.goods_receipts
 for select using (
-  property_id = any (public.my_property_ids())
+  property_id in (select public.my_property_ids())
   and (
     public.has_perm(property_id, 'receiving.view')
     or public.has_perm(property_id, 'receiving.review_photos')
@@ -287,7 +287,7 @@ for select using (
   exists (
     select 1 from public.goods_receipts gr
     where gr.id = goods_receipt_lines.gr_id
-    and gr.property_id = any (public.my_property_ids())
+    and gr.property_id in (select public.my_property_ids())
     and (
       public.has_perm(gr.property_id, 'receiving.view')
       or public.has_perm(gr.property_id, 'receiving.review_photos')
@@ -302,7 +302,7 @@ for select using (
 
 create policy supplier_returns_select on public.supplier_returns
 for select using (
-  property_id = any (public.my_property_ids())
+  property_id in (select public.my_property_ids())
   and (
     public.has_perm(property_id, 'receiving.view')
     or public.has_perm(property_id, 'receiving.review_photos')
@@ -315,7 +315,7 @@ for select using (
   exists (
     select 1 from public.supplier_returns sr
     where sr.id = supplier_return_lines.return_id
-    and sr.property_id = any (public.my_property_ids())
+    and sr.property_id in (select public.my_property_ids())
     and (
       public.has_perm(sr.property_id, 'receiving.view')
       or public.has_perm(sr.property_id, 'receiving.review_photos')
@@ -329,7 +329,7 @@ for select using (
   exists (
     select 1 from public.properties p
     where p.org_id = qc_templates.org_id
-    and p.id = any (public.my_property_ids())
+    and p.id in (select public.my_property_ids())
     and (
       public.has_perm(p.id, 'receiving.perform')
       or public.has_perm(p.id, 'receiving.view')
@@ -1850,7 +1850,7 @@ begin
   select p.id into v_property_id
   from public.properties p
   where p.org_id = p_org_id
-    and p.id = any (public.my_property_ids())
+    and p.id in (select public.my_property_ids())
   order by p.code
   limit 1;
 
@@ -1900,7 +1900,7 @@ begin
   select p.id into v_property_id
   from public.properties p
   where p.org_id = v_template.org_id
-    and p.id = any (public.my_property_ids())
+    and p.id in (select public.my_property_ids())
   order by p.code
   limit 1;
 
