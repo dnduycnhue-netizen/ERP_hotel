@@ -176,11 +176,12 @@ T-010 triển khai trong `supabase/migrations/20261109030000_master_data.sql`:
 
 ### B3. Sổ cái kho bất biến
 
-T-011 đang chuẩn bị schema nền trong
-`supabase/migrations/20261109110000_inventory_foundation.sql`: các bảng mới
-chưa cấp quyền cho client và migration chưa áp dụng production. Việc ghi sổ,
-phân bổ lớp FIFO, đảo và thực thi khóa vẫn chưa được triển khai; đoạn SQL dưới
-đây là đặc tả, không phải khả năng đang chạy.
+T-011 đã triển khai trong `supabase/migrations/20261109110000_inventory_foundation.sql` và
+`supabase/migrations/20261109120000_inventory_ledger_posting.sql`: các bảng sổ cái, số dư,
+giá vốn, lớp FIFO, khóa ngày và đóng kỳ. Hàm `_post_move` hỗ trợ cả 2 phương pháp: bình quân
+gia quyền tức thời và FIFO (phân bổ theo lớp, chặn ghi lùi ngày, chặn đảo/trả lớp đã xuất).
+Các bảng áp dụng trigger bất biến (`forbid_mutation`, `forbid_delete`) và chỉ mở quyền SELECT
+qua RLS cho authenticated theo quyền `stock.view_qty` / `stock.view_value`.
 
 ```sql
 create table public.stock_moves (

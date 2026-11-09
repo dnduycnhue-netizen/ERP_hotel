@@ -25,6 +25,16 @@ export const rpcErrorMessages: Record<string, string> = {
   ERR_NEGATIVE_STOCK: "Không đủ tồn kho để xuất.",
   ERR_PERIOD_CLOSED: "Kỳ kế toán đã khóa, không ghi thêm được.",
   ERR_DAY_LOCKED: "Ngày nghiệp vụ đã khóa, không ghi thêm được.",
+  ERR_FIFO_BACKDATED_FORBIDDEN:
+    "Phương pháp FIFO không cho phép ghi nhận giao dịch lùi ngày.",
+  ERR_FIFO_LAYER_CONSUMED:
+    "Lớp hàng nhập này đã được xuất kho, không thể trả lại hoặc đảo chứng từ.",
+  ERR_ALREADY_REVERSED:
+    "Bút toán này đã được đảo trước đó, không thể đảo lần hai.",
+  ERR_PERIOD_ALREADY_CLOSED: "Kỳ kế toán này đã được đóng trước đó.",
+  ERR_WAREHOUSE_NOT_FOUND: "Không tìm thấy kho được yêu cầu.",
+  ERR_LOCK_NOT_FOUND: "Không tìm thấy thông tin khóa ngày.",
+  ERR_PERIOD_NOT_FOUND: "Không tìm thấy kỳ kế toán.",
   ERR_COUNT_FREEZE:
     "Kho đang kiểm kê nên tạm dừng ghi nhận xuất nhập ở kho này.",
   ERR_OVER_CEILING_NO_REASON:

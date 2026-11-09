@@ -39,6 +39,53 @@ export type Database = {
   }
   public: {
     Tables: {
+      accounting_periods: {
+        Row: {
+          closed_at: string | null
+          closed_by: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          legal_entity_id: string
+          month: number
+          status: string
+          updated_at: string
+          year: number
+        }
+        Insert: {
+          closed_at?: string | null
+          closed_by?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          legal_entity_id: string
+          month: number
+          status?: string
+          updated_at?: string
+          year: number
+        }
+        Update: {
+          closed_at?: string | null
+          closed_by?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          legal_entity_id?: string
+          month?: number
+          status?: string
+          updated_at?: string
+          year?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "accounting_periods_legal_entity_id_fkey"
+            columns: ["legal_entity_id"]
+            isOneToOne: false
+            referencedRelation: "legal_entities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       alert_rules: {
         Row: {
           active: boolean
@@ -337,6 +384,53 @@ export type Database = {
           },
         ]
       }
+      day_locks: {
+        Row: {
+          business_date: string
+          created_at: string
+          created_by: string | null
+          id: string
+          locked_at: string
+          locked_by: string
+          property_id: string
+          shift: string | null
+          updated_at: string
+          warehouse_id: string
+        }
+        Insert: {
+          business_date: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          locked_at?: string
+          locked_by: string
+          property_id: string
+          shift?: string | null
+          updated_at?: string
+          warehouse_id: string
+        }
+        Update: {
+          business_date?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          locked_at?: string
+          locked_by?: string
+          property_id?: string
+          shift?: string | null
+          updated_at?: string
+          warehouse_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "day_locks_warehouse_id_property_id_fkey"
+            columns: ["warehouse_id", "property_id"]
+            isOneToOne: false
+            referencedRelation: "warehouses"
+            referencedColumns: ["id", "property_id"]
+          },
+        ]
+      }
       doc_sequences: {
         Row: {
           doc_type: string
@@ -417,6 +511,188 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "expense_categories"
             referencedColumns: ["id", "org_id"]
+          },
+        ]
+      }
+      fifo_allocations: {
+        Row: {
+          amount: number
+          created_at: string
+          id: number
+          issue_move_id: number
+          layer_id: number
+          legal_entity_id: string
+          org_id: string
+          qty: number
+          unit_cost: number
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          id?: never
+          issue_move_id: number
+          layer_id: number
+          legal_entity_id: string
+          org_id: string
+          qty: number
+          unit_cost: number
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: never
+          issue_move_id?: number
+          layer_id?: number
+          legal_entity_id?: string
+          org_id?: string
+          qty?: number
+          unit_cost?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fifo_allocations_issue_move_id_fkey"
+            columns: ["issue_move_id"]
+            isOneToOne: false
+            referencedRelation: "stock_moves"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fifo_allocations_layer_id_fkey"
+            columns: ["layer_id"]
+            isOneToOne: false
+            referencedRelation: "fifo_layers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fifo_allocations_legal_entity_id_org_id_fkey"
+            columns: ["legal_entity_id", "org_id"]
+            isOneToOne: false
+            referencedRelation: "legal_entities"
+            referencedColumns: ["id", "org_id"]
+          },
+          {
+            foreignKeyName: "fifo_allocations_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fifo_layers: {
+        Row: {
+          business_date: string
+          created_at: string
+          id: number
+          item_id: string
+          legal_entity_id: string
+          org_id: string
+          qty_initial: number
+          qty_remaining: number
+          stock_move_id: number
+          unit_cost: number
+        }
+        Insert: {
+          business_date: string
+          created_at?: string
+          id?: never
+          item_id: string
+          legal_entity_id: string
+          org_id: string
+          qty_initial: number
+          qty_remaining: number
+          stock_move_id: number
+          unit_cost: number
+        }
+        Update: {
+          business_date?: string
+          created_at?: string
+          id?: never
+          item_id?: string
+          legal_entity_id?: string
+          org_id?: string
+          qty_initial?: number
+          qty_remaining?: number
+          stock_move_id?: number
+          unit_cost?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fifo_layers_item_id_org_id_fkey"
+            columns: ["item_id", "org_id"]
+            isOneToOne: false
+            referencedRelation: "items"
+            referencedColumns: ["id", "org_id"]
+          },
+          {
+            foreignKeyName: "fifo_layers_legal_entity_id_org_id_fkey"
+            columns: ["legal_entity_id", "org_id"]
+            isOneToOne: false
+            referencedRelation: "legal_entities"
+            referencedColumns: ["id", "org_id"]
+          },
+          {
+            foreignKeyName: "fifo_layers_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fifo_layers_stock_move_id_fkey"
+            columns: ["stock_move_id"]
+            isOneToOne: false
+            referencedRelation: "stock_moves"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      item_costs: {
+        Row: {
+          avg_cost: number
+          item_id: string
+          legal_entity_id: string
+          org_id: string
+          qty_on_hand: number
+          updated_at: string
+        }
+        Insert: {
+          avg_cost?: number
+          item_id: string
+          legal_entity_id: string
+          org_id: string
+          qty_on_hand?: number
+          updated_at?: string
+        }
+        Update: {
+          avg_cost?: number
+          item_id?: string
+          legal_entity_id?: string
+          org_id?: string
+          qty_on_hand?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "item_costs_item_id_org_id_fkey"
+            columns: ["item_id", "org_id"]
+            isOneToOne: false
+            referencedRelation: "items"
+            referencedColumns: ["id", "org_id"]
+          },
+          {
+            foreignKeyName: "item_costs_legal_entity_id_org_id_fkey"
+            columns: ["legal_entity_id", "org_id"]
+            isOneToOne: false
+            referencedRelation: "legal_entities"
+            referencedColumns: ["id", "org_id"]
+          },
+          {
+            foreignKeyName: "item_costs_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -715,6 +991,67 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "organizations"
             referencedColumns: ["id"]
+          },
+        ]
+      }
+      lots: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          expiry_date: string | null
+          id: string
+          item_id: string
+          lot_no: string
+          org_id: string
+          property_id: string
+          received_at: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          expiry_date?: string | null
+          id?: string
+          item_id: string
+          lot_no: string
+          org_id: string
+          property_id: string
+          received_at?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          expiry_date?: string | null
+          id?: string
+          item_id?: string
+          lot_no?: string
+          org_id?: string
+          property_id?: string
+          received_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lots_item_id_org_id_fkey"
+            columns: ["item_id", "org_id"]
+            isOneToOne: false
+            referencedRelation: "items"
+            referencedColumns: ["id", "org_id"]
+          },
+          {
+            foreignKeyName: "lots_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lots_property_id_org_id_fkey"
+            columns: ["property_id", "org_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id", "org_id"]
           },
         ]
       }
@@ -1357,6 +1694,204 @@ export type Database = {
           },
         ]
       }
+      stock_balances: {
+        Row: {
+          item_id: string
+          legal_entity_id: string
+          lot_id: string | null
+          org_id: string
+          property_id: string
+          qty: number
+          updated_at: string
+          warehouse_id: string
+        }
+        Insert: {
+          item_id: string
+          legal_entity_id: string
+          lot_id?: string | null
+          org_id: string
+          property_id: string
+          qty: number
+          updated_at?: string
+          warehouse_id: string
+        }
+        Update: {
+          item_id?: string
+          legal_entity_id?: string
+          lot_id?: string | null
+          org_id?: string
+          property_id?: string
+          qty?: number
+          updated_at?: string
+          warehouse_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stock_balances_item_id_org_id_fkey"
+            columns: ["item_id", "org_id"]
+            isOneToOne: false
+            referencedRelation: "items"
+            referencedColumns: ["id", "org_id"]
+          },
+          {
+            foreignKeyName: "stock_balances_lot_id_property_id_item_id_org_id_fkey"
+            columns: ["lot_id", "property_id", "item_id", "org_id"]
+            isOneToOne: false
+            referencedRelation: "lots"
+            referencedColumns: ["id", "property_id", "item_id", "org_id"]
+          },
+          {
+            foreignKeyName: "stock_balances_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stock_balances_property_id_legal_entity_id_org_id_fkey"
+            columns: ["property_id", "legal_entity_id", "org_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id", "legal_entity_id", "org_id"]
+          },
+          {
+            foreignKeyName: "stock_balances_warehouse_id_property_id_fkey"
+            columns: ["warehouse_id", "property_id"]
+            isOneToOne: false
+            referencedRelation: "warehouses"
+            referencedColumns: ["id", "property_id"]
+          },
+        ]
+      }
+      stock_moves: {
+        Row: {
+          amount: number
+          business_date: string
+          cost_center_id: string | null
+          expense_category_id: string | null
+          id: number
+          item_id: string
+          legal_entity_id: string
+          lot_id: string | null
+          move_type: string
+          org_id: string
+          posted_at: string
+          posted_by: string
+          property_id: string
+          purpose_code: string | null
+          qty: number
+          reverses_move_id: number | null
+          source_doc_id: string
+          source_doc_type: string
+          source_line_id: string | null
+          unit_cost: number
+          warehouse_id: string
+        }
+        Insert: {
+          amount: number
+          business_date: string
+          cost_center_id?: string | null
+          expense_category_id?: string | null
+          id?: never
+          item_id: string
+          legal_entity_id: string
+          lot_id?: string | null
+          move_type: string
+          org_id: string
+          posted_at?: string
+          posted_by: string
+          property_id: string
+          purpose_code?: string | null
+          qty: number
+          reverses_move_id?: number | null
+          source_doc_id: string
+          source_doc_type: string
+          source_line_id?: string | null
+          unit_cost: number
+          warehouse_id: string
+        }
+        Update: {
+          amount?: number
+          business_date?: string
+          cost_center_id?: string | null
+          expense_category_id?: string | null
+          id?: never
+          item_id?: string
+          legal_entity_id?: string
+          lot_id?: string | null
+          move_type?: string
+          org_id?: string
+          posted_at?: string
+          posted_by?: string
+          property_id?: string
+          purpose_code?: string | null
+          qty?: number
+          reverses_move_id?: number | null
+          source_doc_id?: string
+          source_doc_type?: string
+          source_line_id?: string | null
+          unit_cost?: number
+          warehouse_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stock_moves_cost_center_id_org_id_fkey"
+            columns: ["cost_center_id", "org_id"]
+            isOneToOne: false
+            referencedRelation: "cost_centers"
+            referencedColumns: ["id", "org_id"]
+          },
+          {
+            foreignKeyName: "stock_moves_expense_category_id_org_id_fkey"
+            columns: ["expense_category_id", "org_id"]
+            isOneToOne: false
+            referencedRelation: "expense_categories"
+            referencedColumns: ["id", "org_id"]
+          },
+          {
+            foreignKeyName: "stock_moves_item_id_org_id_fkey"
+            columns: ["item_id", "org_id"]
+            isOneToOne: false
+            referencedRelation: "items"
+            referencedColumns: ["id", "org_id"]
+          },
+          {
+            foreignKeyName: "stock_moves_lot_id_property_id_item_id_org_id_fkey"
+            columns: ["lot_id", "property_id", "item_id", "org_id"]
+            isOneToOne: false
+            referencedRelation: "lots"
+            referencedColumns: ["id", "property_id", "item_id", "org_id"]
+          },
+          {
+            foreignKeyName: "stock_moves_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stock_moves_property_id_legal_entity_id_org_id_fkey"
+            columns: ["property_id", "legal_entity_id", "org_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id", "legal_entity_id", "org_id"]
+          },
+          {
+            foreignKeyName: "stock_moves_reverses_move_id_fkey"
+            columns: ["reverses_move_id"]
+            isOneToOne: true
+            referencedRelation: "stock_moves"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stock_moves_warehouse_id_property_id_fkey"
+            columns: ["warehouse_id", "property_id"]
+            isOneToOne: false
+            referencedRelation: "warehouses"
+            referencedColumns: ["id", "property_id"]
+          },
+        ]
+      }
       supplier_bank_accounts: {
         Row: {
           account_name: string
@@ -1708,6 +2243,27 @@ export type Database = {
         Returns: undefined
       }
       _admin_setting_default: { Args: { p_key: string }; Returns: Json }
+      _post_move: {
+        Args: {
+          p_cost_center?: string
+          p_date: string
+          p_doc_id: string
+          p_doc_type: string
+          p_entity: string
+          p_expense_cat?: string
+          p_item: string
+          p_line_id?: string
+          p_lot: string
+          p_property: string
+          p_purpose?: string
+          p_qty: number
+          p_reverses?: number
+          p_type: string
+          p_unit_cost: number
+          p_wh: string
+        }
+        Returns: number
+      }
       _setting_get: {
         Args: { p_key: string; p_org_id: string; p_property_id: string }
         Returns: Json
@@ -1817,6 +2373,14 @@ export type Database = {
         }
         Returns: Json
       }
+      day_lock: {
+        Args: { p_date: string; p_shift?: string; p_warehouse_id: string }
+        Returns: Json
+      }
+      day_unlock: {
+        Args: { p_lock_id: string; p_reason: string }
+        Returns: Json
+      }
       has_perm: {
         Args: { p_perm: string; p_property: string; p_warehouse?: string }
         Returns: boolean
@@ -1829,6 +2393,14 @@ export type Database = {
         Returns: string
       }
       norm_text: { Args: { p_text: string }; Returns: string }
+      period_close: {
+        Args: { p_entity_id: string; p_month: number; p_year: number }
+        Returns: Json
+      }
+      period_reopen: {
+        Args: { p_period_id: string; p_reason: string }
+        Returns: Json
+      }
       require_perm: {
         Args: { p_perm: string; p_property: string; p_warehouse?: string }
         Returns: undefined

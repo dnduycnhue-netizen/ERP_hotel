@@ -68,7 +68,10 @@ draft ──submit──▶ submitted ──approve (đủ bước)──▶ app
 
 - Không cho tồn âm ở bất kỳ kho nào (`ERR_NEGATIVE_STOCK`).
 - Giá xuất: bình quân gia quyền tức thời theo pháp nhân (B4 trong `03-DATA-MODEL.md`). Phương pháp đặt trong `legal_entities.costing_method`, đổi chỉ khi đầu năm tài chính.
-- **Quyết định tạm thời cho T-011:** khách chọn FIFO theo thứ tự ghi sổ cho toàn chuỗi, đồng thời vẫn hỗ trợ và kiểm thử bình quân gia quyền; cần kế toán trưởng phê duyệt (Q6, Q11, Q12). FIFO chặn ghi lùi ngày và chặn trả/đảo phần lớp nhập đã xuất. Không tự chuyển phương pháp của pháp nhân đã có giao dịch hoặc số dư. Quyết định này **chưa được triển khai**, cấu hình hiện tại chưa tự thay đổi.
+- **Quy tắc giá vốn (T-011):** Hệ thống hỗ trợ cả 2 phương pháp định giá tại `_post_move`: bình quân gia quyền tức thời (`moving_avg`) và FIFO (`fifo`) theo cấu hình `legal_entities.costing_method`.
+  - Với `moving_avg`: tính bình quân tức thời khi nhập mới; khi trả hàng NCC (`return_out`) hoặc đảo nhập (`reversal`), tính lại giá bình quân theo giá trị tồn còn lại và chặn tồn âm (Q11).
+  - Với `fifo`: phân bổ theo các lớp nhập cũ nhất (`fifo_layers`, `fifo_allocations`); chặn ghi lùi ngày (`ERR_FIFO_BACKDATED_FORBIDDEN`) và chặn trả/đảo các lớp nhập đã bị xuất (`ERR_FIFO_LAYER_CONSUMED`) theo Q12.
+  - Cấu hình ban đầu của pháp nhân tạo mới mặc định `moving_avg`, có thể chuyển sang `fifo` trước khi phát sinh giao dịch.
 - Phiếu lĩnh: lệch giữa `issued` và `received` phải giải quyết trước khi khóa ca của outlet.
 - Xuất theo mục đích không tính vào giá vốn hàng bán; gắn `cost_center_id` + `expense_category_id` bắt buộc.
 - Hủy hàng > **1.000.000đ/phiếu** [cấu hình] → thêm duyệt gm.

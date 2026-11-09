@@ -24,14 +24,15 @@ Quy ước tiêu chí nghiệm thu (AC): mọi task phải thỏa Definition of 
 
 ## Giai đoạn MVP-A — Danh mục & sổ cái (tuần 3–4)
 
-> T-011 đang triển khai: đã chuẩn bị schema nền và kiểm thử RLS/bất biến
-> trong transaction rollback. Chưa áp migration lên production, chưa có RPC
-> post, FIFO/bình quân hay thực thi khóa ngày/kỳ; chưa được dùng cho nghiệp vụ.
+> T-011 hoàn tất: migration 20261109110000 và 20261109120000 đã áp dụng production;
+> `_post_move` hỗ trợ cả 2 phương pháp: bình quân gia quyền tức thời và FIFO (phân bổ lớp,
+> chặn ghi lùi ngày, chặn đảo/trả lớp đã xuất); các RPC `day_lock`, `day_unlock`, `period_close`,
+> `period_reopen` đã triển khai; 54/54 assertion pgTAP đạt.
 
 | # | Task | Agent | Phụ thuộc | AC chính |
 |---|---|---|---|---|
 | [x] T-010 | Migration 03 danh mục (A2), `doc_sequences`, `next_doc_no`, `norm_text`, unique `name_norm` | CC | T-002 | Test: số chứng từ tăng đúng khi gọi đồng thời 50 lần (không trùng) |
-| [ ] T-011 | Migration 04 sổ cái: `stock_moves`, `stock_balances`, `item_costs`, `_post_move`, `forbid_mutation`, kỳ & khóa ngày; bổ sung FIFO tạm thời theo Q11/Q12 | CC | T-010 | pgTAP: bình quân gia quyền đúng 5 ca (nhập/xuất xen kẽ), FIFO theo lớp, chặn tồn âm; chặn UPDATE; kỳ đóng chặn ghi |
+| [x] T-011 | Migration 04 sổ cái: `stock_moves`, `stock_balances`, `item_costs`, `_post_move`, `forbid_mutation`, kỳ & khóa ngày; bổ sung FIFO tạm thời theo Q11/Q12 | CC | T-010 | pgTAP: bình quân gia quyền đúng 5 ca (nhập/xuất xen kẽ), FIFO theo lớp, chặn tồn âm; chặn UPDATE; kỳ đóng chặn ghi |
 | [ ] T-012 | Màn hình danh mục: vật tư (lọc nhóm, mã tạm, thiếu quy đổi), nhóm hàng, đơn vị, quy cách mua, kho, phòng, outlet, khoản mục | AG | T-010 | CRUD qua RLS; tạo trùng tên → báo lỗi tiếng Việt |
 | [ ] T-013 | NCC + thẩm định + đổi STK 2 người + hợp đồng khung + giá trần | AG + CC (RPC) | T-012 | SoD STK; alert `BANK_ACCOUNT_CHANGE` tạo ra |
 | [ ] T-014 | Import Excel 4 bước (01.10) cho vật tư & NCC theo `07-IMPORT-MIGRATION.md`; chạy thử với file `Lst_2020_DL_Buffet.xlsx` | CC | T-012 | Phát hiện đủ 11 mã trùng, 54→33 đơn vị, 281 thiếu hệ số trên file mẫu |
