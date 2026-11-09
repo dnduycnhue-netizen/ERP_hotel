@@ -1,0 +1,262 @@
+"use client";
+
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useMemo, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { ConfirmPostDialog } from "@/components/common/confirm-post-dialog";
+import { PinDialog } from "@/components/common/pin-dialog";
+import { postReceivingAction } from "@/features/receiving/actions";
+import type {
+  ReceiptLineRow,
+  ReceiptRow,
+  ReceivingTaskDetail,
+} from "@/features/receiving/queries";
+import { vi } from "@/i18n/vi";
+import { useCan } from "@/lib/permissions/permissions-provider";
+import { MobileLineForm, formatQty } from "./mobile-line-form";
+
+function interpolate(
+  template: string,
+  values: Record<string, string | number>,
+): string {
+  return Object.entries(values).reduce(
+    (text, [key, value]) => text.replace(`{${key}}`, String(value)),
+    template,
+  );
+}
+
+function qcBadgeClass(status: string): string {
+  if (status === "pass") {
+    return "border-green-200 bg-green-50 text-green-800";
+  }
+  if (status === "fail") {
+    return "border-red-200 bg-red-50 text-red-800";
+  }
+  return "border-amber-200 bg-amber-50 text-amber-800";
+}
+
+function qcLabel(status: string): string {
+  if (status === "pass") {
+    return vi.receiving.qcPass;
+  }
+  if (status === "fail") {
+    return vi.receiving.qcFail;
+  }
+  return vi.receiving.qcConditional;
+}
+
+/**
+ * Không gian ghi nhận của 1 phiếu nháp (T-024): từng dòng PO hiện tên hàng
+ * + đặc tả + yêu cầu QC (mù — không số lượng PO, không giá), form ghi dòng,
+ * rồi ghi sổ bằng PIN.
+ *
+ * Ghi sổ chỉ bật khi đã ghi ít nhất 1 dòng và không còn dòng nào đang chờ
+ * cân lại (server cũng chặn post khi còn dòng `needs_reweigh`).
+ */
+export function MobileReceiveWorkspace({
+  receipt,
+  task,
+  propertyId,
+}: {
+  receipt: ReceiptRow;
+  task: ReceivingTaskDetail;
+  propertyId: string;
+}) {
+  const router = useRouter();
+  const canPerform = useCan("receiving.perform");
+  const canPost = useCan("receiving.post");
+  const [lines, setLines] = useState<ReceiptLineRow[]>(receipt.lines);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [pinOpen, setPinOpen] = useState(false);
+  const [pinError, setPinError] = useState<string | null>(null);
+  const [posting, setPosting] = useState(false);
+
+  const storedByPoLine = useMemo(() => {
+    const map = new Map<string, ReceiptLineRow>();
+    for (const line of lines) {
+      if (line.po_line_id) {
+        map.set(line.po_line_id, line);
+      }
+    }
+    return map;
+  }, [lines]);
+
+  const recordedCount = task.lines.filter((line) =>
+    storedByPoLine.has(line.po_line_id),
+  ).length;
+  const needsReweighCount = task.lines.filter(
+    (line) => storedByPoLine.get(line.po_line_id)?.needs_reweigh,
+  ).length;
+  const canPostNow = recordedCount > 0 && needsReweighCount === 0;
+
+  function handleRecorded(line: ReceiptLineRow) {
+    setLines((prev) => {
+      const next = prev.filter((item) => item.po_line_id !== line.po_line_id);
+      return [...next, line];
+    });
+  }
+
+  async function handlePinSubmit(pin: string) {
+    setPosting(true);
+    setPinError(null);
+    const res = await postReceivingAction({ grId: receipt.id, pin });
+    setPosting(false);
+    if (!res.ok) {
+      setPinError(res.error);
+      return;
+    }
+    setPinOpen(false);
+    router.push(`/m/${propertyId}/receive?posted=1`);
+  }
+
+  return (
+    <div className="flex flex-col gap-4">
+      <div>
+        <h1 className="text-xl font-semibold">
+          {vi.receiving.receiptTitle} {receipt.doc_no}
+        </h1>
+        <p className="mt-1 text-sm text-muted-foreground">
+          {task.doc_no} · {task.supplier_name}
+        </p>
+        <p className="mt-1 text-sm font-medium">
+          {interpolate(vi.receiving.recordedProgress, {
+            done: recordedCount,
+            total: task.lines.length,
+          })}
+        </p>
+      </div>
+
+      <ul className="flex flex-col gap-4">
+        {task.lines.map((line) => {
+          const stored = storedByPoLine.get(line.po_line_id) ?? null;
+          const isRecorded = stored !== null && !stored.needs_reweigh;
+          return (
+            <li
+              key={line.po_line_id}
+              className="rounded-xl border bg-card p-4 shadow-sm"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="font-semibold">{line.item_name}</p>
+                  {line.spec ? (
+                    <p className="mt-0.5 text-sm text-muted-foreground">
+                      {vi.receiving.spec}: {line.spec}
+                    </p>
+                  ) : null}
+                  <p className="mt-0.5 text-sm text-muted-foreground">
+                    {line.uom}
+                    {line.track_lot ? ` · ${vi.receiving.lotNo}` : ""}
+                    {line.photo_required
+                      ? ` · ${vi.receiving.photoRequired}`
+                      : ""}
+                  </p>
+                </div>
+                {isRecorded && stored ? (
+                  <span
+                    className={`shrink-0 rounded-full border px-2 py-0.5 text-xs font-medium ${qcBadgeClass(stored.qc_status)}`}
+                  >
+                    {qcLabel(stored.qc_status)}
+                  </span>
+                ) : null}
+              </div>
+
+              {isRecorded && stored ? (
+                <div className="mt-3 flex flex-col gap-1 border-t pt-3 text-sm">
+                  <p>
+                    {vi.receiving.netQty}: {formatQty(stored.net_qty)}{" "}
+                    {stored.uom} ({vi.receiving.grossQty}{" "}
+                    {formatQty(stored.gross_qty)}, {vi.receiving.tareQty}{" "}
+                    {formatQty(stored.tare_qty)})
+                  </p>
+                  <p className="text-muted-foreground">
+                    {vi.receiving.weighCount}: {stored.weigh_count}
+                  </p>
+                  <p className="text-muted-foreground">
+                    {vi.receiving.photoTaken}: {stored.photo_ids.length}
+                  </p>
+                </div>
+              ) : (
+                <div className="mt-3">
+                  <MobileLineForm
+                    line={line}
+                    grId={receipt.id}
+                    propertyId={propertyId}
+                    stored={stored}
+                    canPerform={canPerform}
+                    onRecorded={handleRecorded}
+                  />
+                </div>
+              )}
+            </li>
+          );
+        })}
+      </ul>
+
+      <div className="flex flex-col gap-2 rounded-xl border bg-card p-4 shadow-sm">
+        {needsReweighCount > 0 ? (
+          <p role="alert" className="text-sm text-amber-700">
+            {vi.receiving.reweighHint}
+          </p>
+        ) : recordedCount === task.lines.length ? (
+          <p className="text-sm text-muted-foreground">
+            {vi.receiving.allLinesDone}
+          </p>
+        ) : (
+          <p className="text-sm text-muted-foreground">
+            {vi.receiving.pendingLinesHint}
+          </p>
+        )}
+        {!canPost ? (
+          <p className="text-sm text-muted-foreground">
+            {vi.receiving.noPostPermission}
+          </p>
+        ) : null}
+        <Button
+          size="lg"
+          className="h-14 text-base"
+          disabled={!canPost || !canPostNow || posting}
+          onClick={() => {
+            setConfirmOpen(true);
+          }}
+        >
+          {vi.receiving.post}
+        </Button>
+        <Link
+          href={`/m/${propertyId}/receive`}
+          className="text-center text-sm font-medium text-primary underline-offset-4 hover:underline"
+        >
+          {vi.receiving.backToTasks}
+        </Link>
+      </div>
+
+      <ConfirmPostDialog
+        open={confirmOpen}
+        onOpenChange={setConfirmOpen}
+        title={vi.receiving.pinTitle}
+        docNo={receipt.doc_no}
+        consequences={[
+          vi.components.confirmPost.defaultConsequence,
+          vi.receiving.postConfirmNote,
+        ]}
+        confirmLabel={vi.components.confirmPost.confirmAction}
+        onConfirm={() => {
+          setConfirmOpen(false);
+          setPinError(null);
+          setPinOpen(true);
+        }}
+      />
+      <PinDialog
+        open={pinOpen}
+        onOpenChange={setPinOpen}
+        title={vi.receiving.pinTitle}
+        description={vi.receiving.pinHint}
+        length={6}
+        minLength={4}
+        error={pinError}
+        submitting={posting}
+        onSubmit={(pin) => void handlePinSubmit(pin)}
+      />
+    </div>
+  );
+}
