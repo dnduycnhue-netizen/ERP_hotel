@@ -938,16 +938,16 @@ select is(
      and lot_id is null),
   22::numeric, 'MAIN MUOI balance is 22 after post (override)'
 );
--- Trang thai PO phai doc duoi vai co po.view: thu kho a07 khong co
--- po.view nen RLS an dong purchase_orders (run 12: status NULL). Owner
--- a05 co po.view nen thay duoc; dong PO line thi a07 van doc duoc.
+-- Trang thai PO va dong PO phai doc duoi vai thay duoc PO header: a07
+-- khong thay duoc PO (RLS an dong purchase_orders) nen EXISTS trong policy
+-- purchase_order_lines cung fail -> a07 doc dong PO ra NULL (diag13 dong 47).
+-- Owner a05 thay duoc ca hai.
 select public._t023_as('d0230000-0000-4000-8000-000000000a05');
 select is(
   (select status from public.purchase_orders
    where id = 'd0230000-0000-4000-8000-000000000b01'),
   'partially_received', 'PO1 is partially_received after post'
 );
-select public._t023_as('d0230000-0000-4000-8000-000000000a07');
 select is(
   (select received_qty_stock from public.purchase_order_lines
    where id = 'd0230000-0000-4000-8000-000000000c01'),
@@ -992,13 +992,15 @@ select ok(
   (select ((select resp from t023_resp where key = 'post_gr4') ->> 'ok')::boolean),
   'direct-issue receipt posts'
 );
+-- Dem moves phai doc duoi vai co stock.view_qty: a06 khong co quyen nay
+-- nen RLS an stock_moves (diag13 dong 63: count 0); a07 co stock.view_qty.
+select public._t023_as('d0230000-0000-4000-8000-000000000a07');
 select is(
   (select count(*) from public.stock_moves
    where source_doc_type = 'goods_receipt'
      and source_doc_id = (select id from t023_ctx where key = 'gr4')),
   3::bigint, 'direct issue creates 3 moves'
 );
-select public._t023_as('d0230000-0000-4000-8000-000000000a07');
 select is(
   (select qty from public.stock_balances
    where warehouse_id = 'd0230000-0000-4000-8000-000000000303'
@@ -1050,11 +1052,15 @@ select ok(
   (select ((select resp from t023_resp where key = 'ret_muoi') ->> 'ok')::boolean),
   'supplier_return_post succeeds'
 );
+-- Dong PO chi doc duoc duoi vai thay duoc PO header: a07 doc ra NULL
+-- (diag13 dong 68), a05 thay duoc 20.
+select public._t023_as('d0230000-0000-4000-8000-000000000a05');
 select is(
   (select received_qty_stock from public.purchase_order_lines
    where id = 'd0230000-0000-4000-8000-000000000c03'),
   20::numeric, 'MUOI received_qty_stock drops to 20 after return'
 );
+select public._t023_as('d0230000-0000-4000-8000-000000000a07');
 select is(
   (select count(*) from public.stock_moves
    where source_doc_type = 'supplier_return' and qty = -2 and unit_cost = 5000),
@@ -1097,6 +1103,8 @@ select is(
      and item_id = 'd0230000-0000-4000-8000-000000000502'),
   0::numeric, 'quarantine THIT balance back to 0 after reverse'
 );
+-- Trang thai PO5 phai doc bang a05 (a07 doc ra NULL, diag13 dong 72).
+select public._t023_as('d0230000-0000-4000-8000-000000000a05');
 select is(
   (select status from public.purchase_orders
    where id = 'd0230000-0000-4000-8000-000000000b05'),
