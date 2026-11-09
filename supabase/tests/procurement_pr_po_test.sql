@@ -51,20 +51,8 @@ insert into public.price_agreement_lines (org_id, agreement_id, item_id, uom, un
   ('d0200000-0200-4000-8000-000000000001', 'd0200000-0200-4000-8000-000000000801', 'd0200000-0200-4000-8000-000000000501', 'kg', 10000),
   ('d0200000-0200-4000-8000-000000000001', 'd0200000-0200-4000-8000-000000000801', 'd0200000-0200-4000-8000-000000000502', 'kg', 60000);
 
-insert into public.ceiling_prices (org_id, property_id, item_id, uom, price, valid_from, valid_to) values
-  ('d0200000-0200-4000-8000-000000000001', 'd0200000-0200-4000-8000-000000000201', 'd0200000-0200-4000-8000-000000000501', 'kg', 12000, '2026-01-01', '2030-12-31'),
-  ('d0200000-0200-4000-8000-000000000001', 'd0200000-0200-4000-8000-000000000201', 'd0200000-0200-4000-8000-000000000502', 'kg', 50000, '2026-01-01', '2030-12-31');
-
-insert into public.cost_centers (id, org_id, code, name) values
-  ('d0200000-0200-4000-8000-000000000311', 'd0200000-0200-4000-8000-000000000001', 'CC_KIT', 'Bếp');
-
-insert into public.outlet_types (id, org_id, code, name) values
-  ('d0200000-0200-4000-8000-000000000301', 'd0200000-0200-4000-8000-000000000001', 'KITCHEN', 'Bếp');
-
-insert into public.outlets (id, property_id, outlet_type_id, cost_center_id, code, name) values
-  ('d0200000-0200-4000-8000-000000000321', 'd0200000-0200-4000-8000-000000000201', 'd0200000-0200-4000-8000-000000000301', 'd0200000-0200-4000-8000-000000000311', 'KIT01', 'Bếp chính'),
-  ('d0200000-0200-4000-8000-000000000322', 'd0200000-0200-4000-8000-000000000202', 'd0200000-0200-4000-8000-000000000301', 'd0200000-0200-4000-8000-000000000311', 'KIT02', 'Bếp chính 2');
-
+-- Nguoi dung auth phai dung truoc ceiling_prices vi set_by FK ve auth.users
+-- (mau master_data_test.sql; truoc day block auth nam sau ceiling_prices).
 insert into auth.users (id, instance_id, aud, role, email, encrypted_password, email_confirmed_at, created_at, updated_at, raw_app_meta_data, raw_user_meta_data)
 values
   ('d0200000-0200-4000-8000-000000000a01', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'u1-pur020@test.com', '', now(), now(), now(), '{}'::jsonb, '{}'::jsonb),
@@ -77,6 +65,20 @@ values
   ('d0200000-0200-4000-8000-000000000a08', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'u8-outcreator020@test.com', '', now(), now(), now(), '{}'::jsonb, '{}'::jsonb),
   ('d0200000-0200-4000-8000-000000000a09', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'u9-admin020@test.com', '', now(), now(), now(), '{}'::jsonb, '{}'::jsonb),
   ('d0200000-0200-4000-8000-000000000a10', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'u10-view020@test.com', '', now(), now(), now(), '{}'::jsonb, '{}'::jsonb);
+
+insert into public.ceiling_prices (org_id, property_id, item_id, uom, price, valid_from, valid_to, set_by) values
+  ('d0200000-0200-4000-8000-000000000001', 'd0200000-0200-4000-8000-000000000201', 'd0200000-0200-4000-8000-000000000501', 'kg', 12000, '2026-01-01', '2030-12-31', 'd0200000-0200-4000-8000-000000000a01'),
+  ('d0200000-0200-4000-8000-000000000001', 'd0200000-0200-4000-8000-000000000201', 'd0200000-0200-4000-8000-000000000502', 'kg', 50000, '2026-01-01', '2030-12-31', 'd0200000-0200-4000-8000-000000000a01');
+
+insert into public.cost_centers (id, org_id, code, name) values
+  ('d0200000-0200-4000-8000-000000000311', 'd0200000-0200-4000-8000-000000000001', 'CC_KIT', 'Bếp');
+
+insert into public.outlet_types (id, org_id, code, name) values
+  ('d0200000-0200-4000-8000-000000000301', 'd0200000-0200-4000-8000-000000000001', 'KITCHEN', 'Bếp');
+
+insert into public.outlets (id, property_id, outlet_type_id, cost_center_id, code, name) values
+  ('d0200000-0200-4000-8000-000000000321', 'd0200000-0200-4000-8000-000000000201', 'd0200000-0200-4000-8000-000000000301', 'd0200000-0200-4000-8000-000000000311', 'KIT01', 'Bếp chính'),
+  ('d0200000-0200-4000-8000-000000000322', 'd0200000-0200-4000-8000-000000000202', 'd0200000-0200-4000-8000-000000000301', 'd0200000-0200-4000-8000-000000000311', 'KIT02', 'Bếp chính 2');
 
 insert into public.profiles (id, employee_code, full_name) values
   ('d0200000-0200-4000-8000-000000000a01', 'NV02001', 'Thu mua'),

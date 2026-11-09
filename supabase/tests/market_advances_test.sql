@@ -13,8 +13,8 @@ select plan(56);
 -- Fixture: org, legal entity, property, uom, vat tu, gia tran, vai tro,
 -- nguoi dung, quy tac duyet PO mac dinh (PO < 5tr: 1 buoc outlet_head).
 -- ---------------------------------------------------------------------------
-insert into public.organizations (id, name, code) values
-  ('d0220000-0200-4000-8000-000000000001', 'T-022 Master Org', 'T022');
+insert into public.organizations (id, name) values
+  ('d0220000-0200-4000-8000-000000000001', 'T-022 Master Org');
 
 insert into public.legal_entities (id, org_id, name, code) values
   ('d0220000-0200-4000-8000-000000000101', 'd0220000-0200-4000-8000-000000000001', 'T022 Entity', 'T022E');
@@ -35,9 +35,22 @@ insert into public.items (id, org_id, code, name, group_id, stock_uom, is_key_it
   ('d0220000-0200-4000-8000-000000000502', 'd0220000-0200-4000-8000-000000000001', 'ITM_THIT', 'Thịt ba chỉ', 'd0220000-0200-4000-8000-000000000302', 'kg', true, array['contract']),
   ('d0220000-0200-4000-8000-000000000503', 'd0220000-0200-4000-8000-000000000001', 'ITM_MUOI', 'Muối hạt', 'd0220000-0200-4000-8000-000000000302', 'kg', false, array['contract', 'market']);
 
-insert into public.ceiling_prices (org_id, property_id, item_id, uom, price, valid_from, valid_to) values
-  ('d0220000-0200-4000-8000-000000000001', 'd0220000-0200-4000-8000-000000000201', 'd0220000-0200-4000-8000-000000000501', 'kg', 12000, '2026-01-01', '2030-12-31'),
-  ('d0220000-0200-4000-8000-000000000001', 'd0220000-0200-4000-8000-000000000201', 'd0220000-0200-4000-8000-000000000502', 'kg', 50000, '2026-01-01', '2030-12-31');
+-- Nguoi dung auth (mau master_data_test.sql): profiles, user_property_roles
+-- va ceiling_prices.set_by deu FK ve auth.users nen phai co dong auth truoc.
+insert into auth.users (id, instance_id, aud, role, email, encrypted_password, email_confirmed_at, created_at, updated_at, raw_app_meta_data, raw_user_meta_data)
+values
+  ('d0220000-0200-4000-8000-000000000a01', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 't022-pur@example.test', '', now(), now(), now(), '{}'::jsonb, '{}'::jsonb),
+  ('d0220000-0200-4000-8000-000000000a02', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 't022-oh@example.test', '', now(), now(), now(), '{}'::jsonb, '{}'::jsonb),
+  ('d0220000-0200-4000-8000-000000000a03', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 't022-cc@example.test', '', now(), now(), now(), '{}'::jsonb, '{}'::jsonb),
+  ('d0220000-0200-4000-8000-000000000a04', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 't022-gm@example.test', '', now(), now(), now(), '{}'::jsonb, '{}'::jsonb),
+  ('d0220000-0200-4000-8000-000000000a05', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 't022-own@example.test', '', now(), now(), now(), '{}'::jsonb, '{}'::jsonb),
+  ('d0220000-0200-4000-8000-000000000a06', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 't022-acc@example.test', '', now(), now(), now(), '{}'::jsonb, '{}'::jsonb),
+  ('d0220000-0200-4000-8000-000000000a07', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 't022-view@example.test', '', now(), now(), now(), '{}'::jsonb, '{}'::jsonb),
+  ('d0220000-0200-4000-8000-000000000a08', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 't022-pur2@example.test', '', now(), now(), now(), '{}'::jsonb, '{}'::jsonb);
+
+insert into public.ceiling_prices (org_id, property_id, item_id, uom, price, valid_from, valid_to, set_by) values
+  ('d0220000-0200-4000-8000-000000000001', 'd0220000-0200-4000-8000-000000000201', 'd0220000-0200-4000-8000-000000000501', 'kg', 12000, '2026-01-01', '2030-12-31', 'd0220000-0200-4000-8000-000000000a01'),
+  ('d0220000-0200-4000-8000-000000000001', 'd0220000-0200-4000-8000-000000000201', 'd0220000-0200-4000-8000-000000000502', 'kg', 50000, '2026-01-01', '2030-12-31', 'd0220000-0200-4000-8000-000000000a01');
 
 insert into public.cost_centers (id, org_id, code, name) values
   ('d0220000-0200-4000-8000-000000000401', 'd0220000-0200-4000-8000-000000000001', 'CC_KIT', 'Bếp');
