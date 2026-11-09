@@ -247,7 +247,9 @@ select is(
 );
 
 -- 2. Guard: ghi truc tiep vao bang nhan hang bi chan (chay truoc khi doi
---    role authenticated; superuser bo qua RLS nhung trigger van chay).
+--    role authenticated). Phien SQL Editor khong phai superuser nen
+--    RLS/quyen chan truoc khi trigger kip chay -> 42501 permission denied
+--    (run 12); y nghia kiem tra van giu nguyen: ghi truc tiep bi chan.
 select throws_ok(
   $q$insert into public.goods_receipt_lines (gr_id, org_id, property_id, item_id, gross_qty, uom, net_qty_stock, qc_status) values (
     'd0230000-0000-4000-8000-000000000e01',
@@ -256,8 +258,8 @@ select throws_ok(
     'd0230000-0000-4000-8000-000000000501',
     10, 'kg', 10, 'pass'
   )$q$,
-  'P0001', 'ERR_WRITE_GUARD',
-  'Direct goods_receipt_lines insert is blocked by trigger'
+  '42501', 'permission denied for relation goods_receipt_lines',
+  'Direct goods_receipt_lines insert is blocked'
 );
 
 select set_config('app.receiving_guard_bypass', 'on', true);
@@ -274,8 +276,8 @@ select set_config('app.receiving_guard_bypass', 'off', true);
 
 select throws_ok(
   $q$update public.goods_receipts set status = 'posted' where id = 'd0230000-0000-4000-8000-000000000e01'$q$,
-  'P0001', 'ERR_WRITE_GUARD',
-  'Direct goods_receipts status change is blocked by trigger'
+  '42501', 'permission denied for relation goods_receipts',
+  'Direct goods_receipts status change is blocked'
 );
 
 -- Tu day tro di chay duoi role authenticated (RLS co hieu luc).
@@ -745,6 +747,11 @@ select is(
   (select ((select resp from t023_resp where key = 'rec_fail') ->> 'accepted_qty_stock_capped')::numeric),
   0::numeric, 'QC fail accepts 0'
 );
+-- Doc phieu tra phai doi vai co quyen xem: receiver a06 khong co
+-- receiving.view / supplier_return.post nen RLS an ca supplier_returns
+-- lan supplier_return_lines (run 12: count 0 / qty NULL du phieu tra co
+-- that). Thu kho a07 co supplier_return.post nen thay duoc.
+select public._t023_as('d0230000-0000-4000-8000-000000000a07');
 select is(
   (select count(*) from public.supplier_returns
    where gr_id = (select id from t023_ctx where key = 'gr7')
@@ -757,6 +764,7 @@ select is(
    where sr.gr_id = (select id from t023_ctx where key = 'gr7')),
   2::numeric, 'return line holds the rejected 2kg'
 );
+select public._t023_as('d0230000-0000-4000-8000-000000000a06');
 select throws_ok(
   $q$select public.receiving_record_line(
     p_gr_id := (select id from t023_ctx where key = 'gr7'),
@@ -930,11 +938,16 @@ select is(
      and lot_id is null),
   22::numeric, 'MAIN MUOI balance is 22 after post (override)'
 );
+-- Trang thai PO phai doc duoi vai co po.view: thu kho a07 khong co
+-- po.view nen RLS an dong purchase_orders (run 12: status NULL). Owner
+-- a05 co po.view nen thay duoc; dong PO line thi a07 van doc duoc.
+select public._t023_as('d0230000-0000-4000-8000-000000000a05');
 select is(
   (select status from public.purchase_orders
    where id = 'd0230000-0000-4000-8000-000000000b01'),
   'partially_received', 'PO1 is partially_received after post'
 );
+select public._t023_as('d0230000-0000-4000-8000-000000000a07');
 select is(
   (select received_qty_stock from public.purchase_order_lines
    where id = 'd0230000-0000-4000-8000-000000000c01'),
@@ -1143,13 +1156,14 @@ select ok(
   ) -> 'lines' -> 0 -> 'qc_template') is not null),
   'get_task returns the QC template for GAO'
 );
+-- require_perm raise 42501 theo thiet ke (20261108141000), khong phai P0001.
 select throws_ok(
   $q$select public.admin_qc_template_save(
     'd0230000-0000-4000-8000-000000000001',
     'd0230000-0000-4000-8000-000000000401',
     '[{"q": "Khác"}]'::jsonb
   )$q$,
-  'P0001', 'ERR_FORBIDDEN:admin.settings.manage',
+  '42501', 'ERR_FORBIDDEN:admin.settings.manage',
   'receiver cannot save QC template'
 );
 select public._t023_as('d0230000-0000-4000-8000-000000000a09');
