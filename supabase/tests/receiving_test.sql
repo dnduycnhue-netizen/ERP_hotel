@@ -249,7 +249,10 @@ select is(
 -- 2. Guard: ghi truc tiep vao bang nhan hang bi chan (chay truoc khi doi
 --    role authenticated). Phien chay duoi postgres (bypassrls) nen RLS
 --    khong chan; trigger write-guard nem P0001 ERR_WRITE_GUARD (diag14
---    dong 6-7: run 12 bao 42501 la chep nham).
+--    dong 6-7: run 12 bao 42501 la chep nham). pgTAP throws_ok so sanh
+--    message CHINH XAC (khong phai substring) nen phai ky vong toan bo
+--    message ke ca ten bang (run 14: 85/87 — chi 'ERR_WRITE_GUARD' tron
+--    thi #6/#7 van rot).
 select throws_ok(
   $q$insert into public.goods_receipt_lines (gr_id, org_id, property_id, item_id, gross_qty, uom, net_qty_stock, qc_status) values (
     'd0230000-0000-4000-8000-000000000e01',
@@ -258,7 +261,7 @@ select throws_ok(
     'd0230000-0000-4000-8000-000000000501',
     10, 'kg', 10, 'pass'
   )$q$,
-  'P0001', 'ERR_WRITE_GUARD',
+  'P0001', 'ERR_WRITE_GUARD: goods_receipt_lines chi duoc ghi qua RPC',
   'Direct goods_receipt_lines insert is blocked'
 );
 
@@ -276,7 +279,7 @@ select set_config('app.receiving_guard_bypass', 'off', true);
 
 select throws_ok(
   $q$update public.goods_receipts set status = 'posted' where id = 'd0230000-0000-4000-8000-000000000e01'$q$,
-  'P0001', 'ERR_WRITE_GUARD',
+  'P0001', 'ERR_WRITE_GUARD: goods_receipts chi duoc ghi qua RPC',
   'Direct goods_receipts status change is blocked'
 );
 
