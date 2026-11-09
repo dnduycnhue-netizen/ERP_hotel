@@ -216,6 +216,14 @@ const UNKNOWN_META: DocStatusMeta = {
   Icon: CircleHelp,
 };
 
+/** Nhãn tiếng Việt của 1 mã trạng thái (dùng cho chip lọc...). */
+export function getDocStatusLabel(status: string): string {
+  return (
+    (STATUS_META as Record<string, DocStatusMeta>)[status]?.label ??
+    UNKNOWN_META.label
+  );
+}
+
 /** Huy hiệu trạng thái chứng từ. Nhận mọi chuỗi trạng thái; mã lạ hiện huy hiệu xám "Không rõ trạng thái". */
 export function DocStatusBadge({
   status,
