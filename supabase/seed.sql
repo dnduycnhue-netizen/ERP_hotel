@@ -319,4 +319,35 @@ join public.roles r
 join public.permissions p on p.code = rp.permission_code
 on conflict do nothing;
 
+-- T-020: quyen dong don mua + ma tran duyet mac dinh (ma tran nay cung
+-- duoc seed trong migration 20261109210000 cho moi org hien co; day la ban
+-- seed local cho org mau de db reset co du lieu giong production).
+insert into public.role_permissions (role_id, permission_code)
+select r.id, rp.permission_code
+from (
+  values
+    ('purchaser', 'po.close'),
+    ('owner', 'po.close')
+) as rp(role_code, permission_code)
+join public.roles r
+  on r.org_id = '00000000-0000-4000-8000-000000000001'
+ and r.code = rp.role_code
+join public.permissions p on p.code = rp.permission_code
+on conflict do nothing;
+
+insert into public.approval_rules
+  (org_id, property_id, doc_type, min_amount, max_amount, step, approver_role_id, required_perm)
+values
+  ('00000000-0000-4000-8000-000000000001', null, 'pr', 0, null, 1,
+   '00000000-0000-4000-8000-000000000509', 'pr.approve'),
+  ('00000000-0000-4000-8000-000000000001', null, 'po', 0, 5000000, 1,
+   '00000000-0000-4000-8000-000000000509', 'po.approve'),
+  ('00000000-0000-4000-8000-000000000001', null, 'po', 5000000, 20000000, 2,
+   '00000000-0000-4000-8000-000000000505', 'po.approve'),
+  ('00000000-0000-4000-8000-000000000001', null, 'po', 20000000, 100000000, 3,
+   '00000000-0000-4000-8000-000000000502', 'po.approve'),
+  ('00000000-0000-4000-8000-000000000001', null, 'po', 100000000, null, 4,
+   '00000000-0000-4000-8000-000000000501', 'po.approve')
+on conflict do nothing;
+
 commit;

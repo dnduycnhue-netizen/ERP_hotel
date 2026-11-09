@@ -43,7 +43,7 @@ Quy ước tiêu chí nghiệm thu (AC): mọi task phải thỏa Definition of 
 
 | # | Task | Agent | Phụ thuộc | AC chính |
 |---|---|---|---|---|
-| [ ] T-020 | Migration 06 thu mua + RPC PR/PO/duyệt (`approval_rules` sinh bước) | CC | T-013 | pgTAP: PO 30 triệu có đủ 3 bước; người tạo không duyệt được |
+| [x] T-020 | Migration 06 thu mua + RPC PR/PO/duyệt (`approval_rules` sinh bước) | CC | T-013 | pgTAP: PO 30 triệu có đủ 3 bước; người tạo không duyệt được — **xong 09/11/2026, chưa chạy pgTAP trên DB thật (VM không Docker); chờ verify sau khi merge + db push** |
 | [ ] T-021 | Màn hình PR, PO, timeline duyệt, duyệt nhanh trên mobile | AG | T-020 | Vượt giá trần không submit được khi thiếu lý do |
 | [ ] T-022 | Lệnh mua chợ + tạm ứng (đề nghị, duyệt, chi) | CC + AG | T-020 | Có tạm ứng quá hạn → `ERR_ADVANCE_OVERDUE_BLOCK` |
 | [ ] T-023 | Migration 07 nhận hàng + RPC mù (`receiving_list_tasks`, `get_task`, `record_line`, `post`) | CC | T-020, T-016 | pgTAP: role receiver SELECT `purchase_order_lines` = 0 dòng; lệch 6% → `needs_reweigh`; vượt PO bị chặn trần |

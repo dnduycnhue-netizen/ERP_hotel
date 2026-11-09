@@ -43,6 +43,10 @@ export const rpcErrorMessages: Record<string, string> = {
     "Kho đang kiểm kê nên tạm dừng ghi nhận xuất nhập ở kho này.",
   ERR_OVER_CEILING_NO_REASON:
     "Giá vượt giá trần. Hãy nhập lý do vượt trần rồi gửi lại.",
+  ERR_NOT_APPROVER: "Bạn không phải người duyệt được giao cho bước này.",
+  ERR_PRICE_NOT_SET:
+    "Đơn hàng còn dòng chưa có đơn giá. Hãy nhập giá cho các dòng giá tay trước khi gửi duyệt.",
+  ERR_CHANNEL_NOT_ALLOWED: "Mặt hàng này không được mua theo kênh đã chọn.",
   ERR_PHOTO_REQUIRED: "Thiếu ảnh bắt buộc. Hãy chụp ảnh rồi gửi lại.",
   ERR_ATTACHMENT_IMMUTABLE:
     "Ảnh chứng từ không được sửa hoặc xóa. Hãy tải ảnh mới thay thế.",
