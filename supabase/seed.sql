@@ -135,6 +135,8 @@ from (
     ('gm', 'day.unlock'),
     ('gm', 'minibar.waive.approve'),
     ('gm', 'advance.approve'),
+    ('gm', 'receiving.override_over_po'),
+    ('gm', 'receiving.reverse'),
     ('gm', 'room.manage'),
     ('gm', 'supplier.approve'),
     ('gm', 'supplier.view'),
@@ -207,6 +209,7 @@ from (
     ('storekeeper', 'count.open'),
     ('storekeeper', 'count.perform'),
     ('storekeeper', 'supplier_return.post'),
+    ('storekeeper', 'receiving.override_over_po'),
     ('storekeeper', 'item.temp.create'),
     ('storekeeper', 'item.manage'),
     ('storekeeper', 'warehouse.manage'),
@@ -359,6 +362,23 @@ from (
     ('gm', 'alert.receive.advance_overdue'),
     ('chief_accountant', 'alert.receive.advance_overdue'),
     ('cost_controller', 'alert.receive.advance_overdue')
+) as rp(role_code, permission_code)
+join public.roles r
+  on r.org_id = '00000000-0000-4000-8000-000000000001'
+ and r.code = rp.role_code
+join public.permissions p on p.code = rp.permission_code
+on conflict do nothing;
+
+-- T-023: gan quyen nhan hang vuot PO + dao phieu cho vai tro mau (ma quyen
+-- da co san trong catalog tu 20261108141000, chua gan vai tro nao; owner
+-- da co du 2 ma nay vi manual setup 09/11 gan owner toan bo catalog).
+insert into public.role_permissions (role_id, permission_code)
+select r.id, rp.permission_code
+from (
+  values
+    ('storekeeper', 'receiving.override_over_po'),
+    ('gm', 'receiving.override_over_po'),
+    ('gm', 'receiving.reverse')
 ) as rp(role_code, permission_code)
 join public.roles r
   on r.org_id = '00000000-0000-4000-8000-000000000001'
