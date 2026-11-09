@@ -42,6 +42,11 @@ Các RPC danh mục dưới đây thuộc các task sau, chưa được triển 
 | `receiving_record_line(p_gr_id, p_po_line_id, p_item_id, p_gross, p_tare, p_uom, p_qc jsonb, p_lot, p_expiry, p_photo_ids uuid[], p_client_uuid)` | Server so PO: trả `{ok, needs_reweigh: bool}`. Lần 2 vẫn lệch → ghi nhận, trả `{ok, accepted_qty_stock_capped: bool}` (không nói số) |
 | `receiving_post(p_gr_id, p_pin)` | Kiểm PIN, SoD `SOD_PO_RECEIVER` / `SOD_MARKET_BUYER_RECEIVER`; gọi `_post_move` `receipt` (+ `issue_*` nếu nhận thẳng bếp); cập nhật `received_qty_stock`, trạng thái PO |
 | `supplier_return_post(p_gr_id, p_lines jsonb)` | `return_out` theo giá dòng nhận gốc; `ap_ledger` (−) nếu đã có hóa đơn |
+| `supplier_return_list(p_property_id, p_status, p_search, p_limit, p_offset)` | Danh sách phiếu trả: `doc_no, status, supplier_name, gr_doc_no, po_doc_no, line_count, total_qty_stock, total_amount` (giá chỉ khi có `po.view_price`); quyền `receiving.view` |
+| `supplier_return_get(p_return_id)` | Chi tiết phiếu trả + dòng (`unit_cost`/`line_amount` chỉ khi có `po.view_price`); quyền `receiving.view` |
+| `supplier_return_eligible_lines(p_gr_id)` | Dòng của phiếu nhận đã post còn trả được: `accepted_qty_stock, returned_qty_stock, returnable_qty_stock`; quyền `supplier_return.post` |
+| `supplier_return_confirm(p_return_id, p_supplier_signature_path, p_photo_ids)` | `recorded` → `posted`; cần chữ ký người giao HOẶC ≥1 ảnh (`ERR_PHOTO_REQUIRED`); không phát sinh move (hàng QC fail chưa vào kho); quyền `supplier_return.post` |
+| `supplier_return_cancel(p_return_id, p_reason)` | `recorded` → `cancelled`; lý do bắt buộc (`ERR_REASON_REQUIRED`); quyền `supplier_return.post` |
 | `receiving_reverse(p_gr_id, p_reason)` | Chỉ gm; đảo mọi move của phiếu |
 
 ## 4. Kho

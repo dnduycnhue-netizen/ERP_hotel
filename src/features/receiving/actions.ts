@@ -2,7 +2,16 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { callReceivingRpc, type ReceivingActionResult } from "./rpc";
-import { getReceipt, type ReceiptLineRow } from "./queries";
+import {
+  eligibleReturnLines,
+  getReceipt,
+  getSupplierReturn,
+  listSupplierReturns,
+  type ReceiptLineRow,
+  type EligibleReturnLineRow,
+  type SupplierReturnDetail,
+  type SupplierReturnRow,
+} from "./queries";
 import {
   qcTemplateDeleteSchema,
   qcTemplateSaveSchema,
@@ -12,6 +21,10 @@ import {
   receivingRecordLineSchema,
   receivingReverseSchema,
   receivingStartSchema,
+  supplierReturnCancelSchema,
+  supplierReturnConfirmSchema,
+  supplierReturnEligibleLinesSchema,
+  supplierReturnListSchema,
   supplierReturnPostSchema,
   type QcTemplateDeleteInput,
   type QcTemplateSaveInput,
@@ -21,6 +34,10 @@ import {
   type ReceivingRecordLineInput,
   type ReceivingReverseInput,
   type ReceivingStartInput,
+  type SupplierReturnCancelInput,
+  type SupplierReturnConfirmInput,
+  type SupplierReturnEligibleLinesInput,
+  type SupplierReturnListInput,
   type SupplierReturnPostInput,
 } from "./schemas";
 
@@ -153,6 +170,45 @@ export async function postSupplierReturnAction(
   );
 }
 
+/** Xac nhan NCC da lay hang ve (RPC `supplier_return_confirm`, T-026). */
+export async function confirmSupplierReturnAction(
+  input: SupplierReturnConfirmInput,
+): Promise<ReceivingActionResult<SupplierReturnResult>> {
+  const parsed = supplierReturnConfirmSchema.safeParse(input);
+  if (!parsed.success) {
+    return validationError(parsed.error.issues);
+  }
+  const supabase = await createClient();
+  return callReceivingRpc<SupplierReturnResult>(
+    supabase,
+    "supplier_return_confirm",
+    {
+      p_return_id: parsed.data.returnId,
+      p_supplier_signature_path: parsed.data.supplierSignaturePath ?? null,
+      p_photo_ids: parsed.data.photoIds ?? null,
+    },
+  );
+}
+
+/** Huy phieu tra QC fail (RPC `supplier_return_cancel`, T-026). */
+export async function cancelSupplierReturnAction(
+  input: SupplierReturnCancelInput,
+): Promise<ReceivingActionResult<SupplierReturnResult>> {
+  const parsed = supplierReturnCancelSchema.safeParse(input);
+  if (!parsed.success) {
+    return validationError(parsed.error.issues);
+  }
+  const supabase = await createClient();
+  return callReceivingRpc<SupplierReturnResult>(
+    supabase,
+    "supplier_return_cancel",
+    {
+      p_return_id: parsed.data.returnId,
+      p_reason: parsed.data.reason,
+    },
+  );
+}
+
 /** Dao phieu nhan da post (RPC `receiving_reverse`, T-023). */
 export async function reverseReceivingAction(
   input: ReceivingReverseInput,
@@ -251,4 +307,49 @@ export async function listReceiptsAction(
     p_limit: parsed.data.limit,
     p_offset: parsed.data.offset,
   });
+}
+
+/** Danh sach phieu tra NCC co loc (RPC `supplier_return_list`, T-026). */
+export async function listSupplierReturnsAction(
+  input: SupplierReturnListInput,
+): Promise<
+  ReceivingActionResult<{
+    returns: SupplierReturnRow[];
+    total: number;
+  }>
+> {
+  const parsed = supplierReturnListSchema.safeParse(input);
+  if (!parsed.success) {
+    return validationError(parsed.error.issues);
+  }
+  return listSupplierReturns(parsed.data.propertyId, {
+    status: parsed.data.status ?? null,
+    search: parsed.data.search ?? null,
+    limit: parsed.data.limit,
+    offset: parsed.data.offset,
+  });
+}
+
+/** Chi tiet 1 phieu tra NCC (RPC `supplier_return_get`, T-026). */
+export async function getSupplierReturnAction(
+  returnId: string,
+): Promise<ReceivingActionResult<SupplierReturnDetail>> {
+  return getSupplierReturn(returnId);
+}
+
+/** Dong cua phieu nhan da post con tra duoc (RPC `supplier_return_eligible_lines`, T-026). */
+export async function eligibleReturnLinesAction(
+  input: SupplierReturnEligibleLinesInput,
+): Promise<
+  ReceivingActionResult<{
+    gr_id: string;
+    gr_doc_no: string;
+    lines: EligibleReturnLineRow[];
+  }>
+> {
+  const parsed = supplierReturnEligibleLinesSchema.safeParse(input);
+  if (!parsed.success) {
+    return validationError(parsed.error.issues);
+  }
+  return eligibleReturnLines(parsed.data.grId);
 }

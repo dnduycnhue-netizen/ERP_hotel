@@ -4,7 +4,8 @@ import { Dialog } from "@base-ui/react/dialog";
 import { CheckCircle2, Package, Store, TriangleAlert } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { cn } from "cn";
 import { EmptyState } from "@/components/common/empty-state";
 import { startReceivingAction } from "@/features/receiving/actions";
 import type { ReceivingTaskRow } from "@/features/receiving/queries";
@@ -55,6 +56,9 @@ export function MobileTaskList({
 }) {
   const router = useRouter();
   const canPerform = useCan("receiving.perform");
+  const canViewReceiving = useCan("receiving.view");
+  const canReturn = useCan("supplier_return.post");
+  const canViewReturns = canViewReceiving || canReturn;
   // Mo phieu moi can server (workspace can du lieu server) nen khong
   // xep hang offline duoc — chi ghi dong / duyet vuot / ghi so tren
   // phieu da mo moi offline (T-025).
@@ -117,7 +121,17 @@ export function MobileTaskList({
 
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="text-xl font-semibold">{vi.receiving.tasksTitle}</h1>
+      <div className="flex items-center justify-between gap-3">
+        <h1 className="text-xl font-semibold">{vi.receiving.tasksTitle}</h1>
+        {canViewReturns ? (
+          <a
+            href={`/m/${propertyId}/receive/returns`}
+            className={cn(buttonVariants({ size: "sm", variant: "outline" }))}
+          >
+            {vi.receiving.returnsListTitle}
+          </a>
+        ) : null}
+      </div>
 
       {posted ? (
         <p
