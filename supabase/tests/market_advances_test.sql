@@ -443,8 +443,7 @@ select _t022_as('d0220000-0200-4000-8000-000000000a01');
 select ok(
   (public.po_submit(
     'd0220000-0200-4000-8000-000000000201',
-    (select id from public.purchase_orders where channel = 'market'),
-    null
+    (select id from public.purchase_orders where channel = 'market')
   ) ->> 'ok')::boolean,
   'po_submit PO market (tong < 5tr, khong vuot tran)'
 );
@@ -454,10 +453,9 @@ select _t022_as('d0220000-0200-4000-8000-000000000a02');
 select ok(
   (public.approval_decide(
     'd0220000-0200-4000-8000-000000000201',
-    (select a.id from public.approvals a
-      join public.purchase_orders po on po.id = a.doc_id
-      where po.channel = 'market' and a.status = 'pending'),
-    true, null
+    'po',
+    (select id from public.purchase_orders where channel = 'market'),
+    'approved', null
   ) ->> 'ok')::boolean,
   'outlet_head duyet PO market'
 );
