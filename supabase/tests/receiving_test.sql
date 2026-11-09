@@ -46,10 +46,16 @@ insert into public.item_purchase_units (org_id, item_id, uom, factor_to_stock, i
 insert into public.suppliers (id, org_id, code, name, kind, status) values
   ('d0230000-0000-4000-8000-000000000701', 'd0230000-0000-4000-8000-000000000001', 'NCC_GAO', 'Công ty Gạo Sạch', 'company', 'active');
 
-insert into public.warehouses (id, property_id, code, name, kind) values
-  ('d0230000-0000-4000-8000-000000000301', 'd0230000-0000-4000-8000-000000000201', 'WH_MAIN', 'Kho chính', 'main'),
-  ('d0230000-0000-4000-8000-000000000302', 'd0230000-0000-4000-8000-000000000201', 'WH_QUAR', 'Kho cách ly', 'quarantine'),
-  ('d0230000-0000-4000-8000-000000000303', 'd0230000-0000-4000-8000-000000000201', 'WH_KIT', 'Kho bếp', 'outlet');
+insert into public.outlet_types (id, org_id, code, name) values
+  ('d0230000-0000-4000-8000-000000000801', 'd0230000-0000-4000-8000-000000000001', 'KIT', 'Bếp');
+
+insert into public.outlets (id, property_id, outlet_type_id, code, name) values
+  ('d0230000-0000-4000-8000-000000000802', 'd0230000-0000-4000-8000-000000000201', 'd0230000-0000-4000-8000-000000000801', 'KITCHEN', 'Bếp chính');
+
+insert into public.warehouses (id, property_id, code, name, kind, outlet_id) values
+  ('d0230000-0000-4000-8000-000000000301', 'd0230000-0000-4000-8000-000000000201', 'WH_MAIN', 'Kho chính', 'main', null),
+  ('d0230000-0000-4000-8000-000000000302', 'd0230000-0000-4000-8000-000000000201', 'WH_QUAR', 'Kho cách ly', 'quarantine', null),
+  ('d0230000-0000-4000-8000-000000000303', 'd0230000-0000-4000-8000-000000000201', 'WH_KIT', 'Kho bếp', 'outlet', 'd0230000-0000-4000-8000-000000000802');
 
 insert into auth.users (id, instance_id, aud, role, email, encrypted_password, email_confirmed_at, created_at, updated_at, raw_app_meta_data, raw_user_meta_data)
 values
@@ -74,7 +80,10 @@ insert into public.profiles (id, employee_code, full_name) values
   ('d0230000-0000-4000-8000-000000000a07', 'NV02307', 'Thủ kho'),
   ('d0230000-0000-4000-8000-000000000a08', 'NV02308', 'Nhận hàng chưa đặt PIN'),
   ('d0230000-0000-4000-8000-000000000a09', 'NV02309', 'Quản trị cấu hình'),
-  ('d0230000-0000-4000-8000-000000000a10', 'NV02310', 'Chỉ xem');
+  ('d0230000-0000-4000-8000-000000000a10', 'NV02310', 'Chỉ xem')
+on conflict (id) do update set
+  employee_code = excluded.employee_code,
+  full_name = excluded.full_name;
 
 -- PIN 1234 cho nguoi nhan a06 (a08 co tinh khong dat PIN).
 update public.profiles
