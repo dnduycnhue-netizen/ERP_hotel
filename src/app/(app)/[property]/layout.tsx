@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { notFound, redirect } from "next/navigation";
 import { AdminLink } from "@/components/common/admin-link";
+import { MasterLink } from "@/components/common/master-link";
 import { PropertySwitcher } from "@/components/common/property-switcher";
 import { vi } from "@/i18n/vi";
 import { PermissionsProvider } from "@/lib/permissions/permissions-provider";
@@ -51,6 +52,7 @@ export default async function PropertyLayout({
               {vi.appName}
             </a>
             <div className="flex items-center gap-4">
+              <MasterLink propertyId={currentProperty.id} />
               <AdminLink />
               <PropertySwitcher
                 currentPropertyId={currentProperty.id}

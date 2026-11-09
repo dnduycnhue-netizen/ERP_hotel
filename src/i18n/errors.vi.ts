@@ -35,6 +35,10 @@ export const rpcErrorMessages: Record<string, string> = {
   ERR_WAREHOUSE_NOT_FOUND: "Không tìm thấy kho được yêu cầu.",
   ERR_LOCK_NOT_FOUND: "Không tìm thấy thông tin khóa ngày.",
   ERR_PERIOD_NOT_FOUND: "Không tìm thấy kỳ kế toán.",
+  ERR_ITEM_HAS_STOCK_MOVES:
+    "Vật tư đã có phát sinh giao dịch kho, không thể xóa (chỉ có thể chuyển sang ngừng hoạt động).",
+  ERR_ITEM_UOM_CHANGE_FORBIDDEN:
+    "Không thể đổi đơn vị tính lưu kho của vật tư đã có giao dịch kho.",
   ERR_COUNT_FREEZE:
     "Kho đang kiểm kê nên tạm dừng ghi nhận xuất nhập ở kho này.",
   ERR_OVER_CEILING_NO_REASON:
