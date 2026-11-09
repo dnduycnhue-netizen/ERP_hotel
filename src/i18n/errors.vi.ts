@@ -24,6 +24,8 @@ export const rpcErrorMessages: Record<string, string> = {
     "Chứng từ đang ở trạng thái không phù hợp với thao tác này.",
   ERR_NEGATIVE_STOCK: "Không đủ tồn kho để xuất.",
   ERR_PERIOD_CLOSED: "Kỳ kế toán đã khóa, không ghi thêm được.",
+  ERR_EXPORT_NOT_LOCKED:
+    "Khoảng ngày yêu cầu chứa dữ liệu chưa khóa sổ. Hãy khóa sổ kỳ kế toán hoặc ngày nghiệp vụ rồi xuất lại, hoặc thu hẹp khoảng ngày.",
   ERR_DAY_LOCKED: "Ngày nghiệp vụ đã khóa, không ghi thêm được.",
   ERR_FIFO_BACKDATED_FORBIDDEN:
     "Phương pháp FIFO không cho phép ghi nhận giao dịch lùi ngày.",
@@ -106,6 +108,12 @@ export function getRpcErrorMessage(code: string | null | undefined): string {
     return detail
       ? `Bạn chưa được cấp quyền ${detail} để thực hiện thao tác này.`
       : rpcErrorMessages.ERR_FORBIDDEN;
+  }
+  if (base === "ERR_EXPORT_NOT_LOCKED") {
+    const dates = detail?.trim();
+    return dates
+      ? `Khoảng ngày yêu cầu chứa dữ liệu chưa khóa sổ (${dates}). Hãy khóa sổ kỳ kế toán hoặc ngày nghiệp vụ rồi xuất lại, hoặc thu hẹp khoảng ngày.`
+      : rpcErrorMessages.ERR_EXPORT_NOT_LOCKED;
   }
   if (base.startsWith("ERR_SOD_")) {
     return "Thao tác vi phạm quy tắc tách biệt nhiệm vụ: người thực hiện bước trước không được thực hiện bước này.";
