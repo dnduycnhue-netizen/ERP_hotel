@@ -22,7 +22,9 @@ export default async function MasterLayout({
     perms.has("item.view") ||
     perms.has("item.manage") ||
     perms.has("warehouse.manage") ||
-    perms.has("room.manage");
+    perms.has("room.manage") ||
+    perms.has("supplier.view") ||
+    perms.has("price.view");
 
   if (!canAccess) {
     notFound();

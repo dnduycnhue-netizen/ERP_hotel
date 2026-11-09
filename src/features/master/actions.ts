@@ -2,7 +2,17 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import { getPropertyOrgId, listPurchaseUnits, type PurchaseUnitRow } from "./queries";
+import {
+  getPropertyOrgId,
+  listPurchaseUnits,
+  type PurchaseUnitRow,
+  type AssessmentWarning,
+  listSupplierBankAccounts,
+  type SupplierBankAccountRow,
+  listPriceAgreementLines,
+  type PriceAgreementLineRow,
+} from "./queries";
+import { callMasterRpc } from "./rpc";
 import {
   itemSaveSchema,
   itemGroupSaveSchema,
@@ -14,6 +24,14 @@ import {
   outletSaveSchema,
   outletTypeSaveSchema,
   expenseCategorySaveSchema,
+  supplierSaveSchema,
+  supplierDecisionSchema,
+  supplierSetStatusSchema,
+  supplierBankRequestSchema,
+  supplierBankDecisionSchema,
+  priceAgreementSaveSchema,
+  priceAgreementLineSaveSchema,
+  ceilingPriceSaveSchema,
 } from "./schemas";
 
 export type MasterActionResult<T = unknown> =
@@ -37,6 +55,9 @@ function mapDbError(error: unknown): string {
     if (msg.includes("name_norm")) {
       return "Tên vật tư đã tồn tại trong danh mục (kể cả khi khác chữ hoa/thường hoặc khoảng trắng).";
     }
+    if (msg.includes("account_no")) {
+      return "Số tài khoản này đã tồn tại cho nhà cung cấp (đang chờ duyệt hoặc đang dùng).";
+    }
     if (msg.includes("code")) {
       return "Mã đã tồn tại trong danh mục.";
     }
@@ -44,6 +65,26 @@ function mapDbError(error: unknown): string {
       return "Số phòng đã tồn tại trong khách sạn.";
     }
     return "Dữ liệu bị trùng lặp với bản ghi đã có trong hệ thống.";
+  }
+
+  if (code === "23503") {
+    return "Không thể xóa vì còn dữ liệu liên quan. Hãy xóa các dữ liệu liên quan trước.";
+  }
+
+  if (msg.includes("ERR_SUPPLIER_HAS_BANK_ACCOUNTS")) {
+    return "Nhà cung cấp đã có tài khoản ngân hàng nên không thể xóa. Hãy tạm ngưng hoặc cấm nhà cung cấp thay vì xóa.";
+  }
+
+  if (msg.includes("ERR_AGREEMENT_OVERLAP")) {
+    return "Đã có hợp đồng khung khác của cùng nhà cung cấp còn hiệu lực trong khoảng thời gian này cho cùng vật tư và đơn vị tính.";
+  }
+
+  if (msg.includes("ERR_SOD_")) {
+    return "Thao tác vi phạm quy tắc tách biệt nhiệm vụ: người thực hiện bước trước không được thực hiện bước này.";
+  }
+
+  if (msg.includes("ERR_INVALID_STATUS")) {
+    return "Bản ghi đang ở trạng thái không phù hợp với thao tác này.";
   }
 
   if (msg.includes("ERR_ITEM_HAS_STOCK_MOVES")) {
@@ -297,6 +338,18 @@ export async function listPurchaseUnitsAction(
   itemId: string,
 ): Promise<PurchaseUnitRow[]> {
   return listPurchaseUnits(itemId);
+}
+
+export async function listSupplierBankAccountsAction(
+  supplierId: string,
+): Promise<SupplierBankAccountRow[]> {
+  return listSupplierBankAccounts(supplierId);
+}
+
+export async function listPriceAgreementLinesAction(
+  agreementId: string,
+): Promise<PriceAgreementLineRow[]> {
+  return listPriceAgreementLines(agreementId);
 }
 
 export async function deletePurchaseUnitAction(
@@ -626,4 +679,381 @@ export async function deleteExpenseCategoryAction(
   if (error) return { ok: false, error: mapDbError(error) };
   revalidatePath(`/${propertyId}/master/expense-categories`);
   return { ok: true, data: { id: categoryId } };
+}
+
+// ---------------------------------------------------------------------------
+// T-013: Nha cung cap + doi STK + hop dong khung + gia tran
+// ---------------------------------------------------------------------------
+
+// 9. Suppliers
+export async function saveSupplierAction(
+  input: unknown,
+): Promise<MasterActionResult<{ id: string }>> {
+  const parsed = supplierSaveSchema.safeParse(input);
+  if (!parsed.success) {
+    return {
+      ok: false,
+      error: parsed.error.issues[0]?.message ?? "Dữ liệu không hợp lệ.",
+    };
+  }
+  const { propertyId, id, ...values } = parsed.data;
+  const orgId = await getPropertyOrgId(propertyId);
+  if (!orgId) return { ok: false, error: "Không xác định được tổ chức." };
+
+  const supabase = await createClient();
+  const payload = {
+    code: values.code,
+    name: values.name,
+    tax_code: values.taxCode || null,
+    kind: values.kind,
+    phone: values.phone || null,
+    address: values.address || null,
+    payment_terms_days: values.paymentTermsDays ?? null,
+    food_safety_cert_until: values.foodSafetyCertUntil || null,
+  };
+
+  if (id) {
+    const { error } = await supabase
+      .from("suppliers")
+      .update(payload)
+      .eq("id", id);
+    if (error) return { ok: false, error: mapDbError(error) };
+    revalidatePath(`/${propertyId}/master/suppliers`);
+    return { ok: true, data: { id } };
+  } else {
+    const { data, error } = await supabase
+      .from("suppliers")
+      .insert({ org_id: orgId, ...payload })
+      .select("id")
+      .single();
+    if (error || !data) return { ok: false, error: mapDbError(error) };
+    revalidatePath(`/${propertyId}/master/suppliers`);
+    return { ok: true, data: { id: data.id } };
+  }
+}
+
+export async function deleteSupplierAction(
+  propertyId: string,
+  supplierId: string,
+): Promise<MasterActionResult<{ id: string }>> {
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("suppliers")
+    .delete()
+    .eq("id", supplierId);
+  if (error) return { ok: false, error: mapDbError(error) };
+  revalidatePath(`/${propertyId}/master/suppliers`);
+  return { ok: true, data: { id: supplierId } };
+}
+
+/** Tham dinh NCC (khong doi trang thai): tra ve danh sach canh bao. */
+export async function submitSupplierAction(
+  propertyId: string,
+  supplierId: string,
+): Promise<MasterActionResult<{ id: string; warnings: AssessmentWarning[] }>> {
+  const supabase = await createClient();
+  const res = await callMasterRpc<{
+    ok: boolean;
+    id: string;
+    warnings: AssessmentWarning[];
+  }>(supabase, "supplier_submit", {
+    p_property_id: propertyId,
+    p_supplier_id: supplierId,
+  });
+  if (!res.ok) return res;
+  return {
+    ok: true,
+    data: { id: res.data.id, warnings: res.data.warnings ?? [] },
+  };
+}
+
+export async function approveSupplierAction(
+  input: unknown,
+): Promise<MasterActionResult<{ id: string; status: string }>> {
+  const parsed = supplierDecisionSchema.safeParse(input);
+  if (!parsed.success) {
+    return {
+      ok: false,
+      error: parsed.error.issues[0]?.message ?? "Dữ liệu không hợp lệ.",
+    };
+  }
+  const supabase = await createClient();
+  const res = await callMasterRpc<{ ok: boolean; id: string; status: string }>(
+    supabase,
+    "supplier_approve",
+    {
+      p_property_id: parsed.data.propertyId,
+      p_supplier_id: parsed.data.supplierId,
+      p_approved: parsed.data.approved,
+      p_reason: parsed.data.reason || null,
+    },
+  );
+  if (!res.ok) return res;
+  revalidatePath(`/${parsed.data.propertyId}/master/suppliers`);
+  return { ok: true, data: { id: res.data.id, status: res.data.status } };
+}
+
+export async function setSupplierStatusAction(
+  input: unknown,
+): Promise<MasterActionResult<{ id: string; status: string }>> {
+  const parsed = supplierSetStatusSchema.safeParse(input);
+  if (!parsed.success) {
+    return {
+      ok: false,
+      error: parsed.error.issues[0]?.message ?? "Dữ liệu không hợp lệ.",
+    };
+  }
+  const supabase = await createClient();
+  const res = await callMasterRpc<{ ok: boolean; id: string; status: string }>(
+    supabase,
+    "supplier_set_status",
+    {
+      p_property_id: parsed.data.propertyId,
+      p_supplier_id: parsed.data.supplierId,
+      p_status: parsed.data.status,
+      p_reason: parsed.data.reason,
+    },
+  );
+  if (!res.ok) return res;
+  revalidatePath(`/${parsed.data.propertyId}/master/suppliers`);
+  return { ok: true, data: { id: res.data.id, status: res.data.status } };
+}
+
+// 10. Supplier bank accounts (doi STK 2 nguoi)
+export async function requestBankAccountAction(
+  input: unknown,
+): Promise<MasterActionResult<{ id: string; warnings: AssessmentWarning[] }>> {
+  const parsed = supplierBankRequestSchema.safeParse(input);
+  if (!parsed.success) {
+    return {
+      ok: false,
+      error: parsed.error.issues[0]?.message ?? "Dữ liệu không hợp lệ.",
+    };
+  }
+  const supabase = await createClient();
+  const res = await callMasterRpc<{
+    ok: boolean;
+    id: string;
+    warnings: AssessmentWarning[];
+  }>(supabase, "supplier_bank_request", {
+    p_property_id: parsed.data.propertyId,
+    p_supplier_id: parsed.data.supplierId,
+    p_bank_name: parsed.data.bankName,
+    p_account_no: parsed.data.accountNo,
+    p_account_name: parsed.data.accountName,
+  });
+  if (!res.ok) return res;
+  revalidatePath(`/${parsed.data.propertyId}/master/suppliers`);
+  return {
+    ok: true,
+    data: { id: res.data.id, warnings: res.data.warnings ?? [] },
+  };
+}
+
+export async function approveBankAccountAction(
+  input: unknown,
+): Promise<MasterActionResult<{ id: string; status: string }>> {
+  const parsed = supplierBankDecisionSchema.safeParse(input);
+  if (!parsed.success) {
+    return {
+      ok: false,
+      error: parsed.error.issues[0]?.message ?? "Dữ liệu không hợp lệ.",
+    };
+  }
+  const supabase = await createClient();
+  const res = await callMasterRpc<{ ok: boolean; id: string; status: string }>(
+    supabase,
+    "supplier_bank_approve",
+    {
+      p_property_id: parsed.data.propertyId,
+      p_bank_account_id: parsed.data.bankAccountId,
+      p_approved: parsed.data.approved,
+      p_reason: parsed.data.reason || null,
+    },
+  );
+  if (!res.ok) return res;
+  revalidatePath(`/${parsed.data.propertyId}/master/suppliers`);
+  return { ok: true, data: { id: res.data.id, status: res.data.status } };
+}
+
+// 11. Price agreements (hop dong khung)
+export async function savePriceAgreementAction(
+  input: unknown,
+): Promise<MasterActionResult<{ id: string }>> {
+  const parsed = priceAgreementSaveSchema.safeParse(input);
+  if (!parsed.success) {
+    return {
+      ok: false,
+      error: parsed.error.issues[0]?.message ?? "Dữ liệu không hợp lệ.",
+    };
+  }
+  const { propertyId, id, ...values } = parsed.data;
+  const orgId = await getPropertyOrgId(propertyId);
+  if (!orgId) return { ok: false, error: "Không xác định được tổ chức." };
+
+  const supabase = await createClient();
+  const payload = {
+    supplier_id: values.supplierId,
+    valid_from: values.validFrom,
+    valid_to: values.validTo,
+    status: values.status,
+  };
+
+  if (id) {
+    const { error } = await supabase
+      .from("price_agreements")
+      .update(payload)
+      .eq("id", id);
+    if (error) return { ok: false, error: mapDbError(error) };
+    revalidatePath(`/${propertyId}/master/prices`);
+    return { ok: true, data: { id } };
+  } else {
+    const { data, error } = await supabase
+      .from("price_agreements")
+      .insert({ org_id: orgId, ...payload })
+      .select("id")
+      .single();
+    if (error || !data) return { ok: false, error: mapDbError(error) };
+    revalidatePath(`/${propertyId}/master/prices`);
+    return { ok: true, data: { id: data.id } };
+  }
+}
+
+export async function deletePriceAgreementAction(
+  propertyId: string,
+  agreementId: string,
+): Promise<MasterActionResult<{ id: string }>> {
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("price_agreements")
+    .delete()
+    .eq("id", agreementId);
+  if (error) return { ok: false, error: mapDbError(error) };
+  revalidatePath(`/${propertyId}/master/prices`);
+  return { ok: true, data: { id: agreementId } };
+}
+
+export async function savePriceAgreementLineAction(
+  input: unknown,
+): Promise<MasterActionResult<{ id: string }>> {
+  const parsed = priceAgreementLineSaveSchema.safeParse(input);
+  if (!parsed.success) {
+    return {
+      ok: false,
+      error: parsed.error.issues[0]?.message ?? "Dữ liệu không hợp lệ.",
+    };
+  }
+  const { propertyId, id, ...values } = parsed.data;
+  const orgId = await getPropertyOrgId(propertyId);
+  if (!orgId) return { ok: false, error: "Không xác định được tổ chức." };
+
+  const supabase = await createClient();
+  const payload = {
+    item_id: values.itemId,
+    uom: values.uom,
+    unit_price: values.unitPrice,
+    warn_pct: values.warnPct ?? null,
+    lock_pct: values.lockPct ?? null,
+  };
+
+  if (id) {
+    const { error } = await supabase
+      .from("price_agreement_lines")
+      .update(payload)
+      .eq("id", id);
+    if (error) return { ok: false, error: mapDbError(error) };
+    revalidatePath(`/${propertyId}/master/prices`);
+    return { ok: true, data: { id } };
+  } else {
+    const { data, error } = await supabase
+      .from("price_agreement_lines")
+      .insert({
+        org_id: orgId,
+        agreement_id: values.agreementId,
+        ...payload,
+      })
+      .select("id")
+      .single();
+    if (error || !data) return { ok: false, error: mapDbError(error) };
+    revalidatePath(`/${propertyId}/master/prices`);
+    return { ok: true, data: { id: data.id } };
+  }
+}
+
+export async function deletePriceAgreementLineAction(
+  propertyId: string,
+  lineId: string,
+): Promise<MasterActionResult<{ id: string }>> {
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("price_agreement_lines")
+    .delete()
+    .eq("id", lineId);
+  if (error) return { ok: false, error: mapDbError(error) };
+  revalidatePath(`/${propertyId}/master/prices`);
+  return { ok: true, data: { id: lineId } };
+}
+
+// 12. Ceiling prices (gia tran)
+export async function saveCeilingPriceAction(
+  input: unknown,
+): Promise<MasterActionResult<{ id: string }>> {
+  const parsed = ceilingPriceSaveSchema.safeParse(input);
+  if (!parsed.success) {
+    return {
+      ok: false,
+      error: parsed.error.issues[0]?.message ?? "Dữ liệu không hợp lệ.",
+    };
+  }
+  const { propertyId, id, ...values } = parsed.data;
+  const orgId = await getPropertyOrgId(propertyId);
+  if (!orgId) return { ok: false, error: "Không xác định được tổ chức." };
+
+  const supabase = await createClient();
+  const { data: userData } = await supabase.auth.getUser();
+  const setBy = userData.user?.id;
+  if (!setBy) return { ok: false, error: "Bạn chưa đăng nhập." };
+
+  const payload = {
+    property_id: values.propertyScopeId || null,
+    item_id: values.itemId,
+    uom: values.uom,
+    price: values.price,
+    valid_from: values.validFrom,
+    valid_to: values.validTo,
+    set_by: setBy,
+  };
+
+  if (id) {
+    const { error } = await supabase
+      .from("ceiling_prices")
+      .update(payload)
+      .eq("id", id);
+    if (error) return { ok: false, error: mapDbError(error) };
+    revalidatePath(`/${propertyId}/master/prices`);
+    return { ok: true, data: { id } };
+  } else {
+    const { data, error } = await supabase
+      .from("ceiling_prices")
+      .insert({ org_id: orgId, ...payload })
+      .select("id")
+      .single();
+    if (error || !data) return { ok: false, error: mapDbError(error) };
+    revalidatePath(`/${propertyId}/master/prices`);
+    return { ok: true, data: { id: data.id } };
+  }
+}
+
+export async function deleteCeilingPriceAction(
+  propertyId: string,
+  ceilingId: string,
+): Promise<MasterActionResult<{ id: string }>> {
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("ceiling_prices")
+    .delete()
+    .eq("id", ceilingId);
+  if (error) return { ok: false, error: mapDbError(error) };
+  revalidatePath(`/${propertyId}/master/prices`);
+  return { ok: true, data: { id: ceilingId } };
 }

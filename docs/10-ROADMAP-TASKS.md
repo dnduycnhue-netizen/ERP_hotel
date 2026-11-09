@@ -34,7 +34,7 @@ Quy ước tiêu chí nghiệm thu (AC): mọi task phải thỏa Definition of 
 | [x] T-010 | Migration 03 danh mục (A2), `doc_sequences`, `next_doc_no`, `norm_text`, unique `name_norm` | CC | T-002 | Test: số chứng từ tăng đúng khi gọi đồng thời 50 lần (không trùng) |
 | [x] T-011 | Migration 04 sổ cái: `stock_moves`, `stock_balances`, `item_costs`, `_post_move`, `forbid_mutation`, kỳ & khóa ngày; bổ sung FIFO tạm thời theo Q11/Q12 | CC | T-010 | pgTAP: bình quân gia quyền đúng 5 ca (nhập/xuất xen kẽ), FIFO theo lớp, chặn tồn âm; chặn UPDATE; kỳ đóng chặn ghi |
 | [x] T-012 | Màn hình danh mục: vật tư (lọc nhóm, mã tạm, thiếu quy đổi), nhóm hàng, đơn vị, quy cách mua, kho, phòng, outlet, khoản mục | AG | T-010 | CRUD qua RLS; tạo trùng tên → báo lỗi tiếng Việt |
-| [ ] T-013 | NCC + thẩm định + đổi STK 2 người + hợp đồng khung + giá trần | AG + CC (RPC) | T-012 | SoD STK; alert `BANK_ACCOUNT_CHANGE` tạo ra |
+| [x] T-013 | NCC + thẩm định + đổi STK 2 người + hợp đồng khung + giá trần | AG + CC (RPC) | T-012 | SoD STK; alert `BANK_ACCOUNT_CHANGE` tạo ra |
 | [ ] T-014 | Import Excel 4 bước (01.10) cho vật tư & NCC theo `07-IMPORT-MIGRATION.md`; chạy thử với file `Lst_2020_DL_Buffet.xlsx` | CC | T-012 | Phát hiện đủ 11 mã trùng, 54→33 đơn vị, 281 thiếu hệ số trên file mẫu |
 | [ ] T-015 | Mã tạm + gộp mã (`item_create_temp`, `item_merge`) + cron mã tạm quá hạn | CC | T-011 | Mã tạm > 72h bị chặn dùng |
 | [ ] T-016 | Storage `evidence` + `attachments` + `CameraCapture` (getUserMedia, nén, SHA-256) + `AttachmentGallery` (signed URL) | AG + CC | T-004 | Không có lựa chọn ảnh từ thư viện; ảnh trùng hash → alert `PHOTO_REUSED` |

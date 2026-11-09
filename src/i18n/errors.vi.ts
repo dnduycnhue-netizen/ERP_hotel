@@ -57,6 +57,10 @@ export const rpcErrorMessages: Record<string, string> = {
     "Kỳ dịch vụ chưa được nghiệm thu nên chưa thanh toán được.",
   ERR_UOM_UNKNOWN:
     "Đơn vị chưa được khai báo quy đổi. Hãy bổ sung quy đổi trước khi dùng.",
+  ERR_AGREEMENT_OVERLAP:
+    "Đã có hợp đồng khung khác của cùng nhà cung cấp còn hiệu lực trong khoảng thời gian này cho cùng vật tư và đơn vị tính.",
+  ERR_SUPPLIER_HAS_BANK_ACCOUNTS:
+    "Nhà cung cấp đã có tài khoản ngân hàng nên không thể xóa. Hãy tạm ngưng hoặc cấm nhà cung cấp thay vì xóa.",
 } as const;
 
 export const rpcErrorFallback =

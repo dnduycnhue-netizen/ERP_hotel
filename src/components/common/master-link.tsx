@@ -13,9 +13,16 @@ export function MasterLink({ propertyId }: { propertyId: string }) {
   const canItemManage = useCan("item.manage");
   const canWarehouseManage = useCan("warehouse.manage");
   const canRoomManage = useCan("room.manage");
+  const canSupplierView = useCan("supplier.view");
+  const canPriceView = useCan("price.view");
 
   const canView =
-    canItemView || canItemManage || canWarehouseManage || canRoomManage;
+    canItemView ||
+    canItemManage ||
+    canWarehouseManage ||
+    canRoomManage ||
+    canSupplierView ||
+    canPriceView;
 
   if (!canView) {
     return null;

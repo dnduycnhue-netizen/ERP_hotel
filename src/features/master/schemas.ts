@@ -230,3 +230,160 @@ export const expenseCategorySaveSchema = z.object({
 export type ExpenseCategorySaveInput = z.infer<
   typeof expenseCategorySaveSchema
 >;
+
+// ---------------------------------------------------------------------------
+// T-013: Nha cung cap + doi STK + hop dong khung + gia tran
+// ---------------------------------------------------------------------------
+
+export const supplierSaveSchema = z.object({
+  id: z.string().uuid().optional(),
+  propertyId: z.string().uuid(),
+  code: z
+    .string()
+    .trim()
+    .min(1, "Mã nhà cung cấp không được để trống")
+    .max(50, "Mã nhà cung cấp tối đa 50 ký tự")
+    .regex(
+      /^[A-Za-z0-9_-]+$/,
+      "Mã nhà cung cấp chỉ chứa chữ, số, gạch nối hoặc gạch dưới",
+    ),
+  name: z
+    .string()
+    .trim()
+    .min(1, "Tên nhà cung cấp không được để trống")
+    .max(200, "Tên nhà cung cấp tối đa 200 ký tự"),
+  taxCode: z.string().trim().max(30).optional().nullable(),
+  kind: z.enum(["company", "household", "individual_no_invoice"]),
+  phone: z.string().trim().max(30).optional().nullable(),
+  address: z.string().trim().max(500).optional().nullable(),
+  paymentTermsDays: z.coerce
+    .number()
+    .int()
+    .min(0, "Số ngày thanh toán không được âm")
+    .optional()
+    .nullable(),
+  foodSafetyCertUntil: z.string().trim().optional().nullable(),
+});
+
+export type SupplierSaveInput = z.infer<typeof supplierSaveSchema>;
+
+export const supplierDecisionSchema = z.object({
+  propertyId: z.string().uuid(),
+  supplierId: z.string().uuid(),
+  approved: z.boolean(),
+  reason: z.string().trim().max(500).optional().nullable(),
+});
+
+export type SupplierDecisionInput = z.infer<typeof supplierDecisionSchema>;
+
+export const supplierSetStatusSchema = z.object({
+  propertyId: z.string().uuid(),
+  supplierId: z.string().uuid(),
+  status: z.enum(["suspended", "banned", "active"]),
+  reason: z
+    .string()
+    .trim()
+    .min(1, "Vui lòng nhập lý do cho thao tác này.")
+    .max(500, "Lý do tối đa 500 ký tự"),
+});
+
+export type SupplierSetStatusInput = z.infer<typeof supplierSetStatusSchema>;
+
+export const supplierBankRequestSchema = z.object({
+  propertyId: z.string().uuid(),
+  supplierId: z.string().uuid(),
+  bankName: z
+    .string()
+    .trim()
+    .min(1, "Tên ngân hàng không được để trống")
+    .max(100, "Tên ngân hàng tối đa 100 ký tự"),
+  accountNo: z
+    .string()
+    .trim()
+    .min(1, "Số tài khoản không được để trống")
+    .max(50, "Số tài khoản tối đa 50 ký tự"),
+  accountName: z
+    .string()
+    .trim()
+    .min(1, "Tên chủ tài khoản không được để trống")
+    .max(200, "Tên chủ tài khoản tối đa 200 ký tự"),
+});
+
+export type SupplierBankRequestInput = z.infer<
+  typeof supplierBankRequestSchema
+>;
+
+export const supplierBankDecisionSchema = z.object({
+  propertyId: z.string().uuid(),
+  bankAccountId: z.string().uuid(),
+  approved: z.boolean(),
+  reason: z.string().trim().max(500).optional().nullable(),
+});
+
+export type SupplierBankDecisionInput = z.infer<
+  typeof supplierBankDecisionSchema
+>;
+
+export const priceAgreementSaveSchema = z
+  .object({
+    id: z.string().uuid().optional(),
+    propertyId: z.string().uuid(),
+    supplierId: z.string().uuid("Vui lòng chọn nhà cung cấp"),
+    validFrom: z
+      .string()
+      .trim()
+      .regex(/^\d{4}-\d{2}-\d{2}$/, "Ngày bắt đầu không hợp lệ (YYYY-MM-DD)"),
+    validTo: z
+      .string()
+      .trim()
+      .regex(/^\d{4}-\d{2}-\d{2}$/, "Ngày kết thúc không hợp lệ (YYYY-MM-DD)"),
+    status: z
+      .enum(["draft", "active", "expired", "cancelled"])
+      .default("draft"),
+  })
+  .refine((v) => v.validTo >= v.validFrom, {
+    message: "Ngày kết thúc phải từ ngày bắt đầu trở đi.",
+    path: ["validTo"],
+  });
+
+export type PriceAgreementSaveInput = z.infer<typeof priceAgreementSaveSchema>;
+
+export const priceAgreementLineSaveSchema = z.object({
+  id: z.string().uuid().optional(),
+  propertyId: z.string().uuid(),
+  agreementId: z.string().uuid(),
+  itemId: z.string().uuid("Vui lòng chọn vật tư"),
+  uom: z.string().trim().min(1, "Vui lòng chọn đơn vị tính"),
+  unitPrice: z.coerce.number().min(0, "Đơn giá không được âm"),
+  warnPct: z.coerce.number().min(0).max(100).optional().nullable(),
+  lockPct: z.coerce.number().min(0).max(100).optional().nullable(),
+});
+
+export type PriceAgreementLineSaveInput = z.infer<
+  typeof priceAgreementLineSaveSchema
+>;
+
+export const ceilingPriceSaveSchema = z
+  .object({
+    id: z.string().uuid().optional(),
+    propertyId: z.string().uuid(),
+    // propertyScopeId null = gia tran cap chuoi; co gia tri = gia tran cap khach san.
+    propertyScopeId: z.string().uuid().optional().nullable(),
+    itemId: z.string().uuid("Vui lòng chọn vật tư"),
+    uom: z.string().trim().min(1, "Vui lòng chọn đơn vị tính"),
+    price: z.coerce.number().min(0, "Giá trần không được âm"),
+    validFrom: z
+      .string()
+      .trim()
+      .regex(/^\d{4}-\d{2}-\d{2}$/, "Ngày bắt đầu không hợp lệ (YYYY-MM-DD)"),
+    validTo: z
+      .string()
+      .trim()
+      .regex(/^\d{4}-\d{2}-\d{2}$/, "Ngày kết thúc không hợp lệ (YYYY-MM-DD)"),
+  })
+  .refine((v) => v.validTo >= v.validFrom, {
+    message: "Ngày kết thúc phải từ ngày bắt đầu trở đi.",
+    path: ["validTo"],
+  });
+
+export type CeilingPriceSaveInput = z.infer<typeof ceilingPriceSaveSchema>;

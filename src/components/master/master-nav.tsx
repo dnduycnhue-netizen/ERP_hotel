@@ -25,6 +25,14 @@ export function MasterNav({ propertyId }: { propertyId: string }) {
       href: `/${propertyId}/master/expense-categories`,
       label: vi.master.nav.expenseCategories,
     },
+    {
+      href: `/${propertyId}/master/suppliers`,
+      label: vi.master.nav.suppliers,
+    },
+    {
+      href: `/${propertyId}/master/prices`,
+      label: vi.master.nav.prices,
+    },
   ];
 
   return (

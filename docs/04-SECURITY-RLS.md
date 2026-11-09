@@ -168,6 +168,7 @@ Kiểm tra trong RPC bằng `assert_sod(rule_code, doc_id)`, dựa trên **ngư�
 | `SOD_INVOICE_GR` | Người nhập hóa đơn ≠ người nhận hàng |
 | `SOD_PAYMENT_APPROVER` | Người duyệt thanh toán ≠ người nhập hóa đơn ≠ người yêu cầu đổi STK NCC (30 ngày) |
 | `SOD_BANK_ACCOUNT` | Người yêu cầu đổi STK ≠ người duyệt |
+| `SOD_SUPPLIER_APPROVER` | Người tạo NCC ≠ người phê duyệt NCC đó (T-013) |
 | `SOD_WASTE` | Người đề xuất hủy ≠ người duyệt |
 | `SOD_MINIBAR_WAIVE` | Người đề nghị miễn minibar ≠ người duyệt miễn |
 | `SOD_YIELD` (P2) | Người lập biên bản pha lóc ≠ người duyệt |
