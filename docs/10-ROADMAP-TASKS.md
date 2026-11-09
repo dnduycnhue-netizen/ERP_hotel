@@ -56,7 +56,7 @@ Quy ước tiêu chí nghiệm thu (AC): mọi task phải thỏa Definition of 
 | # | Task | Agent | Phụ thuộc | AC chính |
 |---|---|---|---|---|
 | [x] T-030 | Migration 08: phiếu lĩnh 2 bước, điều chuyển, xuất mục đích, hủy + RPC | CC | T-011 | pgTAP từng loại move; SoD hủy |
-| [ ] T-031 | Màn hình chứng từ kho + tồn kho + thẻ kho | AG | T-030 | Thẻ kho khớp tổng `stock_moves` |
+| [x] T-031 | Màn hình chứng từ kho + tồn kho + thẻ kho | AG | T-030 | Thẻ kho khớp tổng `stock_moves` — **xong 09/11/2026: routes `/[p]/inventory/{requisitions,transfers,issues,waste,stock}` + thẻ kho `/stock/[warehouse]/[item]`, dùng 8 RPC list/get T-030; tồn/thẻ kho đọc trực tiếp qua SELECT (RLS đã chặn theo stock.view_qty/view_value, giá trị chỉ hiện khi có stock.view_value), không migration mới; thẻ kho hiện huy hiệu Khớp/Lệch đối chiếu tồn cuối theo thẻ với `stock_balances`. Q28 mới (stock_balance_get trong đặc tả chưa từng được code).** |
 | [ ] T-032 | Migration 09: kiểm kê tháng mù, điều chỉnh, khóa ngày/kỳ + view `v_count_sheet` | CC | T-030 | Người đếm không đọc được `book_qty`; kho đang kiểm → `ERR_COUNT_FREEZE` |
 | [ ] T-033 | Màn hình kiểm kê mobile (đa quy cách, đếm lại) + biên bản chênh lệch + offline | AG + CC | T-032 | Biên bản xuất Excel |
 | [ ] T-034 | Migration 11 buồng phòng: chuẩn setup, kho tầng/xe đẩy, ca xe đẩy | CC | T-030 | Tiêu hao ca = đầu + lĩnh − cuối |
