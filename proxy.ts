@@ -27,10 +27,11 @@ export async function proxy(request: NextRequest) {
     },
   });
 
-  const { data, error } = await supabase.auth.getClaims();
-  if (error) {
-    throw error;
-  }
+  // Lấy claims để biết đã đăng nhập chưa. Phiên hết hạn/hỏng (refresh
+  // token không dùng được) làm getClaims() trả lỗi — coi như chưa đăng
+  // nhập và để logic chuyển hướng bên dưới đưa về /login, thay vì ném
+  // lỗi gây 500 toàn site (kể cả trang /login).
+  const { data } = await supabase.auth.getClaims();
 
   const pathname = request.nextUrl.pathname;
   if (
