@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { MoneyText } from "@/components/common/money-text";
@@ -30,6 +31,7 @@ export function PaymentRequestForm({
   const [dueDate, setDueDate] = useState("");
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [errorCode, setErrorCode] = useState<string | null>(null);
 
   const total = useMemo(
     () =>
@@ -62,6 +64,7 @@ export function PaymentRequestForm({
   async function handleSubmit() {
     setPending(true);
     setError(null);
+    setErrorCode(null);
     const lines = (payableInvoices ?? [])
       .filter((inv) => Number(selected[inv.id]) > 0)
       .map((inv) => ({ invoiceId: inv.id, amount: Number(selected[inv.id]) }));
@@ -74,6 +77,7 @@ export function PaymentRequestForm({
     setPending(false);
     if (!res.ok) {
       setError(res.error);
+      setErrorCode(res.code ?? null);
       return;
     }
     router.push(`/${propertyId}/finance/payment-requests/${res.data.id}`);
@@ -188,6 +192,18 @@ export function PaymentRequestForm({
           </Button>
           {error ? (
             <p className="mt-3 text-sm font-medium text-red-800">{error}</p>
+          ) : null}
+          {errorCode === "ERR_SERVICE_NOT_ACCEPTED" ? (
+            <p className="mt-3 rounded-md bg-amber-50 p-3 text-sm text-amber-800">
+              <span className="font-medium">{vi.service.blockedTitle}. </span>
+              {vi.service.blockedHint}{" "}
+              <Link
+                href={`/${propertyId}/procurement/service-contracts/schedules`}
+                className="font-medium underline"
+              >
+                {vi.service.goToSchedules}
+              </Link>
+            </p>
           ) : null}
         </div>
       )}

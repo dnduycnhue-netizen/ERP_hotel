@@ -64,9 +64,7 @@ export function FrontdeskCheckList({
   canRequestCheck: boolean;
 }) {
   const router = useRouter();
-  const [requestingRoomId, setRequestingRoomId] = useState<string | null>(
-    null,
-  );
+  const [requestingRoomId, setRequestingRoomId] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -114,19 +112,14 @@ export function FrontdeskCheckList({
             {rooms.map((room) => {
               const open = openByRoom.get(room.id);
               return (
-                <li
-                  key={room.id}
-                  className="rounded-xl border bg-card p-4"
-                >
+                <li key={room.id} className="rounded-xl border bg-card p-4">
                   <div className="flex items-center justify-between gap-2">
                     <span className="font-medium">
                       {vi.minibar.roomNo} {room.room_no}
                     </span>
                     <span className="text-sm text-muted-foreground">
                       {room.floor ? `${vi.minibar.floor} ${room.floor}` : ""}
-                      {room.room_type_name
-                        ? ` · ${room.room_type_name}`
-                        : ""}
+                      {room.room_type_name ? ` · ${room.room_type_name}` : ""}
                     </span>
                   </div>
                   {open ? (

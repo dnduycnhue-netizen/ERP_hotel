@@ -1,10 +1,7 @@
 import { notFound } from "next/navigation";
 import { ErrorState } from "@/components/common/error-state";
 import { FrontdeskCheckDetail } from "@/components/minibar/frontdesk-check-detail";
-import {
-  getMinibarCheck,
-  getMinibarPerms,
-} from "@/features/minibar/queries";
+import { getMinibarCheck, getMinibarPerms } from "@/features/minibar/queries";
 
 /** Chi tiết phiếu kiểm minibar — lễ tân (T-035). */
 export default async function FrontdeskMinibarDetailPage({

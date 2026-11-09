@@ -13,8 +13,17 @@ export function ProcurementLink({ propertyId }: { propertyId: string }) {
   const canPrApprove = useCan("pr.approve");
   const canPoCreate = useCan("po.create");
   const canPoView = useCan("po.view");
+  const canManageContract = useCan("service.contract.manage");
+  const canAccept = useCan("service.accept");
 
-  if (!canPrCreate && !canPrApprove && !canPoCreate && !canPoView) {
+  if (
+    !canPrCreate &&
+    !canPrApprove &&
+    !canPoCreate &&
+    !canPoView &&
+    !canManageContract &&
+    !canAccept
+  ) {
     return null;
   }
   return (

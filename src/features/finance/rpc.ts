@@ -9,7 +9,7 @@ import type { Database } from "@/lib/database.types";
  * không throw ra client, lỗi dịch sang tiếng Việt.
  */
 export type FinanceActionResult<T = unknown> =
-  { ok: true; data: T } | { ok: false; error: string };
+  { ok: true; data: T } | { ok: false; error: string; code?: string | null };
 
 type RpcClient = SupabaseClient<Database>;
 
@@ -40,6 +40,9 @@ export async function callFinanceRpc<T>(
   if (error) {
     return {
       ok: false,
+      // Giữ lại mã lỗi gốc để màn hình gọi có thể hiện hành động phù hợp
+      // (vd link tới lịch kỳ khi bị chặn ERR_SERVICE_NOT_ACCEPTED — T-042).
+      code: extractRpcCode(error.message),
       error: getRpcErrorMessage(extractRpcCode(error.message)),
     };
   }

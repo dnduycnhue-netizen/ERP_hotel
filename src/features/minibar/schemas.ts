@@ -59,7 +59,12 @@ export const minibarDecideWaiveSchema = z.object({
   propertyId: uuidSchema,
   checkId: uuidSchema,
   decision: z.enum(["approved", "rejected"]),
-  note: z.string().trim().max(1000, "Ghi chú tối đa 1000 ký tự.").optional().nullable(),
+  note: z
+    .string()
+    .trim()
+    .max(1000, "Ghi chú tối đa 1000 ký tự.")
+    .optional()
+    .nullable(),
 });
 export type MinibarDecideWaiveInput = z.infer<typeof minibarDecideWaiveSchema>;
 
@@ -67,7 +72,12 @@ export type MinibarDecideWaiveInput = z.infer<typeof minibarDecideWaiveSchema>;
 export const minibarMarkLateChargeSchema = z.object({
   propertyId: uuidSchema,
   checkId: uuidSchema,
-  note: z.string().trim().max(1000, "Ghi chú tối đa 1000 ký tự.").optional().nullable(),
+  note: z
+    .string()
+    .trim()
+    .max(1000, "Ghi chú tối đa 1000 ký tự.")
+    .optional()
+    .nullable(),
 });
 export type MinibarMarkLateChargeInput = z.infer<
   typeof minibarMarkLateChargeSchema

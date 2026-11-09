@@ -155,8 +155,7 @@ export function FrontdeskCheckDetail({
                     ) : null}
                   </td>
                   <td className="py-2 pr-2 text-right tabular-nums">
-                    {formatNumber(line.missing_qty)}{" "}
-                    {line.stock_uom ?? ""}
+                    {formatNumber(line.missing_qty)} {line.stock_uom ?? ""}
                   </td>
                   <td className="py-2 pr-2 text-right">
                     <MoneyText amount={line.unit_price} />
@@ -325,7 +324,8 @@ export function FrontdeskCheckDetail({
                           propertyId,
                           checkId: check.id,
                           decision: "approved",
-                          note: waiveNote.trim() === "" ? null : waiveNote.trim(),
+                          note:
+                            waiveNote.trim() === "" ? null : waiveNote.trim(),
                         }),
                       vi.minibar.waiveDecisionSuccess,
                     )
@@ -347,7 +347,8 @@ export function FrontdeskCheckDetail({
                           propertyId,
                           checkId: check.id,
                           decision: "rejected",
-                          note: waiveNote.trim() === "" ? null : waiveNote.trim(),
+                          note:
+                            waiveNote.trim() === "" ? null : waiveNote.trim(),
                         }),
                       vi.minibar.waiveDecisionSuccess,
                     )

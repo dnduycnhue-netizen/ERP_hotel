@@ -30,23 +30,16 @@ export default async function HousekeepingMinibarPage({
   });
   const monthStart = `${today.slice(0, 7)}-01`;
 
-  const [
-    perms,
-    rooms,
-    itemsRes,
-    pricesRes,
-    stocksRes,
-    recallRes,
-    reportRes,
-  ] = await Promise.all([
-    getMinibarPerms(propertyId),
-    listRooms(propertyId),
-    listMinibarItems(propertyId),
-    listMinibarPrices(propertyId),
-    getRoomStocks(propertyId),
-    getRecallList(propertyId, 30),
-    getMinibarReport(propertyId, monthStart, today),
-  ]);
+  const [perms, rooms, itemsRes, pricesRes, stocksRes, recallRes, reportRes] =
+    await Promise.all([
+      getMinibarPerms(propertyId),
+      listRooms(propertyId),
+      listMinibarItems(propertyId),
+      listMinibarPrices(propertyId),
+      getRoomStocks(propertyId),
+      getRecallList(propertyId, 30),
+      getMinibarReport(propertyId, monthStart, today),
+    ]);
 
   if (!itemsRes.ok) {
     return <ErrorState description={itemsRes.error} />;
@@ -75,9 +68,7 @@ export default async function HousekeepingMinibarPage({
 
   return (
     <div className="space-y-8">
-      <h1 className="text-xl font-semibold">
-        {vi.minibar.housekeepingTitle}
-      </h1>
+      <h1 className="text-xl font-semibold">{vi.minibar.housekeepingTitle}</h1>
 
       <section className="space-y-3">
         <h2 className="text-lg font-semibold">{vi.minibar.stockTitle}</h2>
@@ -160,7 +151,9 @@ export default async function HousekeepingMinibarPage({
                 <th className="py-2 pr-2 text-right font-medium">
                   {vi.minibar.daysLeft}
                 </th>
-                <th className="py-2 text-right font-medium">{vi.minibar.qty}</th>
+                <th className="py-2 text-right font-medium">
+                  {vi.minibar.qty}
+                </th>
               </tr>
             </thead>
             <tbody>

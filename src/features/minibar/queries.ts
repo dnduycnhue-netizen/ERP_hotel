@@ -25,11 +25,7 @@ import { callMinibarRpc, type MinibarActionResult } from "./rpc";
 /* ------------------------------------------------------------------ */
 
 export type MinibarCheckStatus =
-  | "pending_charge"
-  | "charged"
-  | "waived"
-  | "late_charge"
-  | "written_off";
+  "pending_charge" | "charged" | "waived" | "late_charge" | "written_off";
 
 export type MinibarTrigger = "checkout" | "daily" | "audit";
 
@@ -192,8 +188,7 @@ export async function getMinibarPerms(
     canPriceManage: perms.has("minibar.price.manage"),
     canReconcile: perms.has("minibar.reconcile"),
     canViewReport: perms.has("report.view.rpt_minibar"),
-    canViewQty:
-      perms.has("stock.view_value") || perms.has("stock.view_qty"),
+    canViewQty: perms.has("stock.view_value") || perms.has("stock.view_qty"),
     canViewValue: perms.has("stock.view_value"),
   };
 }
@@ -278,16 +273,18 @@ export async function getMinibarCheck(
     .eq("check_id", checkId)
     .order("created_at", { ascending: true });
   if (linesError) return toError(linesError);
-  const lines = ((linesData ?? []) as unknown as Array<{
-    id: string;
-    check_id: string;
-    item_id: string;
-    missing_qty: number;
-    unit_price: number;
-    amount: number;
-    near_expiry: boolean;
-    item: { code: string; name: string; stock_uom: string } | null;
-  }>).map((l) => ({
+  const lines = (
+    (linesData ?? []) as unknown as Array<{
+      id: string;
+      check_id: string;
+      item_id: string;
+      missing_qty: number;
+      unit_price: number;
+      amount: number;
+      near_expiry: boolean;
+      item: { code: string; name: string; stock_uom: string } | null;
+    }>
+  ).map((l) => ({
     id: l.id,
     check_id: l.check_id,
     item_id: l.item_id,
@@ -337,21 +334,21 @@ export async function listMinibarPrices(
   const supabase = await createClient();
   const { data, error } = await untyped(supabase)
     .from("minibar_price_list")
-    .select(
-      "id, item_id, price, valid_from, valid_to, item:items(code, name)",
-    )
+    .select("id, item_id, price, valid_from, valid_to, item:items(code, name)")
     .eq("property_id", propertyId)
     .order("valid_from", { ascending: false })
     .limit(200);
   if (error) return toError(error);
-  const rows = ((data ?? []) as unknown as Array<{
-    id: string;
-    item_id: string;
-    price: number;
-    valid_from: string;
-    valid_to: string | null;
-    item: { code: string; name: string } | null;
-  }>).map((r) => ({
+  const rows = (
+    (data ?? []) as unknown as Array<{
+      id: string;
+      item_id: string;
+      price: number;
+      valid_from: string;
+      valid_to: string | null;
+      item: { code: string; name: string } | null;
+    }>
+  ).map((r) => ({
     id: r.id,
     item_id: r.item_id,
     item_code: r.item?.code ?? null,
@@ -370,9 +367,7 @@ export async function listMinibarPrices(
  */
 export async function getRoomStocks(
   propertyId: string,
-): Promise<
-  MinibarActionResult<{ rows: RoomStockRow[]; canViewQty: boolean }>
-> {
+): Promise<MinibarActionResult<{ rows: RoomStockRow[]; canViewQty: boolean }>> {
   const supabase = await createClient();
   const perms = await getMinibarPerms(propertyId);
   if (!perms.canViewQty) {
@@ -522,14 +517,17 @@ export async function getMinibarReport(
   let lavieQty = 0;
   const topMap = new Map<
     string,
-    { item_code: string | null; item_name: string | null; qty: number; amount: number }
+    {
+      item_code: string | null;
+      item_name: string | null;
+      qty: number;
+      amount: number;
+    }
   >();
   if (checkIds.length > 0) {
     const { data: lines, error: linesError } = await client
       .from("minibar_check_lines")
-      .select(
-        "check_id, item_id, missing_qty, amount, item:items(code, name)",
-      )
+      .select("check_id, item_id, missing_qty, amount, item:items(code, name)")
       .in("check_id", checkIds);
     if (linesError) return toError(linesError);
     for (const l of (lines ?? []) as unknown as Array<{
