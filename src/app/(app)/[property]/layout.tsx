@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { AdminLink } from "@/components/common/admin-link";
 import { MasterLink } from "@/components/common/master-link";
 import { ProcurementLink } from "@/components/common/procurement-link";
+import { ReceivingLink } from "@/components/common/receiving-link";
 import { PropertySwitcher } from "@/components/common/property-switcher";
 import { vi } from "@/i18n/vi";
 import { PermissionsProvider } from "@/lib/permissions/permissions-provider";
@@ -53,6 +54,7 @@ export default async function PropertyLayout({
             <div className="flex items-center gap-4">
               <MasterLink propertyId={currentProperty.id} />
               <ProcurementLink propertyId={currentProperty.id} />
+              <ReceivingLink propertyId={currentProperty.id} />
               <AdminLink />
               <PropertySwitcher
                 currentPropertyId={currentProperty.id}

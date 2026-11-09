@@ -9,7 +9,8 @@ import {
 import type { CapturedPhoto } from "@/components/common/camera-capture";
 
 export type UploadCapturedPhotoResult =
-  { ok: true; data: RegisterAttachmentResult } | { ok: false; error: string };
+  | { ok: true; data: RegisterAttachmentResult & { path: string } }
+  | { ok: false; error: string };
 
 /**
  * Luồng tải ảnh chụp đầy đủ (T-016), dùng chung cho mọi màn hình cần ảnh
@@ -50,7 +51,7 @@ export async function uploadCapturedPhoto(args: {
     };
   }
 
-  return registerAttachmentAction({
+  const registered = await registerAttachmentAction({
     propertyId: args.propertyId,
     bucket: prepared.data.bucket,
     path: prepared.data.path,
@@ -65,4 +66,10 @@ export async function uploadCapturedPhoto(args: {
       source: "camera",
     },
   });
+  if (!registered.ok) {
+    return registered;
+  }
+  // Tra them duong dan storage de noi goi dung lam chung tu (VD chu ky
+  // nguoi giao trong supplier_return_confirm, T-026).
+  return { ok: true, data: { ...registered.data, path: prepared.data.path } };
 }

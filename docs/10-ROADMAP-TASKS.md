@@ -49,7 +49,7 @@ Quy ước tiêu chí nghiệm thu (AC): mọi task phải thỏa Definition of 
 | [x] T-023 | Migration 07 nhận hàng + RPC mù (`receiving_list_tasks`, `get_task`, `record_line`, `post`) | CC | T-020, T-016 | pgTAP: role receiver SELECT `purchase_order_lines` = 0 dòng; lệch 6% → `needs_reweigh`; vượt PO bị chặn trần — **xong 09/11/2026: migration `20261109230000` (5 bảng + 12 RPC incl. `receiving_override_line`, `supplier_return_post`, `receiving_reverse`, `admin_qc_template_*`), pgTAP 87 assertion CHƯA chạy (VM không có Docker); Q20 đã thực thi (PO market `approved` đủ điều kiện nhận); Q21 mới (anh bat buoc theo nhom `food`). UI mobile la T-024.** |
 | [x] T-024 | Màn hình nhận hàng mobile (`/m/[p]/receive`) + NumPad + QC + PIN | AG | T-023 | Thao tác 1 tay; không hiện số PO/giá ở bất kỳ request nào (kiểm tra tab Network) — **xong 09/11/2026: routes `/m/[p]/receive` + `/m/[p]/receive/[grId]`, `NumPad` dùng chung (`src/components/common/num-pad.tsx`), form ghi dòng (Tổng cân − Bì = Thực nhận, CameraCapture + upload ảnh, checklist QC, nhiệt độ, lô/hạn, cân lại lần 2, duyệt vượt PO), ghi sổ qua ConfirmPostDialog + PinDialog (4–6 chữ số), không migration mới, pgTAP không đổi (87 assertion T-023 chưa chạy). Q22 mới (chữ ký người giao chưa có UI).** |
 | [x] T-025 | Offline cho nhận hàng: Dexie queue, `client_uuid`, đồng bộ lại, ảnh chờ tải | CC | T-024 | Tắt mạng nhận 3 dòng → bật mạng tự gửi, không trùng (đã code 09/11/2026, chưa test tay trên máy thật) |
-| [ ] T-026 | Trả hàng NCC + nhận thẳng vào bếp | CC + AG | T-023 | `return_out` dùng giá dòng gốc |
+| [x] T-026 | Trả hàng NCC + nhận thẳng vào bếp | CC + AG | T-023 | `return_out` dùng giá dòng gốc |
 
 ## Giai đoạn MVP-C — Kho, buồng phòng, kiểm kê (tuần 8–9)
 

@@ -122,6 +122,38 @@ export const receivingListReceiptsSchema = z.object({
   offset: z.number().int().min(0).default(0),
 });
 
+/** Loc danh sach phieu tra NCC (RPC `supplier_return_list`, T-026). */
+export const supplierReturnListSchema = z.object({
+  propertyId: uuidSchema,
+  status: z.enum(["recorded", "posted", "cancelled"]).optional().nullable(),
+  search: z
+    .string()
+    .trim()
+    .max(100, "Từ khóa tối đa 100 ký tự.")
+    .optional()
+    .nullable(),
+  limit: z.number().int().min(1).max(100).default(20),
+  offset: z.number().int().min(0).default(0),
+});
+
+/** Xac nhan NCC da lay hang ve (RPC `supplier_return_confirm`, T-026). */
+export const supplierReturnConfirmSchema = z.object({
+  returnId: uuidSchema,
+  supplierSignaturePath: z.string().trim().max(500).optional().nullable(),
+  photoIds: z.array(uuidSchema).optional().nullable(),
+});
+
+/** Huy phieu tra QC fail (RPC `supplier_return_cancel`, T-026). */
+export const supplierReturnCancelSchema = z.object({
+  returnId: uuidSchema,
+  reason: z.string().trim().min(1, "Lý do hủy phiếu trả không được để trống."),
+});
+
+/** Dong cua phieu nhan da post con tra duoc (RPC `supplier_return_eligible_lines`, T-026). */
+export const supplierReturnEligibleLinesSchema = z.object({
+  grId: uuidSchema,
+});
+
 export type ReceivingStartInput = z.infer<typeof receivingStartSchema>;
 export type ReceivingRecordLineInput = z.infer<
   typeof receivingRecordLineSchema
@@ -136,4 +168,14 @@ export type QcTemplateSaveInput = z.infer<typeof qcTemplateSaveSchema>;
 export type QcTemplateDeleteInput = z.infer<typeof qcTemplateDeleteSchema>;
 export type ReceivingListReceiptsInput = z.infer<
   typeof receivingListReceiptsSchema
+>;
+export type SupplierReturnListInput = z.infer<typeof supplierReturnListSchema>;
+export type SupplierReturnConfirmInput = z.infer<
+  typeof supplierReturnConfirmSchema
+>;
+export type SupplierReturnCancelInput = z.infer<
+  typeof supplierReturnCancelSchema
+>;
+export type SupplierReturnEligibleLinesInput = z.infer<
+  typeof supplierReturnEligibleLinesSchema
 >;
