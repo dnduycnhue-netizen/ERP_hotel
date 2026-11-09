@@ -157,8 +157,12 @@ insert into public.user_property_roles (user_id, role_id, property_id) values
   ('d0230000-0000-4000-8000-000000000a10', 'd0230000-0000-4000-8000-000000000609', 'd0230000-0000-4000-8000-000000000201');
 
 -- Tam ung cho PO cho PO2: nguoi giu la thu kho a07 (de test SOD_MARKET_BUYER_RECEIVER).
+-- advances co write-guard (app.advance_guard_bypass) nhu T-022: chen truc
+-- tiep phai bat co, khong thi trigger nem ERR_INVALID_STATUS.
+select set_config('app.advance_guard_bypass', 'on', true);
 insert into public.advances (id, org_id, legal_entity_id, property_id, employee_id, doc_no, amount, purpose, status) values
   ('d0230000-0000-4000-8000-000000000901', 'd0230000-0000-4000-8000-000000000001', 'd0230000-0000-4000-8000-000000000101', 'd0230000-0000-4000-8000-000000000201', 'd0230000-0000-4000-8000-000000000a07', 'ADV-023-001', 1000000, 'Đi chợ', 'disbursed');
+select set_config('app.advance_guard_bypass', 'off', true);
 
 -- PO fixture (chen truc tiep, bypass pr_po; status guard chi chan UPDATE).
 select set_config('app.pr_po_guard_bypass', 'on', true);
