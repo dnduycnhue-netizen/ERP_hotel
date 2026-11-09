@@ -4,6 +4,13 @@
 
 export const rpcErrorMessages: Record<string, string> = {
   ERR_FORBIDDEN: "Bạn chưa được cấp quyền thực hiện thao tác này.",
+  ERR_CONFIG_INVALID: "Thông tin cấu hình không hợp lệ. Hãy kiểm tra lại.",
+  ERR_CONFIG_SCOPE: "Phạm vi cấu hình không thuộc tổ chức đã chọn.",
+  ERR_CONFIG_ITEM_GROUP:
+    "Nhóm hàng không tồn tại hoặc không thuộc tổ chức đã chọn.",
+  ERR_CONFIG_APPROVER:
+    "Người duyệt không hoạt động hoặc chưa có quyền duyệt bắt buộc.",
+  ERR_CONFIG_NOT_FOUND: "Không tìm thấy quy tắc cấu hình.",
   ERR_SELF_GRANT:
     "Không được tự cấp hoặc tự sửa quyền cho chính mình. Nhờ quản trị viên khác thực hiện.",
   ERR_LAST_ADMIN:

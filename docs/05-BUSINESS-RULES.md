@@ -2,6 +2,21 @@
 
 Mọi tham số có chữ **[cấu hình]** lưu trong bảng `settings` (`org_id`, `property_id?`, `key`, `value jsonb`) — không hard-code. Giá trị ghi ở đây là mặc định.
 
+Các khóa cấu hình được quản trị qua `/admin/settings`:
+
+| Khóa | Mặc định | Áp dụng |
+|---|---:|---|
+| `price_spike_pct` | 10 | Tăng giá so với trung bình 7 ngày |
+| `receiving_tolerance_pct` | 5 | Dung sai nhận hàng so với PO |
+| `market_advance_deadline_hours` | 24 | Thời hạn quyết toán tạm ứng |
+| `waste_approval_threshold_vnd` | 1.000.000 | Ngưỡng duyệt hủy hàng |
+| `count_random_items` | 3 | Số mã ngẫu nhiên khi kiểm kê ca (giới hạn 2–3) |
+| `count_variance_threshold_pct` | 3 | Ngưỡng lệch kiểm kê ca |
+| `count_without_cc_factor` | 0,7 | Hệ số khi khách sạn không có Cost Controller |
+| `invoice_price_tolerance_pct` | 1 | Dung sai đơn giá hóa đơn |
+
+Giá trị ở phạm vi khách sạn ghi đè giá trị toàn chuỗi; giá trị mặc định được dùng nếu chưa lưu cấu hình. Các quy tắc cảnh báo hiển thị trong `08-REPORTS-ALERTS.md` vẫn cần chủ đầu tư chốt trước khi được tạo hoặc kích hoạt trong `/admin/alert-rules`.
+
 ## 1. Trạng thái chứng từ
 
 ```
@@ -53,6 +68,7 @@ draft ──submit──▶ submitted ──approve (đủ bước)──▶ app
 
 - Không cho tồn âm ở bất kỳ kho nào (`ERR_NEGATIVE_STOCK`).
 - Giá xuất: bình quân gia quyền tức thời theo pháp nhân (B4 trong `03-DATA-MODEL.md`). Phương pháp đặt trong `legal_entities.costing_method`, đổi chỉ khi đầu năm tài chính.
+- **Quyết định tạm thời cho T-011:** khách chọn FIFO theo thứ tự ghi sổ cho toàn chuỗi, đồng thời vẫn hỗ trợ và kiểm thử bình quân gia quyền; cần kế toán trưởng phê duyệt (Q6, Q11, Q12). FIFO chặn ghi lùi ngày và chặn trả/đảo phần lớp nhập đã xuất. Không tự chuyển phương pháp của pháp nhân đã có giao dịch hoặc số dư. Quyết định này **chưa được triển khai**, cấu hình hiện tại chưa tự thay đổi.
 - Phiếu lĩnh: lệch giữa `issued` và `received` phải giải quyết trước khi khóa ca của outlet.
 - Xuất theo mục đích không tính vào giá vốn hàng bán; gắn `cost_center_id` + `expense_category_id` bắt buộc.
 - Hủy hàng > **1.000.000đ/phiếu** [cấu hình] → thêm duyệt gm.

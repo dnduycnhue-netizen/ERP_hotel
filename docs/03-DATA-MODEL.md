@@ -166,33 +166,21 @@ $$;
 
 ### B2. Đánh số chứng từ
 
-```sql
-create table public.doc_sequences (
-  legal_entity_id uuid not null references public.legal_entities(id),
-  doc_type text not null,
-  year int not null,
-  last_no int not null default 0,
-  primary key (legal_entity_id, doc_type, year)
-);
-alter table public.doc_sequences enable row level security; -- không policy: chỉ hàm definer truy cập
+T-010 triển khai trong `supabase/migrations/20261109030000_master_data.sql`:
 
--- Ví dụ kết quả: PO-KS01-2611-0007
-create or replace function public.next_doc_no(p_entity uuid, p_doc_type text, p_date date default current_date)
-returns text language plpgsql security definer set search_path = public as $$
-declare v_no int; v_code text;
-begin
-  insert into doc_sequences(legal_entity_id, doc_type, year, last_no)
-  values (p_entity, p_doc_type, extract(year from p_date)::int, 1)
-  on conflict (legal_entity_id, doc_type, year)
-  do update set last_no = doc_sequences.last_no + 1
-  returning last_no into v_no;
-  select code into v_code from legal_entities where id = p_entity;
-  return format('%s-%s-%s-%s', p_doc_type, v_code, to_char(p_date,'YYMM'), lpad(v_no::text, 4, '0'));
-end $$;
-revoke all on function public.next_doc_no from public, anon, authenticated;
-```
+- `doc_sequences` dùng khóa `(legal_entity_id, doc_type, year)`, bộ đếm `bigint` và RLS không có policy cho client. `next_doc_no` chỉ được gọi từ hàm nghiệp vụ có quyền tương ứng, không cấp quyền gọi trực tiếp cho client.
+- Một lệnh `INSERT ... ON CONFLICT ... UPDATE ... RETURNING` tăng bộ đếm nguyên tử trong transaction của chứng từ. Năm tính theo ngày nghiệp vụ được truyền; mặc định là ngày `Asia/Ho_Chi_Minh`.
+- Định dạng `PO-KS01-2611-0007`: số thứ tự có **tối thiểu** bốn chữ số, không cắt cụt khi vượt 9999; tháng chỉ thuộc phần hiển thị, không đặt lại bộ đếm.
+- `norm_text` đã được tạo từ migration tiện ích; `items.name_norm` là cột generated và duy nhất trong từng tổ chức.
+- Các bảng danh mục T-010 chỉ mở quyền đọc theo RLS. Luồng ghi danh mục và NCC được bổ sung ở T-012/T-013; không cho ghi trực tiếp trong lúc các kiểm soát nghiệp vụ chưa hoàn chỉnh.
 
 ### B3. Sổ cái kho bất biến
+
+T-011 đang chuẩn bị schema nền trong
+`supabase/migrations/20261109110000_inventory_foundation.sql`: các bảng mới
+chưa cấp quyền cho client và migration chưa áp dụng production. Việc ghi sổ,
+phân bổ lớp FIFO, đảo và thực thi khóa vẫn chưa được triển khai; đoạn SQL dưới
+đây là đặc tả, không phải khả năng đang chạy.
 
 ```sql
 create table public.stock_moves (

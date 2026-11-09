@@ -3,7 +3,9 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ErrorState } from "@/components/common/error-state";
 import { hasChainPerm } from "@/features/admin";
+import { hasAdminConfigPermission } from "@/features/admin";
 import { vi } from "@/i18n/vi";
+import { listAccessibleProperties } from "@/lib/supabase/access";
 import { createClient } from "@/lib/supabase/server";
 
 /**
@@ -25,12 +27,37 @@ export default async function AdminLayout({
     redirect("/login");
   }
 
-  const [canRoles, canUsers] = await Promise.all([
+  const [canRoles, canUsers, properties] = await Promise.all([
     hasChainPerm(supabase, "admin.roles.manage"),
     hasChainPerm(supabase, "admin.users.manage"),
+    listAccessibleProperties(supabase),
   ]);
 
-  if (!canRoles && !canUsers) {
+  async function hasConfigAccess(permission: string): Promise<boolean> {
+    if (await hasAdminConfigPermission(supabase, permission, null)) {
+      return true;
+    }
+    for (const property of properties) {
+      if (await hasAdminConfigPermission(supabase, permission, property.id)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  const [canSettings, canApprovalRules, canAlertRules] = await Promise.all([
+    hasConfigAccess("admin.settings.manage"),
+    hasConfigAccess("admin.approval_rules.manage"),
+    hasConfigAccess("admin.alert_rules.manage"),
+  ]);
+
+  if (
+    !canRoles &&
+    !canUsers &&
+    !canSettings &&
+    !canApprovalRules &&
+    !canAlertRules
+  ) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-muted/30 px-4">
         <div className="w-full max-w-lg rounded-lg border bg-card">
@@ -70,6 +97,30 @@ export default async function AdminLayout({
                 className="text-primary hover:underline"
               >
                 {vi.admin.users}
+              </Link>
+            ) : null}
+            {canSettings ? (
+              <Link
+                href="/admin/settings"
+                className="text-primary hover:underline"
+              >
+                {vi.admin.settings}
+              </Link>
+            ) : null}
+            {canApprovalRules ? (
+              <Link
+                href="/admin/approval-rules"
+                className="text-primary hover:underline"
+              >
+                {vi.admin.approvalRules}
+              </Link>
+            ) : null}
+            {canAlertRules ? (
+              <Link
+                href="/admin/alert-rules"
+                className="text-primary hover:underline"
+              >
+                {vi.admin.alertRules}
               </Link>
             ) : null}
           </nav>

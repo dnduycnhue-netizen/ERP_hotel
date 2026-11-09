@@ -20,14 +20,18 @@ Quy ước tiêu chí nghiệm thu (AC): mọi task phải thỏa Definition of 
 | [x] T-004 | `vi.ts`, `errors.vi.ts`, thành phần chung (`DocStatusBadge`, `MoneyText`, `DataTable`, `EmptyState`, `ErrorState`, `ConfirmPostDialog`, `PinDialog`) | AG | T-003 | Storybook hoặc trang `/dev/components` hiển thị đủ trạng thái |
 | [x] T-005 | Quản trị người dùng: Edge Function `admin-create-user` (service role), RPC `admin_*` (mục 9 `09-API-RPC.md`), đặt PIN, khóa tài khoản | CC | T-003 | Tạo user không cần email thật; `ERR_SELF_GRANT`, `ERR_LAST_ADMIN` có test |
 | [x] T-005b | Màn hình phân quyền `06-UI-UX.md` mục 6: danh sách vai trò, sao chép, so sánh, **ma trận quyền tích chọn theo module**, gán vai trò theo KS/bộ phận/kho có thời hạn, quyền riêng cho/chặn, khối quyền hiệu lực có nguồn, cảnh báo tổ hợp xung đột; hook `useCan` | AG | T-005 | Bỏ tích 1 quyền → người giữ vai trò bị chặn ngay ở lần gọi RPC kế tiếp; nút tương ứng mờ sau khi làm mới quyền |
-| [ ] T-006 | `settings` + `approval_rules` + `alert_rules` + màn hình quản trị cấu hình | AG | T-005 | Đổi ngưỡng có hiệu lực không cần deploy |
+| [x] T-006 | `settings` + `approval_rules` + `alert_rules` + màn hình quản trị cấu hình | AG | T-005 | Đổi ngưỡng có hiệu lực không cần deploy |
 
 ## Giai đoạn MVP-A — Danh mục & sổ cái (tuần 3–4)
 
+> T-011 đang triển khai: đã chuẩn bị schema nền và kiểm thử RLS/bất biến
+> trong transaction rollback. Chưa áp migration lên production, chưa có RPC
+> post, FIFO/bình quân hay thực thi khóa ngày/kỳ; chưa được dùng cho nghiệp vụ.
+
 | # | Task | Agent | Phụ thuộc | AC chính |
 |---|---|---|---|---|
-| [ ] T-010 | Migration 03 danh mục (A2), `doc_sequences`, `next_doc_no`, `norm_text`, unique `name_norm` | CC | T-002 | Test: số chứng từ tăng đúng khi gọi đồng thời 50 lần (không trùng) |
-| [ ] T-011 | Migration 04 sổ cái: `stock_moves`, `stock_balances`, `item_costs`, `_post_move`, `forbid_mutation`, kỳ & khóa ngày | CC | T-010 | pgTAP: bình quân gia quyền đúng 5 ca (nhập/xuất xen kẽ); chặn tồn âm; chặn UPDATE; kỳ đóng chặn ghi |
+| [x] T-010 | Migration 03 danh mục (A2), `doc_sequences`, `next_doc_no`, `norm_text`, unique `name_norm` | CC | T-002 | Test: số chứng từ tăng đúng khi gọi đồng thời 50 lần (không trùng) |
+| [ ] T-011 | Migration 04 sổ cái: `stock_moves`, `stock_balances`, `item_costs`, `_post_move`, `forbid_mutation`, kỳ & khóa ngày; bổ sung FIFO tạm thời theo Q11/Q12 | CC | T-010 | pgTAP: bình quân gia quyền đúng 5 ca (nhập/xuất xen kẽ), FIFO theo lớp, chặn tồn âm; chặn UPDATE; kỳ đóng chặn ghi |
 | [ ] T-012 | Màn hình danh mục: vật tư (lọc nhóm, mã tạm, thiếu quy đổi), nhóm hàng, đơn vị, quy cách mua, kho, phòng, outlet, khoản mục | AG | T-010 | CRUD qua RLS; tạo trùng tên → báo lỗi tiếng Việt |
 | [ ] T-013 | NCC + thẩm định + đổi STK 2 người + hợp đồng khung + giá trần | AG + CC (RPC) | T-012 | SoD STK; alert `BANK_ACCOUNT_CHANGE` tạo ra |
 | [ ] T-014 | Import Excel 4 bước (01.10) cho vật tư & NCC theo `07-IMPORT-MIGRATION.md`; chạy thử với file `Lst_2020_DL_Buffet.xlsx` | CC | T-012 | Phát hiện đủ 11 mã trùng, 54→33 đơn vị, 281 thiếu hệ số trên file mẫu |

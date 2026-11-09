@@ -6,6 +6,10 @@ Tham số offline luôn có `p_client_uuid uuid` → nếu đã xử lý, trả 
 
 ## 1. Danh mục
 
+`next_doc_no(p_entity, p_doc_type, p_date)` là hàm nội bộ cấp số nguyên tử,
+không cấp quyền gọi trực tiếp cho client. Ngày mặc định theo `Asia/Ho_Chi_Minh`.
+Các RPC danh mục dưới đây thuộc các task sau, chưa được triển khai bởi T-010.
+
 | RPC | Tham số chính | Kết quả / ghi chú |
 |---|---|---|
 | `item_create_temp` | `p_name, p_group_id, p_stock_uom` | Tạo mã tạm `TMP-xxxx`, `is_temp = true` |
@@ -104,13 +108,31 @@ Mọi RPC dưới đây yêu cầu `admin.roles.manage` hoặc `admin.users.mana
 | `admin_sod_conflict_check(p_user_id \| p_role_id)` | `admin.users.manage` | Trả danh sách cặp quyền xung đột |
 | `my_permissions(p_property_id)` | đăng nhập | UI dùng cho `useCan` |
 
+## 10. Cấu hình nghiệp vụ
+
+Các RPC cấu hình kiểm tra quyền tương ứng, ghi `audit_log` và chỉ cho phép đọc/ghi qua RPC; bảng bật RLS nhưng không cấp quyền truy cập trực tiếp cho client. `p_property_id = null` là cấu hình toàn chuỗi; giá trị `settings` tại khách sạn ghi đè giá trị toàn chuỗi.
+
+| RPC | Quyền cần | Ghi chú |
+|---|---|---|
+| `admin_settings_list(p_org_id, p_property_id)` | `admin.settings.manage` | Trả giá trị đã lưu hoặc mặc định; nguồn ghi rõ `default` / `organization` / `property` |
+| `admin_setting_save(p_org_id, p_property_id, p_key, p_value text)` | `admin.settings.manage` | Lưu ngưỡng đã kiểm tra miền giá trị |
+| `admin_approval_rules_list(p_org_id, p_property_id)` | `admin.approval_rules.manage` | Danh sách quy tắc theo phạm vi |
+| `admin_approval_approvers_list(p_org_id, p_property_id)` | `admin.approval_rules.manage` | Chỉ trả vai trò hoạt động và người dùng thuộc tổ chức |
+| `admin_approval_rule_save(p_rule jsonb)` / `admin_approval_rule_delete(p_rule_id)` | `admin.approval_rules.manage` | Mỗi bước có đúng một vai trò hoặc người duyệt; vai trò phải có quyền cần duyệt; khi chuyển phạm vi phải có quyền ở cả phạm vi hiện tại và đích |
+| `admin_alert_rules_list(p_org_id, p_property_id)` | `admin.alert_rules.manage` | Danh sách quy tắc theo phạm vi |
+| `admin_alert_rule_save(p_rule jsonb)` / `admin_alert_rule_delete(p_rule_id)` | `admin.alert_rules.manage` | Ngưỡng là JSON object; kênh hợp lệ: `app`, `email`, `webpush`, `zalo`; khi chuyển phạm vi phải có quyền ở cả phạm vi hiện tại và đích |
+
 Khởi tạo production trước khi có quản trị viên là ngoại lệ vận hành một lần: `bootstrap_initial_org(...)` chỉ được gọi từ Edge Function bằng `service_role`, chỉ chạy khi chưa có tổ chức, và tạo hai tài khoản `sys_admin` cùng một tài khoản kiểm thử bị giới hạn ở khách sạn đầu tiên. Tài khoản kiểm thử không nhận quyền quản trị hoặc quyền `critical`. Sau bootstrap, tạo và quản lý người dùng theo các RPC quản trị ở trên; không cấp `service_role` cho client.
 
-## 10. Mã lỗi (UI dịch trong `errors.vi.ts`)
+## 11. Mã lỗi (UI dịch trong `errors.vi.ts`)
 
 | Mã | Nghĩa |
 |---|---|
 | `ERR_FORBIDDEN:<ma.quyen>` | Không có quyền (kèm mã quyền thiếu để UI báo rõ) |
+| `ERR_CONFIG_INVALID` | Cấu hình sai định dạng hoặc ngoài giới hạn |
+| `ERR_CONFIG_SCOPE` | Phạm vi cấu hình không thuộc tổ chức |
+| `ERR_CONFIG_ITEM_GROUP` | Nhóm hàng không tồn tại hoặc không thuộc tổ chức của quy tắc duyệt |
+| `ERR_CONFIG_APPROVER` | Vai trò/người duyệt không hợp lệ hoặc thiếu quyền |
 | `ERR_SELF_GRANT` | Không được tự cấp/sửa quyền cho chính mình |
 | `ERR_LAST_ADMIN` | Phải còn ít nhất 2 người quản trị |
 | `ERR_SYSTEM_ROLE` | Không sửa/xóa vai trò hệ thống |
