@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import { AdminLink } from "@/components/common/admin-link";
 import { MasterLink } from "@/components/common/master-link";
 import { PropertySwitcher } from "@/components/common/property-switcher";
@@ -17,24 +17,22 @@ export default async function PropertyLayout({
 }>) {
   const { property: propertyId } = await params;
   const supabase = await createClient();
-  const { data: userData, error: userError } = await supabase.auth.getUser();
-  if (userError && userError.name !== "AuthSessionMissingError") {
-    throw userError;
-  }
-  if (!userData.user) {
-    redirect("/login");
-  }
 
-  const properties = await listAccessibleProperties(supabase);
+  // Layout cha (app) đã chặn người chưa đăng nhập (getUser + redirect
+  // /login) nên ở đây không gọi getUser() lần nữa; hai lần gọi nối tiếp
+  // chỉ thêm một vòng round-trip tới Supabase Auth cho mỗi request.
+  // listAccessibleProperties và RPC my_permissions không phụ thuộc nhau
+  // nên chạy song song.
+  const [properties, { data: myPermissions }] = await Promise.all([
+    listAccessibleProperties(supabase),
+    supabase.rpc("my_permissions", { p_property: propertyId }),
+  ]);
+
   const currentProperty = properties.find(({ id }) => id === propertyId);
 
   if (!currentProperty) {
     notFound();
   }
-
-  const { data: myPermissions } = await supabase.rpc("my_permissions", {
-    p_property: propertyId,
-  });
 
   return (
     <PermissionsProvider

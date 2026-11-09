@@ -37,12 +37,14 @@ export default async function AdminLayout({
     if (await hasAdminConfigPermission(supabase, permission, null)) {
       return true;
     }
-    for (const property of properties) {
-      if (await hasAdminConfigPermission(supabase, permission, property.id)) {
-        return true;
-      }
-    }
-    return false;
+    // Kiểm tra theo từng khách sạn không phụ thuộc nhau nên chạy song song;
+    // giữ nguyên ngữ nghĩa: đúng khi có bất kỳ phạm vi nào cấp quyền.
+    const perProperty = await Promise.all(
+      properties.map((property) =>
+        hasAdminConfigPermission(supabase, permission, property.id),
+      ),
+    );
+    return perProperty.some(Boolean);
   }
 
   const [canSettings, canApprovalRules, canAlertRules] = await Promise.all([
