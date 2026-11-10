@@ -8,6 +8,7 @@ import { callAdminRpc, type AdminActionResult } from "./rpc";
 import {
   assignRoleSchema,
   copyRoleSchema,
+  createOrgSchema,
   createUserSchema,
   resetPasswordSchema,
   revokeRoleSchema,
@@ -18,6 +19,7 @@ import {
   setPinSchema,
   setRolePermissionsSchema,
   type AssignRoleInput,
+  type CreateOrgInput,
   type CreateUserInput,
   type ResetPasswordInput,
   type SaveRoleInput,
@@ -65,6 +67,12 @@ export type CreateUserResult = {
 export type ResetPasswordResult = {
   user_id: string;
   temp_password: string;
+};
+
+export type CreateOrgResult = {
+  org_id: string;
+  legal_entity_id: string;
+  property_id: string;
 };
 
 function edgeFunctionErrorMessage(code: string | null): string {
@@ -142,6 +150,43 @@ export async function createUserAction(
     },
   );
   if (result.ok) revalidatePath("/admin/users");
+  return result;
+}
+
+/**
+ * Tạo tổ chức + pháp nhân + khách sạn trong 1 lần (C5, RPC admin_org_create).
+ * RPC tự kiểm tra quyền admin.org.manage, seed vai trò mẫu của tổ chức mới
+ * và gán người tạo làm sys_admin + owner toàn chuỗi của tổ chức mới.
+ */
+export async function createOrgAction(
+  input: CreateOrgInput,
+): Promise<AdminActionResult<CreateOrgResult>> {
+  const gate = await authed();
+  if (gate) return gate;
+  const parsed = createOrgSchema.safeParse(input);
+  if (!parsed.success) return firstIssue(parsed);
+  const supabase = await createClient();
+  const d = parsed.data;
+  const result = await callAdminRpc<CreateOrgResult>(
+    supabase,
+    "admin_org_create",
+    {
+      p_org: {
+        org_name: d.orgName,
+        legal_code: d.legalCode,
+        legal_name: d.legalName,
+        tax_code: d.taxCode || null,
+        accounting_regime: d.accountingRegime,
+        costing_method: d.costingMethod,
+        property_code: d.propertyCode,
+        property_name: d.propertyName,
+        address: d.address || null,
+        sod_profile: d.sodProfile,
+        rooms_count: d.roomsCount,
+      },
+    },
+  );
+  if (result.ok) revalidatePath("/admin/organizations");
   return result;
 }
 
