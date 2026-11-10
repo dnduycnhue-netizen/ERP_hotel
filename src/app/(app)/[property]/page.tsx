@@ -11,15 +11,8 @@ import {
   Warehouse,
 } from "lucide-react";
 import { PageHeader } from "@/components/shell/page-header";
-import { createClient } from "@/lib/supabase/server";
+import { getPropertyDashboardOverview } from "@/features/property/dashboard";
 import { vi } from "@/i18n/vi";
-
-type LegalEntityInfo = {
-  code: string;
-  name: string;
-  costing_method: string;
-  accounting_regime: string;
-};
 
 export default async function PropertyHome({
   params,
@@ -27,71 +20,46 @@ export default async function PropertyHome({
   params: Promise<{ property: string }>;
 }) {
   const { property: propertyId } = await params;
-  const supabase = await createClient();
 
-  const { data: property, error: propError } = await supabase
-    .from("properties")
-    .select(
-      "id, code, name, sod_profile, rooms_count, org_id, legal_entity:legal_entities(code, name, costing_method, accounting_regime)",
-    )
-    .eq("id", propertyId)
-    .single();
-
-  if (propError || !property) {
+  // C10 (Q125): 1 RPC duy nhat thay cho 5 SELECT cu (1 select KS + phap
+  // nhan, roi 4 count song song). Loi (KS khong ton tai / khong duoc truy
+  // cap) -> notFound() nhu ban cu.
+  let overview;
+  try {
+    overview = await getPropertyDashboardOverview(propertyId);
+  } catch {
     notFound();
   }
 
-  const [
-    { count: itemsCount },
-    { count: warehousesCount },
-    { count: groupsCount },
-    { count: rolesCount },
-  ] = await Promise.all([
-    supabase
-      .from("items")
-      .select("id", { count: "exact", head: true })
-      .eq("org_id", property.org_id),
-    supabase
-      .from("warehouses")
-      .select("id", { count: "exact", head: true })
-      .eq("property_id", propertyId),
-    supabase
-      .from("item_groups")
-      .select("id", { count: "exact", head: true })
-      .eq("org_id", property.org_id),
-    supabase
-      .from("roles")
-      .select("id", { count: "exact", head: true })
-      .eq("org_id", property.org_id),
-  ]);
-
-  const le = property.legal_entity as unknown as LegalEntityInfo | null;
+  const property = overview.property;
+  const counts = overview.counts;
+  const le = property.legal_entity;
 
   const kpis = [
     {
       label: vi.property.kpiItems,
-      value: itemsCount ?? 0,
+      value: counts.items,
       description: vi.property.kpiItemsDescription,
       icon: Package,
       tileClassName: "bg-blue-500/10 text-blue-600",
     },
     {
       label: vi.property.kpiWarehouses,
-      value: warehousesCount ?? 0,
+      value: counts.warehouses,
       description: vi.property.kpiWarehousesDescription,
       icon: Warehouse,
       tileClassName: "bg-emerald-500/10 text-emerald-600",
     },
     {
       label: vi.property.kpiGroups,
-      value: groupsCount ?? 0,
+      value: counts.item_groups,
       description: vi.property.kpiGroupsDescription,
       icon: Layers,
       tileClassName: "bg-amber-500/10 text-amber-600",
     },
     {
       label: vi.property.kpiRoles,
-      value: rolesCount ?? 0,
+      value: counts.roles,
       description: vi.property.kpiRolesDescription,
       icon: Users,
       tileClassName: "bg-brand/10 text-brand",
