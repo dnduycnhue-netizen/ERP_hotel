@@ -1913,7 +1913,22 @@ export const vi = {
     settling: "Đang quyết toán…",
     settleTitle: "Quyết toán tạm ứng",
     settleHint:
-      "Nhập số tiền thực chi theo từng khoản. Thừa so với tạm ứng sẽ hiện số hoàn lại, thiếu sẽ hiện số phải trả thêm.",
+      "Nhập số tiền thực chi theo từng khoản. Có thể gắn phiếu nhận đã chốt và chụp ảnh biên lai cho từng dòng. Thừa so với tạm ứng sẽ hiện số hoàn lại, thiếu sẽ hiện số phải trả thêm.",
+    settleGrLabel: "Phiếu nhận (GR)",
+    settleGrNone: "Không gắn phiếu nhận",
+    settleGrHint:
+      "Gắn phiếu nhận đã chốt để đối chiếu tự động. Bỏ trống nếu khoản chi không kèm phiếu nhận.",
+    settleGrEmpty: "Không có phiếu nhận đã chốt cho khách sạn này.",
+    settleGrOfPo: "Phiếu nhận của PO này",
+    settleGrOthers: "Phiếu nhận khác (đã chốt)",
+    settlePhotoLabel: "Ảnh biên lai / chứng từ chi",
+    settlePhotoHint:
+      "Chụp ảnh biên lai để đính kèm theo dòng chi. Ảnh tải lên ngay khi chụp.",
+    settlePhotoUploading: "Đang tải ảnh lên…",
+    settlePhotoRemove: "Gỡ ảnh",
+    settleAttachedDocs: "Chứng từ đính kèm",
+    settleGrColumn: "Phiếu nhận",
+    settleHasPhoto: "Có ảnh",
     actualAmount: "Số tiền thực chi",
     spentTotal: "Tổng thực chi",
     refundAmount: "Hoàn lại",

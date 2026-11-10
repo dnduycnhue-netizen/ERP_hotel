@@ -612,6 +612,60 @@ export async function listAdvanceSettlements(
   return { ok: true, data: rows };
 }
 
+/** 1 dòng quyết toán kèm phiếu nhận đã gắn (C12/Q74). */
+export type AdvanceSettlementLineRow = {
+  id: string;
+  settlement_id: string;
+  settlement_doc_no: string;
+  amount: number;
+  gr_id: string | null;
+  gr_doc_no: string | null;
+  receipt_photo_id: string | null;
+};
+
+/**
+ * Dòng quyết toán của các phiếu quyết toán cho trước (C12/Q74) — để
+ * lịch sử quyết toán hiện phiếu nhận đã gắn + dòng nào có ảnh biên lai.
+ * `gr_doc_no` null khi người xem không có `receiving.view` (policy
+ * SELECT của goods_receipts) hoặc dòng không gắn phiếu nhận.
+ */
+export async function listAdvanceSettlementLines(
+  settlementIds: string[],
+): Promise<FinanceActionResult<AdvanceSettlementLineRow[]>> {
+  if (settlementIds.length === 0) {
+    return { ok: true, data: [] };
+  }
+  const supabase = await createClient();
+  const { data, error } = await untyped(supabase)
+    .from("advance_settlement_lines")
+    .select(
+      "id, settlement_id, amount, gr_id, receipt_photo_id, settlement:advance_settlements(doc_no), receipt:goods_receipts(doc_no)",
+    )
+    .in("settlement_id", settlementIds)
+    .order("created_at", { ascending: true });
+  if (error) return toError(error);
+  const rows = (
+    (data ?? []) as unknown as Array<{
+      id: string;
+      settlement_id: string;
+      amount: number;
+      gr_id: string | null;
+      receipt_photo_id: string | null;
+      settlement: { doc_no: string } | null;
+      receipt: { doc_no: string } | null;
+    }>
+  ).map((r) => ({
+    id: r.id,
+    settlement_id: r.settlement_id,
+    settlement_doc_no: r.settlement?.doc_no ?? "",
+    amount: r.amount,
+    gr_id: r.gr_id,
+    gr_doc_no: r.receipt?.doc_no ?? null,
+    receipt_photo_id: r.receipt_photo_id,
+  }));
+  return { ok: true, data: rows };
+}
+
 const PAYMENT_REQUEST_COLUMNS =
   "id, org_id, property_id, supplier_id, doc_no, total, due_date, status, paid_at, bank_ref, created_by, created_at";
 
