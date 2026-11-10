@@ -37,11 +37,7 @@ insert into public.items (id, org_id, code, name, group_id, stock_uom, recipe_uo
   ('d0600000-0200-4000-8000-000000000502', 'd0600000-0200-4000-8000-000000000001', 'ITM_THIT', 'Thịt ba chỉ', 'd0600000-0200-4000-8000-000000000302', 'kg', null, null, true, array['contract']),
   ('d0600000-0200-4000-8000-000000000503', 'd0600000-0200-4000-8000-000000000001', 'ITM_MUOI', 'Muối hạt', 'd0600000-0200-4000-8000-000000000302', 'kg', 'gr', 1000, false, array['contract', 'market']);
 
-insert into public.ceiling_prices (org_id, property_id, item_id, uom, price, valid_from, valid_to, set_by) values
-  ('d0600000-0200-4000-8000-000000000001', 'd0600000-0200-4000-8000-000000000201', 'd0600000-0200-4000-8000-000000000501', 'kg', 12000, '2026-01-01', '2030-12-31', 'd0600000-0200-4000-8000-000000000a01'),
-  ('d0600000-0200-4000-8000-000000000001', 'd0600000-0200-4000-8000-000000000201', 'd0600000-0200-4000-8000-000000000502', 'kg', 50000, '2026-01-01', '2030-12-31', 'd0600000-0200-4000-8000-000000000a01');
-
-insert into public.auth.users (id, instance_id, aud, role, email, encrypted_password, email_confirmed_at, created_at, updated_at, raw_app_meta_data, raw_user_meta_data)
+insert into auth.users (id, instance_id, aud, role, email, encrypted_password, email_confirmed_at, created_at, updated_at, raw_app_meta_data, raw_user_meta_data)
 values
   ('d0600000-0200-4000-8000-000000000a01', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 't060-chef@example.test', '', now(), now(), now(), '{}'::jsonb, '{}'::jsonb),
   ('d0600000-0200-4000-8000-000000000a02', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 't060-oh@example.test', '', now(), now(), now(), '{}'::jsonb, '{}'::jsonb),
@@ -49,6 +45,10 @@ values
   ('d0600000-0200-4000-8000-000000000a04', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 't060-view@example.test', '', now(), now(), now(), '{}'::jsonb, '{}'::jsonb),
   ('d0600000-0200-4000-8000-000000000a05', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 't060-noperm@example.test', '', now(), now(), now(), '{}'::jsonb, '{}'::jsonb),
   ('d0600000-0200-4000-8000-000000000a06', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 't060-own@example.test', '', now(), now(), now(), '{}'::jsonb, '{}'::jsonb);
+
+insert into public.ceiling_prices (org_id, property_id, item_id, uom, price, valid_from, valid_to, set_by) values
+  ('d0600000-0200-4000-8000-000000000001', 'd0600000-0200-4000-8000-000000000201', 'd0600000-0200-4000-8000-000000000501', 'kg', 12000, '2026-01-01', '2030-12-31', 'd0600000-0200-4000-8000-000000000a01'),
+  ('d0600000-0200-4000-8000-000000000001', 'd0600000-0200-4000-8000-000000000201', 'd0600000-0200-4000-8000-000000000502', 'kg', 50000, '2026-01-01', '2030-12-31', 'd0600000-0200-4000-8000-000000000a01');
 
 insert into public.profiles (id, employee_code, full_name) values
   ('d0600000-0200-4000-8000-000000000a01', 'T060_CHEF', 'Bếp trưởng'),
