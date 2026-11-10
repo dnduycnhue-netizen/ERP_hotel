@@ -6,13 +6,15 @@ import {
   listAccessibleProperties,
   selectedPropertyCookie,
 } from "@/lib/supabase/access";
-import { createClient, getAuthenticatedUser } from "@/lib/supabase/server";
+import { createClient, getAuthenticatedUserId } from "@/lib/supabase/server";
 import { signOut } from "../(auth)/login/actions";
 
 export default async function HomePage() {
   const supabase = await createClient();
-  const user = await getAuthenticatedUser(supabase);
-  if (!user) {
+  // Trang này chỉ cần biết đã đăng nhập chưa rồi chuyển tới khách sạn —
+  // dùng getClaims() tại chỗ (0 round-trip) thay vì getUser().
+  const userId = await getAuthenticatedUserId(supabase);
+  if (!userId) {
     redirect("/login");
   }
 

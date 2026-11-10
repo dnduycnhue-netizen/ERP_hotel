@@ -3,7 +3,7 @@ import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { vi } from "@/i18n/vi";
-import { createClient, getAuthenticatedUser } from "@/lib/supabase/server";
+import { createClient, getAuthenticatedUserId } from "@/lib/supabase/server";
 import { signOut } from "../(auth)/login/actions";
 import AppLoading from "./loading";
 
@@ -21,15 +21,17 @@ async function AuthenticatedApp({
   children,
 }: Readonly<{ children: ReactNode }>) {
   const supabase = await createClient();
-  const user = await getAuthenticatedUser(supabase);
-  if (!user) {
+  // Chỉ cần id để kiểm tra active — dùng getClaims() tại chỗ (0
+  // round-trip) thay vì getUser() gọi sang máy chủ Auth mỗi request.
+  const userId = await getAuthenticatedUserId(supabase);
+  if (!userId) {
     redirect("/login");
   }
 
   const { data: profile, error: profileError } = await supabase
     .from("profiles")
     .select("active")
-    .eq("id", user.id)
+    .eq("id", userId)
     .maybeSingle();
 
   if (profileError) {

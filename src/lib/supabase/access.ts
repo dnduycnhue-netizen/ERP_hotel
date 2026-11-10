@@ -13,22 +13,13 @@ export type AccessibleProperty = Pick<
 export async function listAccessibleProperties(
   supabase: SupabaseClient<Database>,
 ): Promise<AccessibleProperty[]> {
-  const { data: propertyIds, error: accessError } =
-    await supabase.rpc("my_property_ids");
-
-  if (accessError) {
-    console.error("Unable to load accessible property IDs.", accessError);
-    throw accessError;
-  }
-
-  if (propertyIds.length === 0) {
-    return [];
-  }
-
+  // Chỉ 1 câu SELECT: policy `properties_select` đã lọc
+  // `id in (select public.my_property_ids())` nên kết quả trả về đúng
+  // các khách sạn người gọi được truy cập, không cần gọi RPC
+  // `my_property_ids()` trước rồi mới select (2 round-trip nối tiếp).
   const { data: properties, error: propertiesError } = await supabase
     .from("properties")
     .select("id, code, name")
-    .in("id", propertyIds)
     .order("name");
 
   if (propertiesError) {

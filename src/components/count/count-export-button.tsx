@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { utils, writeFile } from "xlsx";
 import { Button } from "@/components/ui/button";
 import type { CountResultRow } from "@/features/count/queries";
 import { vi } from "@/i18n/vi";
@@ -49,12 +48,15 @@ export function CountExportButton({
     }
   }
 
-  function handleExport(): void {
+  async function handleExport(): Promise<void> {
     if (exporting || rows.length === 0) {
       return;
     }
     setExporting(true);
     try {
+      // Nạp `xlsx` (chunk ~400KB) chỉ khi người dùng bấm xuất — import
+      // tĩnh ở đầu file kéo cả thư viện vào bundle trang kết quả kiểm kê.
+      const { utils, writeFile } = await import("xlsx");
       const cols = vi.count.exportColumns;
       const data = rows.map((row) => ({
         [cols.itemCode]: row.item_code,
