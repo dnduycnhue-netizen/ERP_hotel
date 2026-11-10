@@ -31,18 +31,22 @@ export function ProcurementNav({ propertyId }: { propertyId: string }) {
   ];
 
   return (
-    <nav className="flex flex-wrap gap-2 border-b pb-3 mb-6">
+    <nav
+      aria-label={vi.procurement.nav.title}
+      className="mb-6 flex gap-1 overflow-x-auto border-b"
+    >
       {links.map((link) => {
         const isActive = pathname.startsWith(link.href);
         return (
           <Link
             key={link.href}
             href={link.href}
+            aria-current={isActive ? "page" : undefined}
             className={cn(
-              "rounded-md px-3 py-1.5 text-sm font-medium transition-colors",
+              "shrink-0 border-b-2 px-3 py-2 text-sm font-medium whitespace-nowrap transition-colors outline-none focus-visible:ring-2 focus-visible:ring-brand/40",
               isActive
-                ? "bg-primary text-primary-foreground shadow-sm"
-                : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                ? "border-brand text-brand"
+                : "border-transparent text-muted-foreground hover:text-foreground",
             )}
           >
             {link.label}

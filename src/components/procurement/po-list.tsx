@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DataTable,
@@ -10,6 +11,7 @@ import {
 } from "@/components/common/data-table";
 import { DocStatusBadge } from "@/components/common/doc-status-badge";
 import { MoneyText } from "@/components/common/money-text";
+import { PageHeader } from "@/components/shell/page-header";
 import { vi } from "@/i18n/vi";
 import type { PoRow } from "@/features/procurement/queries";
 
@@ -147,28 +149,30 @@ export function PoList({
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between gap-4 flex-wrap">
-        <div>
-          <h2 className="text-lg font-semibold">
-            {vi.procurement.po.listTitle}
-          </h2>
-        </div>
-      </div>
+      <PageHeader title={vi.procurement.po.listTitle} />
 
       <div className="flex gap-2 flex-wrap">
-        <input
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") applyFilters({});
-          }}
-          placeholder={vi.procurement.list.searchPlaceholder}
-          className="h-9 flex-1 min-w-52 rounded-md border bg-background px-3 text-sm"
-        />
+        <div className="relative min-w-52 flex-1">
+          <Search
+            className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
+            aria-hidden
+          />
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") applyFilters({});
+            }}
+            placeholder={vi.procurement.list.searchPlaceholder}
+            aria-label={vi.procurement.list.searchPlaceholder}
+            className="h-9 w-full rounded-md border bg-background pr-3 pl-9 text-sm outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
+          />
+        </div>
         <select
           value={currentStatus}
           onChange={(e) => applyFilters({ status: e.target.value })}
-          className="h-9 rounded-md border bg-background px-3 text-sm"
+          aria-label={vi.procurement.list.filterAllStatuses}
+          className="h-9 rounded-md border bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
         >
           <option value="">{vi.procurement.list.filterAllStatuses}</option>
           {PO_STATUSES.map((s) => (
@@ -177,12 +181,7 @@ export function PoList({
             </option>
           ))}
         </select>
-        <Button
-          variant="outline"
-          size="sm"
-          className="h-9"
-          onClick={() => applyFilters({})}
-        >
+        <Button variant="outline" onClick={() => applyFilters({})}>
           {vi.common.search}
         </Button>
       </div>

@@ -3,12 +3,14 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Plus, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DataTable,
   type DataTableColumn,
 } from "@/components/common/data-table";
 import { DocStatusBadge } from "@/components/common/doc-status-badge";
+import { PageHeader } from "@/components/shell/page-header";
 import { useCan } from "@/lib/permissions/permissions-provider";
 import { vi } from "@/i18n/vi";
 import type { PrRow } from "@/features/procurement/queries";
@@ -135,36 +137,42 @@ export function PrList({
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between gap-4 flex-wrap">
-        <div>
-          <h2 className="text-lg font-semibold">
-            {vi.procurement.pr.listTitle}
-          </h2>
-        </div>
-        {canCreate ? (
-          <Button
-            size="sm"
-            onClick={() => router.push(`/${propertyId}/procurement/pr/new`)}
-          >
-            + {vi.procurement.pr.createTitle}
-          </Button>
-        ) : null}
-      </div>
+      <PageHeader
+        title={vi.procurement.pr.listTitle}
+        actions={
+          canCreate ? (
+            <Button
+              onClick={() => router.push(`/${propertyId}/procurement/pr/new`)}
+            >
+              <Plus className="size-4" aria-hidden />
+              {vi.procurement.pr.createTitle}
+            </Button>
+          ) : null
+        }
+      />
 
       <div className="flex gap-2 flex-wrap">
-        <input
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") applyFilters({});
-          }}
-          placeholder={vi.procurement.list.searchPlaceholder}
-          className="h-9 flex-1 min-w-52 rounded-md border bg-background px-3 text-sm"
-        />
+        <div className="relative min-w-52 flex-1">
+          <Search
+            className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
+            aria-hidden
+          />
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") applyFilters({});
+            }}
+            placeholder={vi.procurement.list.searchPlaceholder}
+            aria-label={vi.procurement.list.searchPlaceholder}
+            className="h-9 w-full rounded-md border bg-background pr-3 pl-9 text-sm outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
+          />
+        </div>
         <select
           value={currentStatus}
           onChange={(e) => applyFilters({ status: e.target.value })}
-          className="h-9 rounded-md border bg-background px-3 text-sm"
+          aria-label={vi.procurement.list.filterAllStatuses}
+          className="h-9 rounded-md border bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
         >
           <option value="">{vi.procurement.list.filterAllStatuses}</option>
           {PR_STATUSES.map((s) => (
@@ -173,12 +181,7 @@ export function PrList({
             </option>
           ))}
         </select>
-        <Button
-          variant="outline"
-          size="sm"
-          className="h-9"
-          onClick={() => applyFilters({})}
-        >
+        <Button variant="outline" onClick={() => applyFilters({})}>
           {vi.common.search}
         </Button>
       </div>
