@@ -382,6 +382,11 @@ allow_dynamic_registration = false
 [functions.bootstrap-initial-org]
 verify_jwt = false
 
+# T-045: pg_net goi bang shared secret (header x-notification-secret),
+# khong co JWT nguoi dung.
+[functions.send-notification]
+verify_jwt = false
+
 [edge_runtime]
 enabled = true
 # Supported request policies: `oneshot`, `per_worker`.
