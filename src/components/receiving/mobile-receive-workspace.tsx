@@ -77,6 +77,7 @@ export function MobileReceiveWorkspace({
   const canPost = useCan("receiving.post");
   const [lines, setLines] = useState<ReceiptLineRow[]>(receipt.lines);
   const linesRef = useRef(lines);
+  const lineElementsRef = useRef(new Map<string, HTMLLIElement>());
   useEffect(() => {
     linesRef.current = lines;
   }, [lines]);
@@ -174,6 +175,33 @@ export function MobileReceiveWorkspace({
   // dong bo; neu can can lai thi job post se loi va banner bao loi).
   const canPostNow = recordedCount + queuedCount > 0 && needsReweighCount === 0;
 
+  /** Dòng còn việc phải làm: chưa ghi, hoặc cần cân lại / duyệt vượt. */
+  function lineNeedsAction(poLineId: string): boolean {
+    if (queuedRecords[poLineId]) {
+      return false;
+    }
+    const stored = storedByPoLine.get(poLineId);
+    if (!stored) {
+      return true;
+    }
+    return stored.needs_reweigh || stored.over_po_qty_stock > 0;
+  }
+
+  const nextActionLine = task.lines.find((line) =>
+    lineNeedsAction(line.po_line_id),
+  );
+  const progressPct =
+    task.lines.length === 0 ? 0 : (recordedCount / task.lines.length) * 100;
+
+  function scrollToNextAction() {
+    if (!nextActionLine) {
+      return;
+    }
+    lineElementsRef.current
+      .get(nextActionLine.po_line_id)
+      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
   async function handlePinSubmit(pin: string) {
     // Offline (T-025): xep hang ghi so — PIN luu trong job tren may cho
     // toi khi dong bo xong (xoa ngay sau khi gui); xem Q23.
@@ -195,7 +223,7 @@ export function MobileReceiveWorkspace({
         });
       } catch {
         setPosting(false);
-        setPinError("Không lưu được thao tác offline. Hãy thử lại.");
+        setPinError(vi.offline.queueUnavailable);
         return;
       }
       setPosting(false);
@@ -221,15 +249,44 @@ export function MobileReceiveWorkspace({
         <h1 className="text-xl font-semibold">
           {vi.receiving.receiptTitle} {receipt.doc_no}
         </h1>
-        <p className="mt-1 text-sm text-muted-foreground">
+        <p className="mt-1 text-base text-muted-foreground">
           {task.doc_no} · {task.supplier_name}
         </p>
-        <p className="mt-1 text-sm font-medium">
+        <div
+          role="progressbar"
+          aria-valuenow={recordedCount}
+          aria-valuemin={0}
+          aria-valuemax={task.lines.length}
+          aria-label={interpolate(vi.receiving.recordedProgress, {
+            done: recordedCount,
+            total: task.lines.length,
+          })}
+          className="mt-3 h-2.5 overflow-hidden rounded-full bg-muted"
+        >
+          <div
+            className="h-full rounded-full bg-brand transition-all"
+            style={{ width: `${progressPct}%` }}
+          />
+        </div>
+        <p className="mt-2 text-base font-medium">
           {interpolate(vi.receiving.recordedProgress, {
             done: recordedCount,
             total: task.lines.length,
           })}
+          {queuedCount > 0
+            ? ` · ${interpolate(vi.receiving.queuedLinesCount, { count: queuedCount })}`
+            : ""}
         </p>
+        {nextActionLine ? (
+          <Button
+            type="button"
+            variant="outline"
+            onClick={scrollToNextAction}
+            className="mt-3 min-h-11 w-full text-base"
+          >
+            {vi.receiving.nextUnrecorded}
+          </Button>
+        ) : null}
       </div>
 
       <ul className="flex flex-col gap-4">
@@ -249,17 +306,24 @@ export function MobileReceiveWorkspace({
           return (
             <li
               key={line.po_line_id}
-              className="rounded-xl border bg-card p-4 shadow-sm"
+              ref={(el) => {
+                if (el) {
+                  lineElementsRef.current.set(line.po_line_id, el);
+                } else {
+                  lineElementsRef.current.delete(line.po_line_id);
+                }
+              }}
+              className="scroll-mt-24 rounded-xl border bg-card p-4 shadow-sm"
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <p className="font-semibold">{line.item_name}</p>
+                  <p className="text-base font-semibold">{line.item_name}</p>
                   {line.spec ? (
-                    <p className="mt-0.5 text-sm text-muted-foreground">
+                    <p className="mt-0.5 text-base text-muted-foreground">
                       {vi.receiving.spec}: {line.spec}
                     </p>
                   ) : null}
-                  <p className="mt-0.5 text-sm text-muted-foreground">
+                  <p className="mt-0.5 text-base text-muted-foreground">
                     {line.uom}
                     {line.track_lot ? ` · ${vi.receiving.lotNo}` : ""}
                     {line.photo_required
@@ -324,7 +388,19 @@ export function MobileReceiveWorkspace({
         })}
       </ul>
 
-      <div className="flex flex-col gap-2 rounded-xl border bg-card p-4 shadow-sm">
+      {/* Thanh hành động dính đáy: luôn thấy nút Ghi sổ + tiến độ mà không
+          cần cuộn hết danh sách. Sau khi gộp với shell của W1 (bottom tab
+          cố định), shell cần chừa khoảng trống phía dưới — xem Q180. */}
+      <div className="sticky bottom-0 z-10 -mx-4 flex flex-col gap-2 border-t bg-background/95 px-4 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))] backdrop-blur">
+        <p className="text-base font-medium" aria-live="polite">
+          {interpolate(vi.receiving.recordedProgress, {
+            done: recordedCount,
+            total: task.lines.length,
+          })}
+          {queuedCount > 0
+            ? ` · ${interpolate(vi.receiving.queuedLinesCount, { count: queuedCount })}`
+            : ""}
+        </p>
         {needsReweighCount > 0 ? (
           <p role="alert" className="text-sm text-amber-700">
             {vi.receiving.reweighHint}
@@ -350,7 +426,7 @@ export function MobileReceiveWorkspace({
         ) : null}
         <Button
           size="lg"
-          className="h-14 text-base"
+          className="h-14 w-full text-base"
           disabled={!canPost || !canPostNow || posting || queuedPost}
           onClick={() => {
             setConfirmOpen(true);
@@ -360,7 +436,7 @@ export function MobileReceiveWorkspace({
         </Button>
         <Link
           href={`/m/${propertyId}/receive`}
-          className="text-center text-sm font-medium text-primary underline-offset-4 hover:underline"
+          className="min-h-11 text-center text-base font-medium text-primary underline-offset-4 hover:underline"
         >
           {vi.receiving.backToTasks}
         </Link>

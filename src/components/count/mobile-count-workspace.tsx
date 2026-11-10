@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { DocStatusBadge } from "@/components/common/doc-status-badge";
 import { EmptyState } from "@/components/common/empty-state";
@@ -16,7 +16,12 @@ import { vi } from "@/i18n/vi";
 import { useOfflineSync } from "@/lib/offline/use-offline-sync";
 import { cn } from "@/lib/utils";
 import { CountSubmitDialog } from "./count-submit-dialog";
-import { formatQty, formatYmd, interpolate } from "./count-utils";
+import {
+  formatQty,
+  formatYmd,
+  interpolate,
+  normalizeSearch,
+} from "./count-utils";
 import { MobileCountLineForm } from "./mobile-count-line-form";
 
 const RECORDABLE_STATUSES = ["open", "counting", "recount"] as const;
@@ -59,6 +64,11 @@ export function MobileCountWorkspace({
     onCountRecordSynced: () => router.refresh(),
   });
   const [selectedLineId, setSelectedLineId] = useState<string | null>(null);
+  const [query, setQuery] = useState("");
+  const [filter, setFilter] = useState<
+    "all" | "uncounted" | "counted" | "recount"
+  >("all");
+  const lineElementsRef = useRef(new Map<string, HTMLLIElement>());
   const [submitOpen, setSubmitOpen] = useState(false);
   const [submitResult, setSubmitResult] = useState<{
     recountLineIds: string[];
@@ -90,6 +100,30 @@ export function MobileCountWorkspace({
   }, [sheet, count.status]);
 
   const countedLines = sheet.filter((line) => line.has_counted).length;
+  const progressPct =
+    sheet.length === 0 ? 0 : (countedLines / sheet.length) * 100;
+  const uncountedCount = sheet.filter((line) => !line.has_counted).length;
+  const recountCount = sheet.filter((line) => line.flag === "recount").length;
+
+  const normalizedQuery = normalizeSearch(query.trim());
+  const visibleSheet = useMemo(() => {
+    let rows = orderedSheet;
+    if (filter === "uncounted") {
+      rows = rows.filter((line) => !line.has_counted);
+    } else if (filter === "counted") {
+      rows = rows.filter((line) => line.has_counted);
+    } else if (filter === "recount") {
+      rows = rows.filter((line) => line.flag === "recount");
+    }
+    if (normalizedQuery !== "") {
+      rows = rows.filter((line) =>
+        normalizeSearch(`${line.item_code} ${line.item_name}`).includes(
+          normalizedQuery,
+        ),
+      );
+    }
+    return rows;
+  }, [orderedSheet, filter, normalizedQuery]);
   const counterNames = new Map(counters.map((c) => [c.id, c.full_name]));
   const addableCounters = eligibleCounters.filter(
     (c) => !count.counter_ids.includes(c.id),
@@ -103,6 +137,25 @@ export function MobileCountWorkspace({
       return line.flag === "recount";
     }
     return true;
+  }
+
+  const nextUncountedLine = orderedSheet.find(
+    (line) => isLineRecordable(line) && !line.has_counted,
+  );
+
+  /** Nhảy tới dòng chưa đếm đầu tiên (xóa lọc/tìm kiếm trước để dòng hiện ra). */
+  function scrollToNextUncounted() {
+    if (!nextUncountedLine) {
+      return;
+    }
+    const targetId = nextUncountedLine.line_id;
+    setFilter("all");
+    setQuery("");
+    window.setTimeout(() => {
+      lineElementsRef.current
+        .get(targetId)
+        ?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 0);
   }
 
   async function handleAddCounter(): Promise<void> {
@@ -129,11 +182,11 @@ export function MobileCountWorkspace({
       <div className="flex items-start justify-between gap-3">
         <div>
           <h1 className="text-xl font-semibold">{count.doc_no}</h1>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-base text-muted-foreground">
             {count.warehouse_name ?? vi.common.noData} ·{" "}
             {formatYmd(count.business_date)}
           </p>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-base text-muted-foreground">
             {interpolate(vi.count.countersCount, {
               count: count.counter_ids.length,
             })}
@@ -145,6 +198,41 @@ export function MobileCountWorkspace({
           </p>
         </div>
         <DocStatusBadge status={count.status} />
+      </div>
+
+      <div>
+        <div
+          role="progressbar"
+          aria-valuenow={countedLines}
+          aria-valuemin={0}
+          aria-valuemax={sheet.length}
+          aria-label={interpolate(vi.count.countProgress, {
+            done: countedLines,
+            total: sheet.length,
+          })}
+          className="h-2.5 overflow-hidden rounded-full bg-muted"
+        >
+          <div
+            className="h-full rounded-full bg-brand transition-all"
+            style={{ width: `${progressPct}%` }}
+          />
+        </div>
+        <p className="mt-2 text-base font-medium">
+          {interpolate(vi.count.countProgress, {
+            done: countedLines,
+            total: sheet.length,
+          })}
+        </p>
+        {nextUncountedLine ? (
+          <Button
+            type="button"
+            variant="outline"
+            onClick={scrollToNextUncounted}
+            className="mt-3 min-h-11 w-full text-base"
+          >
+            {vi.count.nextUncounted}
+          </Button>
+        ) : null}
       </div>
 
       {count.kind === "monthly_full" && isRecordable ? (
@@ -183,20 +271,74 @@ export function MobileCountWorkspace({
       ) : null}
 
       {!isCounter && isRecordable ? (
-        <p className="rounded-lg border p-3 text-sm text-muted-foreground">
+        <p className="rounded-lg border p-3 text-base text-muted-foreground">
           {vi.count.notCounter}
         </p>
       ) : null}
 
-      <p className="text-sm text-muted-foreground">
-        {vi.count.lineCounted}: {countedLines}/{sheet.length}
-      </p>
+      {isRecordable ? (
+        <>
+          <label className="flex flex-col gap-1.5">
+            <span className="sr-only">{vi.common.search}</span>
+            <input
+              type="search"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder={vi.count.searchCountPlaceholder}
+              aria-label={vi.count.searchCountPlaceholder}
+              className="h-12 w-full rounded-lg border bg-background px-3 text-base outline-none focus:border-ring"
+            />
+          </label>
+
+          <div
+            className="flex flex-wrap gap-2"
+            role="group"
+            aria-label={vi.count.title}
+          >
+            {(
+              [
+                ["all", vi.common.all, sheet.length],
+                ["uncounted", vi.count.filterUncounted, uncountedCount],
+                ["counted", vi.count.filterCounted, countedLines],
+                ...(count.status === "recount"
+                  ? ([
+                      ["recount", vi.count.filterRecount, recountCount],
+                    ] as const)
+                  : []),
+              ] as const
+            ).map(([value, label, chipCount]) => {
+              const active = filter === value;
+              return (
+                <button
+                  key={value}
+                  type="button"
+                  onClick={() => setFilter(value)}
+                  aria-pressed={active}
+                  className={cn(
+                    "min-h-11 rounded-full border px-3 py-2 text-base font-medium",
+                    active
+                      ? "border-brand bg-brand text-brand-foreground"
+                      : "bg-background",
+                  )}
+                >
+                  {label} ({chipCount})
+                </button>
+              );
+            })}
+          </div>
+        </>
+      ) : null}
 
       {sheet.length === 0 ? (
         <EmptyState title={vi.count.sheetEmpty} />
+      ) : visibleSheet.length === 0 ? (
+        <EmptyState
+          title={vi.count.countsTitle}
+          description={vi.count.noMatchingLines}
+        />
       ) : (
         <ul className="flex flex-col gap-2">
-          {orderedSheet.map((line) => {
+          {visibleSheet.map((line) => {
             const item = items[line.item_id];
             const recordable = isLineRecordable(line);
             const isRecountLine =
@@ -205,8 +347,15 @@ export function MobileCountWorkspace({
             return (
               <li
                 key={line.line_id}
+                ref={(el) => {
+                  if (el) {
+                    lineElementsRef.current.set(line.line_id, el);
+                  } else {
+                    lineElementsRef.current.delete(line.line_id);
+                  }
+                }}
                 className={cn(
-                  "rounded-xl border bg-card",
+                  "scroll-mt-24 rounded-xl border bg-card",
                   isRecountLine && "border-amber-300 bg-amber-50/60",
                 )}
               >
@@ -219,10 +368,10 @@ export function MobileCountWorkspace({
                   className="flex w-full items-start justify-between gap-3 p-4 text-left disabled:cursor-default"
                 >
                   <span>
-                    <span className="block font-medium">
+                    <span className="block text-base font-medium">
                       {line.item_code} — {line.item_name}
                     </span>
-                    <span className="block text-sm text-muted-foreground">
+                    <span className="block text-base text-muted-foreground">
                       {vi.inventory.stockUom}: {line.stock_uom}
                       {line.has_counted && line.my_counted_qty !== null ? (
                         <>
@@ -282,20 +431,32 @@ export function MobileCountWorkspace({
         </ul>
       )}
 
+      {/* Thanh hành động dính đáy: nút Nộp đợt luôn thấy được mà không cần
+          cuộn hết phiếu đếm. Submit chỉ online (T-033) — giữ nguyên.
+          Sau khi gộp với shell của W1 (bottom tab cố định), shell cần
+          chừa khoảng trống phía dưới — xem Q180. */}
       {canSubmit ? (
-        <Button
-          size="lg"
-          className="h-14 text-base"
-          disabled={!online}
-          onClick={() => setSubmitOpen(true)}
-        >
-          {vi.count.submitButton}
-        </Button>
-      ) : null}
-      {canSubmit && !online ? (
-        <p className="text-sm text-muted-foreground">
-          {vi.offline.startNeedsOnline}
-        </p>
+        <div className="sticky bottom-0 z-10 -mx-4 flex flex-col gap-2 border-t bg-background/95 px-4 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))] backdrop-blur">
+          <p className="text-base font-medium" aria-live="polite">
+            {interpolate(vi.count.countProgress, {
+              done: countedLines,
+              total: sheet.length,
+            })}
+          </p>
+          {!online ? (
+            <p className="text-sm text-muted-foreground">
+              {vi.offline.startNeedsOnline}
+            </p>
+          ) : null}
+          <Button
+            size="lg"
+            className="h-14 w-full text-base"
+            disabled={!online}
+            onClick={() => setSubmitOpen(true)}
+          >
+            {vi.count.submitButton}
+          </Button>
+        </div>
       ) : null}
 
       {canOpen && isRecordable && addableCounters.length > 0 ? (
@@ -319,6 +480,7 @@ export function MobileCountWorkspace({
             <Button
               disabled={!addCounterId || addingCounter}
               onClick={() => void handleAddCounter()}
+              className="min-h-11"
             >
               {addingCounter
                 ? vi.count.addingCounter
