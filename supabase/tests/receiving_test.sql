@@ -26,7 +26,8 @@ insert into public.properties (id, org_id, legal_entity_id, code, name, sod_prof
 
 insert into public.uoms (code, name_vi) values
   ('kg', 'Kilôgam'),
-  ('cai', 'Cái');
+  ('cai', 'Cái')
+on conflict do nothing;
 
 insert into public.item_groups (id, org_id, code_prefix, name, kind) values
   ('d0230000-0000-4000-8000-000000000401', 'd0230000-0000-4000-8000-000000000001', 'GAO', 'Gạo', 'food'),
@@ -140,8 +141,10 @@ insert into public.role_permissions (role_id, permission_code) values
   ('d0230000-0000-4000-8000-000000000607', 'receiving.override_over_po'),
   ('d0230000-0000-4000-8000-000000000607', 'supplier_return.post'),
   ('d0230000-0000-4000-8000-000000000607', 'stock.view_qty'),
+  ('d0230000-0000-4000-8000-000000000607', 'attachment.upload'),
   ('d0230000-0000-4000-8000-000000000607', 'attachment.view'),
   ('d0230000-0000-4000-8000-000000000608', 'admin.settings.manage'),
+  ('d0230000-0000-4000-8000-000000000608', 'receiving.view'),
   ('d0230000-0000-4000-8000-000000000609', 'receiving.view');
 
 insert into public.user_property_roles (user_id, role_id, property_id) values
@@ -157,8 +160,12 @@ insert into public.user_property_roles (user_id, role_id, property_id) values
   ('d0230000-0000-4000-8000-000000000a10', 'd0230000-0000-4000-8000-000000000609', 'd0230000-0000-4000-8000-000000000201');
 
 -- Tam ung cho PO cho PO2: nguoi giu la thu kho a07 (de test SOD_MARKET_BUYER_RECEIVER).
+-- advances co write-guard (app.advance_guard_bypass) nhu T-022: chen truc
+-- tiep phai bat co, khong thi trigger nem ERR_INVALID_STATUS.
+select set_config('app.advance_guard_bypass', 'on', true);
 insert into public.advances (id, org_id, legal_entity_id, property_id, employee_id, doc_no, amount, purpose, status) values
   ('d0230000-0000-4000-8000-000000000901', 'd0230000-0000-4000-8000-000000000001', 'd0230000-0000-4000-8000-000000000101', 'd0230000-0000-4000-8000-000000000201', 'd0230000-0000-4000-8000-000000000a07', 'ADV-023-001', 1000000, 'Đi chợ', 'disbursed');
+select set_config('app.advance_guard_bypass', 'off', true);
 
 -- PO fixture (chen truc tiep, bypass pr_po; status guard chi chan UPDATE).
 select set_config('app.pr_po_guard_bypass', 'on', true);
@@ -196,6 +203,11 @@ create temp table t023_ctx (key text primary key, id uuid);
 
 -- Bang tam giu response JSON cua cac lan goi RPC (goi 1 lan, assert nhieu truong).
 create temp table t023_resp (key text primary key, resp jsonb);
+
+-- Hai bang tam tao duoi role postgres, nhung tu lenh 'set local role
+-- authenticated' tro di moi lenh INSERT/SELECT deu chay duoi authenticated
+-- (khong co quyen ghi bang cua role khac) -> cap quyen truoc khi doi role.
+grant all on t023_ctx, t023_resp to authenticated;
 
 -- Helper doi user: dat lai JWT claim (mau T-020).
 create or replace function public._t023_as(p_user uuid)
@@ -235,7 +247,12 @@ select is(
 );
 
 -- 2. Guard: ghi truc tiep vao bang nhan hang bi chan (chay truoc khi doi
---    role authenticated; superuser bo qua RLS nhung trigger van chay).
+--    role authenticated). Phien chay duoi postgres (bypassrls) nen RLS
+--    khong chan; trigger write-guard nem P0001 ERR_WRITE_GUARD (diag14
+--    dong 6-7: run 12 bao 42501 la chep nham). pgTAP throws_ok so sanh
+--    message CHINH XAC (khong phai substring) nen phai ky vong toan bo
+--    message ke ca ten bang (run 14: 85/87 — chi 'ERR_WRITE_GUARD' tron
+--    thi #6/#7 van rot).
 select throws_ok(
   $q$insert into public.goods_receipt_lines (gr_id, org_id, property_id, item_id, gross_qty, uom, net_qty_stock, qc_status) values (
     'd0230000-0000-4000-8000-000000000e01',
@@ -244,8 +261,8 @@ select throws_ok(
     'd0230000-0000-4000-8000-000000000501',
     10, 'kg', 10, 'pass'
   )$q$,
-  'P0001', 'ERR_WRITE_GUARD',
-  'Direct goods_receipt_lines insert is blocked by trigger'
+  'P0001', 'ERR_WRITE_GUARD: goods_receipt_lines chi duoc ghi qua RPC',
+  'Direct goods_receipt_lines insert is blocked'
 );
 
 select set_config('app.receiving_guard_bypass', 'on', true);
@@ -262,8 +279,8 @@ select set_config('app.receiving_guard_bypass', 'off', true);
 
 select throws_ok(
   $q$update public.goods_receipts set status = 'posted' where id = 'd0230000-0000-4000-8000-000000000e01'$q$,
-  'P0001', 'ERR_WRITE_GUARD',
-  'Direct goods_receipts status change is blocked by trigger'
+  'P0001', 'ERR_WRITE_GUARD: goods_receipts chi duoc ghi qua RPC',
+  'Direct goods_receipts status change is blocked'
 );
 
 -- Tu day tro di chay duoi role authenticated (RLS co hieu luc).
@@ -733,6 +750,11 @@ select is(
   (select ((select resp from t023_resp where key = 'rec_fail') ->> 'accepted_qty_stock_capped')::numeric),
   0::numeric, 'QC fail accepts 0'
 );
+-- Doc phieu tra phai doi vai co quyen xem: receiver a06 khong co
+-- receiving.view / supplier_return.post nen RLS an ca supplier_returns
+-- lan supplier_return_lines (run 12: count 0 / qty NULL du phieu tra co
+-- that). Thu kho a07 co supplier_return.post nen thay duoc.
+select public._t023_as('d0230000-0000-4000-8000-000000000a07');
 select is(
   (select count(*) from public.supplier_returns
    where gr_id = (select id from t023_ctx where key = 'gr7')
@@ -745,6 +767,7 @@ select is(
    where sr.gr_id = (select id from t023_ctx where key = 'gr7')),
   2::numeric, 'return line holds the rejected 2kg'
 );
+select public._t023_as('d0230000-0000-4000-8000-000000000a06');
 select throws_ok(
   $q$select public.receiving_record_line(
     p_gr_id := (select id from t023_ctx where key = 'gr7'),
@@ -918,6 +941,11 @@ select is(
      and lot_id is null),
   22::numeric, 'MAIN MUOI balance is 22 after post (override)'
 );
+-- Trang thai PO va dong PO phai doc duoi vai thay duoc PO header: a07
+-- khong thay duoc PO (RLS an dong purchase_orders) nen EXISTS trong policy
+-- purchase_order_lines cung fail -> a07 doc dong PO ra NULL (diag13 dong 47).
+-- Owner a05 thay duoc ca hai.
+select public._t023_as('d0230000-0000-4000-8000-000000000a05');
 select is(
   (select status from public.purchase_orders
    where id = 'd0230000-0000-4000-8000-000000000b01'),
@@ -967,13 +995,15 @@ select ok(
   (select ((select resp from t023_resp where key = 'post_gr4') ->> 'ok')::boolean),
   'direct-issue receipt posts'
 );
+-- Dem moves phai doc duoi vai co stock.view_qty: a06 khong co quyen nay
+-- nen RLS an stock_moves (diag13 dong 63: count 0); a07 co stock.view_qty.
+select public._t023_as('d0230000-0000-4000-8000-000000000a07');
 select is(
   (select count(*) from public.stock_moves
-   where doc_type = 'goods_receipt'
-     and doc_id = (select id from t023_ctx where key = 'gr4')),
+   where source_doc_type = 'goods_receipt'
+     and source_doc_id = (select id from t023_ctx where key = 'gr4')),
   3::bigint, 'direct issue creates 3 moves'
 );
-select public._t023_as('d0230000-0000-4000-8000-000000000a07');
 select is(
   (select qty from public.stock_balances
    where warehouse_id = 'd0230000-0000-4000-8000-000000000303'
@@ -1025,14 +1055,18 @@ select ok(
   (select ((select resp from t023_resp where key = 'ret_muoi') ->> 'ok')::boolean),
   'supplier_return_post succeeds'
 );
+-- Dong PO chi doc duoc duoi vai thay duoc PO header: a07 doc ra NULL
+-- (diag13 dong 68), a05 thay duoc 20.
+select public._t023_as('d0230000-0000-4000-8000-000000000a05');
 select is(
   (select received_qty_stock from public.purchase_order_lines
    where id = 'd0230000-0000-4000-8000-000000000c03'),
   20::numeric, 'MUOI received_qty_stock drops to 20 after return'
 );
+select public._t023_as('d0230000-0000-4000-8000-000000000a07');
 select is(
   (select count(*) from public.stock_moves
-   where doc_type = 'supplier_return' and qty = -2 and unit_cost = 5000),
+   where source_doc_type = 'supplier_return' and qty = -2 and unit_cost = 5000),
   1::bigint, 'return_out move at original cost 5000'
 );
 select throws_ok(
@@ -1072,6 +1106,8 @@ select is(
      and item_id = 'd0230000-0000-4000-8000-000000000502'),
   0::numeric, 'quarantine THIT balance back to 0 after reverse'
 );
+-- Trang thai PO5 phai doc bang a05 (a07 doc ra NULL, diag13 dong 72).
+select public._t023_as('d0230000-0000-4000-8000-000000000a05');
 select is(
   (select status from public.purchase_orders
    where id = 'd0230000-0000-4000-8000-000000000b05'),
@@ -1131,13 +1167,14 @@ select ok(
   ) -> 'lines' -> 0 -> 'qc_template') is not null),
   'get_task returns the QC template for GAO'
 );
+-- require_perm raise 42501 theo thiet ke (20261108141000), khong phai P0001.
 select throws_ok(
   $q$select public.admin_qc_template_save(
     'd0230000-0000-4000-8000-000000000001',
     'd0230000-0000-4000-8000-000000000401',
     '[{"q": "Khác"}]'::jsonb
   )$q$,
-  'P0001', 'ERR_FORBIDDEN:admin.settings.manage',
+  '42501', 'ERR_FORBIDDEN:admin.settings.manage',
   'receiver cannot save QC template'
 );
 select public._t023_as('d0230000-0000-4000-8000-000000000a09');
@@ -1149,10 +1186,13 @@ select ok(
   'admin deletes QC template'
 );
 select public._t023_as('d0230000-0000-4000-8000-000000000a06');
+-- get_task xay lines bang jsonb_agg nen cot qc_template NULL thanh JSON
+-- null trong JSON; '->' tra jsonb 'null' (khong phai SQL NULL) nen
+-- 'is null' luon false. Chi '->>' moi tra SQL NULL (diag15 dong 32-33).
 select ok(
   (select (public.receiving_get_task(
     'd0230000-0000-4000-8000-000000000b01'
-  ) -> 'lines' -> 0 -> 'qc_template') is null),
+  ) -> 'lines' -> 0 ->> 'qc_template') is null),
   'get_task returns null QC template after delete'
 );
 

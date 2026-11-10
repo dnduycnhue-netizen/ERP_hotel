@@ -31,7 +31,8 @@ insert into public.warehouses (id, property_id, code, name, kind) values
   ('d0150000-1500-4000-8000-000000000302', 'd0150000-1500-4000-8000-000000000202', 'KHO015B', 'Kho chinh T-015 B', 'main');
 
 insert into public.uoms (code, name_vi) values
-  ('kg', 'Kilôgam'), ('cai', 'Cái');
+  ('kg', 'Kilôgam'), ('cai', 'Cái')
+on conflict do nothing;
 
 insert into public.item_groups (id, org_id, code_prefix, name, kind) values
   ('d0150000-1500-4000-8000-000000000401', 'd0150000-1500-4000-8000-000000000001', 'RAU', 'Rau củ', 'food');
@@ -54,7 +55,10 @@ values
 insert into public.profiles (id, employee_code, full_name) values
   ('d0150000-1500-4000-8000-000000000a01', 'NV01501', 'Nhan vien mua hang'),
   ('d0150000-1500-4000-8000-000000000a02', 'NV01502', 'Cost Controller'),
-  ('d0150000-1500-4000-8000-000000000a03', 'NV01503', 'Nguoi chi xem');
+  ('d0150000-1500-4000-8000-000000000a03', 'NV01503', 'Nguoi chi xem')
+on conflict (id) do update set
+  employee_code = excluded.employee_code,
+  full_name = excluded.full_name;
 
 insert into public.roles (id, org_id, code, name_vi) values
   ('d0150000-1500-4000-8000-000000000601', 'd0150000-1500-4000-8000-000000000001', 'r_pur015', 'Mua hang'),
