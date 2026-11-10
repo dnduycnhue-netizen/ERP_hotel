@@ -48,7 +48,7 @@ export function TrolleyCountList({
 
   return (
     <div className="flex flex-col gap-2">
-      <p className="text-sm text-muted-foreground">
+      <p className="text-base text-muted-foreground">
         {vi.trolley.countedProgress}: {counted}/{items.length}
       </p>
       <ul className="flex flex-col gap-2">
@@ -62,13 +62,13 @@ export function TrolleyCountList({
                 type="button"
                 disabled={disabled}
                 onClick={() => setActiveItemId(active ? null : item.itemId)}
-                className="flex w-full items-start justify-between gap-3 p-4 text-left disabled:cursor-default"
+                className="flex min-h-11 w-full items-start justify-between gap-3 p-4 text-left disabled:cursor-default"
               >
                 <span>
-                  <span className="block font-medium">
+                  <span className="block text-base font-medium">
                     {item.code} — {item.name}
                   </span>
-                  <span className="block text-sm text-muted-foreground">
+                  <span className="block text-base text-muted-foreground">
                     {vi.inventory.stockUom}: {item.stockUom}
                     {countedQty !== null ? (
                       <>

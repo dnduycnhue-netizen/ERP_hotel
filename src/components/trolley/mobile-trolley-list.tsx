@@ -73,14 +73,40 @@ export function MobileTrolleyList({
     trolleyWarehouses.map((w) => [w.id, w] as const),
   );
 
+  const openShifts = shifts.filter((s) => s.status === "open");
+  const closedShifts = shifts.filter((s) => s.status !== "open");
+
+  function renderShiftRow(shift: TrolleyShiftRow) {
+    return (
+      <li key={shift.id}>
+        <button
+          type="button"
+          onClick={() => router.push(`/m/${propertyId}/trolley/${shift.id}`)}
+          className="flex min-h-11 w-full items-start justify-between gap-3 rounded-xl border bg-card p-4 text-left"
+        >
+          <span>
+            <span className="block text-base font-medium">
+              {shift.trolley_code ?? vi.common.noData}
+              {shift.trolley_name ? ` — ${shift.trolley_name}` : ""}
+            </span>
+            <span className="block text-base text-muted-foreground">
+              {formatYmd(shift.business_date)} · {shiftLabel(shift.shift)}
+            </span>
+          </span>
+          <DocStatusBadge status={shift.status} />
+        </button>
+      </li>
+    );
+  }
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between gap-3">
         <h1 className="text-xl font-semibold">{vi.trolley.shiftsTitle}</h1>
         {canOperate ? (
           <Button
-            size="sm"
             onClick={() => router.push(`/m/${propertyId}/trolley/new`)}
+            className="min-h-11 px-4 text-base"
           >
             {vi.trolley.openButton}
           </Button>
@@ -96,13 +122,13 @@ export function MobileTrolleyList({
                 key={job.key}
                 className="rounded-xl border border-amber-300 bg-amber-50/60 p-4"
               >
-                <p className="font-medium">
+                <p className="text-base font-medium">
                   {wh ? `${wh.code} — ${wh.name}` : vi.common.noData}
                 </p>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-base text-muted-foreground">
                   {formatYmd(job.businessDate)} · {shiftLabel(job.shift)}
                 </p>
-                <p className="mt-1 text-sm font-medium text-amber-800">
+                <p className="mt-1 text-base font-medium text-amber-800">
                   {vi.trolley.pendingOpen}
                 </p>
               </li>
@@ -114,30 +140,28 @@ export function MobileTrolleyList({
       {shifts.length === 0 && pendingOpen.length === 0 ? (
         <EmptyState title={vi.trolley.shiftsEmpty} />
       ) : (
-        <ul className="flex flex-col gap-2">
-          {shifts.map((shift) => (
-            <li key={shift.id}>
-              <button
-                type="button"
-                onClick={() =>
-                  router.push(`/m/${propertyId}/trolley/${shift.id}`)
-                }
-                className="flex w-full items-start justify-between gap-3 rounded-xl border bg-card p-4 text-left"
-              >
-                <span>
-                  <span className="block font-medium">
-                    {shift.trolley_code ?? vi.common.noData}
-                    {shift.trolley_name ? ` — ${shift.trolley_name}` : ""}
-                  </span>
-                  <span className="block text-sm text-muted-foreground">
-                    {formatYmd(shift.business_date)} · {shiftLabel(shift.shift)}
-                  </span>
-                </span>
-                <DocStatusBadge status={shift.status} />
-              </button>
-            </li>
-          ))}
-        </ul>
+        <>
+          {openShifts.length > 0 ? (
+            <section className="flex flex-col gap-2">
+              <h2 className="text-base font-semibold">
+                {vi.trolley.openShiftsTitle} ({openShifts.length})
+              </h2>
+              <ul className="flex flex-col gap-2">
+                {openShifts.map(renderShiftRow)}
+              </ul>
+            </section>
+          ) : null}
+          {closedShifts.length > 0 ? (
+            <section className="flex flex-col gap-2">
+              <h2 className="text-base font-semibold">
+                {vi.trolley.closedShiftsTitle} ({closedShifts.length})
+              </h2>
+              <ul className="flex flex-col gap-2">
+                {closedShifts.map(renderShiftRow)}
+              </ul>
+            </section>
+          ) : null}
+        </>
       )}
     </div>
   );

@@ -11,12 +11,7 @@ import type {
   MinibarPriceRow,
 } from "@/features/minibar/queries";
 import { vi } from "@/i18n/vi";
-
-type LineDraft = {
-  itemId: string;
-  missingQty: string;
-  nearExpiry: boolean;
-};
+import { cn } from "@/lib/utils";
 
 /** Giá đang hiệu lực hôm nay của 1 món (valid_from mới nhất, còn hạn). */
 function priceToday(prices: MinibarPriceRow[], itemId: string): number | null {
@@ -32,11 +27,25 @@ function priceToday(prices: MinibarPriceRow[], itemId: string): number | null {
   return valid.length > 0 ? Number(valid[0].price) : null;
 }
 
+function parseQty(raw: string): number {
+  if (raw === "") return 0;
+  const n = Number(raw);
+  return Number.isFinite(n) && n > 0 ? n : 0;
+}
+
 /**
- * Lưới món kiểm minibar — mobile buồng phòng (T-035).
- * Nhập số thiếu từng món + cờ sắp hết hạn; tiền tạm tính theo bảng
- * giá tại ngày kiểm. Gửi 1 lần với `client_uuid` cố định — gửi lại
- * cùng UUID không ghi trùng (mẫu T-023/T-025).
+ * Lưới món kiểm minibar — mobile buồng phòng (T-035, W3).
+ * Toàn bộ món nhóm minibar hiện thành danh sách, nhập số thiếu từng
+ * món bằng stepper lớn (+ / −, nút ≥ 44px) thay vì thêm dòng + chọn
+ * món — bấm nhanh bằng một tay. Số thiếu mặc định 0 (không thiếu);
+ * chỉ dòng có số thiếu > 0 mới nộp. Tiền tạm tính theo bảng giá tại
+ * ngày kiểm. Gửi 1 lần với `client_uuid` cố định — gửi lại cùng UUID
+ * không ghi trùng (mẫu T-023/T-025).
+ *
+ * Phân quyền giá: bảng giá đọc được qua RLS `minibar_price_list`
+ * (người có `minibar.check` được đọc — xem Q187). Người không đọc
+ * được giá thì dòng hiện "Chưa có giá" và không nộp được (giữ đúng
+ * phân quyền hiện có, không bịa mã quyền mới).
  */
 export function MobileCheckForm({
   propertyId,
@@ -50,57 +59,56 @@ export function MobileCheckForm({
   prices: MinibarPriceRow[];
 }) {
   const router = useRouter();
-  const [lines, setLines] = useState<LineDraft[]>([
-    { itemId: "", missingQty: "", nearExpiry: false },
-  ]);
+  const [qtyByItem, setQtyByItem] = useState<Record<string, string>>({});
+  const [nearExpiryByItem, setNearExpiryByItem] = useState<
+    Record<string, boolean>
+  >({});
   const [clientUuid] = useState(() => crypto.randomUUID());
   const [pending, setPending] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const usedItemIds = new Set(lines.map((l) => l.itemId).filter(Boolean));
+  const missingLines = useMemo(
+    () =>
+      items
+        .map((item) => ({
+          item,
+          qty: parseQty(qtyByItem[item.id] ?? ""),
+        }))
+        .filter((l) => l.qty > 0),
+    [items, qtyByItem],
+  );
 
   const estimatedTotal = useMemo(() => {
     let total = 0;
     let missingPrice = false;
-    for (const line of lines) {
-      const qty = Number(line.missingQty);
-      if (!line.itemId || !Number.isFinite(qty) || qty <= 0) continue;
-      const price = priceToday(prices, line.itemId);
+    for (const line of missingLines) {
+      const price = priceToday(prices, line.item.id);
       if (price === null) {
         missingPrice = true;
         continue;
       }
-      total += qty * price;
+      total += line.qty * price;
     }
     return { total, missingPrice };
-  }, [lines, prices]);
+  }, [missingLines, prices]);
 
-  function updateLine(index: number, patch: Partial<LineDraft>) {
-    setLines((prev) =>
-      prev.map((l, i) => (i === index ? { ...l, ...patch } : l)),
-    );
+  function setQty(itemId: string, raw: string) {
+    const n = Number(raw);
+    if (raw !== "" && (!Number.isFinite(n) || n < 0)) return;
+    setQtyByItem((prev) => ({ ...prev, [itemId]: raw }));
   }
 
-  function addLine() {
-    setLines((prev) => [
-      ...prev,
-      { itemId: "", missingQty: "", nearExpiry: false },
-    ]);
+  function stepQty(itemId: string, delta: number) {
+    setQtyByItem((prev) => {
+      const current = parseQty(prev[itemId] ?? "");
+      const next = Math.max(0, current + delta);
+      return { ...prev, [itemId]: next === 0 ? "" : String(next) };
+    });
   }
 
-  function removeLine(index: number) {
-    setLines((prev) => prev.filter((_, i) => i !== index));
-  }
-
-  const validLines = lines.filter(
-    (l) =>
-      l.itemId !== "" &&
-      Number.isFinite(Number(l.missingQty)) &&
-      Number(l.missingQty) > 0,
-  );
   const canSubmit =
-    !pending && validLines.length > 0 && !estimatedTotal.missingPrice;
+    !pending && missingLines.length > 0 && !estimatedTotal.missingPrice;
 
   async function handleSubmit() {
     setPending(true);
@@ -109,10 +117,10 @@ export function MobileCheckForm({
     const res = await submitCheckAction({
       propertyId,
       checkId: check.id,
-      lines: validLines.map((l) => ({
-        itemId: l.itemId,
-        missingQty: Number(l.missingQty),
-        nearExpiry: l.nearExpiry,
+      lines: missingLines.map((l) => ({
+        itemId: l.item.id,
+        missingQty: l.qty,
+        nearExpiry: nearExpiryByItem[l.item.id] ?? false,
       })),
       clientUuid,
     });
@@ -135,127 +143,142 @@ export function MobileCheckForm({
         <h1 className="text-xl font-semibold">
           {vi.minibar.mobileTitle} — {vi.minibar.roomNo} {check.room_no}
         </h1>
-        <p className="mt-1 text-sm text-muted-foreground">
+        <p className="mt-1 text-base text-muted-foreground">
           {check.doc_no} · {vi.minibar.triggers[check.trigger]}
         </p>
-        <p className="mt-2 text-sm text-muted-foreground">
+        <p className="mt-2 text-base text-muted-foreground">
           {vi.minibar.submitHint}
         </p>
+        {items.length > 0 ? (
+          <p className="mt-2 text-base font-medium">
+            {vi.minibar.enteredMissing}: {missingLines.length}/{items.length}
+          </p>
+        ) : null}
       </div>
 
       {message ? (
-        <p className="rounded-md border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-800">
+        <p className="rounded-md border border-green-200 bg-green-50 px-3 py-2 text-base text-green-800">
           {message}
         </p>
       ) : null}
       {error ? (
-        <p className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">
+        <p className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-base text-red-800">
           {error}
         </p>
       ) : null}
 
-      <div className="flex flex-col gap-3">
-        {lines.map((line, index) => {
-          const price =
-            line.itemId !== "" ? priceToday(prices, line.itemId) : null;
-          const qty = Number(line.missingQty);
-          const lineTotal =
-            price !== null && Number.isFinite(qty) && qty > 0
-              ? qty * price
-              : null;
-          return (
-            <div key={index} className="rounded-xl border bg-card p-4">
-              <label className="block text-sm">
-                {vi.minibar.itemName}
-                <select
-                  value={line.itemId}
-                  onChange={(e) =>
-                    updateLine(index, { itemId: e.target.value })
-                  }
-                  className="mt-1 w-full rounded-md border bg-background px-3 py-2 text-sm"
-                >
-                  <option value="">{vi.minibar.selectItem}</option>
-                  {items
-                    .filter(
-                      (item) =>
-                        item.id === line.itemId || !usedItemIds.has(item.id),
-                    )
-                    .map((item) => (
-                      <option key={item.id} value={item.id}>
-                        {item.name} ({item.code}) — {item.stock_uom}
-                      </option>
-                    ))}
-                </select>
-              </label>
-              <div className="mt-3 grid grid-cols-2 gap-3">
-                <label className="block text-sm">
-                  {vi.minibar.missingQty}
+      {items.length === 0 ? (
+        <p className="rounded-xl border bg-card p-4 text-base text-muted-foreground">
+          {vi.minibar.itemsEmpty}
+        </p>
+      ) : (
+        <div className="flex flex-col gap-3">
+          {items.map((item) => {
+            const raw = qtyByItem[item.id] ?? "";
+            const qty = parseQty(raw);
+            const price = priceToday(prices, item.id);
+            const lineTotal = price !== null && qty > 0 ? qty * price : null;
+            return (
+              <div
+                key={item.id}
+                className={cn(
+                  "rounded-xl border bg-card p-4",
+                  qty > 0 && "border-[#7B68EE]",
+                )}
+              >
+                <p className="text-base font-medium">
+                  {item.name} ({item.code})
+                </p>
+                <p className="text-base text-muted-foreground">
+                  {item.stock_uom}
+                  {price !== null ? (
+                    <>
+                      {" · "}
+                      {vi.minibar.unitPrice}: {formatNumber(price)}
+                    </>
+                  ) : (
+                    <>
+                      {" · "}
+                      {vi.minibar.noPrice}
+                    </>
+                  )}
+                  {lineTotal !== null ? (
+                    <>
+                      {" · "}
+                      <MoneyText amount={lineTotal} />
+                    </>
+                  ) : null}
+                </p>
+
+                <div className="mt-3 flex items-center gap-3">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => stepQty(item.id, -1)}
+                    disabled={qty <= 0}
+                    className="size-11 min-h-11 min-w-11 shrink-0 text-xl font-semibold"
+                    aria-label={`${vi.minibar.stepperDecrease} ${item.name}`}
+                  >
+                    −
+                  </Button>
                   <input
                     type="number"
                     inputMode="decimal"
                     min="0"
-                    step="0.01"
-                    value={line.missingQty}
-                    onChange={(e) =>
-                      updateLine(index, { missingQty: e.target.value })
-                    }
-                    className="mt-1 w-full rounded-md border bg-background px-3 py-2 text-sm"
+                    step="1"
+                    value={raw}
+                    onChange={(e) => setQty(item.id, e.target.value)}
+                    aria-label={`${vi.minibar.missingQty} ${item.name}`}
+                    className="min-h-11 w-20 rounded-md border bg-background px-2 py-2 text-center text-lg font-semibold"
                   />
-                </label>
-                <div className="flex items-end pb-1">
-                  <label className="flex items-center gap-2 text-sm">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => stepQty(item.id, 1)}
+                    className="size-11 min-h-11 min-w-11 shrink-0 text-xl font-semibold"
+                    aria-label={`${vi.minibar.stepperIncrease} ${item.name}`}
+                  >
+                    +
+                  </Button>
+                  <span className="text-base text-muted-foreground">
+                    {vi.minibar.missingQty}
+                  </span>
+                </div>
+
+                {qty > 0 ? (
+                  <label className="mt-3 flex min-h-11 items-center gap-2 text-base">
                     <input
                       type="checkbox"
-                      checked={line.nearExpiry}
+                      checked={nearExpiryByItem[item.id] ?? false}
                       onChange={(e) =>
-                        updateLine(index, { nearExpiry: e.target.checked })
+                        setNearExpiryByItem((prev) => ({
+                          ...prev,
+                          [item.id]: e.target.checked,
+                        }))
                       }
-                      className="h-4 w-4"
+                      className="h-5 w-5"
                     />
                     {vi.minibar.nearExpiry}
                   </label>
-                </div>
-              </div>
-              <p className="mt-2 text-sm text-muted-foreground">
-                {price === null && line.itemId !== ""
-                  ? vi.minibar.noPrice
-                  : price !== null
-                    ? `${vi.minibar.unitPrice}: ${formatNumber(price)}`
-                    : ""}
-                {lineTotal !== null ? (
-                  <>
-                    {" · "}
-                    <MoneyText amount={lineTotal} />
-                  </>
                 ) : null}
-              </p>
-              {lines.length > 1 ? (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  className="mt-2"
-                  onClick={() => removeLine(index)}
-                >
-                  {vi.common.close}
-                </Button>
-              ) : null}
-            </div>
-          );
-        })}
-      </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
 
-      <Button type="button" variant="outline" onClick={addLine}>
-        {vi.minibar.addItem}
-      </Button>
-
-      <p className="flex items-center justify-between rounded-xl border bg-card p-4 font-semibold">
+      <p className="flex min-h-11 items-center justify-between rounded-xl border bg-card p-4 text-base font-semibold">
         <span>{vi.minibar.estimatedTotal}</span>
         <MoneyText amount={estimatedTotal.total} />
       </p>
       {estimatedTotal.missingPrice ? (
-        <p className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
+        <p className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-base text-amber-900">
           {vi.minibar.noPrice}
+        </p>
+      ) : null}
+      {missingLines.length === 0 && items.length > 0 ? (
+        <p className="text-base text-muted-foreground">
+          {vi.minibar.noMissingYet}
         </p>
       ) : null}
 
@@ -264,6 +287,7 @@ export function MobileCheckForm({
         size="lg"
         disabled={!canSubmit}
         onClick={handleSubmit}
+        className="min-h-11 w-full text-base"
       >
         {pending ? vi.minibar.submitting : vi.minibar.submitCheckButton}
       </Button>

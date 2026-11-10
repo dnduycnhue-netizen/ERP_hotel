@@ -30,10 +30,10 @@ import type { TrolleyCleanType } from "@/features/trolley/schemas";
 import { shiftLabel } from "./trolley-utils";
 
 const CLEAN_TYPE_OPTIONS: Array<{ value: TrolleyCleanType; label: string }> = [
-  { value: "checkout", label: "Trả phòng" },
-  { value: "stayover", label: "Ở tiếp" },
-  { value: "vip", label: "VIP" },
-  { value: "child", label: "Trẻ em" },
+  { value: "checkout", label: vi.trolley.cleanTypeOptions.checkout },
+  { value: "stayover", label: vi.trolley.cleanTypeOptions.stayover },
+  { value: "vip", label: vi.trolley.cleanTypeOptions.vip },
+  { value: "child", label: vi.trolley.cleanTypeOptions.child },
 ];
 
 function countsToInput(
@@ -268,7 +268,7 @@ export function MobileTrolleyWorkspace({
             {shift.trolley_code ?? vi.common.noData}
             {shift.trolley_name ? ` — ${shift.trolley_name}` : ""}
           </h1>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-base text-muted-foreground">
             {formatYmd(shift.business_date)} · {shiftLabel(shift.shift)}
           </p>
         </div>
@@ -284,18 +284,18 @@ export function MobileTrolleyWorkspace({
               `/m/${propertyId}/inventory/requisitions/${shift.requisition_id}`,
             )
           }
-          className="rounded-xl border bg-card p-4 text-left"
+          className="min-h-11 rounded-xl border bg-card p-4 text-left"
         >
-          <p className="text-sm text-muted-foreground">
+          <p className="text-base text-muted-foreground">
             {vi.trolley.topUpRequisition}
           </p>
-          <p className="font-medium">
+          <p className="text-base font-medium">
             {shift.requisition_doc_no ?? shift.requisition_id}
             {shift.requisition_status ? ` · ${shift.requisition_status}` : ""}
           </p>
         </button>
       ) : (
-        <p className="rounded-xl border bg-card p-4 text-sm text-muted-foreground">
+        <p className="rounded-xl border bg-card p-4 text-base text-muted-foreground">
           {vi.trolley.noTopUpRequisition}
         </p>
       )}
@@ -304,12 +304,14 @@ export function MobileTrolleyWorkspace({
         <>
           {/* Số đếm đầu ca (chỉ xem — đã đếm lúc mở ca). */}
           <section className="flex flex-col gap-2">
-            <h2 className="font-semibold">{vi.trolley.openingCounts}</h2>
+            <h2 className="text-base font-semibold">
+              {vi.trolley.openingCounts}
+            </h2>
             <ul className="flex flex-col gap-1 rounded-xl border bg-card p-4">
               {detail.opening_counts.map((c) => (
                 <li
                   key={c.item_id}
-                  className="flex justify-between gap-3 text-sm"
+                  className="flex justify-between gap-3 text-base"
                 >
                   <span>
                     {c.item_code} — {c.item_name}
@@ -320,7 +322,7 @@ export function MobileTrolleyWorkspace({
                 </li>
               ))}
               {detail.opening_counts.length === 0 ? (
-                <li className="text-sm text-muted-foreground">
+                <li className="text-base text-muted-foreground">
                   {vi.common.noData}
                 </li>
               ) : null}
@@ -329,7 +331,9 @@ export function MobileTrolleyWorkspace({
 
           {/* Đếm cuối ca (mù). */}
           <section className="flex flex-col gap-2">
-            <h2 className="font-semibold">{vi.trolley.closingCounts}</h2>
+            <h2 className="text-base font-semibold">
+              {vi.trolley.closingCounts}
+            </h2>
             <TrolleyCountList
               items={closeItems}
               values={values}
@@ -342,7 +346,7 @@ export function MobileTrolleyWorkspace({
 
           {/* Phòng đã dọn (tùy chọn, Q117). */}
           <section className="flex flex-col gap-2">
-            <h2 className="font-semibold">{vi.trolley.roomsDone}</h2>
+            <h2 className="text-base font-semibold">{vi.trolley.roomsDone}</h2>
             {roomsDone.map((row, index) => (
               <div
                 key={index}
@@ -358,7 +362,7 @@ export function MobileTrolleyWorkspace({
                         ),
                       )
                     }
-                    className="min-w-0 flex-1 rounded-md border bg-background px-3 py-2 text-base"
+                    className="min-h-11 min-w-0 flex-1 rounded-md border bg-background px-3 py-2 text-base"
                   >
                     <option value="">{vi.trolley.roomPlaceholder}</option>
                     {rooms.map((room) => (
@@ -382,7 +386,7 @@ export function MobileTrolleyWorkspace({
                         ),
                       )
                     }
-                    className="rounded-md border bg-background px-3 py-2 text-base"
+                    className="min-h-11 rounded-md border bg-background px-3 py-2 text-base"
                   >
                     {CLEAN_TYPE_OPTIONS.map((o) => (
                       <option key={o.value} value={o.value}>
@@ -395,12 +399,12 @@ export function MobileTrolleyWorkspace({
                     onClick={() =>
                       setRoomsDone((prev) => prev.filter((_, i) => i !== index))
                     }
-                    className="shrink-0 rounded-md border px-3 py-2 text-sm"
+                    className="min-h-11 shrink-0 rounded-md border px-3 py-2 text-base"
                   >
                     {vi.trolley.removeRoom}
                   </button>
                 </div>
-                <label className="flex items-center gap-2 text-sm">
+                <label className="flex min-h-11 items-center gap-2 text-base">
                   {vi.trolley.guests}
                   <input
                     type="number"
@@ -414,7 +418,7 @@ export function MobileTrolleyWorkspace({
                         ),
                       )
                     }
-                    className="w-20 rounded-md border bg-background px-2 py-1 text-base"
+                    className="min-h-11 w-20 rounded-md border bg-background px-2 py-1 text-base"
                   />
                 </label>
               </div>
@@ -424,28 +428,29 @@ export function MobileTrolleyWorkspace({
               onClick={() =>
                 setRoomsDone((prev) => [...prev, emptyRoomsDoneRow()])
               }
+              className="min-h-11 text-base"
             >
               {vi.trolley.addRoom}
             </Button>
           </section>
 
           {pendingClose ? (
-            <p className="rounded-xl border border-amber-300 bg-amber-50/60 p-3 text-sm">
+            <p className="rounded-xl border border-amber-300 bg-amber-50/60 p-3 text-base">
               {vi.trolley.closePendingSync}
             </p>
           ) : null}
           {!online ? (
-            <p className="rounded-xl border border-amber-300 bg-amber-50/60 p-3 text-sm">
+            <p className="rounded-xl border border-amber-300 bg-amber-50/60 p-3 text-base">
               {vi.offline.offlineQueuedNote}
             </p>
           ) : null}
           {queued ? (
-            <p className="rounded-xl border border-amber-300 bg-amber-50/60 p-3 text-sm">
+            <p className="rounded-xl border border-amber-300 bg-amber-50/60 p-3 text-base">
               {vi.trolley.queuedClose}
             </p>
           ) : null}
           {error ? (
-            <p className="rounded-xl border border-destructive/40 bg-destructive/5 p-3 text-sm text-destructive">
+            <p className="rounded-xl border border-destructive/40 bg-destructive/5 p-3 text-base text-destructive">
               {error}
             </p>
           ) : null}
@@ -454,7 +459,7 @@ export function MobileTrolleyWorkspace({
             disabled={
               !canOperate || !countedAll || submitting || pendingClose || queued
             }
-            className={cn("w-full", !online && "opacity-90")}
+            className={cn("min-h-11 w-full text-base", !online && "opacity-90")}
           >
             {submitting
               ? vi.common.submitting
@@ -463,7 +468,7 @@ export function MobileTrolleyWorkspace({
                 : vi.trolley.closeSubmitOffline}
           </Button>
           {!countedAll ? (
-            <p className="text-sm text-muted-foreground">
+            <p className="text-base text-muted-foreground">
               {vi.trolley.countAllRequired}
             </p>
           ) : null}
@@ -472,12 +477,17 @@ export function MobileTrolleyWorkspace({
         <>
           {/* Kết quả sau khi đóng ca: tiêu hao + thừa + phiếu tiêu hao. */}
           <section className="flex flex-col gap-2">
-            <h2 className="font-semibold">{vi.trolley.consumptionTitle}</h2>
+            <h2 className="text-base font-semibold">
+              {vi.trolley.consumptionTitle}
+            </h2>
+            <p className="text-base text-muted-foreground">
+              {vi.trolley.consumptionFormula}
+            </p>
             <ul className="flex flex-col gap-1 rounded-xl border bg-card p-4">
               {consumption.map((c) => (
                 <li
                   key={c.item_id}
-                  className="flex flex-col gap-0.5 border-b py-2 text-sm last:border-b-0"
+                  className="flex flex-col gap-0.5 border-b py-2 text-base last:border-b-0"
                 >
                   <span className="font-medium">
                     {c.item_code} — {c.item_name}
@@ -498,7 +508,7 @@ export function MobileTrolleyWorkspace({
                 </li>
               ))}
               {consumption.length === 0 ? (
-                <li className="text-sm text-muted-foreground">
+                <li className="text-base text-muted-foreground">
                   {vi.common.noData}
                 </li>
               ) : null}
@@ -507,12 +517,14 @@ export function MobileTrolleyWorkspace({
 
           {surplus.length > 0 ? (
             <section className="flex flex-col gap-2">
-              <h2 className="font-semibold">{vi.trolley.surplusTitle}</h2>
+              <h2 className="text-base font-semibold">
+                {vi.trolley.surplusTitle}
+              </h2>
               <ul className="flex flex-col gap-1 rounded-xl border bg-card p-4">
                 {surplus.map((c) => (
                   <li
                     key={c.item_id}
-                    className="flex justify-between gap-3 text-sm"
+                    className="flex justify-between gap-3 text-base"
                   >
                     <span>
                       {c.item_code} — {c.item_name}
@@ -527,7 +539,7 @@ export function MobileTrolleyWorkspace({
           ) : null}
 
           {shift.purpose_issue_id ? (
-            <p className="rounded-xl border bg-card p-4 text-sm">
+            <p className="rounded-xl border bg-card p-4 text-base">
               {vi.trolley.purposeIssue}:{" "}
               <strong>
                 {shift.purpose_issue_doc_no ?? shift.purpose_issue_id}
@@ -537,14 +549,16 @@ export function MobileTrolleyWorkspace({
 
           {shift.rooms_done.length > 0 ? (
             <section className="flex flex-col gap-2">
-              <h2 className="font-semibold">{vi.trolley.roomsDone}</h2>
+              <h2 className="text-base font-semibold">
+                {vi.trolley.roomsDone}
+              </h2>
               <ul className="flex flex-col gap-1 rounded-xl border bg-card p-4">
                 {shift.rooms_done.map((r, index) => {
                   const room = rooms.find((x) => x.id === r.room_id);
                   return (
                     <li
                       key={index}
-                      className="flex justify-between gap-3 text-sm"
+                      className="flex justify-between gap-3 text-base"
                     >
                       <span>
                         {room ? room.room_no : r.room_id} ·{" "}
