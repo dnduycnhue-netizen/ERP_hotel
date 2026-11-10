@@ -68,6 +68,18 @@ export function approverAccount(): TestAccount {
   };
 }
 
+/** Tai khoan quan tri cho test tao tai khoan (can admin.users.manage). */
+export const hasAdminUser = Boolean(
+  process.env.TEST_ADMIN_EMAIL && process.env.TEST_ADMIN_PASSWORD,
+);
+
+export function adminAccount(): TestAccount {
+  return {
+    email: process.env.TEST_ADMIN_EMAIL ?? "",
+    password: process.env.TEST_ADMIN_PASSWORD ?? "",
+  };
+}
+
 /** PIN ghi so cua nguoi nhan test (mac dinh 1234 theo quy uoc seed). */
 export const RECEIVER_PIN = process.env.TEST_RECEIVER_PIN ?? "1234";
 
