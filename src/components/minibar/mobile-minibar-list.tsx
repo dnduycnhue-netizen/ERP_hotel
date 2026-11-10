@@ -7,9 +7,11 @@ import type { MinibarCheckRow } from "@/features/minibar/queries";
 import { vi } from "@/i18n/vi";
 
 /**
- * Danh sách phòng chờ kiểm minibar — mobile buồng phòng (T-035).
- * Phiếu chưa kiểm (buồng chưa nộp) bấm vào để kiểm; phiếu đã kiểm
- * xong nhưng lễ tân chưa thu thì chỉ xem, không kiểm lại được.
+ * Danh sách phòng chờ kiểm minibar — mobile buồng phòng (T-035, W3).
+ * Phòng chưa kiểm bấm vào để kiểm; phòng đã kiểm xong nhưng lễ tân
+ * chưa thu thì chỉ xem, không kiểm lại được. Trạng thái đã kiểm /
+ * chưa kiểm hiện bằng pill chữ + màu (không chỉ dựa vào màu).
+ * Chuẩn mobile W3: chữ cơ bản ≥ 16px, vùng chạm ≥ 44px.
  */
 export function MobileMinibarList({
   propertyId,
@@ -28,67 +30,83 @@ export function MobileMinibarList({
 
       <a
         href={`/m/${propertyId}/receive`}
-        className="text-sm font-medium text-primary underline"
+        className="inline-flex min-h-11 items-center text-base font-medium text-[#7B68EE] underline"
       >
         ← {vi.receiving.tasksTitle}
       </a>
+
+      {checks.length > 0 ? (
+        <p className="text-base text-muted-foreground">
+          {vi.minibar.awaitingTitle}: {awaiting.length} ·{" "}
+          {vi.minibar.checkedTitle}: {checked.length}
+        </p>
+      ) : null}
 
       {checks.length === 0 ? (
         <EmptyState title={vi.minibar.roomsEmpty} />
       ) : (
         <>
           {awaiting.length > 0 ? (
-            <ul className="flex flex-col gap-2">
-              {awaiting.map((check) => (
-                <li key={check.id}>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      router.push(`/m/${propertyId}/minibar/${check.id}`)
-                    }
-                    className="flex w-full items-start justify-between gap-3 rounded-xl border bg-card p-4 text-left"
-                  >
-                    <span>
-                      <span className="block font-medium">
-                        {vi.minibar.roomNo} {check.room_no}
+            <section className="flex flex-col gap-2">
+              <h2 className="text-base font-semibold">
+                {vi.minibar.awaitingTitle} ({awaiting.length})
+              </h2>
+              <ul className="flex flex-col gap-2">
+                {awaiting.map((check) => (
+                  <li key={check.id}>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        router.push(`/m/${propertyId}/minibar/${check.id}`)
+                      }
+                      className="flex min-h-11 w-full items-start justify-between gap-3 rounded-xl border bg-card p-4 text-left"
+                    >
+                      <span>
+                        <span className="block text-base font-medium">
+                          {vi.minibar.roomNo} {check.room_no}
+                        </span>
+                        <span className="block text-base text-muted-foreground">
+                          {check.doc_no} · {vi.minibar.triggers[check.trigger]}
+                        </span>
                       </span>
-                      <span className="block text-sm text-muted-foreground">
-                        {check.doc_no} · {vi.minibar.triggers[check.trigger]}
+                      <span className="shrink-0 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-900">
+                        {vi.minibar.notChecked}
                       </span>
-                    </span>
-                    <span className="shrink-0 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-900">
-                      {vi.minibar.statuses.pendingCharge}
-                    </span>
-                  </button>
-                </li>
-              ))}
-            </ul>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </section>
           ) : null}
 
           {checked.length > 0 ? (
-            <div className="space-y-2">
-              <h2 className="text-sm font-medium text-muted-foreground">
-                {vi.minibar.statuses.pendingCharge} — {vi.minibar.checkedBy}
+            <section className="flex flex-col gap-2">
+              <h2 className="text-base font-semibold">
+                {vi.minibar.checkedTitle} ({checked.length}) —{" "}
+                {vi.minibar.checkedBy}
               </h2>
               <ul className="flex flex-col gap-2">
                 {checked.map((check) => (
                   <li
                     key={check.id}
-                    className="flex items-start justify-between gap-3 rounded-xl border bg-muted/50 p-4"
+                    className="flex min-h-11 items-start justify-between gap-3 rounded-xl border bg-muted/50 p-4"
                   >
                     <span>
-                      <span className="block font-medium">
+                      <span className="block text-base font-medium">
                         {vi.minibar.roomNo} {check.room_no}
                       </span>
-                      <span className="block text-sm text-muted-foreground">
+                      <span className="block text-base text-muted-foreground">
                         {check.doc_no}
+                      </span>
+                      <span className="mt-1 inline-block rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">
+                        {vi.minibar.checked}
                       </span>
                     </span>
                     <MoneyText amount={check.total_amount} />
                   </li>
                 ))}
               </ul>
-            </div>
+            </section>
           ) : null}
         </>
       )}
