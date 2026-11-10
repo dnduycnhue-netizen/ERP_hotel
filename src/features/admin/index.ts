@@ -21,9 +21,11 @@ export type {
 } from "./configuration-data";
 export {
   copyRoleAction,
+  createUserAction,
   deactivateRoleAction,
   getMyPermissionsAction,
   assignRoleAction,
+  resetUserPasswordAction,
   revokeRoleAction,
   saveRoleAction,
   setActiveAction,
@@ -31,6 +33,7 @@ export {
   setPinAction,
   setRolePermissionsAction,
 } from "./actions";
+export type { CreateUserResult, ResetPasswordResult } from "./actions";
 export {
   getAdminOrgId,
   getEffectivePermissions,

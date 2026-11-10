@@ -7,22 +7,36 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 //   RPC `user_has_perm` bằng service role.
 // - Tạo user KHÔNG cần email thật: nếu không truyền email, hệ thống sinh
 //   địa chỉ nội bộ `<ma_nv>@erp.internal` (không gửi mail đi đâu cả).
-//   Mật khẩu tạm ngẫu nhiên trả về MỘT LẦN cho quản trị viên để bàn giao
-//   trực tiếp cho nhân viên; nhân viên đổi mật khẩu sau lần đăng nhập đầu
-//   (màn tự đổi mật khẩu là task riêng, chưa có ở T-005).
+// - Mật khẩu tạm: quản trị có thể tự đặt (`password`, tối thiểu 8 ký tự,
+//   tiện cho tài khoản test) hoặc để trống để hệ thống sinh ngẫu nhiên.
+//   Mật khẩu tạm trả về MỘT LẦN cho quản trị viên để bàn giao trực tiếp
+//   cho nhân viên; nhân viên đổi mật khẩu sau lần đăng nhập đầu (màn
+//   /settings/password).
 // - Không gửi email thật, không dùng secret ngoài Supabase secrets.
 // - Vai trò ban đầu (nếu truyền) được kiểm tra trước khi tạo user để
-//   tránh tạo dở tài khoản.
+//   tránh tạo dở tài khoản. Nhận nhiều vai trò cùng lúc (`roles` — mỗi
+//   vai trò kèm phạm vi riêng); `roleId` cũ vẫn được chấp nhận để tương
+//   thích ngược. Mọi vai trò đang hoạt động đều gán được, kể cả
+//   sys_admin/owner (nới lỏng admin-relax 10/11/2026).
+
+type RoleAssignmentInput = {
+  roleId: string;
+  propertyId?: string;
+  outletIds?: string[];
+  warehouseIds?: string[];
+};
 
 type CreateUserRequest = {
   employeeCode: string;
   fullName: string;
   email?: string;
   phone?: string;
+  password?: string;
   roleId?: string;
   propertyId?: string;
   outletIds?: string[];
   warehouseIds?: string[];
+  roles?: RoleAssignmentInput[];
   validTo?: string;
 };
 
@@ -58,6 +72,31 @@ function readUuidArray(value: unknown): string[] | null {
   return ids.length === value.length ? ids : null;
 }
 
+function readRoleAssignments(value: unknown): RoleAssignmentInput[] | null {
+  if (value === undefined || value === null) return null;
+  if (!Array.isArray(value)) return null;
+  const uuidPattern =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  const assignments: RoleAssignmentInput[] = [];
+  for (const item of value) {
+    if (!isRecord(item)) return null;
+    const roleId = readString(item.roleId);
+    const propertyId = readString(item.propertyId);
+    const outletIds = readUuidArray(item.outletIds);
+    const warehouseIds = readUuidArray(item.warehouseIds);
+    if (!uuidPattern.test(roleId)) return null;
+    if (propertyId !== "" && !uuidPattern.test(propertyId)) return null;
+    if (outletIds === null || warehouseIds === null) return null;
+    assignments.push({
+      roleId,
+      propertyId: propertyId === "" ? undefined : propertyId,
+      outletIds: outletIds ?? undefined,
+      warehouseIds: warehouseIds ?? undefined,
+    });
+  }
+  return assignments;
+}
+
 function readCreateUserRequest(value: unknown): CreateUserRequest | null {
   if (!isRecord(value)) return null;
 
@@ -65,16 +104,21 @@ function readCreateUserRequest(value: unknown): CreateUserRequest | null {
   const fullName = readString(value.fullName);
   const email = readString(value.email).toLowerCase();
   const phone = readString(value.phone);
+  const password = readString(value.password);
   const roleId = readString(value.roleId);
   const propertyId = readString(value.propertyId);
   const outletIds = readUuidArray(value.outletIds);
   const warehouseIds = readUuidArray(value.warehouseIds);
+  const roles = readRoleAssignments(value.roles);
   const validTo = readString(value.validTo);
 
   if (!EMPLOYEE_CODE_PATTERN.test(employeeCode) || fullName.length === 0) {
     return null;
   }
   if (email !== "" && !EMAIL_PATTERN.test(email)) return null;
+  if (password !== "" && (password.length < 8 || password.length > 128)) {
+    return null;
+  }
   if (outletIds === null || warehouseIds === null) return null;
   if (
     (roleId !== "" &&
@@ -88,6 +132,9 @@ function readCreateUserRequest(value: unknown): CreateUserRequest | null {
   ) {
     return null;
   }
+  if (roles === null && value.roles !== undefined && value.roles !== null) {
+    return null;
+  }
   if (validTo !== "" && Number.isNaN(Date.parse(validTo))) return null;
 
   return {
@@ -95,10 +142,12 @@ function readCreateUserRequest(value: unknown): CreateUserRequest | null {
     fullName,
     email: email === "" ? undefined : email,
     phone: phone === "" ? undefined : phone,
+    password: password === "" ? undefined : password,
     roleId: roleId === "" ? undefined : roleId,
     propertyId: propertyId === "" ? undefined : propertyId,
     outletIds: outletIds ?? undefined,
     warehouseIds: warehouseIds ?? undefined,
+    roles: roles ?? undefined,
     validTo: validTo === "" ? undefined : validTo,
   };
 }
@@ -169,21 +218,36 @@ Deno.serve(async (request) => {
     return jsonResponse(400, { error: "invalid_create_user_request" });
   }
 
+  // Gộp vai trò: `roles` mới ưu tiên; nếu không có thì dùng `roleId` cũ.
+  const assignments: RoleAssignmentInput[] =
+    input.roles ??
+    (input.roleId
+      ? [
+          {
+            roleId: input.roleId,
+            propertyId: input.propertyId,
+            outletIds: input.outletIds,
+            warehouseIds: input.warehouseIds,
+          },
+        ]
+      : []);
+
   // Kiểm tra vai trò/khách sạn trước khi tạo user để tránh tạo dở.
-  if (input.roleId) {
+  // Mọi vai trò đang hoạt động đều gán được (kể cả sys_admin/owner).
+  for (const assignment of assignments) {
     const { data: role, error: roleError } = await supabase
       .from("roles")
       .select("id, org_id, active")
-      .eq("id", input.roleId)
+      .eq("id", assignment.roleId)
       .maybeSingle();
     if (roleError || !role || !role.active) {
       return jsonResponse(400, { error: "invalid_role" });
     }
-    if (input.propertyId) {
+    if (assignment.propertyId) {
       const { data: property, error: propertyError } = await supabase
         .from("properties")
         .select("id, org_id")
-        .eq("id", input.propertyId)
+        .eq("id", assignment.propertyId)
         .maybeSingle();
       if (propertyError || !property || property.org_id !== role.org_id) {
         return jsonResponse(400, { error: "invalid_property_for_role" });
@@ -203,7 +267,9 @@ Deno.serve(async (request) => {
   const loginEmail =
     input.email ??
     `${input.employeeCode.toLowerCase()}@${INTERNAL_EMAIL_DOMAIN}`;
-  const tempPassword = generateTempPassword();
+  // Quản trị tự đặt mật khẩu tạm (tiện cho tài khoản test) hoặc để hệ
+  // thống sinh ngẫu nhiên khi bỏ trống.
+  const tempPassword = input.password ?? generateTempPassword();
 
   const { data: created, error: createError } =
     await supabase.auth.admin.createUser({
@@ -251,21 +317,22 @@ Deno.serve(async (request) => {
     return jsonResponse(502, { error: "create_user_failed" });
   }
 
-  if (input.roleId) {
+  for (const assignment of assignments) {
     const { error: assignError } = await supabase
       .from("user_property_roles")
       .insert({
         user_id: userId,
-        role_id: input.roleId,
-        property_id: input.propertyId ?? null,
-        outlet_ids: input.outletIds ?? null,
-        warehouse_ids: input.warehouseIds ?? null,
+        role_id: assignment.roleId,
+        property_id: assignment.propertyId ?? null,
+        outlet_ids: assignment.outletIds ?? null,
+        warehouse_ids: assignment.warehouseIds ?? null,
         valid_to: input.validTo ?? null,
         granted_by: callerId,
       });
     if (assignError) {
       console.error("admin-create-user could not assign the role.", {
         userId,
+        roleId: assignment.roleId,
         message: assignError.message,
       });
       await supabase.auth.admin.deleteUser(userId);

@@ -3,10 +3,13 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { getRpcErrorMessage } from "@/i18n/errors.vi";
+import { vi } from "@/i18n/vi";
 import { callAdminRpc, type AdminActionResult } from "./rpc";
 import {
   assignRoleSchema,
   copyRoleSchema,
+  createUserSchema,
+  resetPasswordSchema,
   revokeRoleSchema,
   roleIdSchema,
   saveRoleSchema,
@@ -15,6 +18,8 @@ import {
   setPinSchema,
   setRolePermissionsSchema,
   type AssignRoleInput,
+  type CreateUserInput,
+  type ResetPasswordInput,
   type SaveRoleInput,
   type SetOverrideInput,
 } from "./schemas";
@@ -48,6 +53,115 @@ async function authed(): Promise<AdminActionResult<never> | null> {
     return { ok: false, error: getRpcErrorMessage(null) };
   }
   return null;
+}
+
+export type CreateUserResult = {
+  user_id: string;
+  login_email: string;
+  temp_password: string;
+  employee_code: string;
+};
+
+export type ResetPasswordResult = {
+  user_id: string;
+  temp_password: string;
+};
+
+function edgeFunctionErrorMessage(code: string | null): string {
+  if (code && code in vi.admin.edgeFunctionErrors) {
+    return vi.admin.edgeFunctionErrors[
+      code as keyof typeof vi.admin.edgeFunctionErrors
+    ];
+  }
+  return getRpcErrorMessage(null);
+}
+
+async function extractEdgeErrorCode(error: unknown): Promise<string | null> {
+  const context = (error as { context?: unknown } | null)?.context;
+  if (context && typeof (context as Response).json === "function") {
+    try {
+      const payload = (await (context as Response).json()) as Record<
+        string,
+        unknown
+      >;
+      return typeof payload.error === "string" ? payload.error : null;
+    } catch {
+      return null;
+    }
+  }
+  return null;
+}
+
+/**
+ * Gọi Edge Function quản trị (admin-create-user / admin-reset-password).
+ * Đây là lần đầu app gọi Edge Function từ Next.js — dùng
+ * `supabase.functions.invoke` trên SSR server client. Edge Function tự
+ * kiểm tra quyền admin.users.manage qua user_has_perm; server action chỉ
+ * kiểm tra đã đăng nhập (như các action RPC khác).
+ */
+async function invokeAdminFunction<T>(
+  functionName: string,
+  body: Record<string, unknown>,
+): Promise<AdminActionResult<T>> {
+  const supabase = await createClient();
+  const { data, error } = await supabase.functions.invoke<
+    Record<string, unknown>
+  >(functionName, { body });
+  if (error) {
+    const code = await extractEdgeErrorCode(error);
+    return { ok: false, error: edgeFunctionErrorMessage(code) };
+  }
+  if (!data || data.ok !== true) {
+    const code = typeof data?.error === "string" ? data.error : null;
+    return { ok: false, error: edgeFunctionErrorMessage(code) };
+  }
+  return { ok: true, data: data as unknown as T };
+}
+
+/** Tạo tài khoản mới (gọi Edge Function admin-create-user). */
+export async function createUserAction(
+  input: CreateUserInput,
+): Promise<AdminActionResult<CreateUserResult>> {
+  const gate = await authed();
+  if (gate) return gate;
+  const parsed = createUserSchema.safeParse(input);
+  if (!parsed.success) return firstIssue(parsed);
+  const d = parsed.data;
+  const result = await invokeAdminFunction<CreateUserResult>(
+    "admin-create-user",
+    {
+      employeeCode: d.employeeCode,
+      fullName: d.fullName,
+      email: d.email || undefined,
+      phone: d.phone || undefined,
+      password: d.password || undefined,
+      roles: d.roleIds.map((roleId) => ({
+        roleId,
+        propertyId: d.propertyId ?? undefined,
+      })),
+    },
+  );
+  if (result.ok) revalidatePath("/admin/users");
+  return result;
+}
+
+/** Đặt lại mật khẩu cho một tài khoản khác (gọi Edge Function admin-reset-password). */
+export async function resetUserPasswordAction(
+  input: ResetPasswordInput,
+): Promise<AdminActionResult<ResetPasswordResult>> {
+  const gate = await authed();
+  if (gate) return gate;
+  const parsed = resetPasswordSchema.safeParse(input);
+  if (!parsed.success) return firstIssue(parsed);
+  const result = await invokeAdminFunction<ResetPasswordResult>(
+    "admin-reset-password",
+    {
+      userId: parsed.data.userId,
+      password: parsed.data.password || undefined,
+    },
+  );
+  if (result.ok) revalidatePath(`/admin/users/${parsed.data.userId}/access`);
+  return result;
 }
 
 /** Quyền của tôi tại một khách sạn (dùng cho hook `useCan`). */

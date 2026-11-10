@@ -118,16 +118,25 @@ Mọi RPC dưới đây yêu cầu `admin.roles.manage` hoặc `admin.users.mana
 
 | RPC | Quyền cần | Ghi chú |
 |---|---|---|
-| `admin_role_save(p_role jsonb)` | `admin.roles.manage` | Tạo/sửa tên, mô tả; không sửa `sys_admin` |
-| `admin_role_copy(p_role_id, p_new_name)` | `admin.roles.manage` | Sao chép cả ma trận quyền |
-| `admin_role_set_permissions(p_role_id, p_permission_codes text[], p_reason)` | `admin.roles.manage` | Ghi đè toàn bộ ma trận; trả `{added[], removed[], conflicts[]}` |
-| `admin_role_deactivate(p_role_id)` | `admin.roles.manage` | Không xóa vật lý |
-| `admin_user_assign_role(p_user_id, p_role_id, p_property_id, p_outlet_ids, p_warehouse_ids, p_valid_from, p_valid_to)` | `admin.users.manage` | `ERR_SELF_GRANT` nếu cấp cho chính mình |
-| `admin_user_revoke_role(p_assignment_id, p_reason)` | `admin.users.manage` | Đặt `valid_to = hôm nay`; `ERR_LAST_ADMIN` nếu gỡ admin cuối |
-| `admin_permission_override_set(p_user_id, p_property_id, p_permission_code, p_effect, p_valid_to, p_reason)` | `admin.permissions.override` | `allow`/`deny`; lý do bắt buộc |
+| `admin_role_save(p_role jsonb)` | `admin.roles.manage` | Tạo/sửa tên, mô tả; sửa được cả `sys_admin` (admin-relax 10/11/2026) |
+| `admin_role_copy(p_role_id, p_new_name)` | `admin.roles.manage` | Sao chép cả ma trận quyền; sao chép được cả `sys_admin` (admin-relax 10/11/2026) |
+| `admin_role_set_permissions(p_role_id, p_permission_codes text[], p_reason)` | `admin.roles.manage` | Ghi đè toàn bộ ma trận; trả `{added[], removed[], conflicts[]}`; cấp được cho cả `sys_admin` (admin-relax 10/11/2026) |
+| `admin_role_deactivate(p_role_id)` | `admin.roles.manage` | Không xóa vật lý; vẫn chặn `sys_admin` (`ERR_SYSTEM_ROLE`) |
+| `admin_user_assign_role(p_user_id, p_role_id, p_property_id, p_outlet_ids, p_warehouse_ids, p_valid_from, p_valid_to)` | `admin.users.manage` | Tự gán cho chính mình được phép (admin-relax 10/11/2026); gán được mọi vai trò kể cả `sys_admin` |
+| `admin_user_revoke_role(p_assignment_id, p_reason)` | `admin.users.manage` | Đặt `valid_to = hôm nay`; `ERR_LAST_ADMIN` nếu gỡ admin cuối; vẫn chặn tự thu hồi (`ERR_SELF_GRANT`) |
+| `admin_permission_override_set(p_user_id, p_property_id, p_permission_code, p_effect, p_valid_to, p_reason)` | `admin.permissions.override` | `allow`/`deny`; lý do bắt buộc; tự cấp cho chính mình được phép (admin-relax 10/11/2026) |
 | `admin_user_effective_permissions(p_user_id, p_property_id)` | `admin.users.manage` | Trả mỗi quyền + nguồn (vai trò nào / override nào) |
 | `admin_sod_conflict_check(p_user_id \| p_role_id)` | `admin.users.manage` | Trả danh sách cặp quyền xung đột |
 | `my_permissions(p_property_id)` | đăng nhập | UI dùng cho `useCan` |
+
+### Edge Function quản trị tài khoản (gọi từ app qua `supabase.functions.invoke`)
+
+| Edge Function | Quyền cần | Ghi chú |
+|---|---|---|
+| `admin-create-user` | `admin.users.manage` (chuỗi, kiểm tra qua `user_has_perm`) | Tạo tài khoản + gán 1..n vai trò trong 1 lần; body `{employeeCode, fullName, email?, phone?, password?, roles?: [{roleId, propertyId?, outletIds?, warehouseIds?}], roleId?, propertyId?, outletIds?, warehouseIds?, validTo?}`; `password` bỏ trống thì sinh ngẫu nhiên; mật khẩu tạm trả về 1 lần; lỗi trả mã `email_exists` / `employee_code_exists` / `invalid_role` / `invalid_property_for_role` / `assign_role_failed` (UI dịch trong `vi.admin.edgeFunctionErrors`) |
+| `admin-reset-password` | `admin.users.manage` (chuỗi, kiểm tra qua `user_has_perm`) | Đặt lại mật khẩu cho tài khoản khác; body `{userId, password?}`; `password` bỏ trống thì sinh ngẫu nhiên; mật khẩu tạm trả về 1 lần; không đặt lại mật khẩu của chính mình (`cannot_reset_own_password` — tự đổi ở `/settings/password`); ghi `audit_log` (`table_name='profiles'`, `new_data={event:'admin_password_reset'}`) |
+
+Tự đổi mật khẩu của chính mình không qua Edge Function: màn `/settings/password` gọi server action `changeOwnPasswordAction` — xác minh mật khẩu hiện tại bằng `signInWithPassword` rồi `updateUser({password})`; phiên hiện tại giữ nguyên.
 
 ## 10. Cấu hình nghiệp vụ
 
@@ -154,9 +163,9 @@ Khởi tạo production trước khi có quản trị viên là ngoại lệ v�
 | `ERR_CONFIG_SCOPE` | Phạm vi cấu hình không thuộc tổ chức |
 | `ERR_CONFIG_ITEM_GROUP` | Nhóm hàng không tồn tại hoặc không thuộc tổ chức của quy tắc duyệt |
 | `ERR_CONFIG_APPROVER` | Vai trò/người duyệt không hợp lệ hoặc thiếu quyền |
-| `ERR_SELF_GRANT` | Không được tự cấp/sửa quyền cho chính mình |
+| `ERR_SELF_GRANT` | Không được tự thu hồi vai trò / tự khóa tài khoản của chính mình (tự CẤP đã được phép từ admin-relax 10/11/2026) |
 | `ERR_LAST_ADMIN` | Phải còn ít nhất 2 người quản trị |
-| `ERR_SYSTEM_ROLE` | Không sửa/xóa vai trò hệ thống |
+| `ERR_SYSTEM_ROLE` | Không ngừng dùng vai trò hệ thống (sửa/sao chép/cấp quyền cho `sys_admin` đã được phép từ admin-relax 10/11/2026) |
 | `ERR_SOD_<RULE>` | Vi phạm tách biệt nhiệm vụ (mã quy tắc ở `04-SECURITY-RLS.md`) |
 | `ERR_IMMUTABLE_LEDGER` | Cố sửa/xóa sổ cái |
 | `ERR_DOC_POSTED` | Chứng từ đã ghi sổ |

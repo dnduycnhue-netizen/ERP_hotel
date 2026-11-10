@@ -1,5 +1,9 @@
 -- T-005 pgTAP: RPC quản trị người dùng/vai trò (docs/09-API-RPC.md mục 9).
 -- Chạy bằng `supabase test db` ở local (cần Docker). KHÔNG chạy lên production.
+-- Cập nhật admin-relax 10/11/2026: ERR_SELF_GRANT ở assign/override và
+-- ERR_SYSTEM_ROLE ở save/copy/set_permissions đã gỡ — các kiểm tra 6, 7,
+-- 18, 20, 22 đổi từ throws_ok sang ok. Các chặn còn giữ (thu hồi/khóa
+-- chính mình, ngừng dùng sys_admin, quản trị cuối) giữ nguyên.
 -- Fixture dùng chung dải UUID với org_access_test.sql; mỗi file test chạy
 -- trong transaction riêng rồi rollback nên không xung đột.
 begin;
@@ -160,31 +164,33 @@ select ok(
   'a deny override removes the effective permission'
 );
 
--- 6. Tự cấp quyền riêng cho chính mình bị chặn.
-select throws_ok(
-  $$select public.admin_permission_override_set(
-    '00000000-0000-4000-8000-000000000a11',
-    '00000000-0000-4000-8000-000000000201',
-    'receiving.perform',
-    'allow',
-    null,
-    'pgTAP: self grant must fail'
-  )$$,
-  'P0001',
-  'ERR_SELF_GRANT',
-  'setting an override for yourself raises ERR_SELF_GRANT'
+-- 6. Tự cấp quyền riêng cho chính mình được phép (admin-relax 10/11/2026:
+-- ERR_SELF_GRANT ở admin_permission_override_set đã gỡ).
+select ok(
+  (
+    select public.admin_permission_override_set(
+      '00000000-0000-4000-8000-000000000a11',
+      '00000000-0000-4000-8000-000000000201',
+      'receiving.perform',
+      'allow',
+      null,
+      'pgTAP: self grant is now allowed'
+    ) ->> 'ok'
+  ) = 'true',
+  'an admin can set an override for themselves'
 );
 
--- 7. Tự gán vai trò cho chính mình bị chặn.
-select throws_ok(
-  $$select public.admin_user_assign_role(
-    '00000000-0000-4000-8000-000000000a11',
-    '00000000-0000-4000-8000-000000000507',
-    '00000000-0000-4000-8000-000000000201'
-  )$$,
-  'P0001',
-  'ERR_SELF_GRANT',
-  'assigning a role to yourself raises ERR_SELF_GRANT'
+-- 7. Tự gán vai trò cho chính mình được phép (admin-relax 10/11/2026:
+-- ERR_SELF_GRANT ở admin_user_assign_role đã gỡ).
+select ok(
+  (
+    select public.admin_user_assign_role(
+      '00000000-0000-4000-8000-000000000a11',
+      '00000000-0000-4000-8000-000000000507',
+      '00000000-0000-4000-8000-000000000201'
+    ) ->> 'ok'
+  ) = 'true',
+  'an admin can assign a role to themselves'
 );
 
 -- 8. Thu hồi vai trò của người khác, kèm lý do.
@@ -352,14 +358,15 @@ select ok(
   'an admin can create a role'
 );
 
--- 18. Không sửa được vai trò hệ thống.
-select throws_ok(
-  $$select public.admin_role_save(
-    '{"id": "00000000-0000-4000-8000-000000000517", "org_id": "00000000-0000-4000-8000-000000000001", "code": "sys_admin", "name_vi": "Đổi tên sys_admin"}'::jsonb
-  )$$,
-  'P0001',
-  'ERR_SYSTEM_ROLE',
-  'saving the sys_admin role raises ERR_SYSTEM_ROLE'
+-- 18. Sửa được vai trò hệ thống (admin-relax 10/11/2026: ERR_SYSTEM_ROLE
+-- ở admin_role_save đã gỡ; chỉ ngừng dùng sys_admin vẫn bị chặn, xem 25).
+select ok(
+  (
+    select public.admin_role_save(
+      '{"id": "00000000-0000-4000-8000-000000000517", "org_id": "00000000-0000-4000-8000-000000000001", "code": "sys_admin", "name_vi": "Đổi tên sys_admin"}'::jsonb
+    ) ->> 'ok'
+  ) = 'true',
+  'an admin can rename the sys_admin role'
 );
 
 -- 19. Sao chép vai trò kèm ma trận quyền.
@@ -382,14 +389,15 @@ select is(
   'the copied role keeps the source permission matrix'
 );
 
--- 20. Không sao chép được vai trò hệ thống.
-select throws_ok(
-  $$select public.admin_role_copy(
-    '00000000-0000-4000-8000-000000000517', 'Sao chép sys_admin'
-  )$$,
-  'P0001',
-  'ERR_SYSTEM_ROLE',
-  'copying the sys_admin role raises ERR_SYSTEM_ROLE'
+-- 20. Sao chép được vai trò hệ thống (admin-relax 10/11/2026:
+-- ERR_SYSTEM_ROLE ở admin_role_copy đã gỡ).
+select ok(
+  (
+    select public.admin_role_copy(
+      '00000000-0000-4000-8000-000000000517', 'Sao chép sys_admin'
+    ) ->> 'ok'
+  ) = 'true',
+  'an admin can copy the sys_admin role'
 );
 
 -- 21. Ghi đè ma trận quyền: trả added/removed/conflicts.
@@ -416,15 +424,17 @@ select ok(
   'removing the conflicting permission reports it as removed'
 );
 
--- 22. Không ghi đè được ma trận của vai trò hệ thống.
-select throws_ok(
-  $$select public.admin_role_set_permissions(
-    '00000000-0000-4000-8000-000000000517',
-    array['receiving.perform']
-  )$$,
-  'P0001',
-  'ERR_SYSTEM_ROLE',
-  'setting permissions on sys_admin raises ERR_SYSTEM_ROLE'
+-- 22. Ghi đè được ma trận của vai trò hệ thống (admin-relax 10/11/2026:
+-- ERR_SYSTEM_ROLE ở admin_role_set_permissions đã gỡ). Giữ nguyên các
+-- quyền quản trị để các kiểm tra sau (26, 27) còn ý nghĩa.
+select ok(
+  (
+    select public.admin_role_set_permissions(
+      '00000000-0000-4000-8000-000000000517',
+      array['admin.users.manage', 'admin.roles.manage', 'admin.permissions.override', 'receiving.perform']
+    ) -> 'added'
+  ) @> '["receiving.perform"]'::jsonb,
+  'setting permissions on sys_admin adds the new permission'
 );
 
 -- 23. Kiểm tra xung đột SoD của vai trò.

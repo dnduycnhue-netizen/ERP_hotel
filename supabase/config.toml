@@ -387,6 +387,14 @@ verify_jwt = false
 [functions.send-notification]
 verify_jwt = false
 
+# Quan tri tai khoan: JWT nguoi dung duoc gateway xac minh (mac dinh true)
+# roi Edge Function tu kiem tra quyen admin.users.manage qua user_has_perm.
+[functions.admin-create-user]
+verify_jwt = true
+
+[functions.admin-reset-password]
+verify_jwt = true
+
 [edge_runtime]
 enabled = true
 # Supported request policies: `oneshot`, `per_worker`.

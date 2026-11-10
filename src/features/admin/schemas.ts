@@ -73,6 +73,47 @@ export const setPinSchema = z.object({
   pin: z.string().regex(/^[0-9]{4,6}$/, "Mã PIN phải gồm 4–6 chữ số."),
 });
 
+export const createUserSchema = z.object({
+  employeeCode: z
+    .string()
+    .trim()
+    .toUpperCase()
+    .regex(
+      /^[A-Z0-9_-]{2,20}$/,
+      "Mã nhân viên chỉ gồm chữ hoa, số, gạch dưới và gạch ngang, dài 2–20 ký tự.",
+    ),
+  fullName: z.string().trim().min(1, "Vui lòng nhập họ tên."),
+  email: z
+    .string()
+    .trim()
+    .toLowerCase()
+    .email("Email không đúng định dạng.")
+    .optional()
+    .or(z.literal("")),
+  phone: z.string().trim().optional(),
+  password: z
+    .string()
+    .min(8, "Mật khẩu tạm phải có ít nhất 8 ký tự.")
+    .max(128, "Mật khẩu tạm tối đa 128 ký tự.")
+    .optional()
+    .or(z.literal("")),
+  roleIds: z.array(uuid),
+  propertyId: uuid.nullable(),
+});
+
+export const resetPasswordSchema = z.object({
+  userId: uuid,
+  password: z
+    .string()
+    .min(8, "Mật khẩu tạm phải có ít nhất 8 ký tự.")
+    .max(128, "Mật khẩu tạm tối đa 128 ký tự.")
+    .optional()
+    .or(z.literal("")),
+});
+
+export type CreateUserInput = z.infer<typeof createUserSchema>;
+export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;
+
 export const setActiveSchema = z.object({
   userId: uuid,
   active: z.boolean(),

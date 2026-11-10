@@ -6,17 +6,19 @@ import { setOverrideAction } from "@/features/admin/actions";
 import type { PermissionRow } from "@/features/admin/data/queries";
 import { vi } from "@/i18n/vi";
 
-/** Thêm quyền riêng cho/chặn (docs/06-UI-UX.md mục 6.3). */
+/**
+ * Thêm quyền riêng cho/chặn (docs/06-UI-UX.md mục 6.3). Từ admin-relax:
+ * quản trị được tự cấp quyền riêng cho chính mình (ERR_SELF_GRANT ở
+ * admin_permission_override_set đã gỡ).
+ */
 export function OverrideForm({
   userId,
   permissions,
   properties,
-  isSelf,
 }: {
   userId: string;
   permissions: PermissionRow[];
   properties: { id: string; name: string }[];
-  isSelf: boolean;
 }) {
   const [permissionCode, setPermissionCode] = useState("");
   const [propertyId, setPropertyId] = useState("");
@@ -50,14 +52,6 @@ export function OverrideForm({
     setValidTo("");
     setReason("");
     setNotice(vi.admin.overrideAdded);
-  }
-
-  if (isSelf) {
-    return (
-      <p role="alert" className="text-sm text-muted-foreground">
-        {vi.admin.selfEditBlocked}
-      </p>
-    );
   }
 
   return (
