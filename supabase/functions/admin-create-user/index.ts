@@ -7,8 +7,9 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 //   RPC `user_has_perm` bằng service role.
 // - Tạo user KHÔNG cần email thật: nếu không truyền email, hệ thống sinh
 //   địa chỉ nội bộ `<ma_nv>@erp.internal` (không gửi mail đi đâu cả).
-// - Mật khẩu tạm: quản trị có thể tự đặt (`password`, tối thiểu 8 ký tự,
-//   tiện cho tài khoản test) hoặc để trống để hệ thống sinh ngẫu nhiên.
+// - Mật khẩu tạm: quản trị có thể tự đặt (`password`, tối thiểu 12 ký tự,
+//   thống nhất 12 ở mọi nơi — tự phê duyệt 10/11/2026, xem Q132)
+//   hoặc để trống để hệ thống sinh ngẫu nhiên.
 //   Mật khẩu tạm trả về MỘT LẦN cho quản trị viên để bàn giao trực tiếp
 //   cho nhân viên; nhân viên đổi mật khẩu sau lần đăng nhập đầu (màn
 //   /settings/password).
@@ -116,7 +117,7 @@ function readCreateUserRequest(value: unknown): CreateUserRequest | null {
     return null;
   }
   if (email !== "" && !EMAIL_PATTERN.test(email)) return null;
-  if (password !== "" && (password.length < 8 || password.length > 128)) {
+  if (password !== "" && (password.length < 12 || password.length > 128)) {
     return null;
   }
   if (outletIds === null || warehouseIds === null) return null;
