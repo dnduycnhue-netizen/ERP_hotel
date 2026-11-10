@@ -1,6 +1,6 @@
 import { ErrorState } from "@/components/common/error-state";
 import { BanquetForm } from "@/components/restaurant/banquet-form";
-import { listRecipes } from "@/features/restaurant/queries";
+import { listBanquetHalls, listRecipes } from "@/features/restaurant/queries";
 import { vi } from "@/i18n/vi";
 
 /** Thêm tiệc mới (M06). */
@@ -11,7 +11,10 @@ export default async function NewBanquetPage({
 }) {
   const { property: propertyId } = await params;
 
-  const recipesRes = await listRecipes(propertyId);
+  const [recipesRes, hallsRes] = await Promise.all([
+    listRecipes(propertyId),
+    listBanquetHalls(propertyId),
+  ]);
   if (!recipesRes.ok) {
     return <ErrorState description={recipesRes.error} />;
   }
@@ -32,6 +35,12 @@ export default async function NewBanquetPage({
           code: r.code,
           name: r.name,
           sale_price: r.sale_price,
+        }))}
+        halls={(hallsRes.ok ? hallsRes.data : []).map((h) => ({
+          id: h.id,
+          name: h.name,
+          capacity: h.capacity,
+          is_active: h.is_active,
         }))}
       />
     </div>

@@ -7,6 +7,7 @@ import { BanquetForm } from "@/components/restaurant/banquet-form";
 import {
   getBanquet,
   getRestaurantPerms,
+  listBanquetHalls,
   listRecipes,
 } from "@/features/restaurant/queries";
 import { vi } from "@/i18n/vi";
@@ -19,6 +20,12 @@ function banquetDocStatus(status: string) {
   return "cancelled" as const;
 }
 
+function depositStatusLabel(status: string) {
+  return status === "paid"
+    ? vi.restaurant.depositPaid
+    : vi.restaurant.depositUnpaid;
+}
+
 /** Chi tiết tiệc (M06): thực đơn, chuyển trạng thái, hủy. */
 export default async function BanquetDetailPage({
   params,
@@ -27,9 +34,10 @@ export default async function BanquetDetailPage({
 }) {
   const { property: propertyId, id: banquetId } = await params;
 
-  const [res, recipesRes, perms] = await Promise.all([
+  const [res, recipesRes, hallsRes, perms] = await Promise.all([
     getBanquet(propertyId, banquetId),
     listRecipes(propertyId),
+    listBanquetHalls(propertyId),
     getRestaurantPerms(propertyId),
   ]);
 
@@ -56,7 +64,8 @@ export default async function BanquetDetailPage({
             {banquet.hall} · {vi.restaurant.tablesCount}:{" "}
             {banquet.tables_count ?? "—"} · {vi.restaurant.guestsCount}:{" "}
             {banquet.guests_count} · {vi.restaurant.depositAmount}:{" "}
-            {formatMoney(banquet.deposit_amount)}
+            {formatMoney(banquet.deposit_amount)} (
+            {depositStatusLabel(banquet.deposit_status)})
           </p>
           {banquet.customer_phone ? (
             <p className="mt-1 text-sm text-muted-foreground">
@@ -128,6 +137,12 @@ export default async function BanquetDetailPage({
             code: r.code,
             name: r.name,
             sale_price: r.sale_price,
+          }))}
+          halls={(hallsRes.ok ? hallsRes.data : []).map((h) => ({
+            id: h.id,
+            name: h.name,
+            capacity: h.capacity,
+            is_active: h.is_active,
           }))}
         />
       ) : null}

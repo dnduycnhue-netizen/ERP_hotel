@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { vi } from "@/i18n/vi";
 
 /** M06 — schema Zod dùng chung client/server cho form nhà hàng. */
 
@@ -115,6 +116,9 @@ export const dishSaleVoidSchema = z.object({
 
 export type DishSaleVoidInput = z.infer<typeof dishSaleVoidSchema>;
 
+export const depositStatusSchema = z.enum(["unpaid", "paid"]);
+export type DepositStatus = z.infer<typeof depositStatusSchema>;
+
 export const banquetSaveSchema = z
   .object({
     propertyId: z.string().uuid(),
@@ -125,9 +129,11 @@ export const banquetSaveSchema = z
     startTime: z.string().regex(/^\d{2}:\d{2}$/, "Giờ không hợp lệ."),
     endTime: z.string().regex(/^\d{2}:\d{2}$/, "Giờ không hợp lệ."),
     hall: z.string().trim().min(1, "Chưa nhập sảnh / khu vực."),
+    hallId: z.string().uuid().optional(),
     tablesCount: z.number().int().nonnegative().default(0),
     guestsCount: z.number().int().positive("Số khách phải lớn hơn 0."),
     depositAmount: z.number().nonnegative().default(0),
+    depositStatus: depositStatusSchema.default("unpaid"),
     notes: z.string().optional(),
     dishes: z
       .array(
@@ -148,9 +154,28 @@ export const banquetSaveSchema = z
         path: ["endTime"],
       });
     }
+    if (data.depositStatus === "paid" && data.depositAmount <= 0) {
+      ctx.addIssue({
+        code: "custom",
+        message: vi.restaurant.depositPaidRequiresAmount,
+        path: ["depositAmount"],
+      });
+    }
   });
 
 export type BanquetSaveInput = z.infer<typeof banquetSaveSchema>;
+
+/** Danh mục sảnh (C11, Q170b): tên bắt buộc, sức chứa > 0 nếu có. */
+export const banquetHallSaveSchema = z.object({
+  propertyId: z.string().uuid(),
+  id: z.string().uuid().optional(),
+  name: z.string().trim().min(1, "Chưa nhập tên sảnh."),
+  capacity: z.number().int().positive().optional(),
+  isActive: z.boolean().default(true),
+  notes: z.string().optional(),
+});
+
+export type BanquetHallSaveInput = z.infer<typeof banquetHallSaveSchema>;
 
 export const banquetIdSchema = z.object({
   propertyId: z.string().uuid(),
