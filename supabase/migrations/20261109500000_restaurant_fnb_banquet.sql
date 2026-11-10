@@ -943,7 +943,7 @@ begin
       left join public.recipes r on r.id = s.recipe_id
       left join public._restaurant_foodcost_list(p_property_id) f
         on f.recipe_id = s.recipe_id
-      group by s.recipe_id, r.code, r.name, f.has_unknown_cost
+      group by s.recipe_id, r.code, r.name, f.has_unknown_cost, f.foodcost
     )
     select jsonb_build_object(
       'ok', true, 'from', v_from, 'to', v_to,
@@ -1586,7 +1586,7 @@ as $$
     left join public.recipes r on r.id = s.recipe_id
     left join public._restaurant_foodcost_list(p_property_id) f
       on f.recipe_id = s.recipe_id
-    group by s.recipe_id, r.code, r.name, f.has_unknown_cost
+    group by s.recipe_id, r.code, r.name, f.has_unknown_cost, f.foodcost
   ),
   rows as (
     select jsonb_build_object(
