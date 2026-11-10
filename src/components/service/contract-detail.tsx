@@ -171,6 +171,11 @@ export function ContractDetail({
                         ? ` · ${s.acceptance.photo_ids.length} ảnh`
                         : ""}
                     </p>
+                    {s.acceptance.note ? (
+                      <p className="mt-1 text-sm">
+                        {vi.service.note}: {s.acceptance.note}
+                      </p>
+                    ) : null}
                     {s.acceptance.photo_ids.length > 0 ? (
                       <div className="mt-2">
                         <AttachmentGallery

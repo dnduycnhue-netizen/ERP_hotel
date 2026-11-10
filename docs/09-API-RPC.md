@@ -108,7 +108,7 @@ Các RPC danh mục dưới đây thuộc các task sau, chưa được triển 
 | `invoice_approve(p_invoice_id)` | Ghi `ap_ledger` (+) |
 | `advance_request`, `advance_decide`, `advance_disburse`, `advance_settle(p_id, p_lines)` | Quyết toán theo số thực nhận |
 | `payment_request_create`, `payment_request_decide`, `payment_mark_paid(p_id, p_bank_ref)` | `ap_ledger` (−) khi paid |
-| `service_contract_save`, `service_schedule_generate(p_month)`, `service_accept(p_schedule_id, p_rating, p_photos)` | |
+| `service_contract_save`, `service_schedule_generate(p_month)`, `service_accept(p_schedule_id, p_rating, p_photos, p_po_id, p_note)` | `p_note` tuy chon, luu vao `service_acceptances.note` (Q81) |
 | `pms_daily_upsert(p_property_id, p_date, p_stats jsonb)` | Lễ tân nhập hằng ngày |
 | `pos_import_commit(p_import_id)` (P2) | |
 

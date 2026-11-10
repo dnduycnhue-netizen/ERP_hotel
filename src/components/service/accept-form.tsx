@@ -16,13 +16,11 @@ type UploadedPhoto = {
 };
 
 /**
- * Form nghiệm thu kỳ hợp đồng hoặc PO dịch vụ lẻ (T-042).
- * Rating 1–5 tùy chọn; ảnh chụp bằng camera, upload trước qua
- * `uploadCapturedPhoto` (docType `service_acceptance`) rồi mới gửi id
- * ảnh vào RPC `service_accept`.
- *
- * LƯU Ý: RPC `service_accept` không nhận ghi chú (xem Q81) nên form
- * không có ô ghi chú.
+ * Form nghiệm thu kỳ hợp đồng hoặc PO dịch vụ lẻ (T-042, Q81).
+ * Rating 1–5 tùy chọn; ghi chú tùy chọn lưu vào
+ * `service_acceptances.note` qua `p_note` của RPC `service_accept`;
+ * ảnh chụp bằng camera, upload trước qua `uploadCapturedPhoto`
+ * (docType `service_acceptance`) rồi mới gửi id ảnh vào RPC.
  */
 export function AcceptForm({
   propertyId,
@@ -40,6 +38,7 @@ export function AcceptForm({
   onCancel: () => void;
 }) {
   const [rating, setRating] = useState<number | null>(null);
+  const [note, setNote] = useState("");
   const [photos, setPhotos] = useState<UploadedPhoto[]>([]);
   const [uploading, setUploading] = useState(false);
   const [pending, setPending] = useState(false);
@@ -80,6 +79,7 @@ export function AcceptForm({
       scheduleId: scheduleId ?? null,
       poId: poId ?? null,
       rating,
+      note: note.trim() === "" ? null : note.trim(),
       photos: photos.map((p) => p.id),
     });
     setPending(false);
@@ -142,6 +142,25 @@ export function AcceptForm({
         </div>
         <p className="mt-1 text-xs text-muted-foreground">
           {vi.service.ratingHint}
+        </p>
+      </div>
+
+      <div>
+        <label htmlFor="service-accept-note" className="text-sm font-medium">
+          {vi.service.note}
+        </label>
+        <textarea
+          id="service-accept-note"
+          value={note}
+          onChange={(e) => setNote(e.target.value)}
+          maxLength={1000}
+          rows={3}
+          placeholder={vi.service.notePlaceholder}
+          disabled={pending || uploading}
+          className="mt-1 w-full rounded-md border bg-background px-3 py-2 text-sm"
+        />
+        <p className="mt-1 text-xs text-muted-foreground">
+          {vi.service.noteHint}
         </p>
       </div>
 

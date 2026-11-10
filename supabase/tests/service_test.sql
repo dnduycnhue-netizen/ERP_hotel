@@ -2,15 +2,15 @@
 -- Cover: RLS 3 bang moi, write-guard, service_contract_save (validate /
 -- quyen / cap nhat), service_schedule_generate (monthly / quarterly /
 -- yearly / per_visit / idempotent), service_accept (theo ky / theo PO /
--- SoD / rating / quyen), chan thanh toan khi chua nghiem thu (Q72:
--- invoice_match / invoice_approve / payment_request_create raise
+-- SoD / rating / quyen / note Q81: co note + khong note), chan thanh
+-- toan khi chua nghiem thu (Q72: invoice_match / invoice_approve / payment_request_create raise
 -- ERR_SERVICE_NOT_ACCEPTED; sau nghiem thu so nhan = so luong PO),
 -- service_maintenance (het han + alert gia han + dedupe), RLS doc.
 -- CHUA CHAY: khong co Docker tren VM (giong cac test truoc).
 begin;
 create extension if not exists pgtap with schema extensions;
 set local search_path = public, extensions;
-select plan(67);
+select plan(70);
 
 -- 0. Fixture
 insert into public.organizations (id, name) values
@@ -257,10 +257,12 @@ select throws_ok(
 select public._t042_as('d0420000-0000-4000-8000-000000000a06');
 insert into t042_resp values ('acc_q', public.service_accept(
   (select id from public.service_schedules where contract_id = 'd0420000-0000-4000-8000-000000000d02'),
-  5, '[]'::jsonb
+  5, '[]'::jsonb, null, 'Thang máy chạy êm, đã vệ sinh cabin.'
 ));
 select is((select resp ->> 'status' from t042_resp where key = 'acc_q'), 'accepted', 'quarterly schedule accepted');
 select is((select status from public.service_schedules where contract_id = 'd0420000-0000-4000-8000-000000000d02'), 'accepted', 'quarterly schedule status is accepted');
+-- Q81: note duoc luu vao service_acceptances.note.
+select is((select note from public.service_acceptances where schedule_id = (select id from public.service_schedules where contract_id = 'd0420000-0000-4000-8000-000000000d02')), 'Thang máy chạy êm, đã vệ sinh cabin.', 'schedule acceptance note is persisted');
 
 -- Nghiem thu lai ky da accepted -> loi.
 select throws_ok(
@@ -315,6 +317,8 @@ insert into t042_resp values ('acc_y', public.service_accept(
   4, '[]'::jsonb
 ));
 select is((select resp ->> 'status' from t042_resp where key = 'acc_y'), 'accepted', 'yearly schedule accepted with rating 4');
+-- Q81: khong truyen note -> note NULL (tuong thich nguoc loi goi cu).
+select ok((select note from public.service_acceptances where schedule_id = (select id from public.service_schedules where contract_id = 'd0420000-0000-4000-8000-000000000d03')) is null, 'note is null when not passed');
 
 -- 6. Luong hoa don dich vu — CHOT Q72 (ke toan a01 / ke toan truong a02).
 select public._t042_as('d0420000-0000-4000-8000-000000000a01');
@@ -377,12 +381,16 @@ insert into t042_resp values ('pay1', public.payment_request_create(
 ));
 select is((select resp ->> 'status' from t042_resp where key = 'pay1'), 'submitted', 'payment request submitted after acceptance');
 
--- Nghiem thu theo PO le (PO-SVC2, khong hop dong).
+-- Nghiem thu theo PO le (PO-SVC2, khong hop dong) — Q81: goi kieu
+-- named-notation de kiem tra ten tham so p_note.
 select public._t042_as('d0420000-0000-4000-8000-000000000a06');
 insert into t042_resp values ('acc_po2', public.service_accept(
-  null, 5, '[]'::jsonb, 'd0420000-0000-4000-8000-000000000b02'
+  p_po_id => 'd0420000-0000-4000-8000-000000000b02',
+  p_rating => 5, p_photos => '[]'::jsonb,
+  p_note => 'Điều hòa chạy mát, đã thay gas.'
 ));
 select is((select resp ->> 'status' from t042_resp where key = 'acc_po2'), 'accepted', 'one-off service PO accepted via po_id');
+select is((select note from public.service_acceptances where po_id = 'd0420000-0000-4000-8000-000000000b02'), 'Điều hòa chạy mát, đã thay gas.', 'PO acceptance note is persisted (named notation)');
 
 -- Hoa don cho dong c03 cua PO-SVC2 khop duoc sau nghiem thu theo PO.
 select public._t042_as('d0420000-0000-4000-8000-000000000a01');
