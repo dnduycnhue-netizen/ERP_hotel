@@ -230,6 +230,11 @@ export const approvalDelegationSaveSchema = z.object({
     .nullable(),
 });
 
+export const approvalDelegationDeleteSchema = z.object({
+  orgId: uuidSchema,
+  delegationId: uuidSchema,
+});
+
 export type PrSaveDraftInput = z.infer<typeof prSaveDraftSchema>;
 export type PrSubmitInput = z.infer<typeof prSubmitSchema>;
 export type PrDecideInput = z.infer<typeof prDecideSchema>;
@@ -243,6 +248,9 @@ export type PoCloseInput = z.infer<typeof poCloseSchema>;
 export type PoCancelInput = z.infer<typeof poCancelSchema>;
 export type ApprovalDelegationSaveInput = z.infer<
   typeof approvalDelegationSaveSchema
+>;
+export type ApprovalDelegationDeleteInput = z.infer<
+  typeof approvalDelegationDeleteSchema
 >;
 export type ItemSearchInput = z.infer<typeof itemSearchSchema>;
 export type MarketOrderCreateInput = z.infer<typeof marketOrderCreateSchema>;

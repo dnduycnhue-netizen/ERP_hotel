@@ -59,8 +59,9 @@ Các RPC danh mục dưới đây thuộc các task sau, chưa được triển 
 | `transfer_send`, `transfer_receive` | 2 bước qua kho `transit` |
 | `purpose_issue_post(p_id)` | Bắt buộc `cost_center_id`, `expense_category_id` |
 | `waste_submit`, `waste_decide` | SoD `SOD_WASTE`; > ngưỡng thêm gm |
-| `stock_balance_get(p_warehouse_id, p_item_id)` | Chỉ cho vai trò được xem tồn |
 | `requisition_save_draft(p_doc jsonb)` | Tạo/sửa nháp phiếu lĩnh: kho đích phải là kho của outlet (`ERR_INVALID_VALUE`); đổi UOM qua hệ số mua (`ERR_UOM_UNKNOWN`); quyền `requisition.create` |
+
+> `stock_balance_get` đã chốt STOP (Q28/Q147) — không triển khai, không có trong đặc tả nữa.
 | `requisition_cancel(p_property_id, p_id, p_reason)` | `draft`/`submitted`/`approved` → `cancelled`; lý do bắt buộc (`ERR_REASON_REQUIRED`); quyền `requisition.create` |
 | `requisition_list(p_property_id, p_status, p_search, p_limit, p_offset)` | Danh sách phiếu lĩnh (số lượng, không giá); quyền `requisition.create` |
 | `requisition_get(p_id)` | Chi tiết phiếu lĩnh + dòng (không trả `unit_cost`); quyền `requisition.create` |

@@ -70,11 +70,12 @@ export function CreateUserForm({
   function applyPreset(next: PresetKey) {
     setPreset(next);
     if (next !== "custom") {
-      setRoleIds(
-        roles
-          .filter((role) => PRESET_ROLES[next].includes(role.code))
-          .map((role) => role.id),
-      );
+      // Q165: preset chỉ BỔ SUNG vai trò của mẫu, không reset các vai trò
+      // đã tick tay trước đó (hợp nhất thay vì thay thế toàn bộ).
+      const presetRoleIds = roles
+        .filter((role) => PRESET_ROLES[next].includes(role.code))
+        .map((role) => role.id);
+      setRoleIds((prev) => [...new Set([...prev, ...presetRoleIds])]);
     }
   }
 
