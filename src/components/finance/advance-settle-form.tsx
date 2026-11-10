@@ -73,7 +73,7 @@ export function AdvanceSettleForm({
   }
 
   return (
-    <div className="rounded-xl border bg-card p-4">
+    <div className="rounded-lg border bg-card p-4">
       <h2 className="font-medium">{vi.finance.settleTitle}</h2>
       <p className="mt-1 text-sm text-muted-foreground">
         {vi.finance.settleHint}

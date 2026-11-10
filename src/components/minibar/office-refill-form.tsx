@@ -72,7 +72,7 @@ export function OfficeRefillForm({
   }
 
   return (
-    <div className="rounded-xl border bg-card p-4">
+    <div className="rounded-lg border bg-card p-4">
       <h2 className="font-medium">{vi.minibar.refillByFloor}</h2>
       <p className="mt-1 text-sm text-muted-foreground">
         {vi.minibar.refillHint}

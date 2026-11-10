@@ -6,6 +6,7 @@ import {
 } from "@/features/finance/queries";
 import { listSuppliers } from "@/features/master/queries";
 import { vi } from "@/i18n/vi";
+import { PageHeader } from "@/components/shell/page-header";
 
 /** Tạo đề nghị thanh toán (T-041): chọn NCC → hóa đơn còn lại → số tiền. */
 export default async function NewPaymentRequestPage({
@@ -37,8 +38,8 @@ export default async function NewPaymentRequestPage({
   }
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-xl font-semibold">{vi.finance.newPaymentRequest}</h1>
+    <div className="space-y-4">
+      <PageHeader title={vi.finance.newPaymentRequest} />
       <PaymentRequestForm
         key={supplierId}
         propertyId={propertyId}

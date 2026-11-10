@@ -87,7 +87,7 @@ export function NoInvoiceForm({ propertyId }: { propertyId: string }) {
   }
 
   return (
-    <div className="rounded-xl border bg-card p-4">
+    <div className="rounded-lg border bg-card p-4">
       <h2 className="font-medium">{vi.finance.newListing}</h2>
       <div className="mt-3 grid gap-3 sm:grid-cols-2">
         <label className="block text-sm">

@@ -69,7 +69,7 @@ export function ApprovalTimeline({
   }
 
   return (
-    <div className="rounded-xl border p-4 space-y-3">
+    <div className="rounded-lg border p-4 space-y-3">
       <h3 className="font-semibold text-sm">
         {vi.procurement.approval.title} · {vi.procurement.approval.steps}
       </h3>

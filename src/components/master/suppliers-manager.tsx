@@ -9,6 +9,7 @@ import {
 } from "@/components/common/data-table";
 import { useCan } from "@/lib/permissions/permissions-provider";
 import { vi } from "@/i18n/vi";
+import { PageHeader } from "@/components/shell/page-header";
 import type {
   SupplierRow,
   SupplierBankAccountRow,
@@ -475,19 +476,17 @@ export function SuppliersManager({
         </div>
       ) : null}
 
-      <div className="flex items-center justify-between gap-4 flex-wrap">
-        <div>
-          <h2 className="text-lg font-semibold">{vi.master.suppliers.title}</h2>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            {vi.master.suppliers.description}
-          </p>
-        </div>
-        {canManage ? (
-          <Button size="sm" onClick={startCreate}>
-            + {vi.master.suppliers.addSupplier}
-          </Button>
-        ) : null}
-      </div>
+      <PageHeader
+        title={vi.master.suppliers.title}
+        description={vi.master.suppliers.description}
+        actions={
+          canManage ? (
+            <Button size="sm" onClick={startCreate}>
+              + {vi.master.suppliers.addSupplier}
+            </Button>
+          ) : null
+        }
+      />
 
       <div className="flex gap-2 flex-wrap">
         <input
@@ -533,7 +532,7 @@ export function SuppliersManager({
       <DataTable columns={columns} rows={filtered} />
 
       {bankSupplier ? (
-        <div className="rounded-xl border p-4 space-y-3">
+        <div className="rounded-lg border p-4 space-y-3">
           <div className="flex items-center justify-between">
             <h3 className="font-semibold text-sm">
               {vi.master.suppliers.bankAccounts} — {bankSupplier.code} ·{" "}
@@ -554,27 +553,37 @@ export function SuppliersManager({
             <p className="text-sm text-muted-foreground">{vi.common.loading}</p>
           ) : (
             <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b text-left text-xs text-muted-foreground">
-                  <th className="py-2 pr-2">{vi.master.suppliers.bankName}</th>
-                  <th className="py-2 pr-2">{vi.master.suppliers.accountNo}</th>
-                  <th className="py-2 pr-2">
+              <thead className="bg-muted/40 text-left">
+                <tr>
+                  <th className="py-2.5 pr-3 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                    {vi.master.suppliers.bankName}
+                  </th>
+                  <th className="py-2.5 pr-3 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                    {vi.master.suppliers.accountNo}
+                  </th>
+                  <th className="py-2.5 pr-3 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
                     {vi.master.suppliers.accountName}
                   </th>
-                  <th className="py-2 pr-2">{vi.master.suppliers.status}</th>
-                  <th className="py-2 text-right">{vi.common.actions}</th>
+                  <th className="py-2.5 pr-3 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                    {vi.master.suppliers.status}
+                  </th>
+                  <th className="py-2.5 pr-3 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase text-right">
+                    {vi.common.actions}
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {bankAccounts.map((a) => (
-                  <tr key={a.id} className="border-b last:border-0">
-                    <td className="py-2 pr-2">{a.bank_name}</td>
-                    <td className="py-2 pr-2 font-mono text-xs">
+                  <tr key={a.id} className="border-t hover:bg-muted/40">
+                    <td className="py-3 pr-3 align-middle">{a.bank_name}</td>
+                    <td className="py-3 pr-3 font-mono text-xs align-middle">
                       {a.account_no}
                     </td>
-                    <td className="py-2 pr-2">{a.account_name}</td>
-                    <td className="py-2 pr-2">{bankStatusLabel(a.status)}</td>
-                    <td className="py-2 text-right">
+                    <td className="py-3 pr-3 align-middle">{a.account_name}</td>
+                    <td className="py-3 pr-3 align-middle">
+                      {bankStatusLabel(a.status)}
+                    </td>
+                    <td className="py-3 pr-3 text-right align-middle">
                       {a.status === "pending" && canApproveBank ? (
                         <div className="flex justify-end gap-1">
                           <Button

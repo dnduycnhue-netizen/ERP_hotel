@@ -13,6 +13,7 @@ import {
 import { formatNumber } from "@/components/common/money-text";
 import { listRequisitionsAction } from "@/features/inventory/actions";
 import { vi } from "@/i18n/vi";
+import { PageHeader } from "@/components/shell/page-header";
 
 const STATUSES = [
   "draft",
@@ -69,9 +70,7 @@ export default async function RequisitionsPage({
 
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="text-2xl font-semibold">
-        {vi.inventory.requisitionsTitle}
-      </h1>
+      <PageHeader title={vi.inventory.requisitionsTitle} />
 
       <StatusFilter
         status={status}
@@ -103,40 +102,46 @@ export default async function RequisitionsPage({
           description={vi.inventory.requisitionsEmpty}
         />
       ) : (
-        <div className="overflow-x-auto rounded-xl border bg-card shadow-sm">
+        <div className="overflow-x-auto rounded-lg border bg-card">
           <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b text-left text-muted-foreground">
-                <th className="px-4 py-3 font-medium">{vi.inventory.docNo}</th>
-                <th className="px-4 py-3 font-medium">{vi.common.status}</th>
-                <th className="px-4 py-3 font-medium">
+            <thead className="bg-muted/40 text-left">
+              <tr>
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                  {vi.inventory.docNo}
+                </th>
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                  {vi.common.status}
+                </th>
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
                   {vi.inventory.businessDate}
                 </th>
-                <th className="px-4 py-3 font-medium">{vi.inventory.outlet}</th>
-                <th className="px-4 py-3 font-medium">
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                  {vi.inventory.outlet}
+                </th>
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
                   {vi.inventory.fromWarehouse}
                 </th>
-                <th className="px-4 py-3 font-medium">
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
                   {vi.inventory.toWarehouse}
                 </th>
-                <th className="px-4 py-3 text-right font-medium">
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase text-right">
                   {vi.inventory.lineCount}
                 </th>
-                <th className="px-4 py-3 text-right font-medium">
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase text-right">
                   {vi.inventory.totalQty}
                 </th>
-                <th className="px-4 py-3 text-right font-medium">
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase text-right">
                   {vi.inventory.totalIssued}
                 </th>
-                <th className="px-4 py-3 text-right font-medium">
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase text-right">
                   {vi.inventory.totalReceived}
                 </th>
               </tr>
             </thead>
             <tbody>
               {rows.map((row) => (
-                <tr key={row.id} className="border-b last:border-b-0">
-                  <td className="px-4 py-3">
+                <tr key={row.id} className="border-t hover:bg-muted/40">
+                  <td className="px-3 py-3 align-middle">
                     <Link
                       href={`/${propertyId}/inventory/requisitions/${row.id}`}
                       className="font-medium hover:underline"
@@ -144,25 +149,31 @@ export default async function RequisitionsPage({
                       {row.doc_no}
                     </Link>
                   </td>
-                  <td className="px-4 py-3">
+                  <td className="px-3 py-3 align-middle">
                     <DocStatusBadge status={row.status} />
                   </td>
-                  <td className="px-4 py-3 whitespace-nowrap">
+                  <td className="px-3 py-3 whitespace-nowrap align-middle">
                     {row.business_date}
                   </td>
-                  <td className="px-4 py-3">{row.outlet_name ?? "—"}</td>
-                  <td className="px-4 py-3">
+                  <td className="px-3 py-3 align-middle">
+                    {row.outlet_name ?? "—"}
+                  </td>
+                  <td className="px-3 py-3 align-middle">
                     {row.from_warehouse_name ?? "—"}
                   </td>
-                  <td className="px-4 py-3">{row.to_warehouse_name ?? "—"}</td>
-                  <td className="px-4 py-3 text-right">{row.line_count}</td>
-                  <td className="px-4 py-3 text-right">
+                  <td className="px-3 py-3 align-middle">
+                    {row.to_warehouse_name ?? "—"}
+                  </td>
+                  <td className="px-3 py-3 text-right align-middle">
+                    {row.line_count}
+                  </td>
+                  <td className="px-3 py-3 text-right align-middle">
                     {formatNumber(row.total_qty_stock)}
                   </td>
-                  <td className="px-4 py-3 text-right">
+                  <td className="px-3 py-3 text-right align-middle">
                     {formatNumber(row.total_issued_qty_stock)}
                   </td>
-                  <td className="px-4 py-3 text-right">
+                  <td className="px-3 py-3 text-right align-middle">
                     {formatNumber(row.total_received_qty_stock)}
                   </td>
                 </tr>

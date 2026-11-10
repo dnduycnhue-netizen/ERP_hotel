@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { MoneyText } from "@/components/common/money-text";
+import { DocStatusBadge } from "@/components/common/doc-status-badge";
 import { approveNoInvoiceListingAction } from "@/features/finance/actions";
 import type {
   NoInvoiceListingRow,
@@ -87,35 +88,49 @@ export function NoInvoiceList({
         <p className="text-sm font-medium text-red-800">{error}</p>
       ) : null}
       {filtered.length === 0 ? (
-        <p className="rounded-xl border bg-card p-4 text-sm text-muted-foreground">
+        <p className="rounded-lg border bg-card p-4 text-sm text-muted-foreground">
           {vi.components.table.emptyDescription}
         </p>
       ) : (
-        <div className="overflow-x-auto rounded-xl border bg-card">
+        <div className="overflow-x-auto rounded-lg border bg-card">
           <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b text-left text-muted-foreground">
-                <th className="px-3 py-2">{vi.finance.requestDocNo}</th>
-                <th className="px-3 py-2">{vi.finance.sellerName}</th>
-                <th className="px-3 py-2">{vi.finance.purchaseDate}</th>
-                <th className="px-3 py-2 text-right">
+            <thead className="bg-muted/40 text-left">
+              <tr>
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                  {vi.finance.requestDocNo}
+                </th>
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                  {vi.finance.sellerName}
+                </th>
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                  {vi.finance.purchaseDate}
+                </th>
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase text-right">
                   {vi.finance.totalAmount}
                 </th>
-                <th className="px-3 py-2">{vi.common.status}</th>
-                <th className="px-3 py-2">{vi.common.actions}</th>
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                  {vi.common.status}
+                </th>
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                  {vi.common.actions}
+                </th>
               </tr>
             </thead>
             <tbody>
               {filtered.map((l) => (
-                <tr key={l.id} className="border-b last:border-0">
-                  <td className="px-3 py-2 font-medium">{l.doc_no}</td>
-                  <td className="px-3 py-2">{l.seller_name}</td>
-                  <td className="px-3 py-2">{l.purchase_date}</td>
-                  <td className="px-3 py-2 text-right">
+                <tr key={l.id} className="border-t hover:bg-muted/40">
+                  <td className="px-3 py-3 font-medium align-middle">
+                    {l.doc_no}
+                  </td>
+                  <td className="px-3 py-3 align-middle">{l.seller_name}</td>
+                  <td className="px-3 py-3 align-middle">{l.purchase_date}</td>
+                  <td className="px-3 py-3 text-right align-middle">
                     <MoneyText amount={l.total} />
                   </td>
-                  <td className="px-3 py-2">{STATUS_LABELS[l.status]}</td>
-                  <td className="px-3 py-2">
+                  <td className="px-3 py-3 align-middle">
+                    <DocStatusBadge status={l.status} />
+                  </td>
+                  <td className="px-3 py-3 align-middle">
                     {canApproveInvoice && l.status === "draft" ? (
                       <Button
                         type="button"

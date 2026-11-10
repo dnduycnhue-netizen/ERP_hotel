@@ -3,7 +3,9 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { DocStatusBadge } from "@/components/common/doc-status-badge";
 import { MoneyText } from "@/components/common/money-text";
+import { PageHeader } from "@/components/shell/page-header";
 import {
   decidePaymentRequestAction,
   markPaymentPaidAction,
@@ -131,20 +133,23 @@ export function PaymentRequestDetailView({
 
   return (
     <div className="space-y-6">
-      <div className="rounded-xl border bg-card p-4">
+      <div className="rounded-lg border bg-card p-4">
         <div className="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <h1 className="text-xl font-semibold">{request.doc_no}</h1>
-            <p className="mt-1 text-sm text-muted-foreground">
-              {request.supplier_name ?? vi.common.noData} ·{" "}
-              {STATUS_LABELS[request.status] ?? request.status}
-            </p>
+          <PageHeader
+            title={request.doc_no}
+            description={
+              <>
+                {request.supplier_name ?? vi.common.noData} ·{" "}
+                <DocStatusBadge status={request.status} />
+              </>
+            }
+          >
             {bankChangedRecently && request.status === "submitted" ? (
               <p className="mt-2 rounded-md bg-amber-50 p-3 text-sm text-amber-900">
                 {vi.finance.bankChangedNote}
               </p>
             ) : null}
-          </div>
+          </PageHeader>
           <div className="text-right text-sm">
             <p className="font-semibold">
               {vi.finance.totalAmount}: <MoneyText amount={request.total} />
@@ -265,7 +270,7 @@ export function PaymentRequestDetailView({
         ) : null}
       </div>
 
-      <div className="rounded-xl border bg-card p-4">
+      <div className="rounded-lg border bg-card p-4">
         <h2 className="font-medium">{vi.finance.selectInvoices}</h2>
         {lines.length === 0 ? (
           <p className="mt-2 text-sm text-muted-foreground">
@@ -274,35 +279,41 @@ export function PaymentRequestDetailView({
         ) : (
           <div className="mt-3 overflow-x-auto">
             <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b text-left text-muted-foreground">
-                  <th className="px-3 py-2">{vi.finance.invoiceSymbol}</th>
-                  <th className="px-3 py-2">{vi.finance.invoiceNo}</th>
-                  <th className="px-3 py-2 text-right">
+              <thead className="bg-muted/40 text-left">
+                <tr>
+                  <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                    {vi.finance.invoiceSymbol}
+                  </th>
+                  <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                    {vi.finance.invoiceNo}
+                  </th>
+                  <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase text-right">
                     {vi.finance.totalAmount}
                   </th>
-                  <th className="px-3 py-2 text-right">
+                  <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase text-right">
                     {vi.finance.requestAmount}
                   </th>
-                  <th className="px-3 py-2">{vi.common.status}</th>
+                  <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                    {vi.common.status}
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {lines.map((l) => (
-                  <tr key={l.id} className="border-b last:border-0">
-                    <td className="px-3 py-2">
+                  <tr key={l.id} className="border-t hover:bg-muted/40">
+                    <td className="px-3 py-3 align-middle">
                       {l.invoice_symbol ?? vi.common.noData}
                     </td>
-                    <td className="px-3 py-2">
+                    <td className="px-3 py-3 align-middle">
                       {l.invoice_no ?? vi.common.noData}
                     </td>
-                    <td className="px-3 py-2 text-right">
+                    <td className="px-3 py-3 text-right align-middle">
                       <MoneyText amount={l.invoice_total} />
                     </td>
-                    <td className="px-3 py-2 text-right">
+                    <td className="px-3 py-3 text-right align-middle">
                       <MoneyText amount={l.amount} />
                     </td>
-                    <td className="px-3 py-2">
+                    <td className="px-3 py-3 align-middle">
                       {l.invoice_status
                         ? (STATUS_LABELS[l.invoice_status] ?? l.invoice_status)
                         : vi.common.noData}

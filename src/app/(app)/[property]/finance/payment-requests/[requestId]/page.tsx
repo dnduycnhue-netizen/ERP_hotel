@@ -6,7 +6,6 @@ import {
   todayVn,
 } from "@/features/finance/queries";
 import { listSuppliers } from "@/features/master/queries";
-import { vi } from "@/i18n/vi";
 
 /** Chi tiết đề nghị thanh toán (T-041): dòng + tiến trình + duyệt + đã trả. */
 export default async function PaymentRequestDetailPage({
@@ -45,10 +44,7 @@ export default async function PaymentRequestDetailPage({
     }) >= thirtyDaysAgo;
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-xl font-semibold">
-        {vi.finance.paymentRequestsTitle}
-      </h1>
+    <div className="space-y-4">
       <PaymentRequestDetailView
         propertyId={propertyId}
         detail={detailRes.data}

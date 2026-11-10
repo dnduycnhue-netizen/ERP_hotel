@@ -96,22 +96,32 @@ export function ContractList({
       </div>
 
       {filtered.length === 0 ? (
-        <p className="rounded-xl border bg-card p-4 text-sm text-muted-foreground">
+        <p className="rounded-lg border bg-card p-4 text-sm text-muted-foreground">
           {vi.components.table.emptyDescription}
         </p>
       ) : (
-        <div className="overflow-x-auto rounded-xl border bg-card">
+        <div className="overflow-x-auto rounded-lg border bg-card">
           <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b text-left text-muted-foreground">
-                <th className="px-3 py-2">{vi.service.contractTitle}</th>
-                <th className="px-3 py-2">{vi.finance.supplier}</th>
-                <th className="px-3 py-2">{vi.service.billingCycle}</th>
-                <th className="px-3 py-2 text-right">
+            <thead className="bg-muted/40 text-left">
+              <tr>
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                  {vi.service.contractTitle}
+                </th>
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                  {vi.finance.supplier}
+                </th>
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                  {vi.service.billingCycle}
+                </th>
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase text-right">
                   {vi.service.amountPerCycle}
                 </th>
-                <th className="px-3 py-2">{vi.service.endDate}</th>
-                <th className="px-3 py-2">{vi.common.status}</th>
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                  {vi.service.endDate}
+                </th>
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                  {vi.common.status}
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -126,8 +136,8 @@ export function ContractList({
                   remaining <= c.renew_notice_days;
                 const renewalOverdue = remaining !== null && remaining < 0;
                 return (
-                  <tr key={c.id} className="border-b last:border-0">
-                    <td className="px-3 py-2">
+                  <tr key={c.id} className="border-t hover:bg-muted/40">
+                    <td className="px-3 py-3 align-middle">
                       <Link
                         href={`/${propertyId}/procurement/service-contracts/${c.id}`}
                         className="font-medium hover:underline"
@@ -139,16 +149,16 @@ export function ContractList({
                         {c.cost_center_name ?? vi.common.noData}
                       </p>
                     </td>
-                    <td className="px-3 py-2">
+                    <td className="px-3 py-3 align-middle">
                       {c.supplier_name ?? vi.common.noData}
                     </td>
-                    <td className="px-3 py-2">
+                    <td className="px-3 py-3 align-middle">
                       {CYCLE_LABELS[c.billing_cycle] ?? c.billing_cycle}
                     </td>
-                    <td className="px-3 py-2 text-right">
+                    <td className="px-3 py-3 text-right align-middle">
                       <MoneyText amount={c.amount_per_cycle} />
                     </td>
-                    <td className="px-3 py-2">
+                    <td className="px-3 py-3 align-middle">
                       {c.end_date ?? vi.service.noEndDate}
                       {renewalSoon ? (
                         <p className="text-xs font-medium text-amber-700">
@@ -167,7 +177,7 @@ export function ContractList({
                         </p>
                       ) : null}
                     </td>
-                    <td className="px-3 py-2">
+                    <td className="px-3 py-3 align-middle">
                       <span
                         className={cn(
                           "rounded-full px-2 py-0.5 text-xs font-medium",

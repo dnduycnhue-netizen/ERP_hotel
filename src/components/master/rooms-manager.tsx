@@ -9,6 +9,7 @@ import {
 } from "@/components/common/data-table";
 import { useCan } from "@/lib/permissions/permissions-provider";
 import { vi } from "@/i18n/vi";
+import { PageHeader } from "@/components/shell/page-header";
 import type { RoomRow, RoomTypeRow } from "@/features/master/queries";
 import {
   saveRoomAction,
@@ -170,32 +171,30 @@ export function RoomsManager({
         </div>
       ) : null}
 
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-lg font-semibold">{vi.master.rooms.title}</h2>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            {vi.master.rooms.description}
-          </p>
-        </div>
-        {canManage ? (
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setTypeOpen(true)}
-            >
-              + {vi.master.rooms.addRoomType}
-            </Button>
-            <Button
-              size="sm"
-              onClick={startCreateRoom}
-              disabled={roomTypes.length === 0}
-            >
-              + {vi.master.rooms.addRoom}
-            </Button>
-          </div>
-        ) : null}
-      </div>
+      <PageHeader
+        title={vi.master.rooms.title}
+        description={vi.master.rooms.description}
+        actions={
+          canManage ? (
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setTypeOpen(true)}
+              >
+                + {vi.master.rooms.addRoomType}
+              </Button>
+              <Button
+                size="sm"
+                onClick={startCreateRoom}
+                disabled={roomTypes.length === 0}
+              >
+                + {vi.master.rooms.addRoom}
+              </Button>
+            </div>
+          ) : null
+        }
+      />
 
       <DataTable columns={columns} rows={rooms} />
 

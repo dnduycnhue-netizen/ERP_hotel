@@ -7,6 +7,7 @@ import { listCountersAction, openCountAction } from "@/features/count/actions";
 import type { CountCounter } from "@/features/count/queries";
 import type { WarehouseRow } from "@/features/master/queries";
 import { vi } from "@/i18n/vi";
+import { PageHeader } from "@/components/shell/page-header";
 
 /**
  * Mở đợt kiểm kê (T-033): chọn kho → tải người được đếm tại kho
@@ -112,7 +113,7 @@ export function CountOpenForm({
 
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="text-xl font-semibold">{vi.count.openTitle}</h1>
+      <PageHeader title={vi.count.openTitle} />
 
       <label className="flex flex-col gap-1.5 text-sm font-medium">
         {vi.count.warehouse} *

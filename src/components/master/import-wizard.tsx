@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { useCan } from "@/lib/permissions/permissions-provider";
 import { vi } from "@/i18n/vi";
+import { PageHeader } from "@/components/shell/page-header";
 import {
   parseWorkbook,
   getSheetGrid,
@@ -673,12 +674,10 @@ export function ImportWizard({
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-xl font-semibold">{vi.master.import.title}</h1>
-        <p className="text-sm text-muted-foreground">
-          {vi.master.import.description}
-        </p>
-      </div>
+      <PageHeader
+        title={vi.master.import.title}
+        description={vi.master.import.description}
+      />
 
       {error && (
         <div className="rounded-md border border-destructive bg-destructive/10 p-3 text-sm text-destructive">
@@ -985,16 +984,32 @@ export function ImportWizard({
 
           <div className="overflow-x-auto">
             <table className="w-full min-w-[900px] text-sm">
-              <thead>
-                <tr className="border-b text-left">
-                  <th className="py-2 pr-2">{vi.master.import.colRow}</th>
-                  <th className="py-2 pr-2">{vi.master.import.colCode}</th>
-                  <th className="py-2 pr-2">{vi.master.import.colName}</th>
-                  <th className="py-2 pr-2">{vi.master.import.colUom}</th>
-                  <th className="py-2 pr-2">{vi.master.import.colFactor}</th>
-                  <th className="py-2 pr-2">{vi.master.import.colStatus}</th>
-                  <th className="py-2 pr-2">{vi.master.import.colIssues}</th>
-                  <th className="py-2">{vi.master.import.colAction}</th>
+              <thead className="bg-muted/40 text-left">
+                <tr>
+                  <th className="py-2.5 pr-3 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                    {vi.master.import.colRow}
+                  </th>
+                  <th className="py-2.5 pr-3 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                    {vi.master.import.colCode}
+                  </th>
+                  <th className="py-2.5 pr-3 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                    {vi.master.import.colName}
+                  </th>
+                  <th className="py-2.5 pr-3 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                    {vi.master.import.colUom}
+                  </th>
+                  <th className="py-2.5 pr-3 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                    {vi.master.import.colFactor}
+                  </th>
+                  <th className="py-2.5 pr-3 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                    {vi.master.import.colStatus}
+                  </th>
+                  <th className="py-2.5 pr-3 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                    {vi.master.import.colIssues}
+                  </th>
+                  <th className="py-2.5 pr-3 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                    {vi.master.import.colAction}
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -1178,14 +1193,16 @@ function ImportRowFix({
       : "";
 
   return (
-    <tr className="border-b align-top">
-      <td className="py-2 pr-2">{row.row_no}</td>
-      <td className="py-2 pr-2 font-mono text-xs">{code || "—"}</td>
-      <td className="py-2 pr-2">{name || "—"}</td>
-      <td className="py-2 pr-2">{stockUom || "—"}</td>
-      <td className="py-2 pr-2">{factor || "—"}</td>
-      <td className="py-2 pr-2">{statusLabel(row.status)}</td>
-      <td className="py-2 pr-2">
+    <tr className="border-t align-top hover:bg-muted/40">
+      <td className="py-3 pr-3 align-middle">{row.row_no}</td>
+      <td className="py-3 pr-3 font-mono text-xs align-middle">
+        {code || "—"}
+      </td>
+      <td className="py-3 pr-3 align-middle">{name || "—"}</td>
+      <td className="py-3 pr-3 align-middle">{stockUom || "—"}</td>
+      <td className="py-3 pr-3 align-middle">{factor || "—"}</td>
+      <td className="py-3 pr-3 align-middle">{statusLabel(row.status)}</td>
+      <td className="py-3 pr-3 align-middle">
         <ul className="space-y-1">
           {row.issues.map((issue, idx) => (
             <li key={idx} className="text-xs">
@@ -1209,7 +1226,7 @@ function ImportRowFix({
           </p>
         )}
       </td>
-      <td className="py-2">
+      <td className="py-3 pr-3 align-middle">
         {row.status !== "committed" &&
           row.status !== "skipped" &&
           row.status !== "merged" && (

@@ -91,7 +91,7 @@ export function AcceptForm({
   }
 
   return (
-    <div className="space-y-4 rounded-xl border bg-card p-4">
+    <div className="space-y-4 rounded-lg border bg-card p-4">
       <div className="flex items-start justify-between gap-3">
         <div>
           <h3 className="font-medium">

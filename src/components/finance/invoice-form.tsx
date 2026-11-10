@@ -161,7 +161,7 @@ export function InvoiceForm({
 
   return (
     <div className="space-y-6">
-      <div className="grid gap-3 rounded-xl border bg-card p-4 sm:grid-cols-2">
+      <div className="grid gap-3 rounded-lg border bg-card p-4 sm:grid-cols-2">
         <label className="block text-sm">
           {vi.finance.supplier}
           <select
@@ -231,15 +231,15 @@ export function InvoiceForm({
       </div>
 
       {!poLines ? (
-        <p className="rounded-xl border bg-card p-4 text-sm text-muted-foreground">
+        <p className="rounded-lg border bg-card p-4 text-sm text-muted-foreground">
           {vi.finance.selectPo}
         </p>
       ) : poLines.length === 0 ? (
-        <p className="rounded-xl border bg-card p-4 text-sm text-muted-foreground">
+        <p className="rounded-lg border bg-card p-4 text-sm text-muted-foreground">
           {vi.components.table.emptyDescription}
         </p>
       ) : (
-        <div className="rounded-xl border bg-card p-4">
+        <div className="rounded-lg border bg-card p-4">
           <p className="text-sm text-muted-foreground">
             {vi.finance.invoiceQtyStockHint}
           </p>

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { ApprovalTimeline } from "@/components/procurement/approval-timeline";
 import { MoneyText } from "@/components/common/money-text";
+import { PageHeader } from "@/components/shell/page-header";
 import { vi } from "@/i18n/vi";
 import {
   decideApprovalAction,
@@ -37,31 +38,31 @@ export function ApprovalInbox({
 }) {
   if (items.length === 0) {
     return (
-      <div className="rounded-xl border p-8 text-center">
-        <h2 className="text-lg font-semibold">{vi.procurement.inbox.title}</h2>
-        <p className="mt-1 text-sm text-muted-foreground">
-          {vi.procurement.inbox.emptyTitle}
-        </p>
-        <p className="mt-1 text-xs text-muted-foreground">
-          {vi.procurement.inbox.emptyDescription}
-        </p>
+      <div className="space-y-4">
+        <PageHeader title={vi.procurement.inbox.title} />
+        <div className="rounded-lg border bg-card p-8 text-center">
+          <p className="text-sm text-muted-foreground">
+            {vi.procurement.inbox.emptyTitle}
+          </p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            {vi.procurement.inbox.emptyDescription}
+          </p>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="space-y-4">
-      <div>
-        <h2 className="text-lg font-semibold">{vi.procurement.inbox.title}</h2>
-        <p className="text-xs text-muted-foreground mt-0.5">
-          {vi.procurement.inbox.description}
-        </p>
-      </div>
+      <PageHeader
+        title={vi.procurement.inbox.title}
+        description={vi.procurement.inbox.description}
+      />
 
       {items.map((item) => (
         <div
           key={`${item.docType}-${item.docId}`}
-          className="rounded-xl border p-4 space-y-3"
+          className="rounded-lg border bg-card p-4 space-y-3"
         >
           <div className="flex items-start justify-between gap-4 flex-wrap">
             <div>

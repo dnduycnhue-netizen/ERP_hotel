@@ -7,6 +7,7 @@ import {
   listSuppliers,
 } from "@/features/master/queries";
 import { vi } from "@/i18n/vi";
+import { PageHeader } from "@/components/shell/page-header";
 
 /** Tạo hợp đồng dịch vụ mới (T-042). */
 export default async function NewServiceContractPage({
@@ -28,8 +29,8 @@ export default async function NewServiceContractPage({
   ]);
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-xl font-semibold">{vi.service.createTitle}</h1>
+    <div className="space-y-4">
+      <PageHeader title={vi.service.createTitle} />
       <ContractForm
         propertyId={propertyId}
         contract={null}

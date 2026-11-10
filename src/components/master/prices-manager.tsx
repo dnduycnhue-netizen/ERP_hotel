@@ -9,6 +9,7 @@ import {
 } from "@/components/common/data-table";
 import { useCan } from "@/lib/permissions/permissions-provider";
 import { vi } from "@/i18n/vi";
+import { PageHeader } from "@/components/shell/page-header";
 import type {
   PriceAgreementRow,
   PriceAgreementLineRow,
@@ -434,26 +435,22 @@ export function PricesManager({
       ) : null}
 
       <div className="space-y-4">
-        <div className="flex items-center justify-between gap-4 flex-wrap">
-          <div>
-            <h2 className="text-lg font-semibold">
-              {vi.master.prices.agreementsTitle}
-            </h2>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              {vi.master.prices.overlapNote}
-            </p>
-          </div>
-          {canManageAgreements ? (
-            <Button size="sm" onClick={startCreateAgreement}>
-              + {vi.master.prices.addAgreement}
-            </Button>
-          ) : null}
-        </div>
+        <PageHeader
+          title={vi.master.prices.agreementsTitle}
+          description={vi.master.prices.overlapNote}
+          actions={
+            canManageAgreements ? (
+              <Button size="sm" onClick={startCreateAgreement}>
+                + {vi.master.prices.addAgreement}
+              </Button>
+            ) : null
+          }
+        />
 
         <DataTable columns={agreementColumns} rows={agreements} />
 
         {openAgreement ? (
-          <div className="rounded-xl border p-4 space-y-3">
+          <div className="rounded-lg border p-4 space-y-3">
             <div className="flex items-center justify-between">
               <h3 className="font-semibold text-sm">
                 {vi.master.prices.linesTitle} —{" "}
@@ -475,40 +472,46 @@ export function PricesManager({
               </p>
             ) : (
               <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b text-left text-xs text-muted-foreground">
-                    <th className="py-2 pr-2">{vi.master.prices.item}</th>
-                    <th className="py-2 pr-2">{vi.master.prices.uom}</th>
-                    <th className="py-2 pr-2 text-right">
+                <thead className="bg-muted/40 text-left">
+                  <tr>
+                    <th className="py-2.5 pr-3 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                      {vi.master.prices.item}
+                    </th>
+                    <th className="py-2.5 pr-3 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                      {vi.master.prices.uom}
+                    </th>
+                    <th className="py-2.5 pr-3 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase text-right">
                       {vi.master.prices.unitPrice}
                     </th>
-                    <th className="py-2 pr-2 text-right">
+                    <th className="py-2.5 pr-3 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase text-right">
                       {vi.master.prices.warnPct}
                     </th>
-                    <th className="py-2 pr-2 text-right">
+                    <th className="py-2.5 pr-3 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase text-right">
                       {vi.master.prices.lockPct}
                     </th>
-                    <th className="py-2 text-right">{vi.common.actions}</th>
+                    <th className="py-2.5 pr-3 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase text-right">
+                      {vi.common.actions}
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   {lines.map((l) => (
-                    <tr key={l.id} className="border-b last:border-0">
-                      <td className="py-2 pr-2">
+                    <tr key={l.id} className="border-t hover:bg-muted/40">
+                      <td className="py-3 pr-3 align-middle">
                         {l.item_code ? `${l.item_code} · ` : ""}
                         {l.item_name ?? l.item_id}
                       </td>
-                      <td className="py-2 pr-2">{l.uom}</td>
-                      <td className="py-2 pr-2 text-right">
+                      <td className="py-3 pr-3 align-middle">{l.uom}</td>
+                      <td className="py-3 pr-3 text-right align-middle">
                         {l.unit_price.toLocaleString("vi-VN")}
                       </td>
-                      <td className="py-2 pr-2 text-right">
+                      <td className="py-3 pr-3 text-right align-middle">
                         {l.warn_pct ?? "—"}
                       </td>
-                      <td className="py-2 pr-2 text-right">
+                      <td className="py-3 pr-3 text-right align-middle">
                         {l.lock_pct ?? "—"}
                       </td>
-                      <td className="py-2 text-right">
+                      <td className="py-3 pr-3 text-right align-middle">
                         {canManageAgreements ? (
                           <div className="flex justify-end gap-1">
                             <Button
