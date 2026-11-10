@@ -1827,6 +1827,7 @@ export const vi = {
     navAdvances: "Tạm ứng",
     navPaymentRequests: "Đề nghị thanh toán",
     navNoInvoiceListings: "Bảng kê không hóa đơn",
+    navExport: "Xuất file",
     overviewTitle: "Tổng quan tài chính",
     overviewHint:
       "Công nợ, hóa đơn chờ khớp/duyệt và đề nghị thanh toán của khách sạn đang chọn.",
@@ -2089,6 +2090,62 @@ export const vi = {
       settling: "Đang quyết toán",
       settled: "Đã quyết toán",
       overdue: "Quá hạn",
+    },
+    // Màn hub xuất file tài chính /{property}/finance/export (C4).
+    hub: {
+      title: "Xuất file tài chính",
+      hint: "Xuất Excel kế toán, tải PDF đơn mua, xuất file chuyển khoản và xem lịch sử xuất.",
+      noPermission:
+        "Bạn chưa có quyền xuất file nào ở khách sạn này (cần export.accounting, po.view + po.view_price, hoặc payment.mark_paid).",
+      accountingTitle: "Xuất Excel kế toán",
+      accountingHint:
+        "Chỉ xuất được kỳ/ngày đã khóa sổ. Khoảng xuất tối đa 366 ngày.",
+      entityLabel: "Pháp nhân",
+      noEntity:
+        "Khách sạn chưa gắn pháp nhân nên chưa xuất được Excel kế toán.",
+      kindLabel: "Loại file",
+      fromLabel: "Từ ngày",
+      toLabel: "Đến ngày",
+      downloadButton: "Tải file Excel",
+      downloading: "Đang xuất…",
+      invalidRange: "Ngày kết thúc phải từ ngày bắt đầu trở đi.",
+      bankTransferTitle: "Xuất file chuyển khoản",
+      bankTransferHint:
+        "Chọn các đề nghị thanh toán đã duyệt để xuất file Excel ra ngân hàng. Nội dung chuyển khoản mặc định là “Thanh toán <số đề nghị>”.",
+      noApprovedRequests: "Không có đề nghị thanh toán nào đã duyệt.",
+      selectAll: "Chọn tất cả",
+      selectedCount: "Đã chọn {count} đề nghị",
+      totalAmount: "Tổng tiền",
+      alreadyExported: "Đã xuất trước đây",
+      alreadyExportedWarning:
+        "Có {count} đề nghị đã xuất trước đây — xuất lại không bị chặn nhưng sẽ ghi thêm 1 dòng lịch sử.",
+      historyUnknownWarning:
+        "Không đọc được lịch sử xuất trước đây — kiểm tra lại trước khi xuất để tránh xuất trùng.",
+      exportBankTransferButton: "Xuất file chuyển khoản",
+      selectAtLeastOne: "Chọn ít nhất 1 đề nghị để xuất.",
+      poPdfTitle: "Tải PDF đơn mua",
+      poPdfHint:
+        "Chỉ đơn mua đã duyệt trở đi mới tải được PDF. Đơn nháp / chờ duyệt / bị từ chối / đã hủy không có nút tải.",
+      noDownloadablePos: "Không có đơn mua nào đã duyệt.",
+      poDownload: "Tải PDF",
+      historyTitle: "Lịch sử xuất gần đây",
+      historyUnavailable:
+        "Chưa đọc được lịch sử xuất (bảng export_batches chưa có — cần áp migration C3).",
+      historyEmpty: "Chưa có lần xuất nào.",
+      kindLabelColumn: "Loại file",
+      refColumn: "Chứng từ",
+      exportedAtColumn: "Ngày xuất",
+      exportedByColumn: "Người xuất",
+      fileHashColumn: "Mã file",
+      kindLabels: {
+        poPdf: "PDF đơn mua",
+        bankTransfer: "File chuyển khoản",
+        goodsReceipts: "Bảng kê nhập kho",
+        stockIssues: "Bảng kê xuất kho",
+        invoices: "Bảng kê hóa đơn mua",
+        payables: "Bảng kê công nợ phải trả",
+        advances: "Bảng kê tạm ứng",
+      },
     },
   },
   service: {

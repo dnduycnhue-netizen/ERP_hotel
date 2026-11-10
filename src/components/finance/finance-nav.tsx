@@ -11,6 +11,7 @@ export type FinanceNavPerms = {
   canAdvances: boolean;
   canPaymentRequests: boolean;
   canListings: boolean;
+  canExport: boolean;
 };
 
 /**
@@ -66,6 +67,12 @@ export function FinanceNav({
       label: vi.finance.navNoInvoiceListings,
       active: pathname.startsWith(`/${propertyId}/finance/no-invoice-listings`),
       show: perms.canListings,
+    },
+    {
+      href: `/${propertyId}/finance/export`,
+      label: vi.finance.navExport,
+      active: pathname.startsWith(`/${propertyId}/finance/export`),
+      show: perms.canExport,
     },
   ];
   return (
