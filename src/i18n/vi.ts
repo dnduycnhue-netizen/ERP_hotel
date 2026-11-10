@@ -9,6 +9,8 @@ export const vi = {
     confirm: "Xác nhận",
     save: "Lưu",
     close: "Đóng",
+    copy: "Sao chép",
+    copied: "Đã sao chép",
     back: "Quay lại",
     next: "Tiếp",
     search: "Tìm kiếm",
@@ -244,7 +246,7 @@ export const vi = {
     lockAccountWarning:
       "Tài khoản bị khóa sẽ không đăng nhập được nữa. Các phiên đang mở vẫn còn tới khi hết hạn.",
     selfEditBlocked:
-      "Bạn không thể sửa quyền của chính mình. Nhờ quản trị viên khác thực hiện.",
+      "Bạn không thể thu hồi vai trò hoặc khóa tài khoản của chính mình. Nhờ quản trị viên khác thực hiện.",
     roleCreated: "Đã tạo vai trò.",
     roleCopied: "Đã sao chép vai trò.",
     roleDeactivated: "Đã ngừng dùng vai trò.",
@@ -346,6 +348,88 @@ export const vi = {
     configChannelEmail: "Email",
     configChannelWebPush: "Thông báo web",
     configChannelZalo: "Zalo",
+    createUser: "Tạo tài khoản",
+    createUserTitle: "Tạo tài khoản mới",
+    createUserDescription:
+      "Tài khoản mới tạo xong có thể đăng nhập ngay. Mật khẩu tạm chỉ hiển thị một lần — hãy bàn giao trực tiếp cho nhân viên.",
+    createUserPreset: "Mẫu vai trò",
+    createUserPresetCustom: "Tùy chọn",
+    createUserPresetPurchaser: "Người tạo mua hàng",
+    createUserPresetApproverReceiver: "Người duyệt + nhận hàng",
+    createUserPresetFrontDesk: "Lễ tân",
+    createUserPresetStorekeeper: "Thủ kho",
+    createUserPresetHousekeeping: "Buồng phòng",
+    createUserEmployeeCode: "Mã nhân viên",
+    createUserFullName: "Họ tên",
+    createUserEmail: "Email (không bắt buộc)",
+    createUserEmailHint:
+      "Để trống nếu nhân viên chưa có email — hệ thống dùng địa chỉ nội bộ theo mã NV.",
+    createUserPhone: "Số điện thoại (không bắt buộc)",
+    createUserRoles: "Vai trò",
+    createUserRolesHint:
+      "Chọn một hoặc nhiều vai trò. Vai trò nào cũng gán được, kể cả sys_admin/owner.",
+    createUserProperty: "Phạm vi áp dụng",
+    createUserPropertyChain: "Toàn chuỗi",
+    createUserPasswordMode: "Mật khẩu tạm",
+    createUserPasswordAuto: "Tự sinh ngẫu nhiên",
+    createUserPasswordCustom: "Tự đặt mật khẩu",
+    createUserPassword: "Mật khẩu tạm",
+    createUserPasswordHint:
+      "Tối thiểu 8 ký tự. Mật khẩu này dùng để đăng nhập lần đầu.",
+    createUserSubmit: "Tạo tài khoản",
+    createUserCreated: "Đã tạo tài khoản.",
+    createUserLoginEmail: "Email đăng nhập",
+    createUserTempPassword: "Mật khẩu tạm",
+    createUserTempPasswordHint:
+      "Mật khẩu tạm chỉ hiển thị một lần. Hãy sao chép và bàn giao trực tiếp cho nhân viên.",
+    createUserViewAccess: "Xem quyền của tài khoản này",
+    createUserBackToList: "Về danh sách người dùng",
+    resetPassword: "Đặt lại mật khẩu",
+    resetPasswordTitle: "Đặt lại mật khẩu",
+    resetPasswordDescription:
+      "Đặt mật khẩu tạm mới cho tài khoản này. Việc đặt lại được ghi vào nhật ký.",
+    resetPasswordAuto: "Tự sinh ngẫu nhiên",
+    resetPasswordCustom: "Tự đặt mật khẩu",
+    resetPasswordNew: "Mật khẩu tạm mới",
+    resetPasswordDone: "Đã đặt lại mật khẩu.",
+    resetPasswordHint:
+      "Mật khẩu tạm chỉ hiển thị một lần. Hãy sao chép và bàn giao trực tiếp cho nhân viên.",
+    edgeFunctionErrors: {
+      unauthorized: "Phiên đăng nhập đã hết. Hãy đăng nhập lại.",
+      forbidden_admin_users_manage:
+        "Bạn chưa được cấp quyền quản lý người dùng.",
+      invalid_json: "Dữ liệu gửi lên không hợp lệ.",
+      invalid_create_user_request:
+        "Thông tin tạo tài khoản chưa hợp lệ. Hãy kiểm tra lại.",
+      invalid_reset_request: "Yêu cầu đặt lại mật khẩu chưa hợp lệ.",
+      invalid_role: "Vai trò đã chọn không còn hiệu lực.",
+      invalid_property_for_role:
+        "Khách sạn đã chọn không thuộc tổ chức của vai trò.",
+      employee_code_exists: "Mã nhân viên này đã có người dùng.",
+      email_exists: "Email này đã được đăng ký.",
+      user_not_found: "Không tìm thấy người dùng.",
+      cannot_reset_own_password:
+        "Không đặt lại mật khẩu của chính mình bằng đường này. Hãy dùng màn đổi mật khẩu.",
+      assign_role_failed: "Tạo tài khoản xong nhưng gán vai trò thất bại.",
+      create_user_failed: "Không tạo được tài khoản. Hãy thử lại.",
+      reset_password_failed: "Không đặt lại được mật khẩu. Hãy thử lại.",
+      admin_create_user_unavailable: "Dịch vụ tạo tài khoản chưa sẵn sàng.",
+      admin_reset_password_unavailable:
+        "Dịch vụ đặt lại mật khẩu chưa sẵn sàng.",
+    },
+  },
+  password: {
+    changePasswordTitle: "Đổi mật khẩu",
+    changePasswordDescription:
+      "Sau khi đổi, bạn vẫn đăng nhập bằng phiên hiện tại.",
+    currentPassword: "Mật khẩu hiện tại",
+    newPassword: "Mật khẩu mới",
+    confirmPassword: "Nhập lại mật khẩu mới",
+    passwordChanged: "Đã đổi mật khẩu.",
+    passwordTooShort: "Mật khẩu mới phải có ít nhất 8 ký tự.",
+    passwordMismatch: "Mật khẩu nhập lại không khớp.",
+    currentPasswordWrong: "Mật khẩu hiện tại không đúng.",
+    changePasswordSubmit: "Đổi mật khẩu",
   },
   auth: {
     loginTitle: "Đăng nhập",

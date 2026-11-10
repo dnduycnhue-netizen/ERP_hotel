@@ -122,6 +122,12 @@ export default async function AdminLayout({
                 {vi.admin.alertRules}
               </Link>
             ) : null}
+            <Link
+              href="/settings/password"
+              className="text-primary hover:underline"
+            >
+              {vi.password.changePasswordTitle}
+            </Link>
           </nav>
           <Link
             href="/"

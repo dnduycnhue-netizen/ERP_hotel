@@ -14,18 +14,18 @@ function todayVn(): string {
 
 /**
  * Gán vai trò cho người dùng theo khách sạn, có thời hạn
- * (docs/06-UI-UX.md mục 6.3). Quyền tự sửa bị chặn ở server (ERR_SELF_GRANT).
+ * (docs/06-UI-UX.md mục 6.3). Từ admin-relax: quản trị được tự gán vai
+ * trò cho chính mình (ERR_SELF_GRANT ở admin_user_assign_role đã gỡ);
+ * chỉ thu hồi/khóa tài khoản của chính mình vẫn bị chặn.
  */
 export function AssignRoleForm({
   userId,
   roles,
   properties,
-  isSelf,
 }: {
   userId: string;
   roles: RoleSummary[];
   properties: { id: string; name: string }[];
-  isSelf: boolean;
 }) {
   const [roleId, setRoleId] = useState("");
   const [propertyId, setPropertyId] = useState("");
@@ -58,14 +58,6 @@ export function AssignRoleForm({
     setPropertyId("");
     setValidTo("");
     setNotice(vi.admin.roleAssigned);
-  }
-
-  if (isSelf) {
-    return (
-      <p role="alert" className="text-sm text-muted-foreground">
-        {vi.admin.selfEditBlocked}
-      </p>
-    );
   }
 
   return (

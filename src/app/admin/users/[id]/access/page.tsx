@@ -5,6 +5,7 @@ import { AssignRoleForm } from "@/components/admin/assign-role-form";
 import { LockAccountButton } from "@/components/admin/lock-account-button";
 import { OverrideForm } from "@/components/admin/override-form";
 import { PinResetButton } from "@/components/admin/pin-reset-button";
+import { ResetPasswordButton } from "@/components/admin/reset-password-button";
 import { RevokeAssignmentButton } from "@/components/admin/revoke-assignment-button";
 import { EmptyState } from "@/components/common/empty-state";
 import { Button } from "@/components/ui/button";
@@ -84,6 +85,7 @@ export default async function UserAccessPage({
         </p>
         <div className="mt-4 flex flex-wrap items-start gap-4">
           <PinResetButton userId={userId} disabled={isSelf} />
+          <ResetPasswordButton userId={userId} disabled={isSelf} />
           <LockAccountButton
             userId={userId}
             active={profile.active}
@@ -149,7 +151,6 @@ export default async function UserAccessPage({
             userId={userId}
             roles={roles.filter((role) => role.active)}
             properties={properties}
-            isSelf={isSelf}
           />
         </div>
       </section>
@@ -206,7 +207,6 @@ export default async function UserAccessPage({
             userId={userId}
             permissions={permissions}
             properties={properties}
-            isSelf={isSelf}
           />
         </div>
       </section>
