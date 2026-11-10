@@ -1,4 +1,5 @@
 import Dexie, { type Table } from "dexie";
+import type { CountRecordLineInput } from "@/features/count/schemas";
 import type {
   ReceivingOverrideLineInput,
   ReceivingPostInput,
@@ -20,7 +21,7 @@ export type QueuedPhoto = {
   attachmentId: string | null;
 };
 
-export type OfflineJobKind = "record" | "override" | "post";
+export type OfflineJobKind = "record" | "override" | "post" | "count_record";
 export type OfflineJobStatus = "pending" | "syncing" | "failed";
 
 export type OfflineJobPayload =
@@ -30,19 +31,24 @@ export type OfflineJobPayload =
       photos: QueuedPhoto[];
     }
   | { kind: "override"; input: ReceivingOverrideLineInput }
-  | { kind: "post"; input: ReceivingPostInput };
+  | { kind: "post"; input: ReceivingPostInput }
+  | { kind: "count_record"; input: CountRecordLineInput };
 
 /**
- * Một thao tác nhận hàng xếp hàng chờ đồng bộ (T-025).
+ * Một thao tác nhận hàng / kiểm kê xếp hàng chờ đồng bộ (T-025, T-033).
  * `clientUuid` cố định từ lúc xếp hàng: gửi lại cùng key, server
- * (`receiving_start` / `receiving_record_line`, T-023) trả về dòng cũ
- * thay vì tạo trùng. Job `post` không có idempotency key phía server —
- * đồng bộ lại kiểm tra trạng thái phiếu trước khi đánh lỗi.
+ * (`receiving_start` / `receiving_record_line` / `count_record_line`,
+ * T-023/T-032) trả về dòng cũ thay vì tạo trùng. Job `post` không có
+ * idempotency key phía server — đồng bộ lại kiểm tra trạng thái phiếu
+ * trước khi đánh lỗi.
  */
 export type OfflineJob = {
   id?: number;
   propertyId: string;
-  grId: string;
+  /** Phiếu nhận (job nhận hàng); null với job kiểm kê. */
+  grId: string | null;
+  /** Đợt kiểm kê (job kiểm kê); null với job nhận hàng. */
+  countId: string | null;
   kind: OfflineJobKind;
   status: OfflineJobStatus;
   clientUuid: string | null;

@@ -41,6 +41,17 @@ export const rpcErrorMessages: Record<string, string> = {
     "Không thể đổi đơn vị tính lưu kho của vật tư đã có giao dịch kho.",
   ERR_COUNT_FREEZE:
     "Kho đang kiểm kê nên tạm dừng ghi nhận xuất nhập ở kho này.",
+  ERR_COUNT_ALREADY_OPEN:
+    "Kho này đã có đợt kiểm kê đang mở. Hãy hoàn thành hoặc hủy đợt đó trước.",
+  ERR_COUNT_INCOMPLETE:
+    "Đợt kiểm kê còn dòng chưa đếm đủ. Hãy đếm hết các dòng trước khi nộp.",
+  ERR_COUNT_NOT_LOCKED:
+    "Tháng này còn kho chưa khóa đợt kiểm kê tháng. Hãy hoàn thành kiểm kê trước khi đóng kỳ.",
+  ERR_PO_UNRESOLVED:
+    "Còn đơn mua nhận dở dang quá 30 ngày. Hãy xử lý xong trước khi đóng kỳ.",
+  ERR_ADVANCE_OVERDUE:
+    "Còn tạm ứng quá hạn chưa quyết toán. Hãy quyết toán xong trước khi đóng kỳ.",
+  ERR_REASON_CODE_INVALID: "Mã lý do chênh lệch không hợp lệ.",
   ERR_OVER_CEILING_NO_REASON:
     "Giá vượt giá trần. Hãy nhập lý do vượt trần rồi gửi lại.",
   ERR_NOT_APPROVER: "Bạn không phải người duyệt được giao cho bước này.",

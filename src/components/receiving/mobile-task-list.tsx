@@ -59,6 +59,17 @@ export function MobileTaskList({
   const canViewReceiving = useCan("receiving.view");
   const canReturn = useCan("supplier_return.post");
   const canViewReturns = canViewReceiving || canReturn;
+  const canCountOpen = useCan("count.open");
+  const canCountPerform = useCan("count.perform");
+  const canCountViewVariance = useCan("count.view_variance");
+  const canCountLock = useCan("count.lock");
+  const canCountAdjustApprove = useCan("count.adjust.approve");
+  const canCount =
+    canCountOpen ||
+    canCountPerform ||
+    canCountViewVariance ||
+    canCountLock ||
+    canCountAdjustApprove;
   // Mo phieu moi can server (workspace can du lieu server) nen khong
   // xep hang offline duoc — chi ghi dong / duyet vuot / ghi so tren
   // phieu da mo moi offline (T-025).
@@ -123,14 +134,24 @@ export function MobileTaskList({
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between gap-3">
         <h1 className="text-xl font-semibold">{vi.receiving.tasksTitle}</h1>
-        {canViewReturns ? (
-          <a
-            href={`/m/${propertyId}/receive/returns`}
-            className={cn(buttonVariants({ size: "sm", variant: "outline" }))}
-          >
-            {vi.receiving.returnsListTitle}
-          </a>
-        ) : null}
+        <div className="flex gap-2">
+          {canCount ? (
+            <a
+              href={`/m/${propertyId}/count`}
+              className={cn(buttonVariants({ size: "sm", variant: "outline" }))}
+            >
+              {vi.count.title}
+            </a>
+          ) : null}
+          {canViewReturns ? (
+            <a
+              href={`/m/${propertyId}/receive/returns`}
+              className={cn(buttonVariants({ size: "sm", variant: "outline" }))}
+            >
+              {vi.receiving.returnsListTitle}
+            </a>
+          ) : null}
+        </div>
       </div>
 
       {posted ? (
