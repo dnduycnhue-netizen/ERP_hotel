@@ -89,7 +89,11 @@ export const NAV_ITEMS: NavItem[] = [
     href: (propertyId) => `/${propertyId}/receiving/returns`,
     matchPrefix: (propertyId) => `/${propertyId}/receiving`,
     icon: PackageCheck,
-    visible: hasAny("receiving.view", "supplier_return.post"),
+    visible: hasAny(
+      "receiving.view",
+      "receiving.review_photos",
+      "supplier_return.post",
+    ),
   },
   {
     key: "inventory",
@@ -279,6 +283,7 @@ export function buildJumpDestinations(propertyId: string): JumpDestination[] {
       "/procurement/service-contracts/schedules",
     ),
     item("receiving", vi.receiving.returnsListTitle, "/receiving/returns"),
+    item("receiving", vi.receiving.photoReviewTitle, "/receiving/review"),
     item("inventory", vi.inventory.nav.requisitions, "/inventory/requisitions"),
     item("inventory", vi.inventory.nav.transfers, "/inventory/transfers"),
     item("inventory", vi.inventory.nav.issues, "/inventory/issues"),
