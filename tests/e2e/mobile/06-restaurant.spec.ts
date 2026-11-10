@@ -7,11 +7,10 @@ import { expectNoHorizontalOverflow } from "./mobile-helpers";
  * Tang LIVE-DATA (W5) — man nha hang mobile (W4).
  * Chi chay tren may Mac sau khi seed xong (doi dieu phoi vien bao).
  *
- * GIA DINH ROUTE (Q198): base nay chua co route mobile nha hang —
- * W4 dang lam song song. Spec viet theo route da chot:
- *   /m/[p]/restaurant/kitchen | /dishes | /banquets | /buffet
- * (anh xa 1–1 tu route desktop
- * src/app/(app)/[property]/restaurant/{banquets,buffet,dishes,kitchen,sales}).
+ * Route that (Q198 — da khop sau khi W4 merge):
+ *   /m/[p]/restaurant/kitchen | /sales | /banquets | /buffet
+ * (W4 khong lam route mobile `/dishes` — chon mon nam trong man
+ * ghi ban `/sales`; route desktop van co `/dishes`).
  * Neu W4 doi ten, sua RESTAURANT_MOBILE_ROUTES trong
  * tests/e2e/fixtures/mobile-real-data.ts (1 cho) + ghi Q198.
  *
@@ -57,13 +56,13 @@ for (const [key, path] of Object.entries(RESTAURANT_MOBILE_ROUTES)) {
 test("M-K-all — món MON01 (nếu màn món ăn liệt kê món thật)", async ({
   page,
 }) => {
-  // Chi kiem khi route dishes ton tai VA co du lieu mon (MON01 moi chi
+  // Chi kiem khi route sales ton tai VA co du lieu mon (MON01 moi chi
   // co trong pgTAP restaurant_test.sql, chua import tu Excel — Q168).
   // Neu chua co mon nao, test skip ro ly do thay vi fail.
-  if (!(await routeExists(page, RESTAURANT_MOBILE_ROUTES.dishes))) {
+  if (!(await routeExists(page, RESTAURANT_MOBILE_ROUTES.sales))) {
     test.skip(
       true,
-      "Route W4 /restaurant/dishes chưa có trên bản build này (404) — Q198.",
+      "Route W4 /restaurant/sales chưa có trên bản build này (404) — Q198.",
     );
   }
   const body = await page.locator("main").innerText();

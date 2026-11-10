@@ -101,14 +101,16 @@ export const MON01_DISH = {
 export const TEST47_PROPERTY_ID = "b0000000-0000-4000-8000-000000000002";
 
 /**
- * Route mobile nha hang (W4) — GIA DINH, chua co tren base nay
- * (W4 dang lam song song; repo chi co route desktop
- * `src/app/(app)/[property]/restaurant/{banquets,buffet,dishes,kitchen,sales}`).
- * Neu W4 doi ten route, sua 1 cho o day + ghi Q198.
+ * Route mobile nha hang (W4, da merge) — route that:
+ * `src/app/m/[p]/restaurant/{kitchen,sales,banquets,buffet}`.
+ * Khong co route mobile `/dishes` (W4 co y khong lam danh sach mon
+ * rieng — chon mon nam trong man ghi ban `/sales`); route desktop
+ * `src/app/(app)/[property]/restaurant/{banquets,buffet,dishes,kitchen,sales}`
+ * van co `/dishes`. Neu W4 doi ten route, sua 1 cho o day + ghi Q198.
  */
 export const RESTAURANT_MOBILE_ROUTES = {
   kitchen: "/restaurant/kitchen",
-  dishes: "/restaurant/dishes",
+  sales: "/restaurant/sales",
   banquets: "/restaurant/banquets",
   buffet: "/restaurant/buffet",
 } as const;
