@@ -2,7 +2,7 @@
 
 - Ngày: 10/11/2026
 - Trạng thái: Đã chấp nhận (theo chỉ thị Duy 10/11 10:38 + 10:40)
-- Liên quan: `docs/09-API-RPC.md` §9 + §11, `docs/OPEN-QUESTIONS.md` Q118–Q123, migration `20261109400000_admin_relax.sql`, Edge Function `admin-create-user` / `admin-reset-password`
+- Liên quan: `docs/09-API-RPC.md` §9 + §11, `docs/OPEN-QUESTIONS.md` Q118–Q132, migration `20261109400000_admin_relax.sql`, Edge Function `admin-create-user` / `admin-reset-password`
 
 ## Bối cảnh
 
@@ -61,7 +61,7 @@ outlet_head/receiver) nhưng tạo tài khoản test đang vướng đúng các 
    đều đổi được mật khẩu của mình).
 8. **Không cờ tài khoản test, không giới hạn số tài khoản.** Tài khoản test
    là tài khoản thật, nhận diện bằng mã NV tiền tố `TEST` / email
-   `@erp.internal` (xem Q119, Q120).
+   `@erp.internal` (xem Q128, Q129).
 
 ## Hệ quả
 
@@ -71,4 +71,4 @@ outlet_head/receiver) nhưng tạo tài khoản test đang vướng đúng các 
   + 1 kiểm tra cuối `num_failed() = 0` (quy ước đếm như các file pgTAP khác).
 - Chưa thống nhất: mật khẩu lần đầu ở `(auth)/set-password` yêu cầu tối
   thiểu 12 ký tự, mật khẩu tạm + tự đổi mật khẩu mới yêu cầu tối thiểu 8
-  ký tự (xem Q123).
+  ký tự (xem Q132).
