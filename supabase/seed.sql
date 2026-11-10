@@ -393,4 +393,24 @@ join public.roles r
 join public.permissions p on p.code = rp.permission_code
 on conflict do nothing;
 
+-- Q60/Q61: cap `item.view` + `stock.view_qty` cho front_desk/owner/gm
+-- (giong migration 20261109420000; day la ban seed local cho org mau
+-- de db reset co du lieu giong production).
+insert into public.role_permissions (role_id, permission_code)
+select r.id, rp.permission_code
+from (
+  values
+    ('front_desk', 'item.view'),
+    ('owner', 'item.view'),
+    ('gm', 'item.view'),
+    ('front_desk', 'stock.view_qty'),
+    ('owner', 'stock.view_qty'),
+    ('gm', 'stock.view_qty')
+) as rp(role_code, permission_code)
+join public.roles r
+  on r.org_id = '00000000-0000-4000-8000-000000000001'
+ and r.code = rp.role_code
+join public.permissions p on p.code = rp.permission_code
+on conflict do nothing;
+
 commit;
