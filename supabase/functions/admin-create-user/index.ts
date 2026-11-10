@@ -59,8 +59,8 @@ function readString(value: unknown): string {
   return typeof value === "string" ? value.trim() : "";
 }
 
-function readUuidArray(value: unknown): string[] | null {
-  if (value === undefined || value === null) return null;
+function readUuidArray(value: unknown): string[] | undefined | null {
+  if (value === undefined || value === null) return undefined;
   if (!Array.isArray(value)) return null;
   const ids = value.filter(
     (item): item is string =>
