@@ -9,7 +9,9 @@
     "lint": "eslint",
     "typecheck": "next typegen && tsc --noEmit",
     "format": "prettier --write \"src/**/*.{ts,tsx,css}\" \"*.{json,mjs,ts,yaml,yml}\" \".github/**/*.{yml,yaml}\"",
-    "format:check": "prettier --check \"src/**/*.{ts,tsx,css}\" \"*.{json,mjs,ts,yaml,yml}\" \".github/**/*.{yml,yaml}\""
+    "format:check": "prettier --check \"src/**/*.{ts,tsx,css}\" \"*.{json,mjs,ts,yaml,yml}\" \".github/**/*.{yml,yaml}\"",
+    "test": "vitest run",
+    "e2e": "playwright test"
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",
@@ -27,17 +29,20 @@
     "zod": "^4.6.7"
   },
   "devDependencies": {
+    "@playwright/test": "^1.65.0",
     "@tailwindcss/turbopack": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.4.5",
+    "fake-indexeddb": "^6.2.8",
     "prettier": "^3.9.10",
     "shadcn": "^4.23.0",
     "supabase": "^3.0.0",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^5.1.0"
   },
   "packageManager": "pnpm@12.14.0"
 }
