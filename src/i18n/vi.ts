@@ -2222,6 +2222,37 @@ export const vi = {
       "Cần có mạng để mở phiếu nhận mới. Phiếu đã mở vẫn ghi dòng offline được.",
     queueUnavailable: "Không lưu được thao tác offline. Hãy thử lại.",
   },
+  pwa: {
+    offlinePageTitle: "Bạn đang ngoại tuyến",
+    offlinePageHint:
+      "Không có kết nối mạng. Các màn nhận hàng, kiểm kê và kiểm minibar đã mở trước đó vẫn dùng được — thao tác ghi nhận sẽ tự đồng bộ khi có mạng trở lại.",
+    tryAgain: "Thử lại",
+    installTitle: "Cài Mini-ERP lên màn hình chính",
+    installHint:
+      "Mở nhanh như app, dùng được khi mất mạng ở kho và hiện trường.",
+    installButton: "Thêm vào màn hình chính",
+    installLater: "Để sau",
+    installDone: "Đã thêm vào màn hình chính.",
+    installDeclined:
+      "Bạn đã từ chối lần này. Có thể cài lại từ menu trình duyệt.",
+    iosTitle: "Cài Mini-ERP trên iPhone/iPad",
+    iosStep1: "Bấm nút Chia sẻ ở thanh công cụ Safari.",
+    iosStep2: "Chọn “Thêm vào MH chính”.",
+    iosStep3: "Bấm “Thêm” để đặt app lên màn hình chính.",
+    pushTitle: "Nhận thông báo đẩy",
+    pushHint:
+      "Nhận cảnh báo đỏ/vàng ngay trên thiết bị này, kể cả khi không mở app.",
+    pushEnable: "Bật thông báo",
+    pushDisable: "Tắt thông báo",
+    pushEnabled: "Đã bật thông báo trên thiết bị này.",
+    pushDisabled: "Đã tắt thông báo trên thiết bị này.",
+    pushDenied:
+      "Trình duyệt đã chặn quyền thông báo. Hãy bật lại trong cài đặt trình duyệt của thiết bị.",
+    pushNotConfigured:
+      "Chưa cấu hình khóa Web Push (NEXT_PUBLIC_VAPID_PUBLIC_KEY). Liên hệ quản trị viên.",
+    pushUnsupported: "Trình duyệt này không hỗ trợ thông báo đẩy.",
+    pushError: "Không bật được thông báo. Hãy thử lại.",
+  },
   errors: {
     pageTitle: "Không thể tải trang",
     pageDescription:

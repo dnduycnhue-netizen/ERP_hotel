@@ -45,6 +45,10 @@ supabase functions deploy admin-create-user
 
 - Gắn domain (vd. `erp.<ten-chuoi>.vn`) trên Vercel; HTTPS bắt buộc cho camera và service worker.
 - Supabase Auth → URL Configuration: thêm domain production + preview vào Redirect URLs.
+- PWA (T-046, service worker viết tay `public/sw.js`, không dùng thư viện):
+  - Sau mỗi deploy, service worker mới tự kích hoạt (`skipWaiting`) và xóa cache cũ theo `CACHE_VERSION` — khi đổi app shell/manifest thì tăng `CACHE_VERSION` trong `public/sw.js`.
+  - Nút "Bật thông báo" ở màn lịch sử cảnh báo chỉ hoạt động khi Vercel có biến `NEXT_PUBLIC_VAPID_PUBLIC_KEY` (khóa công khai; khóa bí mật `VAPID_PRIVATE_KEY` chỉ nằm trong Supabase secrets cho Edge Function). Chưa có khóa thì nút hiện ghi chú, không lỗi.
+  - iOS: cài thủ công qua Share → Thêm vào MH chính; web push trên iOS chỉ hoạt động khi app đã thêm vào MH chính (iOS 16.4+).
 
 ## 6. Vận hành
 

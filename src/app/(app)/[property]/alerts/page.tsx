@@ -1,5 +1,6 @@
 import { ErrorState } from "@/components/common/error-state";
 import { AlertsHistory } from "@/components/alerts/alerts-history";
+import { PushSubscriptionToggle } from "@/components/pwa/push-subscription-toggle";
 import {
   canViewAlerts,
   listAlerts,
@@ -32,6 +33,7 @@ export default async function AlertsPage({
     <div className="space-y-6">
       <h1 className="text-xl font-semibold">{vi.alerts.indexTitle}</h1>
       <p className="text-sm text-muted-foreground">{vi.alerts.indexHint}</p>
+      <PushSubscriptionToggle />
       {!canView ? (
         <p className="text-sm text-muted-foreground">
           {vi.alerts.noPermission}
