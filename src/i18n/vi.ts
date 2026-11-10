@@ -2597,6 +2597,19 @@ export const vi = {
     offlineQueuedNote:
       "Mất mạng — thao tác sẽ xếp hàng chờ đồng bộ khi có mạng trở lại.",
   },
+  mobile: {
+    navLabel: "Màn hình hiện trường",
+    navReceive: "Nhận hàng",
+    navCount: "Kiểm kê",
+    navTrolley: "Buồng phòng",
+    navMinibar: "Minibar",
+    chooseProperty: "Chọn khách sạn",
+    choosePropertyHint:
+      "Chọn khách sạn để mở màn hình hiện trường trên điện thoại.",
+    noAccessibleProperty:
+      "Bạn chưa được cấp quyền vào khách sạn nào. Hãy liên hệ quản trị viên.",
+    fieldRequired: "Bắt buộc",
+  },
   pwa: {
     offlinePageTitle: "Bạn đang ngoại tuyến",
     offlinePageHint:

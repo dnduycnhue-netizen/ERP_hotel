@@ -2,8 +2,9 @@ import type { Viewport } from "next";
 import type { ReactNode } from "react";
 import { notFound, redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { MobileNav } from "@/components/common/mobile-nav";
-import { OfflineBanner } from "@/components/common/offline-banner";
+import { MobileBottomNav } from "@/components/mobile/mobile-bottom-nav";
+import { MobileHeader } from "@/components/mobile/mobile-header";
+import { MobileOfflineBanner } from "@/components/mobile/mobile-offline-banner";
 import { InstallPrompt } from "@/components/pwa/install-prompt";
 import { vi } from "@/i18n/vi";
 import { PermissionsProvider } from "@/lib/permissions/permissions-provider";
@@ -18,11 +19,18 @@ export const viewport: Viewport = {
 };
 
 /**
- * Layout màn hình hiện trường `/m/[p]` (T-024).
+ * Layout màn hình hiện trường `/m/[p]` (T-024, shell chuẩn hóa W1).
  *
  * Cùng cơ chế bảo vệ như layout văn phòng: chưa đăng nhập → /login;
  * tài khoản bị khóa → màn hình báo không dùng được; khách sạn không
- * thuộc quyền → 404. Header gọn cho một tay: tên app + tên khách sạn.
+ * thuộc quyền → 404.
+ *
+ * Shell mobile (W1): `MobileHeader` sticky (tên màn + tên khách sạn +
+ * nút back khi ở trang con) + `MobileBottomNav` cố định dưới đáy (4
+ * đích: Nhận hàng / Kiểm kê / Buồng phòng / Minibar, mục active tím
+ * #7B68EE) + `MobileOfflineBanner`. Nội dung chừa padding đáy cho tab
+ * bar (`pb` = chiều cao tab ~56px + safe-area iOS) và dùng chữ cơ bản
+ * 16px. Các màn con (W2/W3/W4) chỉ render nội dung bên trong shell.
  */
 export default async function MobilePropertyLayout({
   children,
@@ -83,28 +91,19 @@ export default async function MobilePropertyLayout({
       propertyId={propertyId}
       initialPermissions={myPermissions ?? []}
     >
-      <div className="min-h-screen bg-muted/30">
-        <header className="sticky top-0 z-10 border-b bg-background">
-          <div className="mx-auto flex max-w-2xl items-center justify-between gap-3 px-4 py-3">
-            <a
-              className="truncate font-semibold tracking-tight"
-              href={`/m/${currentProperty.id}/receive`}
-            >
-              {vi.appName}
-            </a>
-            <span className="shrink-0 text-sm text-muted-foreground">
-              {currentProperty.name}
-            </span>
-          </div>
-        </header>
-        <main className="mx-auto max-w-2xl px-4 py-6">
-          <MobileNav propertyId={currentProperty.id} />
+      <div className="min-h-screen bg-muted/30 text-base">
+        <MobileHeader
+          propertyId={currentProperty.id}
+          propertyName={currentProperty.name}
+        />
+        <main className="mx-auto max-w-2xl px-4 pt-4 pb-[calc(4.5rem+env(safe-area-inset-bottom))]">
           <div className="mb-4">
             <InstallPrompt />
-            <OfflineBanner />
+            <MobileOfflineBanner />
           </div>
           {children}
         </main>
+        <MobileBottomNav propertyId={currentProperty.id} />
       </div>
     </PermissionsProvider>
   );
