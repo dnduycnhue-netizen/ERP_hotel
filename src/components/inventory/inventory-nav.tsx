@@ -30,6 +30,8 @@ export function InventoryNav({ propertyId }: { propertyId: string }) {
   const canCountViewVariance = useCan("count.view_variance");
   const canCountLock = useCan("count.lock");
   const canCountAdjustApprove = useCan("count.adjust.approve");
+  const canReceivingView = useCan("receiving.view");
+  const canReceivingReviewPhotos = useCan("receiving.review_photos");
 
   const canRequisition =
     canRequisitionCreate ||
@@ -46,6 +48,7 @@ export function InventoryNav({ propertyId }: { propertyId: string }) {
     canCountViewVariance ||
     canCountLock ||
     canCountAdjustApprove;
+  const canReceipts = canReceivingView || canReceivingReviewPhotos;
 
   const links: { href: string; label: string }[] = [];
   if (canRequisition) {
@@ -82,6 +85,12 @@ export function InventoryNav({ propertyId }: { propertyId: string }) {
     links.push({
       href: `/${propertyId}/inventory/stock`,
       label: vi.inventory.nav.stock,
+    });
+  }
+  if (canReceipts) {
+    links.push({
+      href: `/${propertyId}/inventory/receipts`,
+      label: vi.inventory.nav.receipts,
     });
   }
 

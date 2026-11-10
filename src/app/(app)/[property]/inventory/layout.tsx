@@ -41,7 +41,11 @@ export default async function InventoryLayout({
     perms.has("count.lock") ||
     perms.has("count.adjust.approve") ||
     perms.has("stock.view_qty") ||
-    perms.has("stock.view_value");
+    perms.has("stock.view_value") ||
+    // Trang phieu nhan (/inventory/receipts) song duoi khu kho: nguoi chi
+    // co quyen nhan hang van vao duoc (C6).
+    perms.has("receiving.view") ||
+    perms.has("receiving.review_photos");
 
   if (!canAccess) {
     notFound();
