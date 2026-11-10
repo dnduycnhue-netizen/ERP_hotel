@@ -135,6 +135,7 @@ export async function acceptServiceAction(
       p_rating: parsed.data.rating ?? null,
       p_photos: parsed.data.photos,
       p_po_id: parsed.data.poId ?? null,
+      p_note: parsed.data.note ?? null,
     },
   );
   if (res.ok) {

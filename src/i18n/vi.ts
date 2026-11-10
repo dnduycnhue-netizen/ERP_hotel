@@ -2159,6 +2159,10 @@ export const vi = {
     photos: "Ảnh nghiệm thu",
     photosHint:
       "Chụp ảnh chứng từ (biên bản, hiện trường) rồi gửi kèm. Ảnh chỉ chụp bằng camera, không chọn từ thư viện.",
+    note: "Ghi chú",
+    noteHint:
+      "Tùy chọn — ghi lại nhận xét về chất lượng dịch vụ, hạng mục chưa đạt, hoặc việc cần theo dõi.",
+    notePlaceholder: "Ví dụ: Thang máy chạy êm, đã vệ sinh cabin.",
     photoUploaded: "Đã tải lên {count} ảnh.",
     acceptedMessage: "Đã nghiệm thu.",
     acceptedAt: "Nghiệm thu lúc",
