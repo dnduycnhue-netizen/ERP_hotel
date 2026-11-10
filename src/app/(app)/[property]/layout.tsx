@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { notFound } from "next/navigation";
 import { AdminLink } from "@/components/common/admin-link";
 import { FinanceLink } from "@/components/common/finance-link";
+import { ReportsLink } from "@/components/common/reports-link";
 import { FrontdeskLink } from "@/components/common/frontdesk-link";
 import { HousekeepingLink } from "@/components/common/housekeeping-link";
 import { InventoryLink } from "@/components/common/inventory-link";
@@ -62,6 +63,7 @@ export default async function PropertyLayout({
               <ReceivingLink propertyId={currentProperty.id} />
               <InventoryLink propertyId={currentProperty.id} />
               <FinanceLink propertyId={currentProperty.id} />
+              <ReportsLink propertyId={currentProperty.id} />
               <FrontdeskLink propertyId={currentProperty.id} />
               <PmsDailyLink propertyId={currentProperty.id} />
               <HousekeepingLink propertyId={currentProperty.id} />
