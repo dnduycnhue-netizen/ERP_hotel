@@ -86,7 +86,7 @@ export const NAV_ITEMS: NavItem[] = [
     key: "receiving",
     group: "operations",
     label: vi.receiving.receivingTitle,
-    href: (propertyId) => `/${propertyId}/receiving/returns`,
+    href: (propertyId) => `/${propertyId}/receiving`,
     matchPrefix: (propertyId) => `/${propertyId}/receiving`,
     icon: PackageCheck,
     visible: hasAny(
@@ -294,7 +294,12 @@ export function buildJumpDestinations(propertyId: string): JumpDestination[] {
     item("procurement", vi.procurement.nav.po, "/procurement/po"),
     item("procurement", vi.procurement.pr.createTitle, "/procurement/pr/new"),
     item("procurement", vi.procurement.nav.approvals, "/procurement/approvals"),
-    item("procurement", vi.procurement.nav.market, "/procurement/market/new"),
+    item("procurement", vi.procurement.nav.market, "/procurement/market"),
+    item(
+      "procurement",
+      vi.procurement.market.createTitle,
+      "/procurement/market/new",
+    ),
     item("procurement", vi.procurement.nav.advances, "/procurement/advances"),
     item(
       "procurement",
@@ -306,8 +311,10 @@ export function buildJumpDestinations(propertyId: string): JumpDestination[] {
       vi.service.schedulesTitle,
       "/procurement/service-contracts/schedules",
     ),
+    item("receiving", vi.receiving.receivingTitle, "/receiving"),
     item("receiving", vi.receiving.returnsListTitle, "/receiving/returns"),
     item("receiving", vi.receiving.photoReviewTitle, "/receiving/review"),
+    item("inventory", vi.receiving.listTitle, "/inventory/receipts"),
     item("inventory", vi.inventory.nav.requisitions, "/inventory/requisitions"),
     item("inventory", vi.inventory.nav.transfers, "/inventory/transfers"),
     item("inventory", vi.inventory.nav.issues, "/inventory/issues"),

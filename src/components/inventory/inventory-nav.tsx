@@ -34,6 +34,8 @@ export function InventoryNav({ propertyId }: { propertyId: string }) {
   const canDayUnlock = useCan("day.unlock");
   const canPeriodClose = useCan("period.close");
   const canPeriodReopen = useCan("period.reopen");
+  const canReceivingView = useCan("receiving.view");
+  const canReceivingReviewPhotos = useCan("receiving.review_photos");
 
   const canRequisition =
     canRequisitionCreate ||
@@ -52,6 +54,7 @@ export function InventoryNav({ propertyId }: { propertyId: string }) {
     canCountAdjustApprove;
   const canLocks =
     canDayLock || canDayUnlock || canPeriodClose || canPeriodReopen;
+  const canReceipts = canReceivingView || canReceivingReviewPhotos;
 
   const links: { href: string; label: string }[] = [];
   if (canRequisition) {
@@ -94,6 +97,12 @@ export function InventoryNav({ propertyId }: { propertyId: string }) {
     links.push({
       href: `/${propertyId}/inventory/stock`,
       label: vi.inventory.nav.stock,
+    });
+  }
+  if (canReceipts) {
+    links.push({
+      href: `/${propertyId}/inventory/receipts`,
+      label: vi.inventory.nav.receipts,
     });
   }
 
