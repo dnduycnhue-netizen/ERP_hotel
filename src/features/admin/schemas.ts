@@ -97,7 +97,7 @@ export const createUserSchema = z.object({
     .max(128, "Mật khẩu tạm tối đa 128 ký tự.")
     .optional()
     .or(z.literal("")),
-  roleIds: z.array(uuid),
+  roleIds: z.array(uuid).min(1, "Vui lòng chọn ít nhất một vai trò."),
   propertyId: uuid.nullable(),
 });
 
@@ -111,8 +111,43 @@ export const resetPasswordSchema = z.object({
     .or(z.literal("")),
 });
 
+const orgCode = z
+  .string()
+  .trim()
+  .toUpperCase()
+  .regex(
+    /^[A-Z0-9_-]{2,20}$/,
+    "Mã chỉ gồm chữ hoa, số, gạch dưới và gạch ngang, dài 2–20 ký tự.",
+  );
+
+/**
+ * Tạo tổ chức + pháp nhân + khách sạn trong 1 lần (C5, RPC admin_org_create).
+ * Trường bắt buộc và miền giá trị bám đúng DDL: organizations.name,
+ * legal_entities (code unique theo org, accounting_regime TT99/TT133,
+ * costing_method moving_avg/fifo), properties (code unique theo org,
+ * sod_profile with_cc/without_cc, rooms_count >= 0).
+ */
+export const createOrgSchema = z.object({
+  orgName: z.string().trim().min(1, "Vui lòng nhập tên tổ chức."),
+  legalCode: orgCode,
+  legalName: z.string().trim().min(1, "Vui lòng nhập tên pháp nhân."),
+  taxCode: z.string().trim().optional().or(z.literal("")),
+  accountingRegime: z.enum(["TT99", "TT133"]).default("TT99"),
+  costingMethod: z.enum(["moving_avg", "fifo"]).default("moving_avg"),
+  propertyCode: orgCode,
+  propertyName: z.string().trim().min(1, "Vui lòng nhập tên khách sạn."),
+  address: z.string().trim().optional().or(z.literal("")),
+  sodProfile: z.enum(["with_cc", "without_cc"]).default("with_cc"),
+  roomsCount: z
+    .number()
+    .int("Số phòng phải là số nguyên.")
+    .min(0, "Số phòng không được âm.")
+    .default(0),
+});
+
 export type CreateUserInput = z.infer<typeof createUserSchema>;
 export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;
+export type CreateOrgInput = z.infer<typeof createOrgSchema>;
 
 export const setActiveSchema = z.object({
   userId: uuid,

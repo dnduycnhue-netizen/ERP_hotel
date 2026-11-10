@@ -739,7 +739,7 @@ declare
   v_n integer;
 begin
   insert into public.items (org_id, code, name, group_id, stock_uom, recipe_uom, stock_to_recipe, is_key_item, external_codes)
-  select v_org_id, v.code, v.name, g.id, v.stock_uom, v.recipe_uom, v.factor, v.is_key, v.ext
+  select v_org_id, v.code, v.name, g.id, v.stock_uom, v.recipe_uom, v.factor::numeric, v.is_key, v.ext
   from (values
   ('SEED-CCDC-0127', 'Bình mắm nhỏ', 'CCDC', 'cai', 'cai', NULL, false, '{"f":"buffet-nvl","loai":"CCDC","code_gen":true}'::jsonb),
   ('SEED-CCDC-0128', 'Bình ngũ cốc đơn', 'CCDC', 'cai', 'cai', NULL, false, '{"f":"buffet-nvl","loai":"CCDC","code_gen":true}'::jsonb),
@@ -859,7 +859,7 @@ declare
   v_n integer;
 begin
   insert into public.items (org_id, code, name, group_id, stock_uom, recipe_uom, stock_to_recipe, is_key_item, external_codes)
-  select v_org_id, v.code, v.name, g.id, v.stock_uom, v.recipe_uom, v.factor, v.is_key, v.ext
+  select v_org_id, v.code, v.name, g.id, v.stock_uom, v.recipe_uom, v.factor::numeric, v.is_key, v.ext
   from (values
   ('MB-LARUE', 'Larue', 'MB', 'lon', NULL, NULL, false, '{"f":"minibar","hdr":"LARUE","note":"ĐVT (lon/chai) suy ra từ loại hàng — file không ghi ĐVT","sheet":"10.2018-11.2019"}'::jsonb),
   ('MB-TIGER', 'Tiger', 'MB', 'lon', NULL, NULL, false, '{"f":"minibar","hdr":"TIGER","note":"ĐVT (lon/chai) suy ra từ loại hàng — file không ghi ĐVT","sheet":"10.2018-11.2019"}'::jsonb),
@@ -890,7 +890,7 @@ declare
   v_n integer;
 begin
   insert into public.items (org_id, code, name, group_id, stock_uom, recipe_uom, stock_to_recipe, is_key_item, external_codes)
-  select v_org_id, v.code, v.name, g.id, v.stock_uom, v.recipe_uom, v.factor, v.is_key, v.ext
+  select v_org_id, v.code, v.name, g.id, v.stock_uom, v.recipe_uom, v.factor::numeric, v.is_key, v.ext
   from (values
   ('AMN-GIAY-VS', 'Giấy vệ sinh', 'AMN', 'cuon', NULL, NULL, false, '{"f":"amenities","dvt":"cuộn","sheet":"1.5-8.5 + 9.5.2019-31.5.2019 + SL sử dụng trong tháng 5.2019"}'::jsonb),
   ('AMN-TRA-COZY', 'Trà cozy', 'AMN', 'goi', NULL, NULL, false, '{"f":"amenities","dvt":"gói","sheet":"1.5-8.5 + 9.5.2019-31.5.2019 + SL sử dụng trong tháng 5.2019"}'::jsonb),
@@ -947,7 +947,7 @@ end;
 $seed$;
 
 -- ============================================================================
--- §5. CHUẨN SETUP PHÒNG (room_setup_standards) — qty = số lượng dùng tháng 5/2019 / 1.175 phòng (làm tròn 4 chữ số); chỉ clean_type 'checkout', per_guest=false. Nếu property chưa có room_types thì 0 dòng — tạo loại phòng trước rồi chạy lại khối này (idempotent). Giá trị là ĐỊNH MỨC THAM KHẢO, cần buồng phòng xác nhận (Q159)
+-- §5. CHUẨN SETUP PHÒNG (room_setup_standards) — qty = số lượng dùng tháng 5/2019 / 1.175 phòng (làm tròn 4 chữ số); chỉ clean_type 'checkout', per_guest=false. Nếu property chưa có room_types thì 0 dòng — tạo loại phòng trước rồi chạy lại khối này (idempotent). Giá trị là ĐỊNH MỨC THAM KHẢO, cần buồng phòng xác nhận (Q159). Đối chiếu migration 310000 (10/11/2026): cột thật là (org_id, property_id, room_type_id NOT NULL, clean_type NOT NULL, item_id, qty, per_guest, created_by, created_at, updated_at) — KHÔNG có cột min_qty; clean_type chỉ nhận 'checkout'/'stayover'/'vip'/'child'.
 -- ============================================================================
 do $seed$
 declare
@@ -980,7 +980,7 @@ end;
 $seed$;
 
 -- ============================================================================
--- §6. MỨC PAR XE ĐẨY (trolley_par_levels) — par_qty = lượng XUẤT lên xe lớn nhất 1 ngày trong tháng 5/2019 (sheet 9.5–31.5). Nếu property chưa có kho kind='trolley' thì 0 dòng — tạo xe đẩy trước rồi chạy lại khối này (idempotent). Giá trị là THAM KHẢO, cần giám sát buồng xác nhận (Q159)
+-- §6. MỨC PAR XE ĐẨY (trolley_par_levels) — par_qty = lượng XUẤT lên xe lớn nhất 1 ngày trong tháng 5/2019 (sheet 9.5–31.5). Nếu property chưa có kho kind='trolley' thì 0 dòng — tạo xe đẩy trước rồi chạy lại khối này (idempotent). Giá trị là THAM KHẢO, cần giám sát buồng xác nhận (Q159). Đối chiếu migration 310000 (10/11/2026): cột trolley_warehouse_id NOT NULL bắt buộc (FK warehouses, kind='trolley'); KHÔNG bịa warehouse — kho xe đẩy lấy từ bảng warehouses của chính property.
 -- ============================================================================
 do $seed$
 declare

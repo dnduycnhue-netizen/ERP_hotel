@@ -17,7 +17,7 @@ export function ProcurementNav({ propertyId }: { propertyId: string }) {
       label: vi.procurement.nav.approvals,
     },
     {
-      href: `/${propertyId}/procurement/market/new`,
+      href: `/${propertyId}/procurement/market`,
       label: vi.procurement.nav.market,
     },
     {

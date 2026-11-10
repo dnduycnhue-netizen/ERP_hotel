@@ -151,7 +151,12 @@ export default async function StockPage({
                   className="border-t hover:bg-muted/40"
                 >
                   <td className="px-3 py-3 align-middle">
-                    {row.warehouse_name}
+                    <Link
+                      href={`/${propertyId}/inventory/stock/${row.warehouse_id}`}
+                      className="font-medium hover:underline"
+                    >
+                      {row.warehouse_name}
+                    </Link>
                   </td>
                   <td className="px-3 py-3 align-middle">{row.item_code}</td>
                   <td className="px-3 py-3 align-middle">

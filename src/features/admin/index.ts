@@ -9,6 +9,7 @@ export {
   hasAdminConfigPermission,
   listAlertRules,
   listApprovalApprovers,
+  listApprovalDelegations,
   listApprovalRules,
   listSettingEntries,
   resolveAdminConfigScope,
@@ -16,11 +17,13 @@ export {
 export type {
   AlertRule,
   ApprovalApprovers,
+  ApprovalDelegation,
   ApprovalRule,
   SettingEntry,
 } from "./configuration-data";
 export {
   copyRoleAction,
+  createOrgAction,
   createUserAction,
   deactivateRoleAction,
   getMyPermissionsAction,
@@ -33,14 +36,20 @@ export {
   setPinAction,
   setRolePermissionsAction,
 } from "./actions";
-export type { CreateUserResult, ResetPasswordResult } from "./actions";
+export type {
+  CreateOrgResult,
+  CreateUserResult,
+  ResetPasswordResult,
+} from "./actions";
 export {
   getAdminOrgId,
   getEffectivePermissions,
+  getOrgDetail,
   getRoleDetail,
   getRoleHistory,
   getUserProfile,
   hasChainPerm,
+  listOrganizations,
   listPermissions,
   listRoles,
   listSodPairs,
@@ -51,6 +60,10 @@ export {
 export type {
   AssignmentRow,
   EffectivePermission,
+  OrgDetail,
+  OrgLegalEntitySummary,
+  OrgPropertySummary,
+  OrgSummary,
   OverrideRow,
   PermissionRow,
   RoleHistoryEntry,
@@ -58,4 +71,10 @@ export type {
   RoleSummary,
   UserRow,
 } from "./data/queries";
+export {
+  QUICK_ASSIGN_ROLE_CODES,
+  filterQuickAssignRoles,
+  type QuickAssignRole,
+  type SodProfile,
+} from "./org";
 export type { AdminActionResult } from "./rpc";

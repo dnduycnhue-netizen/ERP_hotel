@@ -1,9 +1,10 @@
+import { createHash } from "node:crypto";
 import { NextResponse, type NextRequest } from "next/server";
 import { getRpcErrorMessage } from "@/i18n/errors.vi";
 import { vi } from "@/i18n/vi";
 import { getExportDefinition } from "@/features/export/definitions";
 import { exportParamsSchema } from "@/features/export/params";
-import { callExportRpc } from "@/features/export/rpc";
+import { callExportRpc, callJsonRpc } from "@/features/export/rpc";
 import { buildExportWorkbook } from "@/features/export/workbook";
 import { createClient, getAuthenticatedUser } from "@/lib/supabase/server";
 
@@ -17,6 +18,12 @@ import { createClient, getAuthenticatedUser } from "@/lib/supabase/server";
  * - 403 khi thieu quyen `export.accounting` (kiem tra trong RPC).
  * - 400 khi khoang ngay chua khoa so: loi tieng Viet kem ngay/kỳ chua khoa.
  * - 200 tra file .xlsx (tien/so luong la so Excel that).
+ *
+ * (C3) Chong xuat trung (M09): sau khi build xong file, ghi 1 dong vao
+ * bang `export_batches` (kind=<kind>, ref_type='legal_entity',
+ * ref_id=<entity id>, file_hash=sha256 hex cua file) TRUOC khi tra file —
+ * file khong bao gio duoc tra ma khong co dong log. Xuat ke toan theo
+ * ky khong co chung tu don de danh dau `export_status` nen chi ghi log.
  */
 export async function GET(
   request: NextRequest,
@@ -59,6 +66,23 @@ export async function GET(
   }
 
   const buffer = buildExportWorkbook(def, result.data);
+
+  // (C3) Ghi log xuat TRUOC khi tra file (chong xuat trung, M09).
+  const fileHash = createHash("sha256").update(buffer).digest("hex");
+  const recordResult = await callJsonRpc(supabase, "export_batch_record", {
+    p_kind: kind,
+    p_ref_type: "legal_entity",
+    p_ref_ids: [parsed.data.entity],
+    p_file_hash: fileHash,
+    p_note: null,
+  });
+  if (!recordResult.ok) {
+    return NextResponse.json(
+      { error: vi.export.exportRecordFailed, code: recordResult.code },
+      { status: 500 },
+    );
+  }
+
   const filename = `${def.filePrefix}-${result.data.meta.entity_code}-${parsed.data.from}-${parsed.data.to}.xlsx`;
   return new NextResponse(new Uint8Array(buffer), {
     headers: {

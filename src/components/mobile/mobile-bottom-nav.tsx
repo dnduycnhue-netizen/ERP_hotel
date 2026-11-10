@@ -24,7 +24,7 @@ type BottomNavItem = {
  * Bottom tab nav cho màn hình hiện trường `/m/[p]` (W1).
  *
  * Thay thanh pill `MobileNav` cũ ở đầu trang (ADR-006 giữ `MobileNav`
- * cho giai đoạn 1 — xem Q174): tab cố định dưới đáy, chạm được bằng
+ * cho giai đoạn 1 — xem Q201): tab cố định dưới đáy, chạm được bằng
  * một tay, mục đang chọn tím #7B68EE (`text-brand`) kèm `aria-current`.
  * Chỉ hiện mục mà user có quyền dùng (cùng mã quyền như `MobileNav`):
  * nhận hàng `receiving.view`, kiểm kê 1 trong 5 quyền `count.*`,

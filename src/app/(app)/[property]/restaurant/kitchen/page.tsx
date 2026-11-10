@@ -87,6 +87,9 @@ export default async function KitchenPage({
                   <th className="px-3 py-2 text-right font-medium">
                     {vi.restaurant.foodcost}
                   </th>
+                  <th className="px-3 py-2 text-right font-medium">
+                    {vi.restaurant.portionsPerBatch}
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -108,6 +111,11 @@ export default async function KitchenPage({
                       {d.foodcost !== null
                         ? formatMoney(d.foodcost)
                         : vi.restaurant.foodcostUnknown}
+                    </td>
+                    <td className="px-3 py-2 text-right tabular-nums">
+                      {d.portions_per_batch !== null
+                        ? formatNumber(d.portions_per_batch)
+                        : "—"}
                     </td>
                   </tr>
                 ))}
@@ -135,6 +143,9 @@ export default async function KitchenPage({
                   <li key={d.recipe_id}>
                     {d.recipe_name} — {formatNumber(d.planned_qty)}{" "}
                     {vi.restaurant.servings.toLowerCase()}
+                    {d.batches !== null
+                      ? ` · ${formatNumber(d.batches)} ${vi.restaurant.batchUnit}`
+                      : ""}
                   </li>
                 ))}
               </ul>
@@ -169,6 +180,9 @@ export default async function KitchenPage({
                   <li key={d.recipe_id}>
                     {d.recipe_name} — {formatNumber(d.qty)}{" "}
                     {vi.restaurant.servings.toLowerCase()}
+                    {d.batches !== null
+                      ? ` · ${formatNumber(d.batches)} ${vi.restaurant.batchUnit}`
+                      : ""}
                   </li>
                 ))}
               </ul>

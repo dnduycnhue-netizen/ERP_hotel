@@ -73,7 +73,14 @@ export default async function UsersPage({
             <tbody>
               {users.map((user) => (
                 <tr key={user.id} className="border-b last:border-0">
-                  <td className="px-4 py-3 font-medium">{user.full_name}</td>
+                  <td className="px-4 py-3 font-medium">
+                    <Link
+                      href={`/admin/users/${user.id}`}
+                      className="text-primary hover:underline"
+                    >
+                      {user.full_name}
+                    </Link>
+                  </td>
                   <td className="px-4 py-3 font-mono text-xs">
                     {user.employee_code ?? "—"}
                   </td>

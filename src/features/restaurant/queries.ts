@@ -99,13 +99,24 @@ export type BanquetRow = {
   start_time: string;
   end_time: string;
   hall: string;
+  hall_id: string | null;
   tables_count: number;
   guests_count: number;
   deposit_amount: number;
+  deposit_status: "unpaid" | "paid";
   status: "new" | "confirmed" | "in_progress" | "completed" | "cancelled";
   cancel_reason: string | null;
   notes: string | null;
   dish_count: number;
+};
+
+/** 1 sảnh trong danh mục (C11, Q170b). */
+export type BanquetHallRow = {
+  id: string;
+  name: string;
+  capacity: number | null;
+  is_active: boolean;
+  notes: string | null;
 };
 
 export type BanquetDishRow = {
@@ -133,6 +144,7 @@ export type KitchenToday = {
     sale_price: number | null;
     foodcost: number | null;
     has_unknown_cost: boolean;
+    portions_per_batch: number | null;
   }>;
   buffet_sessions: Array<{
     id: string;
@@ -145,6 +157,8 @@ export type KitchenToday = {
       recipe_code: string;
       recipe_name: string;
       planned_qty: number;
+      portions_per_batch: number | null;
+      batches: number | null;
     }>;
   }>;
   banquets: Array<{
@@ -161,6 +175,8 @@ export type KitchenToday = {
       recipe_code: string;
       recipe_name: string;
       qty: number;
+      portions_per_batch: number | null;
+      batches: number | null;
     }>;
   }>;
   prep: Array<{
@@ -604,7 +620,7 @@ export async function listBanquets(
   let query = untyped(supabase)
     .from("banquets")
     .select(
-      "id, doc_no, customer_name, customer_phone, event_date, start_time, end_time, hall, tables_count, guests_count, deposit_amount, status, cancel_reason, notes, dishes:banquet_dishes(id)",
+      "id, doc_no, customer_name, customer_phone, event_date, start_time, end_time, hall, hall_id, tables_count, guests_count, deposit_amount, deposit_status, status, cancel_reason, notes, dishes:banquet_dishes(id)",
     )
     .eq("property_id", propertyId)
     .gte("event_date", from)
@@ -624,9 +640,25 @@ export async function listBanquets(
     ).map((b) => ({
       ...b,
       status: b.status as BanquetRow["status"],
+      deposit_status: b.deposit_status as BanquetRow["deposit_status"],
       dish_count: b.dishes?.length ?? 0,
     })),
   };
+}
+
+/** Danh mục sảnh của 1 khách sạn (C11, Q170b) — đọc trực tiếp qua RLS. */
+export async function listBanquetHalls(
+  propertyId: string,
+): Promise<RestaurantActionResult<BanquetHallRow[]>> {
+  const supabase = await createClient();
+  const { data, error } = await untyped(supabase)
+    .from("banquet_halls")
+    .select("id, name, capacity, is_active, notes")
+    .eq("property_id", propertyId)
+    .order("name", { ascending: true })
+    .limit(200);
+  if (error) return toError(error);
+  return { ok: true, data: (data ?? []) as unknown as BanquetHallRow[] };
 }
 
 /** Chi tiết 1 tiệc + thực đơn. */
@@ -638,7 +670,7 @@ export async function getBanquet(
   const { data, error } = await untyped(supabase)
     .from("banquets")
     .select(
-      "id, doc_no, customer_name, customer_phone, event_date, start_time, end_time, hall, tables_count, guests_count, deposit_amount, status, cancel_reason, notes",
+      "id, doc_no, customer_name, customer_phone, event_date, start_time, end_time, hall, hall_id, tables_count, guests_count, deposit_amount, deposit_status, status, cancel_reason, notes",
     )
     .eq("property_id", propertyId)
     .eq("id", banquetId)
@@ -672,6 +704,7 @@ export async function getBanquet(
     data: {
       ...raw,
       status: raw.status as BanquetRow["status"],
+      deposit_status: raw.deposit_status as BanquetRow["deposit_status"],
       dish_count: dishes.length,
       dishes,
     },

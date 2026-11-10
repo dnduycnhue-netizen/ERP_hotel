@@ -5,7 +5,15 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { saveBanquetAction } from "@/features/restaurant/actions";
 import type { BanquetDetail } from "@/features/restaurant/queries";
+import type { DepositStatus } from "@/features/restaurant/schemas";
 import { vi } from "@/i18n/vi";
+
+export type HallOption = {
+  id: string;
+  name: string;
+  capacity: number | null;
+  is_active: boolean;
+};
 
 type DishLineState = {
   key: number;
@@ -18,11 +26,14 @@ type DishLineState = {
 /**
  * Form tạo / sửa tiệc (M06, RPC `banquet_save`).
  * Đơn giá mặc định = giá bán của món (snapshot lúc lưu).
+ * Sảnh: chọn trong danh mục (C11, Q170b) hoặc nhập tay; tên sảnh lưu
+ * snapshot vào `hall`, `hall_id` link danh mục (nullable).
  */
 export function BanquetForm({
   propertyId,
   banquet,
   recipes,
+  halls,
 }: {
   propertyId: string;
   banquet: BanquetDetail | null;
@@ -32,6 +43,7 @@ export function BanquetForm({
     name: string;
     sale_price: number | null;
   }>;
+  halls: HallOption[];
 }) {
   const router = useRouter();
   const [customerName, setCustomerName] = useState(
@@ -44,6 +56,11 @@ export function BanquetForm({
   const [startTime, setStartTime] = useState(banquet?.start_time ?? "10:00");
   const [endTime, setEndTime] = useState(banquet?.end_time ?? "13:00");
   const [hall, setHall] = useState(banquet?.hall ?? "");
+  const [hallId, setHallId] = useState(banquet?.hall_id ?? "");
+  const hallInList = halls.some((h) => h.id === hallId);
+  const [depositStatus, setDepositStatus] = useState<DepositStatus>(
+    banquet?.deposit_status ?? "unpaid",
+  );
   const [tablesCount, setTablesCount] = useState(
     String(banquet?.tables_count ?? 0),
   );
@@ -103,7 +120,7 @@ export function BanquetForm({
     startTime !== "" &&
     endTime !== "" &&
     endTime > startTime &&
-    hall.trim() !== "" &&
+    (hallId !== "" || hall.trim() !== "") &&
     guestsCount !== "" &&
     Number(guestsCount) > 0 &&
     Number.isInteger(Number(guestsCount)) &&
@@ -111,6 +128,7 @@ export function BanquetForm({
     Number(tablesCount) >= 0 &&
     deposit !== "" &&
     Number(deposit) >= 0 &&
+    (depositStatus !== "paid" || Number(deposit) > 0) &&
     dishes.every(
       (d) =>
         d.recipeId !== "" &&
@@ -132,9 +150,11 @@ export function BanquetForm({
       startTime,
       endTime,
       hall: hall.trim(),
+      hallId: hallInList ? hallId : undefined,
       tablesCount: Number(tablesCount),
       guestsCount: Number(guestsCount),
       depositAmount: Number(deposit),
+      depositStatus,
       notes: notes.trim() || undefined,
       dishes: dishes.map((d) => ({
         recipeId: d.recipeId,
@@ -186,12 +206,34 @@ export function BanquetForm({
         </label>
         <label className="space-y-1 text-sm">
           <span className="block font-medium">{vi.restaurant.hall} *</span>
-          <input
-            value={hall}
-            onChange={(e) => setHall(e.target.value)}
-            placeholder="Sảnh A"
-            className="h-9 w-full rounded-lg border border-border bg-background px-2.5"
-          />
+          <select
+            value={hallInList ? hallId : ""}
+            onChange={(e) => {
+              const id = e.target.value;
+              setHallId(id);
+              const picked = halls.find((h) => h.id === id);
+              if (picked) setHall(picked.name);
+            }}
+            className="h-9 w-full rounded-lg border border-border bg-background px-2"
+          >
+            <option value="">{vi.restaurant.hallOther}</option>
+            {halls
+              .filter((h) => h.is_active)
+              .map((h) => (
+                <option key={h.id} value={h.id}>
+                  {h.name}
+                  {h.capacity !== null ? ` (${h.capacity})` : ""}
+                </option>
+              ))}
+          </select>
+          {hallInList ? null : (
+            <input
+              value={hall}
+              onChange={(e) => setHall(e.target.value)}
+              placeholder="Sảnh A"
+              className="h-9 w-full rounded-lg border border-border bg-background px-2.5"
+            />
+          )}
         </label>
         <label className="space-y-1 text-sm">
           <span className="block font-medium">{vi.restaurant.startTime} *</span>
@@ -247,6 +289,24 @@ export function BanquetForm({
             onChange={(e) => setDeposit(e.target.value)}
             className="h-9 w-full rounded-lg border border-border bg-background px-2.5"
           />
+        </label>
+        <label className="space-y-1 text-sm">
+          <span className="block font-medium">
+            {vi.restaurant.depositStatus}
+          </span>
+          <select
+            value={depositStatus}
+            onChange={(e) => setDepositStatus(e.target.value as DepositStatus)}
+            className="h-9 w-full rounded-lg border border-border bg-background px-2"
+          >
+            <option value="unpaid">{vi.restaurant.depositUnpaid}</option>
+            <option value="paid">{vi.restaurant.depositPaid}</option>
+          </select>
+          {depositStatus === "paid" && Number(deposit) <= 0 ? (
+            <span className="block text-xs text-destructive">
+              {vi.restaurant.depositPaidRequiresAmount}
+            </span>
+          ) : null}
         </label>
       </div>
       <label className="block space-y-1 text-sm">

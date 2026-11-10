@@ -154,6 +154,45 @@ export const supplierReturnEligibleLinesSchema = z.object({
   grId: uuidSchema,
 });
 
+/** Loc danh sach phieu cho hau kiem anh (RPC `receiving_list_photo_reviews`, C2). */
+export const photoReviewListSchema = z.object({
+  propertyId: uuidSchema,
+  reviewStatus: z
+    .enum(["pending", "approved", "rejected"])
+    .optional()
+    .nullable(),
+  search: z
+    .string()
+    .trim()
+    .max(100, "Từ khóa tối đa 100 ký tự.")
+    .optional()
+    .nullable(),
+  limit: z.number().int().min(1).max(100).default(20),
+  offset: z.number().int().min(0).default(0),
+});
+
+/** Duyet / tu choi anh cua 1 phieu nhan (RPC `receiving_review_photos`, C2). */
+export const photoReviewSchema = z
+  .object({
+    grId: uuidSchema,
+    decision: z.enum(["approved", "rejected"]),
+    reason: z
+      .string()
+      .trim()
+      .max(1000, "Lý do tối đa 1000 ký tự.")
+      .optional()
+      .nullable(),
+  })
+  .superRefine((value, ctx) => {
+    if (value.decision === "rejected" && !value.reason) {
+      ctx.addIssue({
+        code: "custom",
+        message: "Từ chối ảnh cần ghi rõ lý do.",
+        path: ["reason"],
+      });
+    }
+  });
+
 export type ReceivingStartInput = z.infer<typeof receivingStartSchema>;
 export type ReceivingRecordLineInput = z.infer<
   typeof receivingRecordLineSchema
@@ -179,3 +218,5 @@ export type SupplierReturnCancelInput = z.infer<
 export type SupplierReturnEligibleLinesInput = z.infer<
   typeof supplierReturnEligibleLinesSchema
 >;
+export type PhotoReviewListInput = z.infer<typeof photoReviewListSchema>;
+export type PhotoReviewInput = z.infer<typeof photoReviewSchema>;

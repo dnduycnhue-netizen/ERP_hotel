@@ -228,12 +228,14 @@ export async function getPr(
   return { ok: true, data: { pr: res.data.pr, lines: res.data.lines ?? [] } };
 }
 
-/** Danh sách PO qua RPC `po_list` (T-020). */
+/** Danh sách PO qua RPC `po_list` (T-020). C6: loc them theo kenh
+ * (`p_channel` cua migration 20261109525000) cho danh sach lenh mua cho. */
 export async function listPos(
   propertyId: string,
   opts: {
     status?: string;
     search?: string;
+    channel?: "contract" | "quote" | "market";
     page?: number;
     pageSize?: number;
   } = {},
@@ -247,6 +249,7 @@ export async function listPos(
     p_search: opts.search ?? null,
     p_limit: pageSize,
     p_offset: (page - 1) * pageSize,
+    p_channel: opts.channel ?? null,
   });
   if (!res.ok) {
     return res;

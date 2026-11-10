@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { callRestaurantRpc, type RestaurantActionResult } from "./rpc";
 import {
   banquetCancelSchema,
+  banquetHallSaveSchema,
   banquetIdSchema,
   banquetSaveSchema,
   buffetSessionCancelSchema,
@@ -15,6 +16,7 @@ import {
   recipeSaveSchema,
   recipeSetActiveSchema,
   type BanquetCancelInput,
+  type BanquetHallSaveInput,
   type BanquetIdInput,
   type BanquetSaveInput,
   type BuffetSessionCancelInput,
@@ -44,6 +46,14 @@ export type BanquetCompleteResult = {
   ok: boolean;
   id: string;
   revenue: number;
+};
+
+/** Kết quả xác nhận tiệc: kèm phiếu lĩnh nháp tự sinh (C11, Q169). */
+export type BanquetConfirmResult = {
+  ok: boolean;
+  id: string;
+  requisition_id: string | null;
+  requisition_note: string | null;
 };
 
 function validationError(
@@ -291,9 +301,11 @@ export async function saveBanquetAction(
       start_time: parsed.data.startTime,
       end_time: parsed.data.endTime,
       hall: parsed.data.hall,
+      hall_id: parsed.data.hallId ?? null,
       tables_count: parsed.data.tablesCount,
       guests_count: parsed.data.guestsCount,
       deposit_amount: parsed.data.depositAmount,
+      deposit_status: parsed.data.depositStatus,
       notes: parsed.data.notes ?? null,
       dishes: parsed.data.dishes.map((d) => ({
         recipe_id: d.recipeId,
@@ -339,20 +351,34 @@ async function banquetStatusAction(
   return res;
 }
 
-/** Xác nhận tiệc (RPC `banquet_confirm`). */
+/** Xác nhận tiệc (RPC `banquet_confirm`) — kèm phiếu lĩnh nháp tự sinh. */
 export async function confirmBanquetAction(
   input: BanquetIdInput,
-): Promise<RestaurantActionResult<IdResult>> {
+): Promise<RestaurantActionResult<BanquetConfirmResult>> {
   const parsed = banquetIdSchema.safeParse(input);
   if (!parsed.success) {
     return validationError(parsed.error.issues);
   }
-  return banquetStatusAction(
+  const supabase = await createClient();
+  const res = await callRestaurantRpc<BanquetConfirmResult>(
+    supabase,
     "banquet_confirm",
-    parsed.data,
-    parsed.data.propertyId,
-    parsed.data.banquetId,
+    {
+      p_property_id: parsed.data.propertyId,
+      p_banquet_id: parsed.data.banquetId,
+    },
   );
+  if (res.ok) {
+    revalidatePath(restaurantPath(parsed.data.propertyId, "/banquets"));
+    revalidatePath(
+      restaurantPath(
+        parsed.data.propertyId,
+        `/banquets/${parsed.data.banquetId}`,
+      ),
+    );
+    revalidatePath(restaurantPath(parsed.data.propertyId, "/kitchen"));
+  }
+  return res;
 }
 
 /** Bắt đầu tiệc (RPC `banquet_start`). */
@@ -399,6 +425,32 @@ export async function completeBanquetAction(
     revalidatePath(restaurantPath(parsed.data.propertyId, "/sales"));
     revalidatePath(mobileRestaurantPath(parsed.data.propertyId, "/banquets"));
     revalidatePath(mobileRestaurantPath(parsed.data.propertyId, "/sales"));
+  }
+  return res;
+}
+
+/** Tạo / cập nhật sảnh trong danh mục (C11, Q170b — RPC `banquet_hall_save`). */
+export async function saveBanquetHallAction(
+  input: BanquetHallSaveInput,
+): Promise<RestaurantActionResult<IdResult>> {
+  const parsed = banquetHallSaveSchema.safeParse(input);
+  if (!parsed.success) {
+    return validationError(parsed.error.issues);
+  }
+  const supabase = await createClient();
+  const res = await callRestaurantRpc<IdResult>(supabase, "banquet_hall_save", {
+    p_property_id: parsed.data.propertyId,
+    p_hall: {
+      id: parsed.data.id ?? null,
+      name: parsed.data.name,
+      capacity: parsed.data.capacity ?? null,
+      is_active: parsed.data.isActive,
+      notes: parsed.data.notes ?? null,
+    },
+  });
+  if (res.ok) {
+    revalidatePath(restaurantPath(parsed.data.propertyId, "/halls"));
+    revalidatePath(restaurantPath(parsed.data.propertyId, "/banquets"));
   }
   return res;
 }

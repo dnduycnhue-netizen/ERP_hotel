@@ -22,6 +22,12 @@ function banquetDocStatus(status: string) {
   return "cancelled" as const;
 }
 
+function depositStatusLabel(status: string) {
+  return status === "paid"
+    ? vi.restaurant.depositPaid
+    : vi.restaurant.depositUnpaid;
+}
+
 /** Danh sách đặt tiệc (M06): mặc định hôm nay → 60 ngày sau. */
 export default async function BanquetsPage({
   params,
@@ -140,6 +146,9 @@ export default async function BanquetsPage({
                 <th className="px-3 py-2 text-right font-medium">
                   {vi.restaurant.depositAmount}
                 </th>
+                <th className="px-3 py-2 font-medium">
+                  {vi.restaurant.depositStatus}
+                </th>
                 <th className="px-3 py-2 font-medium">{vi.common.status}</th>
               </tr>
             </thead>
@@ -167,6 +176,9 @@ export default async function BanquetsPage({
                   </td>
                   <td className="px-3 py-2 text-right tabular-nums">
                     {formatMoney(b.deposit_amount)}
+                  </td>
+                  <td className="px-3 py-2">
+                    {depositStatusLabel(b.deposit_status)}
                   </td>
                   <td className="px-3 py-2">
                     <DocStatusBadge status={banquetDocStatus(b.status)} />

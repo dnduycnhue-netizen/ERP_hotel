@@ -24,9 +24,10 @@ export default async function AdminLayout({
     redirect("/login");
   }
 
-  const [canRoles, canUsers, properties] = await Promise.all([
+  const [canRoles, canUsers, canOrg, properties] = await Promise.all([
     hasChainPerm(supabase, "admin.roles.manage"),
     hasChainPerm(supabase, "admin.users.manage"),
+    hasChainPerm(supabase, "admin.org.manage"),
     listAccessibleProperties(supabase),
   ]);
 
@@ -53,6 +54,7 @@ export default async function AdminLayout({
   if (
     !canRoles &&
     !canUsers &&
+    !canOrg &&
     !canSettings &&
     !canApprovalRules &&
     !canAlertRules
@@ -96,6 +98,14 @@ export default async function AdminLayout({
                 className="text-primary hover:underline"
               >
                 {vi.admin.users}
+              </Link>
+            ) : null}
+            {canOrg ? (
+              <Link
+                href="/admin/organizations"
+                className="text-primary hover:underline"
+              >
+                {vi.admin.organizations}
               </Link>
             ) : null}
             {canSettings ? (
