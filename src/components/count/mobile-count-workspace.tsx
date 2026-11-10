@@ -436,7 +436,7 @@ export function MobileCountWorkspace({
           Sau khi gộp với shell của W1 (bottom tab cố định), shell cần
           chừa khoảng trống phía dưới — xem Q180. */}
       {canSubmit ? (
-        <div className="sticky bottom-0 z-10 -mx-4 flex flex-col gap-2 border-t bg-background/95 px-4 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))] backdrop-blur">
+        <div className="sticky bottom-[calc(3.5rem+env(safe-area-inset-bottom))] z-10 -mx-4 flex flex-col gap-2 border-t bg-background/95 px-4 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))] backdrop-blur">
           <p className="text-base font-medium" aria-live="polite">
             {interpolate(vi.count.countProgress, {
               done: countedLines,
