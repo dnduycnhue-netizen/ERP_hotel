@@ -69,16 +69,21 @@ export function DataTable<T extends { id: string | number }>({
     : rows.length;
 
   return (
-    <div className={cn("w-full overflow-x-auto rounded-lg border", className)}>
+    <div
+      className={cn(
+        "w-full overflow-x-auto rounded-lg border bg-card",
+        className,
+      )}
+    >
       <table className="w-full text-sm">
-        <thead className="bg-muted/50 text-left">
+        <thead className="bg-muted/40 text-left">
           <tr>
             {columns.map((column) => (
               <th
                 key={column.key}
                 scope="col"
                 className={cn(
-                  "px-3 py-2 font-medium whitespace-nowrap",
+                  "px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase",
                   column.align === "right" && "text-right",
                   column.align === "center" && "text-center",
                 )}
@@ -128,7 +133,7 @@ export function DataTable<T extends { id: string | number }>({
                   <td
                     key={column.key}
                     className={cn(
-                      "px-3 py-2 align-top",
+                      "px-3 py-3 align-middle",
                       column.align === "right" && "text-right",
                       column.align === "center" && "text-center",
                     )}

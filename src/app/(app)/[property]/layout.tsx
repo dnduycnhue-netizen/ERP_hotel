@@ -1,18 +1,6 @@
 import type { ReactNode } from "react";
 import { notFound } from "next/navigation";
-import { AdminLink } from "@/components/common/admin-link";
-import { AlertsLink } from "@/components/common/alerts-link";
-import { FinanceLink } from "@/components/common/finance-link";
-import { ReportsLink } from "@/components/common/reports-link";
-import { FrontdeskLink } from "@/components/common/frontdesk-link";
-import { HousekeepingLink } from "@/components/common/housekeeping-link";
-import { InventoryLink } from "@/components/common/inventory-link";
-import { MasterLink } from "@/components/common/master-link";
-import { PmsDailyLink } from "@/components/common/pms-daily-link";
-import { ProcurementLink } from "@/components/common/procurement-link";
-import { ReceivingLink } from "@/components/common/receiving-link";
-import { PropertySwitcher } from "@/components/common/property-switcher";
-import { vi } from "@/i18n/vi";
+import { AppShell } from "@/components/shell/app-shell";
 import { PermissionsProvider } from "@/lib/permissions/permissions-provider";
 import { listAccessibleProperties } from "@/lib/supabase/access";
 import { createClient } from "@/lib/supabase/server";
@@ -49,36 +37,13 @@ export default async function PropertyLayout({
       propertyId={propertyId}
       initialPermissions={myPermissions ?? []}
     >
-      <div className="min-h-screen bg-muted/30">
-        <header className="border-b bg-background">
-          <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-            <a
-              className="font-semibold tracking-tight"
-              href={`/${currentProperty.id}`}
-            >
-              {vi.appName}
-            </a>
-            <div className="flex items-center gap-4">
-              <MasterLink propertyId={currentProperty.id} />
-              <ProcurementLink propertyId={currentProperty.id} />
-              <ReceivingLink propertyId={currentProperty.id} />
-              <InventoryLink propertyId={currentProperty.id} />
-              <FinanceLink propertyId={currentProperty.id} />
-              <ReportsLink propertyId={currentProperty.id} />
-              <AlertsLink propertyId={currentProperty.id} />
-              <FrontdeskLink propertyId={currentProperty.id} />
-              <PmsDailyLink propertyId={currentProperty.id} />
-              <HousekeepingLink propertyId={currentProperty.id} />
-              <AdminLink />
-              <PropertySwitcher
-                currentPropertyId={currentProperty.id}
-                properties={properties}
-              />
-            </div>
-          </div>
-        </header>
-        <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6">{children}</main>
-      </div>
+      <AppShell
+        propertyId={currentProperty.id}
+        propertyName={currentProperty.name}
+        properties={properties}
+      >
+        {children}
+      </AppShell>
     </PermissionsProvider>
   );
 }

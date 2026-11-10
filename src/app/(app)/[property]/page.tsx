@@ -1,5 +1,16 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import {
+  ArrowRight,
+  Building2,
+  CheckCircle2,
+  Layers,
+  Package,
+  Settings,
+  Users,
+  Warehouse,
+} from "lucide-react";
+import { PageHeader } from "@/components/shell/page-header";
 import { createClient } from "@/lib/supabase/server";
 import { vi } from "@/i18n/vi";
 
@@ -56,247 +67,226 @@ export default async function PropertyHome({
 
   const le = property.legal_entity as unknown as LegalEntityInfo | null;
 
+  const kpis = [
+    {
+      label: vi.property.kpiItems,
+      value: itemsCount ?? 0,
+      description: vi.property.kpiItemsDescription,
+      icon: Package,
+      tileClassName: "bg-blue-500/10 text-blue-600",
+    },
+    {
+      label: vi.property.kpiWarehouses,
+      value: warehousesCount ?? 0,
+      description: vi.property.kpiWarehousesDescription,
+      icon: Warehouse,
+      tileClassName: "bg-emerald-500/10 text-emerald-600",
+    },
+    {
+      label: vi.property.kpiGroups,
+      value: groupsCount ?? 0,
+      description: vi.property.kpiGroupsDescription,
+      icon: Layers,
+      tileClassName: "bg-amber-500/10 text-amber-600",
+    },
+    {
+      label: vi.property.kpiRoles,
+      value: rolesCount ?? 0,
+      description: vi.property.kpiRolesDescription,
+      icon: Users,
+      tileClassName: "bg-brand/10 text-brand",
+    },
+  ];
+
+  const modules = [
+    {
+      href: `/${propertyId}/master/items`,
+      title: vi.property.moduleItemsTitle,
+      description: vi.property.moduleItemsDescription,
+      icon: Package,
+      tileClassName: "bg-blue-500/10 text-blue-600",
+    },
+    {
+      href: `/${propertyId}/master/warehouses`,
+      title: vi.property.moduleWarehousesTitle,
+      description: vi.property.moduleWarehousesDescription,
+      icon: Building2,
+      tileClassName: "bg-emerald-500/10 text-emerald-600",
+    },
+    {
+      href: "/admin/users",
+      title: vi.property.moduleUsersTitle,
+      description: vi.property.moduleUsersDescription,
+      icon: Users,
+      tileClassName: "bg-brand/10 text-brand",
+    },
+    {
+      href: "/admin/settings",
+      title: vi.property.moduleSettingsTitle,
+      description: vi.property.moduleSettingsDescription,
+      icon: Settings,
+      tileClassName: "bg-amber-500/10 text-amber-600",
+    },
+  ];
+
+  const securityItems = [
+    {
+      title: vi.property.securityLedgerTitle,
+      description: vi.property.securityLedgerDescription,
+    },
+    {
+      title: vi.property.securityRlsTitle,
+      description: vi.property.securityRlsDescription,
+    },
+    {
+      title: vi.property.securitySodTitle,
+      description: `${vi.property.securitySodDescription} ${
+        property.sod_profile === "with_cc"
+          ? vi.property.sodWithCc
+          : vi.property.sodWithoutCc
+      }.`,
+    },
+  ];
+
   return (
     <div className="space-y-8">
-      {/* Hero Welcome Banner */}
-      <section className="rounded-xl border bg-gradient-to-br from-card via-card to-muted/40 p-6 shadow-sm sm:p-8">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-semibold tracking-wider text-primary uppercase">
-                {vi.property.dashboard}
-              </span>
-              <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-xs font-medium text-emerald-600">
-                ● Đang hoạt động
-              </span>
-            </div>
-            <h1 className="mt-2 text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-              {property.name}
-            </h1>
-            <p className="mt-1 text-xs text-muted-foreground">
-              Mã khách sạn:{" "}
-              <span className="font-mono font-semibold text-foreground">
-                {property.code}
-              </span>
-              {" | "}
-              Pháp nhân:{" "}
-              <span className="font-semibold text-foreground">
-                {le?.name ?? "—"}
-              </span>{" "}
-              ({le?.code}){" | "}
-              Định giá:{" "}
-              <span className="font-semibold text-foreground">
-                {le?.costing_method === "fifo" ? "FIFO" : "Bình quân gia quyền"}
-              </span>
-            </p>
-          </div>
-          <div className="flex flex-wrap items-center gap-2">
+      <PageHeader
+        title={property.name}
+        description={
+          <>
+            {vi.property.codeLabel}{" "}
+            <span className="font-mono font-semibold text-foreground">
+              {property.code}
+            </span>
+            {" | "}
+            {vi.property.legalEntityLabel}{" "}
+            <span className="font-semibold text-foreground">
+              {le?.name ?? "—"}
+            </span>{" "}
+            ({le?.code}){" | "}
+            {vi.property.costingLabel}{" "}
+            <span className="font-semibold text-foreground">
+              {le?.costing_method === "fifo"
+                ? vi.property.costingFifo
+                : vi.property.costingMovingAvg}
+            </span>
+          </>
+        }
+        actions={
+          <>
             <Link
               href={`/${propertyId}/master/items`}
-              className="inline-flex h-9 items-center justify-center rounded-md bg-primary px-4 text-xs font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90"
+              className="inline-flex h-9 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90"
             >
-              Vào danh mục
+              {vi.property.goToItems}
             </Link>
             <Link
               href="/admin/users"
-              className="inline-flex h-9 items-center justify-center rounded-md border border-input bg-background px-4 text-xs font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground"
+              className="inline-flex h-9 items-center justify-center rounded-md border border-input bg-background px-4 text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground"
             >
-              Phân quyền nhân viên
+              {vi.property.manageUsers}
             </Link>
-          </div>
-        </div>
-      </section>
+          </>
+        }
+      >
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-2.5 py-1 text-[11px] font-semibold tracking-wide text-emerald-700 uppercase">
+          <CheckCircle2 className="size-3.5" aria-hidden />
+          {vi.property.activeStatus}
+        </span>
+      </PageHeader>
 
-      {/* KPI Stats Grid */}
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-        <div className="rounded-xl border bg-card p-4 shadow-sm">
-          <p className="text-xs font-medium text-muted-foreground">
-            Mặt hàng danh mục
-          </p>
-          <p className="mt-2 text-2xl font-bold text-foreground">
-            {itemsCount ?? 0}
-          </p>
-          <p className="mt-1 text-[11px] text-muted-foreground">
-            Vật tư, nguyên liệu, amenities
-          </p>
-        </div>
-
-        <div className="rounded-xl border bg-card p-4 shadow-sm">
-          <p className="text-xs font-medium text-muted-foreground">
-            Kho hoạt động
-          </p>
-          <p className="mt-2 text-2xl font-bold text-foreground">
-            {warehousesCount ?? 0}
-          </p>
-          <p className="mt-1 text-[11px] text-muted-foreground">
-            Kho tổng, trung chuyển, minibar
-          </p>
-        </div>
-
-        <div className="rounded-xl border bg-card p-4 shadow-sm">
-          <p className="text-xs font-medium text-muted-foreground">
-            Nhóm hàng hóa
-          </p>
-          <p className="mt-2 text-2xl font-bold text-foreground">
-            {groupsCount ?? 0}
-          </p>
-          <p className="mt-1 text-[11px] text-muted-foreground">
-            Thực phẩm, đồ uống, đồ vải...
-          </p>
-        </div>
-
-        <div className="rounded-xl border bg-card p-4 shadow-sm">
-          <p className="text-xs font-medium text-muted-foreground">
-            Vai trò hệ thống
-          </p>
-          <p className="mt-2 text-2xl font-bold text-foreground">
-            {rolesCount ?? 0}
-          </p>
-          <p className="mt-1 text-[11px] text-muted-foreground">
-            Sẵn sàng gán cho nhân viên
-          </p>
-        </div>
+      {/* KPI */}
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        {kpis.map((kpi) => {
+          const Icon = kpi.icon;
+          return (
+            <div
+              key={kpi.label}
+              className="rounded-xl border bg-card p-4 shadow-sm"
+            >
+              <div className="flex items-center justify-between gap-2">
+                <p className="text-sm font-medium text-muted-foreground">
+                  {kpi.label}
+                </p>
+                <span
+                  className={`flex h-8 w-8 items-center justify-center rounded-lg ${kpi.tileClassName}`}
+                >
+                  <Icon className="size-4" aria-hidden />
+                </span>
+              </div>
+              <p className="mt-2 text-2xl font-bold text-foreground">
+                {kpi.value}
+              </p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                {kpi.description}
+              </p>
+            </div>
+          );
+        })}
       </div>
 
-      {/* Main Functional Modules Grid */}
-      <div>
+      {/* Phân hệ */}
+      <section>
         <h2 className="text-base font-semibold tracking-tight text-foreground">
-          Bảng điều khiển các phân hệ
+          {vi.property.modulesTitle}
         </h2>
-        <p className="mt-0.5 text-xs text-muted-foreground">
-          Truy cập nhanh các chức năng nghiệp vụ của khách sạn
+        <p className="mt-0.5 text-sm text-muted-foreground">
+          {vi.property.modulesDescription}
         </p>
 
         <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <Link
-            href={`/${propertyId}/master/items`}
-            className="group flex flex-col justify-between rounded-xl border bg-card p-5 shadow-sm transition-all hover:border-primary/50 hover:shadow-md"
-          >
-            <div>
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-500/10 font-bold text-blue-600">
-                📦
-              </div>
-              <h3 className="mt-3 font-semibold text-foreground group-hover:text-primary">
-                Danh mục vật tư
-              </h3>
-              <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
-                Quản lý mã hàng, tên, quy cách đóng gói, quy đổi đơn vị tính kho
-                - công thức, và cờ Key Items.
-              </p>
-            </div>
-            <div className="mt-4 flex items-center text-xs font-medium text-primary">
-              Truy cập ngay →
-            </div>
-          </Link>
-
-          <Link
-            href={`/${propertyId}/master/warehouses`}
-            className="group flex flex-col justify-between rounded-xl border bg-card p-5 shadow-sm transition-all hover:border-primary/50 hover:shadow-md"
-          >
-            <div>
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-500/10 font-bold text-emerald-600">
-                🏢
-              </div>
-              <h3 className="mt-3 font-semibold text-foreground group-hover:text-primary">
-                Kho & Điểm dịch vụ
-              </h3>
-              <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
-                Cơ cấu kho tổng, kho trung chuyển, kho hủy, minibar phòng nghỉ,
-                và các outlet điểm bán.
-              </p>
-            </div>
-            <div className="mt-4 flex items-center text-xs font-medium text-primary">
-              Truy cập ngay →
-            </div>
-          </Link>
-
-          <Link
-            href="/admin/users"
-            className="group flex flex-col justify-between rounded-xl border bg-card p-5 shadow-sm transition-all hover:border-primary/50 hover:shadow-md"
-          >
-            <div>
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-purple-500/10 font-bold text-purple-600">
-                👥
-              </div>
-              <h3 className="mt-3 font-semibold text-foreground group-hover:text-primary">
-                Người dùng & Phân quyền
-              </h3>
-              <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
-                Cấp tài khoản nhân viên, gán vai trò có thời hạn theo kho/ca làm
-                việc, và đặt mã PIN ký số.
-              </p>
-            </div>
-            <div className="mt-4 flex items-center text-xs font-medium text-primary">
-              Truy cập ngay →
-            </div>
-          </Link>
-
-          <Link
-            href="/admin/settings"
-            className="group flex flex-col justify-between rounded-xl border bg-card p-5 shadow-sm transition-all hover:border-primary/50 hover:shadow-md"
-          >
-            <div>
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-500/10 font-bold text-amber-600">
-                ⚙️
-              </div>
-              <h3 className="mt-3 font-semibold text-foreground group-hover:text-primary">
-                Cấu hình & Quy tắc duyệt
-              </h3>
-              <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
-                Thiết lập ngưỡng duyệt đơn mua hàng, dung sai nhận hàng, cảnh
-                báo biến động giá và giờ im lặng.
-              </p>
-            </div>
-            <div className="mt-4 flex items-center text-xs font-medium text-primary">
-              Truy cập ngay →
-            </div>
-          </Link>
+          {modules.map((module) => {
+            const Icon = module.icon;
+            return (
+              <Link
+                key={module.title}
+                href={module.href}
+                className="group flex flex-col justify-between rounded-xl border bg-card p-5 shadow-sm transition-all hover:border-brand/50 hover:shadow-md"
+              >
+                <div>
+                  <span
+                    className={`flex h-10 w-10 items-center justify-center rounded-lg ${module.tileClassName}`}
+                  >
+                    <Icon className="size-5" aria-hidden />
+                  </span>
+                  <h3 className="mt-3 font-semibold text-foreground group-hover:text-brand">
+                    {module.title}
+                  </h3>
+                  <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+                    {module.description}
+                  </p>
+                </div>
+                <span className="mt-4 flex items-center gap-1 text-sm font-medium text-brand">
+                  {vi.property.openNow}
+                  <ArrowRight
+                    className="size-4 transition-transform group-hover:translate-x-0.5"
+                    aria-hidden
+                  />
+                </span>
+              </Link>
+            );
+          })}
         </div>
-      </div>
+      </section>
 
-      {/* Architecture & Security Highlights */}
+      {/* Bảo mật */}
       <section className="rounded-xl border bg-card p-6 shadow-sm">
-        <h3 className="text-sm font-semibold text-foreground">
-          Bảo mật và toàn vẹn dữ liệu
-        </h3>
-        <div className="mt-3 grid grid-cols-1 gap-4 text-xs text-muted-foreground sm:grid-cols-3">
-          <div className="flex items-start gap-2">
-            <span className="font-bold text-emerald-600">✓</span>
-            <div>
-              <p className="font-medium text-foreground">Sổ cái kho bất biến</p>
-              <p className="mt-0.5">
-                Mọi dịch chuyển kho qua hàm RPC post, chặn sửa/xóa trực tiếp,
-                sửa sai bằng bút toán đảo.
-              </p>
+        <h2 className="text-base font-semibold text-foreground">
+          {vi.property.securityTitle}
+        </h2>
+        <div className="mt-4 grid grid-cols-1 gap-4 text-sm text-muted-foreground sm:grid-cols-3">
+          {securityItems.map((item) => (
+            <div key={item.title} className="flex items-start gap-2">
+              <CheckCircle2
+                className="mt-0.5 size-4 shrink-0 text-emerald-600"
+                aria-hidden
+              />
+              <div>
+                <p className="font-medium text-foreground">{item.title}</p>
+                <p className="mt-0.5 leading-relaxed">{item.description}</p>
+              </div>
             </div>
-          </div>
-          <div className="flex items-start gap-2">
-            <span className="font-bold text-emerald-600">✓</span>
-            <div>
-              <p className="font-medium text-foreground">
-                Row Level Security 100%
-              </p>
-              <p className="mt-0.5">
-                Dữ liệu phân lập theo pháp nhân và khách sạn, áp dụng chính sách
-                phân quyền động.
-              </p>
-            </div>
-          </div>
-          <div className="flex items-start gap-2">
-            <span className="font-bold text-emerald-600">✓</span>
-            <div>
-              <p className="font-medium text-foreground">
-                Hồ sơ kiểm soát bù trừ
-              </p>
-              <p className="mt-0.5">
-                Khách sạn áp dụng hồ sơ{" "}
-                {property.sod_profile === "with_cc"
-                  ? "Có Cost Controller"
-                  : "Không có Cost Controller"}
-                .
-              </p>
-            </div>
-          </div>
+          ))}
         </div>
       </section>
     </div>

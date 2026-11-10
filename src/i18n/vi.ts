@@ -2,6 +2,22 @@ export const vi = {
   appName: "Mini-ERP Chuỗi khách sạn",
   appDescription:
     "Nền tảng quản lý thu mua, kho và chi phí vận hành khách sạn.",
+  shell: {
+    menu: "Menu",
+    collapseSidebar: "Thu gọn thanh điều hướng",
+    expandSidebar: "Mở rộng thanh điều hướng",
+    closeSidebar: "Đóng menu",
+    searchPlaceholder: "Tìm kiếm chức năng…",
+    searchNoResults: "Không tìm thấy chức năng nào",
+    switchProperty: "Đổi khách sạn",
+    groups: {
+      overview: "Tổng quan",
+      operations: "Nghiệp vụ",
+      housekeeping: "Buồng phòng & Lễ tân",
+      insights: "Báo cáo & Cảnh báo",
+      system: "Hệ thống",
+    },
+  },
   common: {
     loading: "Đang tải dữ liệu…",
     tryAgain: "Thử lại",
@@ -393,6 +409,48 @@ export const vi = {
     noAccessTitle: "Bạn chưa được phân quyền khách sạn",
     noAccessDescription:
       "Tài khoản đã đăng nhập nhưng chưa được gán quyền truy cập khách sạn. Hãy liên hệ quản trị viên.",
+    activeStatus: "Đang hoạt động",
+    codeLabel: "Mã khách sạn:",
+    legalEntityLabel: "Pháp nhân:",
+    costingLabel: "Định giá:",
+    costingFifo: "FIFO",
+    costingMovingAvg: "Bình quân gia quyền",
+    goToItems: "Vào danh mục",
+    manageUsers: "Phân quyền nhân viên",
+    kpiItems: "Mặt hàng danh mục",
+    kpiItemsDescription: "Vật tư, nguyên liệu, amenities",
+    kpiWarehouses: "Kho hoạt động",
+    kpiWarehousesDescription: "Kho tổng, trung chuyển, minibar",
+    kpiGroups: "Nhóm hàng hóa",
+    kpiGroupsDescription: "Thực phẩm, đồ uống, đồ vải...",
+    kpiRoles: "Vai trò hệ thống",
+    kpiRolesDescription: "Sẵn sàng gán cho nhân viên",
+    modulesTitle: "Bảng điều khiển các phân hệ",
+    modulesDescription: "Truy cập nhanh các chức năng nghiệp vụ của khách sạn",
+    moduleItemsTitle: "Danh mục vật tư",
+    moduleItemsDescription:
+      "Quản lý mã hàng, tên, quy cách đóng gói, quy đổi đơn vị tính kho - công thức, và cờ Key Items.",
+    moduleWarehousesTitle: "Kho & Điểm dịch vụ",
+    moduleWarehousesDescription:
+      "Cơ cấu kho tổng, kho trung chuyển, kho hủy, minibar phòng nghỉ, và các outlet điểm bán.",
+    moduleUsersTitle: "Người dùng & Phân quyền",
+    moduleUsersDescription:
+      "Cấp tài khoản nhân viên, gán vai trò có thời hạn theo kho/ca làm việc, và đặt mã PIN ký số.",
+    moduleSettingsTitle: "Cấu hình & Quy tắc duyệt",
+    moduleSettingsDescription:
+      "Thiết lập ngưỡng duyệt đơn mua hàng, dung sai nhận hàng, cảnh báo biến động giá và giờ im lặng.",
+    openNow: "Truy cập ngay",
+    securityTitle: "Bảo mật và toàn vẹn dữ liệu",
+    securityLedgerTitle: "Sổ cái kho bất biến",
+    securityLedgerDescription:
+      "Mọi dịch chuyển kho qua hàm RPC post, chặn sửa/xóa trực tiếp, sửa sai bằng bút toán đảo.",
+    securityRlsTitle: "Row Level Security 100%",
+    securityRlsDescription:
+      "Dữ liệu phân lập theo pháp nhân và khách sạn, áp dụng chính sách phân quyền động.",
+    securitySodTitle: "Hồ sơ kiểm soát bù trừ",
+    securitySodDescription: "Khách sạn áp dụng hồ sơ",
+    sodWithCc: "Có Cost Controller",
+    sodWithoutCc: "Không có Cost Controller",
   },
   master: {
     title: "Danh mục",
@@ -928,6 +986,7 @@ export const vi = {
       manual: "Giá tay",
     },
     nav: {
+      title: "Điều hướng thu mua",
       pr: "Yêu cầu mua",
       po: "Đơn mua",
       approvals: "Chờ tôi duyệt",
