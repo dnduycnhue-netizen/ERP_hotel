@@ -26,7 +26,7 @@ Các RPC danh mục dưới đây thuộc các task sau, chưa được triển 
 | `pr_submit(p_pr_id)` / `pr_decide(p_pr_id, p_decision, p_comment)` | |
 | `po_create_from_pr(p_pr_line_ids uuid[], p_supplier_id, p_channel)` | Tự lấy giá theo thứ tự hợp đồng → báo giá → giá trần |
 | `po_save_draft(p_po jsonb)` | Không cho sửa `unit_price` nếu `price_source <> 'manual'` |
-| `po_submit(p_po_id)` | Sinh các bước `approvals` theo `approval_rules` |
+| `po_submit(p_po_id)` | Sinh các bước `approvals` theo `approval_rules`; chặn `ERR_PRICE_NOT_SET` khi PO **thường** (contract/quote) có dòng `manual` giá ≤ 0 — **PO chợ (`channel = 'market'`) được miễn** kiểm tra giá (T-022A, tự phê duyệt 10/11) |
 | `approval_decide(p_doc_type, p_doc_id, p_decision, p_comment)` | Kiểm `SOD_PO_CREATOR_APPROVER` |
 | `po_send(p_po_id)` | Trạng thái `sent`; sinh PDF ở route `/api/export/po/[id]` |
 | `po_close(p_po_id, p_reason)` | Đóng phần còn thiếu |
