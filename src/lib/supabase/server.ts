@@ -44,3 +44,25 @@ export async function getAuthenticatedUser(
   }
   return data.user;
 }
+
+/**
+ * Chỉ lấy id của người dùng đã đăng nhập (từ JWT claims), hoặc `null`.
+ *
+ * Dùng ở những chỗ chỉ cần biết "ai đang gọi" (vd kiểm tra active, chọn
+ * khách sạn) thay vì `getAuthenticatedUser()`: `getClaims()` xác thực JWT
+ * tại chỗ, KHÔNG gọi sang máy chủ Auth (0 round-trip), trong khi
+ * `getUser()` gọi `/auth/v1/user` mỗi lần — trên đường truyền xuyên vùng
+ * (Vercel → Supabase ap-south-1) mỗi lần đó tốn 200–300ms. Token hết hạn
+ * nhưng refresh token còn hiệu lực vẫn được làm mới qua `getSession()`
+ * bên trong (xem @supabase/ssr: session initialization); token hỏng thì
+ * trả `null` như `getUser()` lỗi — nơi gọi xử lý giống nhau.
+ */
+export async function getAuthenticatedUserId(
+  supabase: SupabaseClient<Database>,
+): Promise<string | null> {
+  const { data, error } = await supabase.auth.getClaims();
+  if (error || !data?.claims?.sub) {
+    return null;
+  }
+  return data.claims.sub;
+}
