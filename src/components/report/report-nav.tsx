@@ -21,30 +21,35 @@ export function ReportsNav({
   return (
     <nav
       aria-label={vi.reports.title}
-      className="flex flex-wrap items-center gap-1 border-b pb-2"
+      className="mb-6 flex gap-1 overflow-x-auto border-b"
     >
       <Link
         href={`/${propertyId}/reports`}
+        aria-current={
+          pathname === `/${propertyId}/reports` ? "page" : undefined
+        }
         className={cn(
-          "rounded-md px-3 py-1.5 text-sm",
+          "shrink-0 border-b-2 px-3 py-2 text-sm font-medium whitespace-nowrap transition-colors outline-none focus-visible:ring-2 focus-visible:ring-brand/40",
           pathname === `/${propertyId}/reports`
-            ? "bg-primary/10 font-medium text-primary"
-            : "text-muted-foreground hover:text-foreground",
+            ? "border-brand text-brand"
+            : "border-transparent text-muted-foreground hover:text-foreground",
         )}
       >
         {vi.reports.indexTitle}
       </Link>
       {REPORT_META.filter((m) => perms[m.code]).map((m) => {
         const href = `/${propertyId}/reports/${m.slug}`;
+        const isActive = pathname === href || pathname.startsWith(`${href}/`);
         return (
           <Link
             key={m.code}
             href={href}
+            aria-current={isActive ? "page" : undefined}
             className={cn(
-              "rounded-md px-3 py-1.5 text-sm",
-              pathname === href || pathname.startsWith(`${href}/`)
-                ? "bg-primary/10 font-medium text-primary"
-                : "text-muted-foreground hover:text-foreground",
+              "shrink-0 border-b-2 px-3 py-2 text-sm font-medium whitespace-nowrap transition-colors outline-none focus-visible:ring-2 focus-visible:ring-brand/40",
+              isActive
+                ? "border-brand text-brand"
+                : "border-transparent text-muted-foreground hover:text-foreground",
             )}
           >
             {m.title}

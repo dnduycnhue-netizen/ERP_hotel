@@ -182,7 +182,7 @@ export function PoForm({
         </div>
       ) : null}
 
-      <div className="rounded-xl border p-4 space-y-3">
+      <div className="rounded-lg border p-4 space-y-3">
         <h2 className="text-lg font-semibold">
           {vi.procurement.po.detailTitle} ·{" "}
           <span className="font-mono">{po.doc_no}</span>
@@ -247,7 +247,7 @@ export function PoForm({
         {formLines.map((line, index) => (
           <div
             key={line.key}
-            className="rounded-xl border p-4 space-y-3 bg-card"
+            className="rounded-lg border p-4 space-y-3 bg-card"
           >
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium">

@@ -97,14 +97,20 @@ export function PurchaseUnitsDialog({
 
         <div className="mt-4">
           <table className="w-full text-sm border rounded-md">
-            <thead className="bg-muted/50 text-left">
+            <thead className="bg-muted/40 text-left">
               <tr>
-                <th className="px-3 py-2">{vi.master.items.purchaseUom}</th>
-                <th className="px-3 py-2">{vi.master.items.factorToStock}</th>
-                <th className="px-3 py-2">
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                  {vi.master.items.purchaseUom}
+                </th>
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                  {vi.master.items.factorToStock}
+                </th>
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
                   {vi.master.items.isDefaultPurchaseUnit}
                 </th>
-                <th className="px-3 py-2 text-right">{vi.common.actions}</th>
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase text-right">
+                  {vi.common.actions}
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -120,12 +126,14 @@ export function PurchaseUnitsDialog({
                 </tr>
               ) : (
                 units.map((u) => (
-                  <tr key={u.id} className="border-t hover:bg-muted/30">
-                    <td className="px-3 py-2 font-medium">{u.uom}</td>
-                    <td className="px-3 py-2">
+                  <tr key={u.id} className="border-t hover:bg-muted/40">
+                    <td className="px-3 py-3 font-medium align-middle">
+                      {u.uom}
+                    </td>
+                    <td className="px-3 py-3 align-middle">
                       1 {u.uom} = {u.factor_to_stock} {item.stock_uom}
                     </td>
-                    <td className="px-3 py-2">
+                    <td className="px-3 py-3 align-middle">
                       {u.is_default ? (
                         <span className="rounded bg-primary/10 px-1.5 py-0.5 text-xs font-semibold text-primary">
                           Mặc định
@@ -134,7 +142,7 @@ export function PurchaseUnitsDialog({
                         "—"
                       )}
                     </td>
-                    <td className="px-3 py-2 text-right">
+                    <td className="px-3 py-3 text-right align-middle">
                       <Button
                         variant="ghost"
                         size="sm"

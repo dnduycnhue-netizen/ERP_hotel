@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { MoneyText } from "@/components/common/money-text";
+import { DocStatusBadge } from "@/components/common/doc-status-badge";
 import type { InvoiceRow, InvoiceStatus } from "@/features/finance/queries";
 import type { SupplierRow } from "@/features/master/queries";
 import { vi } from "@/i18n/vi";
@@ -123,28 +124,38 @@ export function InvoiceList({
       </div>
 
       {filtered.length === 0 ? (
-        <p className="rounded-xl border bg-card p-4 text-sm text-muted-foreground">
+        <p className="rounded-lg border bg-card p-4 text-sm text-muted-foreground">
           {vi.components.table.emptyDescription}
         </p>
       ) : (
-        <div className="overflow-x-auto rounded-xl border bg-card">
+        <div className="overflow-x-auto rounded-lg border bg-card">
           <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b text-left text-muted-foreground">
-                <th className="px-3 py-2">{vi.finance.invoiceSymbol}</th>
-                <th className="px-3 py-2">{vi.finance.invoiceNo}</th>
-                <th className="px-3 py-2">{vi.finance.invoiceDate}</th>
-                <th className="px-3 py-2">{vi.finance.supplier}</th>
-                <th className="px-3 py-2 text-right">
+            <thead className="bg-muted/40 text-left">
+              <tr>
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                  {vi.finance.invoiceSymbol}
+                </th>
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                  {vi.finance.invoiceNo}
+                </th>
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                  {vi.finance.invoiceDate}
+                </th>
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                  {vi.finance.supplier}
+                </th>
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase text-right">
                   {vi.finance.totalAmount}
                 </th>
-                <th className="px-3 py-2">{vi.common.status}</th>
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                  {vi.common.status}
+                </th>
               </tr>
             </thead>
             <tbody>
               {filtered.map((inv) => (
-                <tr key={inv.id} className="border-b last:border-0">
-                  <td className="px-3 py-2">
+                <tr key={inv.id} className="border-t hover:bg-muted/40">
+                  <td className="px-3 py-3 align-middle">
                     <Link
                       href={`/${propertyId}/finance/invoices/${inv.id}`}
                       className="font-medium hover:underline"
@@ -152,24 +163,16 @@ export function InvoiceList({
                       {inv.invoice_symbol}
                     </Link>
                   </td>
-                  <td className="px-3 py-2">{inv.invoice_no}</td>
-                  <td className="px-3 py-2">{inv.invoice_date}</td>
-                  <td className="px-3 py-2">
+                  <td className="px-3 py-3 align-middle">{inv.invoice_no}</td>
+                  <td className="px-3 py-3 align-middle">{inv.invoice_date}</td>
+                  <td className="px-3 py-3 align-middle">
                     {inv.supplier_name ?? vi.common.noData}
                   </td>
-                  <td className="px-3 py-2 text-right">
+                  <td className="px-3 py-3 text-right align-middle">
                     <MoneyText amount={inv.total} />
                   </td>
-                  <td className="px-3 py-2">
-                    <span
-                      className={
-                        inv.status === "on_hold"
-                          ? "font-medium text-red-800"
-                          : undefined
-                      }
-                    >
-                      {STATUS_LABELS[inv.status]}
-                    </span>
+                  <td className="px-3 py-3 align-middle">
+                    <DocStatusBadge status={inv.status} />
                   </td>
                 </tr>
               ))}

@@ -8,6 +8,7 @@ import {
 } from "@/features/service/queries";
 import { todayVn } from "@/features/finance/queries";
 import { vi } from "@/i18n/vi";
+import { PageHeader } from "@/components/shell/page-header";
 
 /**
  * Lịch kỳ dịch vụ theo tháng + PO dịch vụ lẻ chờ nghiệm thu (T-042).
@@ -44,13 +45,11 @@ export default async function ServiceSchedulesPage({
   }
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-xl font-semibold">{vi.service.schedulesTitle}</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          {vi.service.schedulesHint}
-        </p>
-      </div>
+    <div className="space-y-4">
+      <PageHeader
+        title={vi.service.schedulesTitle}
+        description={vi.service.schedulesHint}
+      />
       <ScheduleList
         propertyId={propertyId}
         month={selectedMonth}

@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { ErrorState } from "@/components/common/error-state";
 import { getSupplierReturnAction } from "@/features/receiving/actions";
 import { vi } from "@/i18n/vi";
+import { PageHeader } from "@/components/shell/page-header";
 
 /**
  * Chi tiết phiếu trả hàng NCC trên desktop (T-026) — chỉ xem để soát.
@@ -49,11 +50,11 @@ export default async function DesktopReturnDetailPage({
           ← {vi.receiving.returnsListTitle}
         </Link>
       </div>
-      <h1 className="text-2xl font-semibold">
-        {vi.receiving.returnDetailTitle}: {detail.doc_no}
-      </h1>
+      <PageHeader
+        title={`${vi.receiving.returnDetailTitle}: ${detail.doc_no}`}
+      />
 
-      <section className="rounded-xl border bg-card p-4 shadow-sm">
+      <section className="rounded-lg border bg-card p-4">
         <dl className="grid grid-cols-1 gap-2 text-sm sm:grid-cols-2">
           <div className="flex justify-between gap-3 sm:block">
             <dt className="text-muted-foreground">{vi.common.status}</dt>
@@ -96,7 +97,7 @@ export default async function DesktopReturnDetailPage({
         </dl>
       </section>
 
-      <section className="rounded-xl border bg-card p-4 shadow-sm">
+      <section className="rounded-lg border bg-card p-4">
         <h2 className="font-semibold">{vi.receiving.returnLinesTitle}</h2>
         {detail.lines.length === 0 ? (
           <p className="mt-2 text-sm text-muted-foreground">
@@ -105,26 +106,26 @@ export default async function DesktopReturnDetailPage({
         ) : (
           <div className="mt-3 overflow-x-auto">
             <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b text-left text-muted-foreground">
-                  <th className="py-2 pr-4 font-medium">
+              <thead className="bg-muted/40 text-left">
+                <tr>
+                  <th className="py-2.5 pr-3 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
                     {vi.receiving.itemName}
                   </th>
-                  <th className="py-2 pr-4 text-right font-medium">
+                  <th className="py-2.5 pr-3 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase text-right">
                     {vi.receiving.returnQty}
                   </th>
-                  <th className="py-2 pr-4 text-right font-medium">
+                  <th className="py-2.5 pr-3 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase text-right">
                     {vi.receiving.unitCost}
                   </th>
-                  <th className="py-2 text-right font-medium">
+                  <th className="py-2.5 pr-3 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase text-right">
                     {vi.receiving.lineAmount}
                   </th>
                 </tr>
               </thead>
               <tbody>
                 {detail.lines.map((line) => (
-                  <tr key={line.id} className="border-b last:border-b-0">
-                    <td className="py-2 pr-4">
+                  <tr key={line.id} className="border-t hover:bg-muted/40">
+                    <td className="py-3 pr-3 align-middle">
                       <p className="font-medium">{line.item_name}</p>
                       {line.reason ? (
                         <p className="text-muted-foreground">
@@ -132,13 +133,15 @@ export default async function DesktopReturnDetailPage({
                         </p>
                       ) : null}
                     </td>
-                    <td className="py-2 pr-4 text-right">{line.qty_stock}</td>
-                    <td className="py-2 pr-4 text-right">
+                    <td className="py-3 pr-3 text-right align-middle">
+                      {line.qty_stock}
+                    </td>
+                    <td className="py-3 pr-3 text-right align-middle">
                       {line.unit_cost === null
                         ? vi.common.noData
                         : line.unit_cost.toLocaleString("vi-VN")}
                     </td>
-                    <td className="py-2 text-right">
+                    <td className="py-3 pr-3 text-right align-middle">
                       {line.line_amount === null
                         ? vi.common.noData
                         : line.line_amount.toLocaleString("vi-VN")}

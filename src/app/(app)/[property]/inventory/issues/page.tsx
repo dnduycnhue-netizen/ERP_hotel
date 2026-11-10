@@ -13,6 +13,7 @@ import {
 import { formatNumber } from "@/components/common/money-text";
 import { listPurposeIssuesAction } from "@/features/inventory/actions";
 import { vi } from "@/i18n/vi";
+import { PageHeader } from "@/components/shell/page-header";
 
 const STATUSES = ["draft", "posted", "reversed", "cancelled"] as const;
 
@@ -69,7 +70,7 @@ export default async function PurposeIssuesPage({
 
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="text-2xl font-semibold">{vi.inventory.issuesTitle}</h1>
+      <PageHeader title={vi.inventory.issuesTitle} />
 
       <StatusFilter
         status={status}
@@ -101,36 +102,40 @@ export default async function PurposeIssuesPage({
           description={vi.inventory.issuesEmpty}
         />
       ) : (
-        <div className="overflow-x-auto rounded-xl border bg-card shadow-sm">
+        <div className="overflow-x-auto rounded-lg border bg-card">
           <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b text-left text-muted-foreground">
-                <th className="px-4 py-3 font-medium">{vi.inventory.docNo}</th>
-                <th className="px-4 py-3 font-medium">{vi.common.status}</th>
-                <th className="px-4 py-3 font-medium">
+            <thead className="bg-muted/40 text-left">
+              <tr>
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                  {vi.inventory.docNo}
+                </th>
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                  {vi.common.status}
+                </th>
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
                   {vi.inventory.businessDate}
                 </th>
-                <th className="px-4 py-3 font-medium">
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
                   {vi.inventory.purpose}
                 </th>
-                <th className="px-4 py-3 font-medium">
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
                   {vi.inventory.warehouse}
                 </th>
-                <th className="px-4 py-3 font-medium">
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
                   {vi.inventory.costCenter}
                 </th>
-                <th className="px-4 py-3 text-right font-medium">
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase text-right">
                   {vi.inventory.lineCount}
                 </th>
-                <th className="px-4 py-3 text-right font-medium">
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase text-right">
                   {vi.inventory.totalQty}
                 </th>
               </tr>
             </thead>
             <tbody>
               {rows.map((row) => (
-                <tr key={row.id} className="border-b last:border-b-0">
-                  <td className="px-4 py-3">
+                <tr key={row.id} className="border-t hover:bg-muted/40">
+                  <td className="px-3 py-3 align-middle">
                     <Link
                       href={`/${propertyId}/inventory/issues/${row.id}`}
                       className="font-medium hover:underline"
@@ -138,19 +143,25 @@ export default async function PurposeIssuesPage({
                       {row.doc_no}
                     </Link>
                   </td>
-                  <td className="px-4 py-3">
+                  <td className="px-3 py-3 align-middle">
                     <DocStatusBadge status={row.status} />
                   </td>
-                  <td className="px-4 py-3 whitespace-nowrap">
+                  <td className="px-3 py-3 whitespace-nowrap align-middle">
                     {row.business_date}
                   </td>
-                  <td className="px-4 py-3">
+                  <td className="px-3 py-3 align-middle">
                     {purposeLabel(row.purpose_code)}
                   </td>
-                  <td className="px-4 py-3">{row.warehouse_name ?? "—"}</td>
-                  <td className="px-4 py-3">{row.cost_center_name ?? "—"}</td>
-                  <td className="px-4 py-3 text-right">{row.line_count}</td>
-                  <td className="px-4 py-3 text-right">
+                  <td className="px-3 py-3 align-middle">
+                    {row.warehouse_name ?? "—"}
+                  </td>
+                  <td className="px-3 py-3 align-middle">
+                    {row.cost_center_name ?? "—"}
+                  </td>
+                  <td className="px-3 py-3 text-right align-middle">
+                    {row.line_count}
+                  </td>
+                  <td className="px-3 py-3 text-right align-middle">
                     {formatNumber(row.total_qty_stock)}
                   </td>
                 </tr>

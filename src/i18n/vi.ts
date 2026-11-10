@@ -9,6 +9,10 @@ export const vi = {
     closeSidebar: "Đóng menu",
     searchPlaceholder: "Tìm kiếm chức năng…",
     searchNoResults: "Không tìm thấy chức năng nào",
+    listView: "Danh sách",
+    boardView: "Bảng",
+    boardNote:
+      "Bảng nhóm các chứng từ của trang hiện tại theo trạng thái — bấm vào thẻ để mở chi tiết.",
     switchProperty: "Đổi khách sạn",
     groups: {
       overview: "Tổng quan",
@@ -455,6 +459,7 @@ export const vi = {
     passwordLabel: "Mật khẩu",
     signIn: "Đăng nhập",
     signOut: "Đăng xuất",
+    account: "Tài khoản",
     callbackTitle: "Đang xác minh lời mời",
     callbackErrorTitle: "Liên kết không còn hợp lệ",
     callbackErrorDescription:

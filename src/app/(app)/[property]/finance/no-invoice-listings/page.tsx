@@ -6,6 +6,7 @@ import {
   listNoInvoiceListings,
 } from "@/features/finance/queries";
 import { vi } from "@/i18n/vi";
+import { PageHeader } from "@/components/shell/page-header";
 
 /** Bảng kê mua hàng không hóa đơn (T-041): danh sách + nhập mới + duyệt. */
 export default async function FinanceNoInvoiceListingsPage({
@@ -25,12 +26,12 @@ export default async function FinanceNoInvoiceListingsPage({
   }
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-xl font-semibold">{vi.finance.listingsTitle}</h1>
+    <div className="space-y-4">
+      <PageHeader title={vi.finance.listingsTitle} />
       {perms.canManageInvoice ? (
         <NoInvoiceForm propertyId={propertyId} />
       ) : (
-        <p className="rounded-xl border bg-card p-4 text-sm text-muted-foreground">
+        <p className="rounded-lg border bg-card p-4 text-sm text-muted-foreground">
           {vi.finance.noPermissionListing}
         </p>
       )}

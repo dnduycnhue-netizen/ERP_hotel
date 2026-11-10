@@ -3,6 +3,7 @@ import { ErrorState } from "@/components/common/error-state";
 import { EmptyState } from "@/components/common/empty-state";
 import { listSupplierReturnsAction } from "@/features/receiving/actions";
 import { vi } from "@/i18n/vi";
+import { PageHeader } from "@/components/shell/page-header";
 
 /**
  * Danh sách phiếu trả hàng NCC trên desktop (T-026) — chỉ xem để soát
@@ -51,11 +52,9 @@ export default async function DesktopReturnsPage({
 
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="text-2xl font-semibold">
-        {vi.receiving.returnsListTitle}
-      </h1>
+      <PageHeader title={vi.receiving.returnsListTitle} />
 
-      <div className="flex gap-2">
+      <div className="flex flex-wrap gap-1.5">
         {(
           [
             ["", vi.common.all],
@@ -68,10 +67,10 @@ export default async function DesktopReturnsPage({
             key={value}
             href={`/${propertyId}/receiving/returns${value ? `?status=${value}` : ""}`}
             aria-current={status === value ? "page" : undefined}
-            className={`rounded-lg border px-3 py-1.5 text-sm font-medium ${
+            className={`rounded-full border px-3 py-1.5 text-sm font-medium outline-none transition-colors focus-visible:ring-2 focus-visible:ring-brand/40 ${
               status === value
-                ? "bg-primary text-primary-foreground"
-                : "bg-card hover:border-ring"
+                ? "border-brand/40 bg-brand/10 text-brand"
+                : "bg-background text-muted-foreground hover:text-foreground"
             }`}
           >
             {label}
@@ -89,32 +88,34 @@ export default async function DesktopReturnsPage({
           description={vi.receiving.returnsEmpty}
         />
       ) : (
-        <div className="overflow-x-auto rounded-xl border bg-card shadow-sm">
+        <div className="overflow-x-auto rounded-lg border bg-card">
           <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b text-left text-muted-foreground">
-                <th className="px-4 py-3 font-medium">
+            <thead className="bg-muted/40 text-left">
+              <tr>
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
                   {vi.receiving.returnDocNo}
                 </th>
-                <th className="px-4 py-3 font-medium">{vi.common.status}</th>
-                <th className="px-4 py-3 font-medium">
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                  {vi.common.status}
+                </th>
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
                   {vi.receiving.supplier}
                 </th>
-                <th className="px-4 py-3 font-medium">
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
                   {vi.receiving.returnGrDocNo}
                 </th>
-                <th className="px-4 py-3 text-right font-medium">
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase text-right">
                   {vi.receiving.returnQty}
                 </th>
-                <th className="px-4 py-3 text-right font-medium">
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase text-right">
                   {vi.receiving.totalAmount}
                 </th>
               </tr>
             </thead>
             <tbody>
               {returns.map((ret) => (
-                <tr key={ret.id} className="border-b last:border-b-0">
-                  <td className="px-4 py-3">
+                <tr key={ret.id} className="border-t hover:bg-muted/40">
+                  <td className="px-3 py-3 align-middle">
                     <Link
                       href={`/${propertyId}/receiving/returns/${ret.id}`}
                       className="font-medium hover:underline"
@@ -122,13 +123,19 @@ export default async function DesktopReturnsPage({
                       {ret.doc_no}
                     </Link>
                   </td>
-                  <td className="px-4 py-3">{statusLabel(ret.status)}</td>
-                  <td className="px-4 py-3">{ret.supplier_name}</td>
-                  <td className="px-4 py-3">{ret.gr_doc_no ?? "—"}</td>
-                  <td className="px-4 py-3 text-right">
+                  <td className="px-3 py-3 align-middle">
+                    {statusLabel(ret.status)}
+                  </td>
+                  <td className="px-3 py-3 align-middle">
+                    {ret.supplier_name}
+                  </td>
+                  <td className="px-3 py-3 align-middle">
+                    {ret.gr_doc_no ?? "—"}
+                  </td>
+                  <td className="px-3 py-3 text-right align-middle">
                     {ret.total_qty_stock}
                   </td>
-                  <td className="px-4 py-3 text-right">
+                  <td className="px-3 py-3 text-right align-middle">
                     {ret.total_amount === null
                       ? vi.common.noData
                       : ret.total_amount.toLocaleString("vi-VN")}
@@ -145,7 +152,7 @@ export default async function DesktopReturnsPage({
           {page > 1 ? (
             <Link
               href={`/${propertyId}/receiving/returns?page=${page - 1}${status ? `&status=${status}` : ""}`}
-              className="rounded-lg border bg-card px-3 py-1.5 hover:border-ring"
+              className="flex h-9 items-center rounded-md border bg-background px-3 font-medium outline-none transition-colors hover:bg-accent focus-visible:ring-2 focus-visible:ring-brand/40"
             >
               ← {vi.common.back}
             </Link>
@@ -156,7 +163,7 @@ export default async function DesktopReturnsPage({
           {page < totalPages ? (
             <Link
               href={`/${propertyId}/receiving/returns?page=${page + 1}${status ? `&status=${status}` : ""}`}
-              className="rounded-lg border bg-card px-3 py-1.5 hover:border-ring"
+              className="flex h-9 items-center rounded-md border bg-background px-3 font-medium outline-none transition-colors hover:bg-accent focus-visible:ring-2 focus-visible:ring-brand/40"
             >
               {vi.common.next} →
             </Link>

@@ -4,6 +4,7 @@ import { ReportsNav } from "@/components/report/report-nav";
 import { getReportPerms, type ReportPerms } from "@/features/report/queries";
 import { REPORT_CODES } from "@/features/report/definitions";
 import { vi } from "@/i18n/vi";
+import { PageHeader } from "@/components/shell/page-header";
 
 /**
  * Layout khu Báo cáo (T-044): chặn người không có quyền xem báo cáo nào,
@@ -23,7 +24,7 @@ export default async function ReportsLayout({
   if (!canAny) {
     return (
       <div className="space-y-4">
-        <h1 className="text-2xl font-bold">{vi.reports.title}</h1>
+        <PageHeader title={vi.reports.title} />
         <ErrorState title={vi.reports.noPermission} />
       </div>
     );
@@ -31,7 +32,7 @@ export default async function ReportsLayout({
 
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-bold">{vi.reports.title}</h1>
+      <PageHeader title={vi.reports.title} />
       <ReportsNav propertyId={property} perms={perms} />
       {children}
     </div>

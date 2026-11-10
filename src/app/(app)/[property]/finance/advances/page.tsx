@@ -2,6 +2,7 @@ import { ErrorState } from "@/components/common/error-state";
 import { AdvanceList } from "@/components/finance/advance-list";
 import { listAdvances } from "@/features/procurement/queries";
 import { vi } from "@/i18n/vi";
+import { PageHeader } from "@/components/shell/page-header";
 
 /** Danh sách tạm ứng (T-041): trạng thái + hạn quyết toán. */
 export default async function FinanceAdvancesPage({
@@ -17,8 +18,8 @@ export default async function FinanceAdvancesPage({
   }
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-xl font-semibold">{vi.finance.advancesTitle}</h1>
+    <div className="space-y-4">
+      <PageHeader title={vi.finance.advancesTitle} />
       <AdvanceList propertyId={propertyId} advances={advancesRes.data.rows} />
     </div>
   );

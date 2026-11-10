@@ -112,7 +112,7 @@ export function FrontdeskCheckList({
             {rooms.map((room) => {
               const open = openByRoom.get(room.id);
               return (
-                <li key={room.id} className="rounded-xl border bg-card p-4">
+                <li key={room.id} className="rounded-lg border bg-card p-4">
                   <div className="flex items-center justify-between gap-2">
                     <span className="font-medium">
                       {vi.minibar.roomNo} {room.room_no}
@@ -173,7 +173,7 @@ export function FrontdeskCheckList({
               <li key={check.id}>
                 <Link
                   href={`/${propertyId}/frontdesk/minibar/${check.id}`}
-                  className="flex flex-wrap items-center justify-between gap-2 rounded-xl border bg-card p-4 hover:bg-muted/50"
+                  className="flex flex-wrap items-center justify-between gap-2 rounded-lg border bg-card p-4 hover:bg-muted/50"
                 >
                   <span>
                     <span className="block font-medium">
@@ -206,7 +206,7 @@ export function FrontdeskCheckList({
               <li key={check.id}>
                 <Link
                   href={`/${propertyId}/frontdesk/minibar/${check.id}`}
-                  className="flex flex-wrap items-center justify-between gap-2 rounded-xl border bg-card p-4 hover:bg-muted/50"
+                  className="flex flex-wrap items-center justify-between gap-2 rounded-lg border bg-card p-4 hover:bg-muted/50"
                 >
                   <span>
                     <span className="block font-medium">

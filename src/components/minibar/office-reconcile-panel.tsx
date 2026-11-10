@@ -51,7 +51,7 @@ export function OfficeReconcilePanel({ propertyId }: { propertyId: string }) {
     : [];
 
   return (
-    <div className="rounded-xl border bg-card p-4">
+    <div className="rounded-lg border bg-card p-4">
       <h2 className="font-medium">{vi.minibar.reconcileTitle}</h2>
       <p className="mt-1 text-sm text-muted-foreground">
         {vi.minibar.reconcileHint}
@@ -84,18 +84,20 @@ export function OfficeReconcilePanel({ propertyId }: { propertyId: string }) {
           <table className="w-full text-sm">
             <tbody>
               {rows.map((row) => (
-                <tr key={row.label} className="border-b last:border-0">
-                  <td className="py-2 pr-2 text-muted-foreground">
+                <tr key={row.label} className="border-t hover:bg-muted/40">
+                  <td className="py-3 pr-3 text-muted-foreground align-middle">
                     {row.label}
                   </td>
-                  <td className="py-2 text-right font-medium">
+                  <td className="py-3 pr-3 text-right font-medium align-middle">
                     <MoneyText amount={row.value} />
                   </td>
                 </tr>
               ))}
               <tr>
-                <td className="py-2 pr-2 font-semibold">{vi.minibar.diff}</td>
-                <td className="py-2 text-right font-semibold">
+                <td className="py-3 pr-3 font-semibold align-middle">
+                  {vi.minibar.diff}
+                </td>
+                <td className="py-3 pr-3 text-right font-semibold align-middle">
                   <MoneyText amount={Number(result.diff)} />
                 </td>
               </tr>

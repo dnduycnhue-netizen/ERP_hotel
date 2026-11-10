@@ -7,6 +7,7 @@ import {
 } from "@/features/finance/queries";
 import { listSuppliers } from "@/features/master/queries";
 import { vi } from "@/i18n/vi";
+import { PageHeader } from "@/components/shell/page-header";
 
 const VALID_STATUSES = new Set([
   "draft",
@@ -42,10 +43,8 @@ export default async function FinancePaymentRequestsPage({
     : "";
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-xl font-semibold">
-        {vi.finance.paymentRequestsTitle}
-      </h1>
+    <div className="space-y-4">
+      <PageHeader title={vi.finance.paymentRequestsTitle} />
       <PaymentRequestList
         propertyId={propertyId}
         requests={requestsRes.data}

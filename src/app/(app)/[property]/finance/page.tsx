@@ -9,6 +9,7 @@ import {
 } from "@/features/finance/queries";
 import { listAdvances } from "@/features/procurement/queries";
 import { vi } from "@/i18n/vi";
+import { PageHeader } from "@/components/shell/page-header";
 
 /** Tổng quan tài chính (T-041): còn phải trả, quá hạn, hóa đơn chờ xử lý. */
 export default async function FinanceOverviewPage({
@@ -56,13 +57,13 @@ export default async function FinanceOverviewPage({
   ).length;
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-xl font-semibold">{vi.finance.overviewTitle}</h1>
+    <div className="space-y-4">
+      <PageHeader title={vi.finance.overviewTitle} />
       <p className="text-sm text-muted-foreground">{vi.finance.overviewHint}</p>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Link
           href={`/${propertyId}/finance/payables`}
-          className="rounded-xl border bg-card p-4 hover:bg-muted/50"
+          className="rounded-lg border bg-card p-4 hover:bg-muted/50"
         >
           <p className="text-sm text-muted-foreground">
             {vi.finance.totalPayable}
@@ -73,7 +74,7 @@ export default async function FinanceOverviewPage({
         </Link>
         <Link
           href={`/${propertyId}/finance/payables`}
-          className="rounded-xl border bg-card p-4 hover:bg-muted/50"
+          className="rounded-lg border bg-card p-4 hover:bg-muted/50"
         >
           <p className="text-sm text-muted-foreground">
             {vi.finance.totalOverdue}
@@ -86,7 +87,7 @@ export default async function FinanceOverviewPage({
         </Link>
         <Link
           href={`/${propertyId}/finance/payment-requests?status=submitted`}
-          className="rounded-xl border bg-card p-4 hover:bg-muted/50"
+          className="rounded-lg border bg-card p-4 hover:bg-muted/50"
         >
           <p className="text-sm text-muted-foreground">
             {vi.finance.pendingPaymentRequests}
@@ -97,7 +98,7 @@ export default async function FinanceOverviewPage({
         </Link>
         <Link
           href={`/${propertyId}/finance/advances`}
-          className="rounded-xl border bg-card p-4 hover:bg-muted/50"
+          className="rounded-lg border bg-card p-4 hover:bg-muted/50"
         >
           <p className="text-sm text-muted-foreground">
             {vi.finance.unsettledAdvances}
@@ -108,7 +109,7 @@ export default async function FinanceOverviewPage({
       <div className="grid gap-4 sm:grid-cols-2">
         <Link
           href={`/${propertyId}/finance/invoices`}
-          className="rounded-xl border bg-card p-4 hover:bg-muted/50"
+          className="rounded-lg border bg-card p-4 hover:bg-muted/50"
         >
           <p className="font-medium">{vi.finance.navInvoices}</p>
           <p className="mt-1 text-sm text-muted-foreground">
@@ -118,7 +119,7 @@ export default async function FinanceOverviewPage({
         </Link>
         <Link
           href={`/${propertyId}/finance/no-invoice-listings`}
-          className="rounded-xl border bg-card p-4 hover:bg-muted/50"
+          className="rounded-lg border bg-card p-4 hover:bg-muted/50"
         >
           <p className="font-medium">{vi.finance.navNoInvoiceListings}</p>
           <p className="mt-1 text-sm text-muted-foreground">

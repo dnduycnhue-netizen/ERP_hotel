@@ -86,35 +86,47 @@ export function AlertsHistory({
         ) : (
           <div className="overflow-x-auto rounded-lg border">
             <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b bg-muted/50 text-left">
-                  <th className="px-3 py-2">{vi.alerts.createdAt}</th>
-                  <th className="px-3 py-2">{vi.alerts.code}</th>
-                  <th className="px-3 py-2">{vi.alerts.severity}</th>
-                  <th className="px-3 py-2">Tiêu đề</th>
-                  <th className="px-3 py-2">{vi.alerts.sentAt}</th>
-                  <th className="px-3 py-2">{vi.alerts.ackAt}</th>
+              <thead className="bg-muted/40 text-left">
+                <tr>
+                  <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                    {vi.alerts.createdAt}
+                  </th>
+                  <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                    {vi.alerts.code}
+                  </th>
+                  <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                    {vi.alerts.severity}
+                  </th>
+                  <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                    Tiêu đề
+                  </th>
+                  <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                    {vi.alerts.sentAt}
+                  </th>
+                  <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                    {vi.alerts.ackAt}
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {alerts.map((alert) => (
-                  <tr key={alert.id} className="border-b last:border-0">
-                    <td className="px-3 py-2 whitespace-nowrap">
+                  <tr key={alert.id} className="border-t hover:bg-muted/40">
+                    <td className="px-3 py-3 whitespace-nowrap align-middle">
                       {formatTime(alert.created_at)}
                     </td>
-                    <td className="px-3 py-2 font-mono text-xs">
+                    <td className="px-3 py-3 font-mono text-xs align-middle">
                       {alert.code}
                     </td>
-                    <td className="px-3 py-2">
+                    <td className="px-3 py-3 align-middle">
                       {severityLabel(alert.severity)}
                     </td>
-                    <td className="px-3 py-2">{alert.title}</td>
-                    <td className="px-3 py-2 whitespace-nowrap">
+                    <td className="px-3 py-3 align-middle">{alert.title}</td>
+                    <td className="px-3 py-3 whitespace-nowrap align-middle">
                       {alert.sent_at
                         ? formatTime(alert.sent_at)
                         : vi.alerts.notSent}
                     </td>
-                    <td className="px-3 py-2 whitespace-nowrap">
+                    <td className="px-3 py-3 whitespace-nowrap align-middle">
                       {alert.ack_at ? (
                         vi.alerts.acked
                       ) : (
@@ -138,37 +150,53 @@ export function AlertsHistory({
         ) : (
           <div className="overflow-x-auto rounded-lg border">
             <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b bg-muted/50 text-left">
-                  <th className="px-3 py-2">{vi.alerts.createdAt}</th>
-                  <th className="px-3 py-2">{vi.alerts.channel}</th>
-                  <th className="px-3 py-2">{vi.alerts.recipient}</th>
-                  <th className="px-3 py-2">Tiêu đề</th>
-                  <th className="px-3 py-2">{vi.alerts.status}</th>
-                  <th className="px-3 py-2">{vi.alerts.attempts}</th>
-                  <th className="px-3 py-2">{vi.alerts.errorMessage}</th>
+              <thead className="bg-muted/40 text-left">
+                <tr>
+                  <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                    {vi.alerts.createdAt}
+                  </th>
+                  <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                    {vi.alerts.channel}
+                  </th>
+                  <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                    {vi.alerts.recipient}
+                  </th>
+                  <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                    Tiêu đề
+                  </th>
+                  <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                    {vi.alerts.status}
+                  </th>
+                  <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                    {vi.alerts.attempts}
+                  </th>
+                  <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                    {vi.alerts.errorMessage}
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {deliveries.map((delivery) => (
-                  <tr key={delivery.id} className="border-b last:border-0">
-                    <td className="px-3 py-2 whitespace-nowrap">
+                  <tr key={delivery.id} className="border-t hover:bg-muted/40">
+                    <td className="px-3 py-3 whitespace-nowrap align-middle">
                       {formatTime(delivery.created_at)}
                     </td>
-                    <td className="px-3 py-2">
+                    <td className="px-3 py-3 align-middle">
                       {delivery.kind === "digest"
                         ? `${delivery.channel} (${vi.alerts.digest})`
                         : delivery.channel}
                     </td>
-                    <td className="px-3 py-2 break-all">
+                    <td className="px-3 py-3 break-all align-middle">
                       {delivery.recipient_address}
                     </td>
-                    <td className="px-3 py-2">{delivery.title}</td>
-                    <td className="px-3 py-2">
+                    <td className="px-3 py-3 align-middle">{delivery.title}</td>
+                    <td className="px-3 py-3 align-middle">
                       {statusLabel(delivery.status)}
                     </td>
-                    <td className="px-3 py-2">{delivery.attempts}</td>
-                    <td className="px-3 py-2 break-all">
+                    <td className="px-3 py-3 align-middle">
+                      {delivery.attempts}
+                    </td>
+                    <td className="px-3 py-3 break-all align-middle">
                       {delivery.error_message ?? "—"}
                     </td>
                   </tr>

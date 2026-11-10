@@ -9,6 +9,7 @@ import {
   type PmsDailyStatsValues,
 } from "@/features/pms-daily/queries";
 import { vi } from "@/i18n/vi";
+import { PageHeader } from "@/components/shell/page-header";
 
 type HistoryFieldKey = keyof PmsDailyStatsValues;
 
@@ -119,10 +120,10 @@ export default async function FrontdeskPmsDailyPage({
   }
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-xl font-semibold">{vi.pmsDaily.frontdeskTitle}</h1>
+    <div className="space-y-4">
+      <PageHeader title={vi.pmsDaily.frontdeskTitle} />
 
-      <form method="get" className="flex flex-wrap items-end gap-3">
+      <form method="get" className="flex flex-wrap items-end gap-2">
         <label className="block text-sm">
           {vi.pmsDaily.dateLabel}
           <input
@@ -130,24 +131,24 @@ export default async function FrontdeskPmsDailyPage({
             name="date"
             defaultValue={businessDate}
             max={today}
-            className="mt-1 block rounded-md border bg-background px-3 py-2 text-sm"
+            className="mt-1 block h-9 rounded-md border bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
           />
         </label>
         <Link
           href={`/${propertyId}/frontdesk/pms-daily?date=${shiftDate(businessDate, -1)}`}
-          className="rounded-md border px-3 py-2 text-sm hover:bg-muted"
+          className="inline-flex h-9 items-center rounded-md border bg-background px-3 text-sm font-medium outline-none transition-colors hover:bg-accent focus-visible:ring-2 focus-visible:ring-brand/40"
         >
           ← {vi.pmsDaily.prevDay}
         </Link>
         <Link
           href={`/${propertyId}/frontdesk/pms-daily?date=${shiftDate(businessDate, 1)}`}
-          className="rounded-md border px-3 py-2 text-sm hover:bg-muted"
+          className="inline-flex h-9 items-center rounded-md border bg-background px-3 text-sm font-medium outline-none transition-colors hover:bg-accent focus-visible:ring-2 focus-visible:ring-brand/40"
         >
           {vi.pmsDaily.nextDay} →
         </Link>
         <button
           type="submit"
-          className="rounded-md border bg-primary px-3 py-2 text-sm text-primary-foreground hover:bg-primary/90"
+          className="inline-flex h-9 items-center rounded-md bg-primary px-3 text-sm font-medium text-primary-foreground outline-none transition-colors hover:bg-primary/90 focus-visible:ring-2 focus-visible:ring-brand/40"
         >
           {vi.pmsDaily.viewButton}
         </button>

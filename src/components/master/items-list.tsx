@@ -9,6 +9,7 @@ import {
 } from "@/components/common/data-table";
 import { useCan } from "@/lib/permissions/permissions-provider";
 import { vi } from "@/i18n/vi";
+import { PageHeader } from "@/components/shell/page-header";
 import type {
   ItemRow,
   ItemGroupRow,
@@ -273,6 +274,10 @@ export function ItemsList({
 
   return (
     <div className="space-y-4">
+      <PageHeader
+        title={vi.master.items.title}
+        description={vi.master.items.description}
+      />
       {error ? (
         <div className="rounded-md border border-destructive/20 bg-destructive/10 p-3 text-sm text-destructive">
           {error}

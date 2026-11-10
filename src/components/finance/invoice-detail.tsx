@@ -4,23 +4,15 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { DocStatusBadge } from "@/components/common/doc-status-badge";
 import { MoneyText, formatNumber } from "@/components/common/money-text";
+import { PageHeader } from "@/components/shell/page-header";
 import {
   approveInvoiceAction,
   matchInvoiceAction,
 } from "@/features/finance/actions";
 import type { InvoiceDetail } from "@/features/finance/queries";
 import { vi } from "@/i18n/vi";
-
-const STATUS_LABELS: Record<string, string> = {
-  draft: vi.components.docStatus.draft,
-  matched: vi.components.docStatus.matched,
-  on_hold: vi.components.docStatus.onHold,
-  approved: vi.components.docStatus.approved,
-  partially_paid: vi.components.docStatus.partiallyPaid,
-  paid: vi.components.docStatus.paid,
-  cancelled: vi.components.docStatus.cancelled,
-};
 
 /**
  * Chi tiết hóa đơn (T-041): dòng hóa đơn + kết quả khớp 3 chiều từng
@@ -97,23 +89,24 @@ export function InvoiceDetailView({
 
   return (
     <div className="space-y-6">
-      <div className="rounded-xl border bg-card p-4">
+      <div className="rounded-lg border bg-card p-4">
         <div className="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <h1 className="text-xl font-semibold">
-              {invoice.invoice_symbol} {invoice.invoice_no}
-            </h1>
-            <p className="mt-1 text-sm text-muted-foreground">
-              {invoice.supplier_name ?? vi.common.noData} ·{" "}
-              {vi.finance.invoiceDate}: {invoice.invoice_date} ·{" "}
-              {STATUS_LABELS[invoice.status] ?? invoice.status}
-            </p>
+          <PageHeader
+            title={`${invoice.invoice_symbol} ${invoice.invoice_no}`}
+            description={
+              <>
+                {invoice.supplier_name ?? vi.common.noData} ·{" "}
+                {vi.finance.invoiceDate}: {invoice.invoice_date} ·{" "}
+                <DocStatusBadge status={invoice.status} />
+              </>
+            }
+          >
             {invoice.lookup_code ? (
-              <p className="mt-1 text-sm text-muted-foreground">
+              <p className="text-sm text-muted-foreground">
                 {vi.finance.lookupCode}: {invoice.lookup_code}
               </p>
             ) : null}
-          </div>
+          </PageHeader>
           <div className="text-right text-sm">
             <p>
               {vi.finance.totalBeforeTax}:{" "}
@@ -182,7 +175,7 @@ export function InvoiceDetailView({
         ) : null}
       </div>
 
-      <div className="rounded-xl border bg-card p-4">
+      <div className="rounded-lg border bg-card p-4">
         <h2 className="font-medium">{vi.finance.matchResultTitle}</h2>
         {lines.length === 0 ? (
           <p className="mt-2 text-sm text-muted-foreground">
@@ -191,43 +184,49 @@ export function InvoiceDetailView({
         ) : (
           <div className="mt-3 overflow-x-auto">
             <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b text-left text-muted-foreground">
-                  <th className="px-3 py-2">{vi.finance.itemDesc}</th>
-                  <th className="px-3 py-2 text-right">
+              <thead className="bg-muted/40 text-left">
+                <tr>
+                  <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                    {vi.finance.itemDesc}
+                  </th>
+                  <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase text-right">
                     {vi.finance.invoiceQty}
                   </th>
-                  <th className="px-3 py-2 text-right">
+                  <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase text-right">
                     {vi.finance.unitPrice}
                   </th>
-                  <th className="px-3 py-2 text-right">{vi.finance.vatRate}</th>
-                  <th className="px-3 py-2 text-right">
+                  <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase text-right">
+                    {vi.finance.vatRate}
+                  </th>
+                  <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase text-right">
                     {vi.finance.lineAmount}
                   </th>
-                  <th className="px-3 py-2">{vi.finance.matchResultTitle}</th>
+                  <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                    {vi.finance.matchResultTitle}
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {lines.map((l) => {
                   const m = l.match_result;
                   return (
-                    <tr key={l.id} className="border-b last:border-0">
-                      <td className="px-3 py-2">
+                    <tr key={l.id} className="border-t hover:bg-muted/40">
+                      <td className="px-3 py-3 align-middle">
                         {l.item_name ?? l.item_code ?? vi.common.noData}
                       </td>
-                      <td className="px-3 py-2 text-right">
+                      <td className="px-3 py-3 text-right align-middle">
                         {formatNumber(l.qty)}
                       </td>
-                      <td className="px-3 py-2 text-right">
+                      <td className="px-3 py-3 text-right align-middle">
                         <MoneyText amount={l.unit_price} />
                       </td>
-                      <td className="px-3 py-2 text-right">
+                      <td className="px-3 py-3 text-right align-middle">
                         {formatNumber(l.vat_rate)}%
                       </td>
-                      <td className="px-3 py-2 text-right">
+                      <td className="px-3 py-3 text-right align-middle">
                         <MoneyText amount={l.amount} />
                       </td>
-                      <td className="px-3 py-2 text-xs">
+                      <td className="px-3 py-3 text-xs align-middle">
                         {!m ? (
                           <span className="text-muted-foreground">
                             {vi.finance.matchNotRun}

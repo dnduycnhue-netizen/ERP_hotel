@@ -7,6 +7,7 @@ import {
 } from "@/features/finance/queries";
 import { listSuppliers } from "@/features/master/queries";
 import { vi } from "@/i18n/vi";
+import { PageHeader } from "@/components/shell/page-header";
 
 /** Công nợ nhà cung cấp (T-041): tuổi nợ theo due_date + sổ chi tiết. */
 export default async function FinancePayablesPage({
@@ -41,8 +42,8 @@ export default async function FinancePayablesPage({
   }
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-xl font-semibold">{vi.finance.payablesTitle}</h1>
+    <div className="space-y-4">
+      <PageHeader title={vi.finance.payablesTitle} />
       <PayablesView
         aging={agingRes.data}
         ledger={ledgerRes.data}

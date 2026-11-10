@@ -9,6 +9,7 @@ import type { ServiceContractDetail } from "@/features/service/queries";
 import { daysLeft } from "@/features/service/dates";
 import type { ServiceScheduleRow } from "@/features/service/queries";
 import { AcceptForm } from "./accept-form";
+import { PageHeader } from "@/components/shell/page-header";
 import { vi } from "@/i18n/vi";
 import { cn } from "@/lib/utils";
 
@@ -68,15 +69,19 @@ export function ContractDetail({
 
   return (
     <div className="space-y-6">
-      <div className="rounded-xl border bg-card p-4">
+      <div className="rounded-lg border bg-card p-4">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <h1 className="text-xl font-semibold">{contract.title}</h1>
-            <p className="mt-1 text-sm text-muted-foreground">
-              {contract.supplier_name ?? vi.common.noData} ·{" "}
-              {contract.expense_category_name ?? vi.common.noData} ·{" "}
-              {contract.cost_center_name ?? vi.common.noData}
-            </p>
+            <PageHeader
+              title={contract.title}
+              description={
+                <>
+                  {contract.supplier_name ?? vi.common.noData} ·{" "}
+                  {contract.expense_category_name ?? vi.common.noData} ·{" "}
+                  {contract.cost_center_name ?? vi.common.noData}
+                </>
+              }
+            />
             <p className="mt-1 text-sm text-muted-foreground">
               {CYCLE_LABELS[contract.billing_cycle] ?? contract.billing_cycle} ·{" "}
               <MoneyText amount={contract.amount_per_cycle} /> /{" "}
@@ -122,7 +127,7 @@ export function ContractDetail({
         ) : null}
       </div>
 
-      <div className="rounded-xl border bg-card p-4">
+      <div className="rounded-lg border bg-card p-4">
         <h2 className="font-medium">{vi.service.schedulesTitle}</h2>
         {schedules.length === 0 ? (
           <p className="mt-2 text-sm text-muted-foreground">

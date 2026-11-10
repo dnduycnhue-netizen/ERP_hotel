@@ -224,7 +224,7 @@ export function PrDetail({
         </div>
       </div>
 
-      <div className="rounded-xl border p-4">
+      <div className="rounded-lg border p-4">
         <h3 className="font-semibold text-sm mb-3">
           {vi.procurement.list.lines} ({lines.length})
         </h3>
@@ -234,26 +234,32 @@ export function PrDetail({
           </p>
         ) : (
           <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b text-left text-xs text-muted-foreground">
-                <th className="py-2 pr-2">{vi.procurement.form.item}</th>
-                <th className="py-2 pr-2 text-right">
+            <thead className="bg-muted/40 text-left">
+              <tr>
+                <th className="py-2.5 pr-3 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                  {vi.procurement.form.item}
+                </th>
+                <th className="py-2.5 pr-3 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase text-right">
                   {vi.procurement.form.qty}
                 </th>
-                <th className="py-2 pr-2">{vi.procurement.form.uom}</th>
-                <th className="py-2 pr-2 text-right">
+                <th className="py-2.5 pr-3 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                  {vi.procurement.form.uom}
+                </th>
+                <th className="py-2.5 pr-3 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase text-right">
                   {vi.procurement.detail.convertedQty}
                 </th>
-                <th className="py-2 pr-2 text-right">
+                <th className="py-2.5 pr-3 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase text-right">
                   {vi.procurement.detail.remainingQty}
                 </th>
-                <th className="py-2 pr-2">{vi.procurement.form.reason}</th>
+                <th className="py-2.5 pr-3 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                  {vi.procurement.form.reason}
+                </th>
               </tr>
             </thead>
             <tbody>
               {lines.map((line) => (
-                <tr key={line.id} className="border-b last:border-0">
-                  <td className="py-2 pr-2">
+                <tr key={line.id} className="border-t hover:bg-muted/40">
+                  <td className="py-3 pr-3 align-middle">
                     {line.item_code ? (
                       <>
                         <span className="font-mono text-xs font-bold">
@@ -270,17 +276,17 @@ export function PrDetail({
                       </p>
                     ) : null}
                   </td>
-                  <td className="py-2 pr-2 text-right tabular-nums">
+                  <td className="py-3 pr-3 text-right tabular-nums align-middle">
                     {formatNumber(line.qty)}
                   </td>
-                  <td className="py-2 pr-2">{line.uom}</td>
-                  <td className="py-2 pr-2 text-right tabular-nums">
+                  <td className="py-3 pr-3 align-middle">{line.uom}</td>
+                  <td className="py-3 pr-3 text-right tabular-nums align-middle">
                     {formatNumber(line.converted_qty)}
                   </td>
-                  <td className="py-2 pr-2 text-right tabular-nums">
+                  <td className="py-3 pr-3 text-right tabular-nums align-middle">
                     {formatNumber(line.qty - line.converted_qty)}
                   </td>
-                  <td className="py-2 pr-2 text-muted-foreground">
+                  <td className="py-3 pr-3 text-muted-foreground align-middle">
                     {line.reason ?? "—"}
                   </td>
                 </tr>

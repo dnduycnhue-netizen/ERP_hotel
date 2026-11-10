@@ -13,6 +13,7 @@ import {
   listMinibarPrices,
 } from "@/features/minibar/queries";
 import { vi } from "@/i18n/vi";
+import { PageHeader } from "@/components/shell/page-header";
 
 /**
  * Màn văn phòng — minibar buồng phòng (T-035): tồn từng phòng, bổ
@@ -68,7 +69,7 @@ export default async function HousekeepingMinibarPage({
 
   return (
     <div className="space-y-8">
-      <h1 className="text-xl font-semibold">{vi.minibar.housekeepingTitle}</h1>
+      <PageHeader title={vi.minibar.housekeepingTitle} />
 
       <section className="space-y-3">
         <h2 className="text-lg font-semibold">{vi.minibar.stockTitle}</h2>
@@ -83,7 +84,7 @@ export default async function HousekeepingMinibarPage({
         ) : (
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {[...stocksByRoom.entries()].map(([roomId, rows]) => (
-              <div key={roomId} className="rounded-xl border bg-card p-4">
+              <div key={roomId} className="rounded-lg border bg-card p-4">
                 <p className="font-medium">
                   {vi.minibar.roomNo} {rows[0].room_no}
                   {rows[0].floor
@@ -132,7 +133,7 @@ export default async function HousekeepingMinibarPage({
         <OfficeReconcilePanel propertyId={propertyId} />
       ) : null}
 
-      <section className="rounded-xl border bg-card p-4">
+      <section className="rounded-lg border bg-card p-4">
         <h2 className="font-medium">{vi.minibar.recallTitle}</h2>
         {recallRes.data.length === 0 ? (
           <p className="mt-2 text-sm text-muted-foreground">
@@ -140,18 +141,24 @@ export default async function HousekeepingMinibarPage({
           </p>
         ) : (
           <table className="mt-3 w-full text-sm">
-            <thead>
-              <tr className="border-b text-left text-muted-foreground">
-                <th className="py-2 pr-2 font-medium">{vi.minibar.roomNo}</th>
-                <th className="py-2 pr-2 font-medium">{vi.minibar.itemCode}</th>
-                <th className="py-2 pr-2 font-medium">{vi.minibar.lotNo}</th>
-                <th className="py-2 pr-2 font-medium">
+            <thead className="bg-muted/40 text-left">
+              <tr>
+                <th className="py-2.5 pr-3 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                  {vi.minibar.roomNo}
+                </th>
+                <th className="py-2.5 pr-3 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                  {vi.minibar.itemCode}
+                </th>
+                <th className="py-2.5 pr-3 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                  {vi.minibar.lotNo}
+                </th>
+                <th className="py-2.5 pr-3 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
                   {vi.minibar.expiryDate}
                 </th>
-                <th className="py-2 pr-2 text-right font-medium">
+                <th className="py-2.5 pr-3 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase text-right">
                   {vi.minibar.daysLeft}
                 </th>
-                <th className="py-2 text-right font-medium">
+                <th className="py-2.5 pr-3 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase text-right">
                   {vi.minibar.qty}
                 </th>
               </tr>
@@ -160,16 +167,16 @@ export default async function HousekeepingMinibarPage({
               {recallRes.data.map((row) => (
                 <tr
                   key={`${row.room_no}-${row.lot_id}`}
-                  className="border-b last:border-0"
+                  className="border-t hover:bg-muted/40"
                 >
-                  <td className="py-2 pr-2">{row.room_no}</td>
-                  <td className="py-2 pr-2">{row.item_code}</td>
-                  <td className="py-2 pr-2">{row.lot_no}</td>
-                  <td className="py-2 pr-2">{row.expiry_date}</td>
-                  <td className="py-2 pr-2 text-right tabular-nums">
+                  <td className="py-3 pr-3 align-middle">{row.room_no}</td>
+                  <td className="py-3 pr-3 align-middle">{row.item_code}</td>
+                  <td className="py-3 pr-3 align-middle">{row.lot_no}</td>
+                  <td className="py-3 pr-3 align-middle">{row.expiry_date}</td>
+                  <td className="py-3 pr-3 text-right tabular-nums align-middle">
                     {row.days_left}
                   </td>
-                  <td className="py-2 text-right tabular-nums">
+                  <td className="py-3 pr-3 text-right tabular-nums align-middle">
                     {formatNumber(row.qty)}
                   </td>
                 </tr>
@@ -180,7 +187,7 @@ export default async function HousekeepingMinibarPage({
       </section>
 
       {perms.canViewReport ? (
-        <section className="rounded-xl border bg-card p-4">
+        <section className="rounded-lg border bg-card p-4">
           <h2 className="font-medium">
             {vi.minibar.reportTitle} — {monthStart} → {today}
           </h2>
@@ -230,30 +237,33 @@ export default async function HousekeepingMinibarPage({
               </dl>
               {report.topItems.length > 0 ? (
                 <table className="mt-4 w-full text-sm">
-                  <thead>
-                    <tr className="border-b text-left text-muted-foreground">
-                      <th className="py-2 pr-2 font-medium">
+                  <thead className="bg-muted/40 text-left">
+                    <tr>
+                      <th className="py-2.5 pr-3 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
                         {vi.minibar.itemName}
                       </th>
-                      <th className="py-2 pr-2 text-right font-medium">
+                      <th className="py-2.5 pr-3 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase text-right">
                         {vi.minibar.qty}
                       </th>
-                      <th className="py-2 text-right font-medium">
+                      <th className="py-2.5 pr-3 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase text-right">
                         {vi.minibar.amount}
                       </th>
                     </tr>
                   </thead>
                   <tbody>
                     {report.topItems.map((item) => (
-                      <tr key={item.item_id} className="border-b last:border-0">
-                        <td className="py-2 pr-2">
+                      <tr
+                        key={item.item_id}
+                        className="border-t hover:bg-muted/40"
+                      >
+                        <td className="py-3 pr-3 align-middle">
                           {item.item_name ?? vi.minibar.itemNameHidden}
                           {item.item_code ? ` (${item.item_code})` : ""}
                         </td>
-                        <td className="py-2 pr-2 text-right tabular-nums">
+                        <td className="py-3 pr-3 text-right tabular-nums align-middle">
                           {formatNumber(item.qty)}
                         </td>
-                        <td className="py-2 text-right">
+                        <td className="py-3 pr-3 text-right align-middle">
                           <MoneyText amount={item.amount} />
                         </td>
                       </tr>

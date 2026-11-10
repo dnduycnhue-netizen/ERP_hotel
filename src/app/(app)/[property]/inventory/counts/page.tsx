@@ -11,6 +11,7 @@ import {
 } from "@/components/inventory/doc-list-controls";
 import { listCounts } from "@/features/count/queries";
 import { vi } from "@/i18n/vi";
+import { PageHeader } from "@/components/shell/page-header";
 
 const STATUSES = [
   "open",
@@ -66,15 +67,17 @@ export default async function CountsPage({
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between gap-3">
-        <h1 className="text-2xl font-semibold">{vi.count.countsTitle}</h1>
-        <Link
-          href={`/${propertyId}/inventory/counts/new`}
-          className="rounded-lg border bg-card px-3 py-1.5 text-sm font-medium hover:border-ring"
-        >
-          {vi.count.openButton}
-        </Link>
-      </div>
+      <PageHeader
+        title={vi.count.countsTitle}
+        actions={
+          <Link
+            href={`/${propertyId}/inventory/counts/new`}
+            className="inline-flex h-9 items-center rounded-md border bg-background px-3 text-sm font-medium outline-none transition-colors hover:bg-accent focus-visible:ring-2 focus-visible:ring-brand/40"
+          >
+            {vi.count.openButton}
+          </Link>
+        }
+      />
 
       <StatusFilter
         status={status}
@@ -93,23 +96,31 @@ export default async function CountsPage({
       {items.length === 0 ? (
         <EmptyState title={vi.count.countsEmpty} />
       ) : (
-        <div className="overflow-x-auto rounded-xl border bg-card">
+        <div className="overflow-x-auto rounded-lg border bg-card">
           <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b text-left text-muted-foreground">
-                <th className="px-3 py-2 font-medium">{vi.count.docNo}</th>
-                <th className="px-3 py-2 font-medium">{vi.count.warehouse}</th>
-                <th className="px-3 py-2 font-medium">
+            <thead className="bg-muted/40 text-left">
+              <tr>
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                  {vi.count.docNo}
+                </th>
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                  {vi.count.warehouse}
+                </th>
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
                   {vi.count.businessDate}
                 </th>
-                <th className="px-3 py-2 font-medium">{vi.count.kind}</th>
-                <th className="px-3 py-2 font-medium">{vi.count.status}</th>
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                  {vi.count.kind}
+                </th>
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                  {vi.count.status}
+                </th>
               </tr>
             </thead>
             <tbody>
               {items.map((count) => (
-                <tr key={count.id} className="border-b last:border-0">
-                  <td className="px-3 py-2">
+                <tr key={count.id} className="border-t hover:bg-muted/40">
+                  <td className="px-3 py-3 align-middle">
                     <Link
                       href={`/${propertyId}/inventory/counts/${count.id}`}
                       className="font-medium text-primary underline"
@@ -117,11 +128,13 @@ export default async function CountsPage({
                       {count.doc_no}
                     </Link>
                   </td>
-                  <td className="px-3 py-2">
+                  <td className="px-3 py-3 align-middle">
                     {count.warehouse_name ?? vi.common.noData}
                   </td>
-                  <td className="px-3 py-2">{count.business_date}</td>
-                  <td className="px-3 py-2">
+                  <td className="px-3 py-3 align-middle">
+                    {count.business_date}
+                  </td>
+                  <td className="px-3 py-3 align-middle">
                     {count.kind === "monthly_full"
                       ? vi.count.kindMonthlyFull
                       : count.kind === "cycle"
@@ -132,7 +145,7 @@ export default async function CountsPage({
                             ? vi.count.kindTrolley
                             : vi.count.kindMinibarAudit}
                   </td>
-                  <td className="px-3 py-2">
+                  <td className="px-3 py-3 align-middle">
                     <DocStatusBadge status={count.status} />
                   </td>
                 </tr>

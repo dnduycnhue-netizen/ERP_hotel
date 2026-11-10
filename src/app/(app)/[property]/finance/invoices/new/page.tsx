@@ -4,6 +4,7 @@ import { getFinancePerms } from "@/features/finance/queries";
 import { listSuppliers } from "@/features/master/queries";
 import { getPo, listPos } from "@/features/procurement/queries";
 import { vi } from "@/i18n/vi";
+import { PageHeader } from "@/components/shell/page-header";
 
 /** Nhập hóa đơn mới (T-041): chọn NCC → đơn mua → nhập dòng. */
 export default async function NewInvoicePage({
@@ -39,8 +40,8 @@ export default async function NewInvoicePage({
   }
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-xl font-semibold">{vi.finance.newInvoice}</h1>
+    <div className="space-y-4">
+      <PageHeader title={vi.finance.newInvoice} />
       <InvoiceForm
         key={poId}
         propertyId={propertyId}

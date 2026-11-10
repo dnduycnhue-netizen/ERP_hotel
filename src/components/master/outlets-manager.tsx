@@ -9,6 +9,7 @@ import {
 } from "@/components/common/data-table";
 import { useCan } from "@/lib/permissions/permissions-provider";
 import { vi } from "@/i18n/vi";
+import { PageHeader } from "@/components/shell/page-header";
 import type {
   OutletRow,
   OutletTypeRow,
@@ -183,32 +184,30 @@ export function OutletsManager({
         </div>
       ) : null}
 
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-lg font-semibold">{vi.master.outlets.title}</h2>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            {vi.master.outlets.description}
-          </p>
-        </div>
-        {canManage ? (
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setTypeOpen(true)}
-            >
-              + {vi.master.outlets.addOutletType}
-            </Button>
-            <Button
-              size="sm"
-              onClick={startCreateOutlet}
-              disabled={outletTypes.length === 0}
-            >
-              + {vi.master.outlets.addOutlet}
-            </Button>
-          </div>
-        ) : null}
-      </div>
+      <PageHeader
+        title={vi.master.outlets.title}
+        description={vi.master.outlets.description}
+        actions={
+          canManage ? (
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setTypeOpen(true)}
+              >
+                + {vi.master.outlets.addOutletType}
+              </Button>
+              <Button
+                size="sm"
+                onClick={startCreateOutlet}
+                disabled={outletTypes.length === 0}
+              >
+                + {vi.master.outlets.addOutlet}
+              </Button>
+            </div>
+          ) : null
+        }
+      />
 
       <DataTable columns={columns} rows={outlets} />
 

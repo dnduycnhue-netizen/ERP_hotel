@@ -69,7 +69,10 @@ export function FinanceNav({
     },
   ];
   return (
-    <nav className="flex flex-wrap gap-2" aria-label={vi.finance.title}>
+    <nav
+      className="mb-6 flex gap-1 overflow-x-auto border-b"
+      aria-label={vi.finance.title}
+    >
       {items
         .filter((i) => i.show)
         .map((i) => (
@@ -78,10 +81,10 @@ export function FinanceNav({
             href={i.href}
             aria-current={i.active ? "page" : undefined}
             className={cn(
-              "rounded-full border px-3 py-1.5 text-sm",
+              "shrink-0 border-b-2 px-3 py-2 text-sm font-medium whitespace-nowrap transition-colors outline-none focus-visible:ring-2 focus-visible:ring-brand/40",
               i.active
-                ? "border-primary bg-primary text-primary-foreground"
-                : "bg-background text-foreground/80 hover:text-foreground",
+                ? "border-brand text-brand"
+                : "border-transparent text-muted-foreground hover:text-foreground",
             )}
           >
             {i.label}

@@ -5,6 +5,7 @@ import { ErrorState } from "@/components/common/error-state";
 import { MoneyText, formatNumber } from "@/components/common/money-text";
 import { getPurposeIssueAction } from "@/features/inventory/actions";
 import { vi } from "@/i18n/vi";
+import { PageHeader } from "@/components/shell/page-header";
 
 /** Chi tiết xuất mục đích (T-031) — chỉ xem. Giá vốn chỉ hiện khi RPC trả (có stock.view_value). */
 export default async function PurposeIssueDetailPage({
@@ -39,12 +40,12 @@ export default async function PurposeIssueDetailPage({
         ← {vi.common.back}
       </Link>
 
-      <div className="flex flex-wrap items-center gap-3">
-        <h1 className="text-2xl font-semibold">{doc.doc_no}</h1>
-        <DocStatusBadge status={doc.status} />
-      </div>
+      <PageHeader
+        title={doc.doc_no}
+        description={<DocStatusBadge status={doc.status} />}
+      />
 
-      <dl className="grid grid-cols-2 gap-x-6 gap-y-2 rounded-xl border bg-card p-4 text-sm sm:grid-cols-3">
+      <dl className="grid grid-cols-2 gap-x-6 gap-y-2 rounded-lg border bg-card p-4 text-sm sm:grid-cols-3">
         <div>
           <dt className="text-muted-foreground">{vi.inventory.businessDate}</dt>
           <dd className="font-medium">{doc.business_date}</dd>
@@ -79,57 +80,67 @@ export default async function PurposeIssueDetailPage({
           description={vi.inventory.issuesEmpty}
         />
       ) : (
-        <div className="overflow-x-auto rounded-xl border bg-card shadow-sm">
+        <div className="overflow-x-auto rounded-lg border bg-card">
           <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b text-left text-muted-foreground">
-                <th className="px-4 py-3 font-medium">
+            <thead className="bg-muted/40 text-left">
+              <tr>
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
                   {vi.inventory.itemName}
                 </th>
-                <th className="px-4 py-3 font-medium">{vi.inventory.uom}</th>
-                <th className="px-4 py-3 text-right font-medium">
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                  {vi.inventory.uom}
+                </th>
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase text-right">
                   {vi.inventory.qty}
                 </th>
-                <th className="px-4 py-3 text-right font-medium">
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase text-right">
                   {vi.inventory.qtyStock}
                 </th>
-                <th className="px-4 py-3 font-medium">{vi.inventory.lot}</th>
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                  {vi.inventory.lot}
+                </th>
                 {showValue ? (
                   <>
-                    <th className="px-4 py-3 text-right font-medium">
+                    <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase text-right">
                       {vi.inventory.unitCost}
                     </th>
-                    <th className="px-4 py-3 text-right font-medium">
+                    <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase text-right">
                       {vi.inventory.lineAmount}
                     </th>
                   </>
                 ) : null}
-                <th className="px-4 py-3 font-medium">{vi.inventory.note}</th>
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                  {vi.inventory.note}
+                </th>
               </tr>
             </thead>
             <tbody>
               {doc.lines.map((line) => (
-                <tr key={line.id} className="border-b last:border-b-0">
-                  <td className="px-4 py-3 font-medium">{line.item_name}</td>
-                  <td className="px-4 py-3">{line.uom}</td>
-                  <td className="px-4 py-3 text-right">
+                <tr key={line.id} className="border-t hover:bg-muted/40">
+                  <td className="px-3 py-3 font-medium align-middle">
+                    {line.item_name}
+                  </td>
+                  <td className="px-3 py-3 align-middle">{line.uom}</td>
+                  <td className="px-3 py-3 text-right align-middle">
                     {formatNumber(line.qty)}
                   </td>
-                  <td className="px-4 py-3 text-right">
+                  <td className="px-3 py-3 text-right align-middle">
                     {formatNumber(line.qty_stock)}
                   </td>
-                  <td className="px-4 py-3">{line.lot_no ?? "—"}</td>
+                  <td className="px-3 py-3 align-middle">
+                    {line.lot_no ?? "—"}
+                  </td>
                   {showValue ? (
                     <>
-                      <td className="px-4 py-3 text-right">
+                      <td className="px-3 py-3 text-right align-middle">
                         <MoneyText amount={line.unit_cost} />
                       </td>
-                      <td className="px-4 py-3 text-right">
+                      <td className="px-3 py-3 text-right align-middle">
                         <MoneyText amount={line.line_amount} />
                       </td>
                     </>
                   ) : null}
-                  <td className="px-4 py-3">{line.note ?? "—"}</td>
+                  <td className="px-3 py-3 align-middle">{line.note ?? "—"}</td>
                 </tr>
               ))}
             </tbody>

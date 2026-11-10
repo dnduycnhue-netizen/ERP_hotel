@@ -65,7 +65,7 @@ export function OfficePriceManager({
   }
 
   return (
-    <div className="rounded-xl border bg-card p-4">
+    <div className="rounded-lg border bg-card p-4">
       <h2 className="font-medium">{vi.minibar.priceListTitle}</h2>
       {message ? (
         <p className="mt-3 rounded-md border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-800">
@@ -139,20 +139,26 @@ export function OfficePriceManager({
         </p>
       ) : (
         <table className="mt-4 w-full text-sm">
-          <thead>
-            <tr className="border-b text-left text-muted-foreground">
-              <th className="py-2 pr-2 font-medium">{vi.minibar.itemName}</th>
-              <th className="py-2 pr-2 text-right font-medium">
+          <thead className="bg-muted/40 text-left">
+            <tr>
+              <th className="py-2.5 pr-3 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                {vi.minibar.itemName}
+              </th>
+              <th className="py-2.5 pr-3 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase text-right">
                 {vi.minibar.price}
               </th>
-              <th className="py-2 pr-2 font-medium">{vi.minibar.validFrom}</th>
-              <th className="py-2 font-medium">{vi.minibar.validTo}</th>
+              <th className="py-2.5 pr-3 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                {vi.minibar.validFrom}
+              </th>
+              <th className="py-2.5 pr-3 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                {vi.minibar.validTo}
+              </th>
             </tr>
           </thead>
           <tbody>
             {prices.map((row) => (
-              <tr key={row.id} className="border-b last:border-0">
-                <td className="py-2 pr-2">
+              <tr key={row.id} className="border-t hover:bg-muted/40">
+                <td className="py-3 pr-3 align-middle">
                   {row.item_name ?? vi.minibar.itemNameHidden}
                   {row.item_code ? (
                     <span className="block text-xs text-muted-foreground">
@@ -160,11 +166,13 @@ export function OfficePriceManager({
                     </span>
                   ) : null}
                 </td>
-                <td className="py-2 pr-2 text-right">
+                <td className="py-3 pr-3 text-right align-middle">
                   <MoneyText amount={row.price} />
                 </td>
-                <td className="py-2 pr-2">{row.valid_from}</td>
-                <td className="py-2">{row.valid_to ?? vi.common.noData}</td>
+                <td className="py-3 pr-3 align-middle">{row.valid_from}</td>
+                <td className="py-3 pr-3 align-middle">
+                  {row.valid_to ?? vi.common.noData}
+                </td>
               </tr>
             ))}
           </tbody>

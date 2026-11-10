@@ -155,7 +155,7 @@ export function MarketOrderForm({
         </div>
       ) : null}
 
-      <div className="rounded-xl border p-4 space-y-3">
+      <div className="rounded-lg border p-4 space-y-3">
         <h2 className="text-lg font-semibold">
           {vi.procurement.market.createTitle}
         </h2>
@@ -222,7 +222,7 @@ export function MarketOrderForm({
         {lines.map((line, index) => (
           <div
             key={line.key}
-            className="rounded-xl border p-4 space-y-3 bg-card"
+            className="rounded-lg border p-4 space-y-3 bg-card"
           >
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium">

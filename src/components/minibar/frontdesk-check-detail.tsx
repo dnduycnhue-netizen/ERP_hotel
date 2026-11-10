@@ -18,6 +18,7 @@ import type {
   MinibarPerms,
 } from "@/features/minibar/queries";
 import { vi } from "@/i18n/vi";
+import { PageHeader } from "@/components/shell/page-header";
 
 function statusLabel(status: MinibarCheckStatus): string {
   switch (status) {
@@ -86,14 +87,15 @@ export function FrontdeskCheckDetail({
 
   return (
     <div className="flex flex-col gap-6">
-      <div>
-        <h1 className="text-xl font-semibold">
-          {vi.minibar.detailTitle} — {vi.minibar.roomNo} {check.room_no}
-        </h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          {check.doc_no} · {check.business_date} · {statusLabel(check.status)}
-          {check.is_loss ? ` · ${vi.minibar.isLoss}` : ""}
-        </p>
+      <PageHeader
+        title={`${vi.minibar.detailTitle} — ${vi.minibar.roomNo} ${check.room_no}`}
+        description={
+          <>
+            {check.doc_no} · {check.business_date} · {statusLabel(check.status)}
+            {check.is_loss ? ` · ${vi.minibar.isLoss}` : ""}
+          </>
+        }
+      >
         {check.is_loss ? (
           <p className="mt-3 flex items-start gap-2 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
             <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
@@ -110,9 +112,9 @@ export function FrontdeskCheckDetail({
             {error}
           </p>
         ) : null}
-      </div>
+      </PageHeader>
 
-      <section className="rounded-xl border bg-card p-4">
+      <section className="rounded-lg border bg-card p-4">
         <h2 className="font-medium">{vi.minibar.checksTitle}</h2>
         {!isChecked ? (
           <p className="mt-2 text-sm text-muted-foreground">
@@ -124,24 +126,26 @@ export function FrontdeskCheckDetail({
           </p>
         ) : (
           <table className="mt-3 w-full text-sm">
-            <thead>
-              <tr className="border-b text-left text-muted-foreground">
-                <th className="py-2 pr-2 font-medium">{vi.minibar.itemName}</th>
-                <th className="py-2 pr-2 text-right font-medium">
+            <thead className="bg-muted/40 text-left">
+              <tr>
+                <th className="py-2.5 pr-3 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                  {vi.minibar.itemName}
+                </th>
+                <th className="py-2.5 pr-3 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase text-right">
                   {vi.minibar.missingQty}
                 </th>
-                <th className="py-2 pr-2 text-right font-medium">
+                <th className="py-2.5 pr-3 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase text-right">
                   {vi.minibar.unitPrice}
                 </th>
-                <th className="py-2 text-right font-medium">
+                <th className="py-2.5 pr-3 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase text-right">
                   {vi.minibar.amount}
                 </th>
               </tr>
             </thead>
             <tbody>
               {lines.map((line) => (
-                <tr key={line.id} className="border-b last:border-0">
-                  <td className="py-2 pr-2">
+                <tr key={line.id} className="border-t hover:bg-muted/40">
+                  <td className="py-3 pr-3 align-middle">
                     {line.item_name ?? vi.minibar.itemNameHidden}
                     {line.item_code ? (
                       <span className="block text-xs text-muted-foreground">
@@ -154,13 +158,13 @@ export function FrontdeskCheckDetail({
                       </span>
                     ) : null}
                   </td>
-                  <td className="py-2 pr-2 text-right tabular-nums">
+                  <td className="py-3 pr-3 text-right tabular-nums align-middle">
                     {formatNumber(line.missing_qty)} {line.stock_uom ?? ""}
                   </td>
-                  <td className="py-2 pr-2 text-right">
+                  <td className="py-3 pr-3 text-right align-middle">
                     <MoneyText amount={line.unit_price} />
                   </td>
-                  <td className="py-2 text-right font-medium">
+                  <td className="py-3 pr-3 text-right font-medium align-middle">
                     <MoneyText amount={line.amount} />
                   </td>
                 </tr>
@@ -187,7 +191,7 @@ export function FrontdeskCheckDetail({
       {isOpen && isChecked ? (
         <section className="grid gap-4 md:grid-cols-2">
           {perms.canConfirmCharge ? (
-            <div className="rounded-xl border bg-card p-4">
+            <div className="rounded-lg border bg-card p-4">
               <h2 className="font-medium">{vi.minibar.chargeButton}</h2>
               <label className="mt-3 block text-sm">
                 {vi.minibar.folioNo}
@@ -224,7 +228,7 @@ export function FrontdeskCheckDetail({
           ) : null}
 
           {perms.canConfirmCharge ? (
-            <div className="rounded-xl border bg-card p-4">
+            <div className="rounded-lg border bg-card p-4">
               <h2 className="font-medium">{vi.minibar.markLateButton}</h2>
               <label className="mt-3 block text-sm">
                 {vi.minibar.lateNote}
@@ -261,7 +265,7 @@ export function FrontdeskCheckDetail({
           ) : null}
 
           {perms.canWaiveRequest && !waiveRequested ? (
-            <div className="rounded-xl border bg-card p-4">
+            <div className="rounded-lg border bg-card p-4">
               <h2 className="font-medium">{vi.minibar.waiveButton}</h2>
               <label className="mt-3 block text-sm">
                 {vi.minibar.waiveReason}
@@ -298,7 +302,7 @@ export function FrontdeskCheckDetail({
           ) : null}
 
           {waiveRequested && perms.canWaiveApprove ? (
-            <div className="rounded-xl border bg-card p-4">
+            <div className="rounded-lg border bg-card p-4">
               <h2 className="font-medium">{vi.minibar.waiveRequested}</h2>
               <p className="mt-2 text-sm text-muted-foreground">
                 {vi.minibar.waiveReason}: {check.waive_reason}
@@ -363,7 +367,7 @@ export function FrontdeskCheckDetail({
           ) : null}
 
           {perms.canWaiveApprove ? (
-            <div className="rounded-xl border bg-card p-4">
+            <div className="rounded-lg border bg-card p-4">
               <h2 className="font-medium">{vi.minibar.writeOffButton}</h2>
               <label className="mt-3 block text-sm">
                 {vi.minibar.writeOffReason}
