@@ -29,3 +29,11 @@ export function formatQty(value: number): string {
     maximumFractionDigits: 4,
   }).format(value);
 }
+
+/** Bỏ dấu + thường hóa để tìm kiếm tiếng Việt khớp cả khi gõ không dấu. */
+export function normalizeSearch(value: string): string {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
+}

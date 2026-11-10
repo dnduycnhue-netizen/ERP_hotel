@@ -26,6 +26,24 @@ function formatYmd(value: string | null): string {
   return `${day}/${month}/${year}`;
 }
 
+function interpolate(
+  template: string,
+  values: Record<string, string | number>,
+): string {
+  return Object.entries(values).reduce(
+    (text, [key, value]) => text.replace(`{${key}}`, String(value)),
+    template,
+  );
+}
+
+/** Bỏ dấu + thường hóa để tìm kiếm tiếng Việt khớp cả khi gõ không dấu. */
+function normalizeSearch(value: string): string {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
+}
+
 function channelLabel(channel: string): string {
   if (channel === "market") {
     return vi.receiving.channelMarket;
@@ -74,13 +92,30 @@ export function MobileTaskList({
   // xep hang offline duoc — chi ghi dong / duyet vuot / ghi so tren
   // phieu da mo moi offline (T-025).
   const { online } = useOfflineSync();
+  const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<ReceivingTaskRow | null>(null);
   const [warehouseId, setWarehouseId] = useState("");
   const [directIssueWarehouseId, setDirectIssueWarehouseId] = useState("");
   const [starting, setStarting] = useState(false);
   const [startError, setStartError] = useState<string | null>(null);
 
-  // Kho nhận / nhận thẳng bếp chỉ nhận kind main/outlet/floor.
+  const normalizedQuery = normalizeSearch(query.trim());
+  const filteredTasks = useMemo(
+    () =>
+      normalizedQuery === ""
+        ? tasks
+        : tasks.filter((task) => {
+            const haystack = normalizeSearch(
+              [
+                task.supplier_name ?? "",
+                task.doc_no,
+                channelLabel(task.channel),
+              ].join(" "),
+            );
+            return haystack.includes(normalizedQuery);
+          }),
+    [tasks, normalizedQuery],
+  );
   const receivableWarehouses = useMemo(
     () =>
       warehouses.filter((w) => ["main", "outlet", "floor"].includes(w.kind)),
@@ -138,7 +173,10 @@ export function MobileTaskList({
           {canCount ? (
             <a
               href={`/m/${propertyId}/count`}
-              className={cn(buttonVariants({ size: "sm", variant: "outline" }))}
+              className={cn(
+                buttonVariants({ size: "sm", variant: "outline" }),
+                "min-h-11",
+              )}
             >
               {vi.count.title}
             </a>
@@ -146,13 +184,35 @@ export function MobileTaskList({
           {canViewReturns ? (
             <a
               href={`/m/${propertyId}/receive/returns`}
-              className={cn(buttonVariants({ size: "sm", variant: "outline" }))}
+              className={cn(
+                buttonVariants({ size: "sm", variant: "outline" }),
+                "min-h-11",
+              )}
             >
               {vi.receiving.returnsListTitle}
             </a>
           ) : null}
         </div>
       </div>
+
+      <label className="flex flex-col gap-1.5">
+        <span className="sr-only">{vi.common.search}</span>
+        <input
+          type="search"
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+          placeholder={vi.receiving.searchTasksPlaceholder}
+          aria-label={vi.receiving.searchTasksPlaceholder}
+          className="h-12 w-full rounded-lg border bg-background px-3 text-base outline-none focus:border-ring"
+        />
+      </label>
+
+      <p className="text-base text-muted-foreground">
+        {interpolate(vi.receiving.tasksCount, { count: tasks.length })}
+        {normalizedQuery !== ""
+          ? ` · ${filteredTasks.length}/${tasks.length}`
+          : ""}
+      </p>
 
       {posted ? (
         <p
@@ -170,19 +230,25 @@ export function MobileTaskList({
           title={vi.receiving.tasksTitle}
           description={vi.receiving.tasksEmpty}
         />
+      ) : filteredTasks.length === 0 ? (
+        <EmptyState
+          icon={Package}
+          title={vi.receiving.tasksTitle}
+          description={vi.receiving.noMatchingTasks}
+        />
       ) : (
         <ul className="flex flex-col gap-3">
-          {tasks.map((task) => (
+          {filteredTasks.map((task) => (
             <li key={task.po_id}>
               <button
                 type="button"
                 onClick={() => openStart(task)}
                 disabled={!canPerform}
-                className="w-full rounded-xl border bg-card p-4 text-left shadow-sm transition-colors hover:border-ring disabled:opacity-60"
+                className="min-h-11 w-full rounded-xl border bg-card p-4 text-left shadow-sm transition-colors hover:border-ring disabled:opacity-60"
               >
                 <span className="flex items-start justify-between gap-3">
                   <span className="flex min-w-0 flex-col gap-1">
-                    <span className="flex items-center gap-2 font-semibold">
+                    <span className="flex items-center gap-2 text-base font-semibold">
                       <Store className="size-4 shrink-0" aria-hidden />
                       <span className="truncate">
                         {task.supplier_name ??
@@ -191,11 +257,11 @@ export function MobileTaskList({
                             : vi.common.noData)}
                       </span>
                     </span>
-                    <span className="text-sm text-muted-foreground">
+                    <span className="text-base text-muted-foreground">
                       {task.doc_no} · {task.line_count}{" "}
                       {vi.receiving.taskLineCount}
                     </span>
-                    <span className="text-sm text-muted-foreground">
+                    <span className="text-base text-muted-foreground">
                       {vi.receiving.expectedDate}:{" "}
                       {formatYmd(task.expected_date)}
                     </span>
@@ -241,10 +307,10 @@ export function MobileTaskList({
                       : vi.common.noData)}
                 </Dialog.Description>
                 <div className="mt-4 flex flex-col gap-4">
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-base text-muted-foreground">
                     {vi.receiving.startReceiptHint}
                   </p>
-                  <label className="flex flex-col gap-1.5 text-sm font-medium">
+                  <label className="flex flex-col gap-1.5 text-base font-medium">
                     {vi.receiving.warehouse}
                     <select
                       value={warehouseId}
@@ -259,7 +325,7 @@ export function MobileTaskList({
                       ))}
                     </select>
                   </label>
-                  <label className="flex flex-col gap-1.5 text-sm font-medium">
+                  <label className="flex flex-col gap-1.5 text-base font-medium">
                     {vi.receiving.directIssueWarehouse}
                     <select
                       value={directIssueWarehouseId}
@@ -296,12 +362,14 @@ export function MobileTaskList({
                     variant="outline"
                     disabled={starting}
                     onClick={closeStart}
+                    className="min-h-11"
                   >
                     {vi.common.cancel}
                   </Button>
                   <Button
                     disabled={starting || !warehouseId || !online}
                     onClick={() => void handleStart()}
+                    className="min-h-11"
                   >
                     {starting ? vi.common.loading : vi.receiving.startReceipt}
                   </Button>
