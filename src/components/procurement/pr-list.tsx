@@ -129,6 +129,11 @@ export function PrList({
       cell: (row) => <DocStatusBadge status={row.status} />,
     },
     {
+      key: "created_by_name",
+      header: vi.procurement.list.createdBy,
+      cell: (row) => row.created_by_name ?? "—",
+    },
+    {
       key: "created_at",
       header: vi.procurement.list.createdAt,
       cell: (row) => new Date(row.created_at).toLocaleDateString("vi-VN"),

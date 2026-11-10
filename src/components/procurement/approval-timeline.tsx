@@ -17,16 +17,20 @@ export type DecideResult = { ok: boolean; error?: string };
  * quyền, không so sánh tên vai trò, AGENTS.md quy tắc 10). SoD (người
  * tạo không duyệt) và ủy quyền do RPC kiểm tra ở server; nếu bị chặn,
  * lỗi tiếng Việt từ server hiện ngay trong khung này.
+ * `readOnly` (Q73): màn chi tiết đề nghị thanh toán đã có nút duyệt
+ * riêng nên chỉ hiện timeline, không hiện nút duyệt ở đây.
  */
 export function ApprovalTimeline({
   steps,
   onDecide,
+  readOnly = false,
 }: {
   steps: ApprovalStepRow[];
-  onDecide: (
+  onDecide?: (
     decision: "approved" | "rejected",
     comment: string | null,
   ) => Promise<DecideResult>;
+  readOnly?: boolean;
 }) {
   const router = useRouter();
   const currentStep = steps.find((s) => s.decision === "pending") ?? null;
@@ -42,7 +46,7 @@ export function ApprovalTimeline({
 
   async function handleDecide(e: React.FormEvent) {
     e.preventDefault();
-    if (!decideMode) return;
+    if (!decideMode || !onDecide) return;
     if (decideMode === "rejected" && !comment.trim()) {
       setError(vi.procurement.approval.commentRequiredForReject);
       return;
@@ -132,7 +136,7 @@ export function ApprovalTimeline({
                       {step.comment}
                     </p>
                   ) : null}
-                  {isCurrent && canDecideCurrent ? (
+                  {isCurrent && canDecideCurrent && !readOnly ? (
                     <div className="mt-2 flex gap-2">
                       <Button
                         size="sm"
