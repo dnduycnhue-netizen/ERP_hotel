@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { DocStatusBadge } from "@/components/common/doc-status-badge";
@@ -7,7 +8,7 @@ import { EmptyState } from "@/components/common/empty-state";
 import type { CountKind, CountRow } from "@/features/count/queries";
 import { vi } from "@/i18n/vi";
 import { useCan } from "@/lib/permissions/permissions-provider";
-import { formatYmd } from "./count-utils";
+import { formatYmd, interpolate, normalizeSearch } from "./count-utils";
 
 function kindLabel(kind: CountKind): string {
   switch (kind) {
@@ -34,6 +35,25 @@ export function MobileCountList({
 }) {
   const router = useRouter();
   const canOpen = useCan("count.open");
+  const [query, setQuery] = useState("");
+
+  const normalizedQuery = normalizeSearch(query.trim());
+  const filteredCounts = useMemo(
+    () =>
+      normalizedQuery === ""
+        ? counts
+        : counts.filter((count) => {
+            const haystack = normalizeSearch(
+              [
+                count.doc_no,
+                count.warehouse_name ?? "",
+                kindLabel(count.kind),
+              ].join(" "),
+            );
+            return haystack.includes(normalizedQuery);
+          }),
+    [counts, normalizedQuery],
+  );
 
   return (
     <div className="flex flex-col gap-4">
@@ -43,6 +63,7 @@ export function MobileCountList({
           <Button
             size="sm"
             onClick={() => router.push(`/m/${propertyId}/count/new`)}
+            className="min-h-11"
           >
             {vi.count.openButton}
           </Button>
@@ -51,31 +72,57 @@ export function MobileCountList({
 
       <a
         href={`/m/${propertyId}/receive`}
-        className="text-sm font-medium text-primary underline"
+        className="min-h-11 text-base font-medium text-primary underline"
       >
         ← {vi.receiving.tasksTitle}
       </a>
 
+      <label className="flex flex-col gap-1.5">
+        <span className="sr-only">{vi.common.search}</span>
+        <input
+          type="search"
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+          placeholder={vi.count.searchCountPlaceholder}
+          aria-label={vi.count.searchCountPlaceholder}
+          className="h-12 w-full rounded-lg border bg-background px-3 text-base outline-none focus:border-ring"
+        />
+      </label>
+
+      <p className="text-base text-muted-foreground">
+        {interpolate(vi.count.countsCount, { count: counts.length })}
+        {normalizedQuery !== ""
+          ? ` · ${filteredCounts.length}/${counts.length}`
+          : ""}
+      </p>
+
       {counts.length === 0 ? (
         <EmptyState title={vi.count.countsEmpty} />
+      ) : filteredCounts.length === 0 ? (
+        <EmptyState
+          title={vi.count.countsTitle}
+          description={vi.count.noMatchingLines}
+        />
       ) : (
         <ul className="flex flex-col gap-2">
-          {counts.map((count) => (
+          {filteredCounts.map((count) => (
             <li key={count.id}>
               <button
                 type="button"
                 onClick={() =>
                   router.push(`/m/${propertyId}/count/${count.id}`)
                 }
-                className="flex w-full items-start justify-between gap-3 rounded-xl border bg-card p-4 text-left"
+                className="flex min-h-11 w-full items-start justify-between gap-3 rounded-xl border bg-card p-4 text-left"
               >
                 <span>
-                  <span className="block font-medium">{count.doc_no}</span>
-                  <span className="block text-sm text-muted-foreground">
+                  <span className="block text-base font-medium">
+                    {count.doc_no}
+                  </span>
+                  <span className="block text-base text-muted-foreground">
                     {count.warehouse_name ?? vi.common.noData} ·{" "}
                     {formatYmd(count.business_date)}
                   </span>
-                  <span className="block text-sm text-muted-foreground">
+                  <span className="block text-base text-muted-foreground">
                     {kindLabel(count.kind)}
                   </span>
                 </span>
