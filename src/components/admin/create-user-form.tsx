@@ -306,7 +306,7 @@ export function CreateUserForm({
               value={password}
               onChange={(event) => setPassword(event.target.value)}
               autoComplete="new-password"
-              minLength={8}
+              minLength={12}
               required
               className="h-9 w-full rounded-md border bg-background px-3"
             />

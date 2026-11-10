@@ -395,7 +395,7 @@ export const vi = {
     createUserPasswordCustom: "Tự đặt mật khẩu",
     createUserPassword: "Mật khẩu tạm",
     createUserPasswordHint:
-      "Tối thiểu 8 ký tự. Mật khẩu này dùng để đăng nhập lần đầu.",
+      "Tối thiểu 12 ký tự. Mật khẩu này dùng để đăng nhập lần đầu.",
     createUserSubmit: "Tạo tài khoản",
     createUserCreated: "Đã tạo tài khoản.",
     createUserLoginEmail: "Email đăng nhập",
@@ -446,7 +446,7 @@ export const vi = {
     newPassword: "Mật khẩu mới",
     confirmPassword: "Nhập lại mật khẩu mới",
     passwordChanged: "Đã đổi mật khẩu.",
-    passwordTooShort: "Mật khẩu mới phải có ít nhất 8 ký tự.",
+    passwordTooShort: "Mật khẩu mới phải có ít nhất 12 ký tự.",
     passwordMismatch: "Mật khẩu nhập lại không khớp.",
     currentPasswordWrong: "Mật khẩu hiện tại không đúng.",
     changePasswordSubmit: "Đổi mật khẩu",

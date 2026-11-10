@@ -7,8 +7,9 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 // - Chỉ người có quyền `admin.users.manage` cấp chuỗi mới gọi được.
 //   JWT của người gọi được xác minh bằng anon key, quyền được kiểm tra qua
 //   RPC `user_has_perm` bằng service role (đúng mẫu admin-create-user).
-// - Quản trị có thể tự đặt mật khẩu tạm (`password`, tối thiểu 8 ký tự,
-//   tiện cho tài khoản test) hoặc để trống để hệ thống sinh ngẫu nhiên.
+// - Quản trị có thể tự đặt mật khẩu tạm (`password`, tối thiểu 12 ký tự,
+//   thống nhất 12 ở mọi nơi — tự phê duyệt 10/11/2026, xem Q132)
+//   hoặc để trống để hệ thống sinh ngẫu nhiên.
 //   Mật khẩu tạm trả về MỘT LẦN cho quản trị viên để bàn giao trực tiếp;
 //   KHÔNG bao giờ ghi mật khẩu vào log.
 // - Ghi audit_log lại việc đặt lại (ai đặt, cho ai, lúc nào).
@@ -44,7 +45,7 @@ function readResetPasswordRequest(value: unknown): ResetPasswordRequest | null {
   const userId = readString(value.userId);
   const password = readString(value.password);
   if (!UUID_PATTERN.test(userId)) return null;
-  if (password !== "" && (password.length < 8 || password.length > 128)) {
+  if (password !== "" && (password.length < 12 || password.length > 128)) {
     return null;
   }
   return {
