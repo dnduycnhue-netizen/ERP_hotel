@@ -97,7 +97,7 @@ export const createUserSchema = z.object({
     .max(128, "Mật khẩu tạm tối đa 128 ký tự.")
     .optional()
     .or(z.literal("")),
-  roleIds: z.array(uuid),
+  roleIds: z.array(uuid).min(1, "Vui lòng chọn ít nhất một vai trò."),
   propertyId: uuid.nullable(),
 });
 

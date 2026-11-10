@@ -51,7 +51,7 @@ Viết test CSDL bằng cách đặt JWT giả: `set local role authenticated; s
 3. `deny po.approve` riêng cho GM tại KS01 → GM không duyệt được PO ở KS01 nhưng vẫn duyệt được ở KS02.
 4. Gán Thủ kho với `warehouse_ids = [kho bếp]` → không post được phiếu của kho bar.
 5. Vai trò `active = false` → mọi quyền từ vai trò đó mất hiệu lực.
-6. Admin tự gán vai trò cho chính mình → `ERR_SELF_GRANT`. Gỡ quyền quản trị của người thứ 2 khi chỉ còn 2 → `ERR_LAST_ADMIN`.
+6. Tự gán vai trò/quyền cho chính mình được phép có chủ đích từ migration `20261109400000` (admin-relax, 10/11/2026): `admin_user_assign_role` và `admin_permission_override_set` không còn chặn `ERR_SELF_GRANT` — người có `admin.users.manage` vốn đã tạo được tài khoản khác với mọi quyền nên khối tự cấp chỉ thêm ma sát, không thêm an toàn thật. Các guard còn giữ: gỡ quyền quản trị của người thứ 2 khi chỉ còn 2 → `ERR_LAST_ADMIN` (giữ ít nhất 2 quản trị chuỗi); tự thu hồi vai trò của chính mình (`admin_user_revoke_role`) và tự khóa tài khoản của chính mình (`admin_user_set_active`) vẫn → `ERR_SELF_GRANT`; vô hiệu hóa vai trò hệ thống (`admin_role_deactivate`) vẫn → `ERR_SYSTEM_ROLE`.
 7. Một người có đủ mọi quyền (`po.create`, `po.approve`, `receiving.post`) vẫn bị `ERR_SOD_PO_CREATOR_APPROVER` và `ERR_SOD_PO_RECEIVER` trên cùng một PO.
 8. Thay đổi quyền mức `critical` sinh alert `PERMISSION_CRITICAL_CHANGED`.
 

@@ -9,6 +9,7 @@ export {
   hasAdminConfigPermission,
   listAlertRules,
   listApprovalApprovers,
+  listApprovalDelegations,
   listApprovalRules,
   listSettingEntries,
   resolveAdminConfigScope,
@@ -16,6 +17,7 @@ export {
 export type {
   AlertRule,
   ApprovalApprovers,
+  ApprovalDelegation,
   ApprovalRule,
   SettingEntry,
 } from "./configuration-data";

@@ -49,4 +49,9 @@ describe("createUserSchema — tạo tài khoản đa vai trò", () => {
     });
     expect(parsed.success).toBe(false);
   });
+
+  it("U17 — Q165: không chọn vai trò nào thì validation lỗi", () => {
+    const parsed = createUserSchema.safeParse({ ...base, roleIds: [] });
+    expect(parsed.success).toBe(false);
+  });
 });
