@@ -4,15 +4,21 @@ import { createClient } from "@/lib/supabase/server";
 import { callReceivingRpc, type ReceivingActionResult } from "./rpc";
 import {
   eligibleReturnLines,
+  getPhotoReview,
   getReceipt,
   getSupplierReturn,
+  listPhotoReviews,
   listSupplierReturns,
+  type PhotoReviewDetail,
+  type PhotoReviewListRow,
   type ReceiptLineRow,
   type EligibleReturnLineRow,
   type SupplierReturnDetail,
   type SupplierReturnRow,
 } from "./queries";
 import {
+  photoReviewListSchema,
+  photoReviewSchema,
   qcTemplateDeleteSchema,
   qcTemplateSaveSchema,
   receivingListReceiptsSchema,
@@ -26,6 +32,8 @@ import {
   supplierReturnEligibleLinesSchema,
   supplierReturnListSchema,
   supplierReturnPostSchema,
+  type PhotoReviewInput,
+  type PhotoReviewListInput,
   type QcTemplateDeleteInput,
   type QcTemplateSaveInput,
   type ReceivingListReceiptsInput,
@@ -335,6 +343,50 @@ export async function getSupplierReturnAction(
   returnId: string,
 ): Promise<ReceivingActionResult<SupplierReturnDetail>> {
   return getSupplierReturn(returnId);
+}
+
+/** Danh sach phieu cho hau kiem anh co loc (RPC `receiving_list_photo_reviews`, C2). */
+export async function listPhotoReviewsAction(
+  input: PhotoReviewListInput,
+): Promise<
+  ReceivingActionResult<{
+    reviews: PhotoReviewListRow[];
+    total: number;
+  }>
+> {
+  const parsed = photoReviewListSchema.safeParse(input);
+  if (!parsed.success) {
+    return validationError(parsed.error.issues);
+  }
+  return listPhotoReviews(parsed.data.propertyId, {
+    reviewStatus: parsed.data.reviewStatus ?? null,
+    search: parsed.data.search ?? null,
+    limit: parsed.data.limit,
+    offset: parsed.data.offset,
+  });
+}
+
+/** Chi tiet 1 phieu nhan cho hau kiem anh (RPC `receiving_get_photo_review`, C2). */
+export async function getPhotoReviewAction(
+  grId: string,
+): Promise<ReceivingActionResult<PhotoReviewDetail>> {
+  return getPhotoReview(grId);
+}
+
+/** Duyet / tu choi anh cua 1 phieu nhan (RPC `receiving_review_photos`, C2). */
+export async function reviewPhotosAction(
+  input: PhotoReviewInput,
+): Promise<ReceivingActionResult<{ id: string; photo_review_status: string }>> {
+  const parsed = photoReviewSchema.safeParse(input);
+  if (!parsed.success) {
+    return validationError(parsed.error.issues);
+  }
+  const supabase = await createClient();
+  return callReceivingRpc(supabase, "receiving_review_photos", {
+    p_gr_id: parsed.data.grId,
+    p_decision: parsed.data.decision,
+    p_reason: parsed.data.reason ?? null,
+  });
 }
 
 /** Dong cua phieu nhan da post con tra duoc (RPC `supplier_return_eligible_lines`, T-026). */

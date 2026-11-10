@@ -269,3 +269,91 @@ export async function listReceipts(
     },
   );
 }
+
+export type PhotoReviewStatus = "pending" | "approved" | "rejected";
+
+/** 1 phieu nhan trong danh sach hau kiem anh — khong co gia tien. */
+export type PhotoReviewListRow = {
+  id: string;
+  doc_no: string;
+  po_id: string | null;
+  po_doc_no: string | null;
+  supplier_name: string;
+  status: string;
+  receiver_id: string;
+  received_at: string;
+  line_count: number;
+  photo_count: number;
+  photo_review_status: PhotoReviewStatus;
+  photo_reviewed_by: string | null;
+  photo_reviewed_at: string | null;
+  photo_review_reason: string | null;
+};
+
+/** 1 dong hang trong chi tiet hau kiem anh (khong co gia tien). */
+export type PhotoReviewLineRow = {
+  id: string;
+  po_line_id: string | null;
+  item_id: string;
+  item_name: string;
+  uom: string;
+  qc_status: "pass" | "fail" | "conditional";
+  photo_ids: string[];
+  photo_count: number;
+};
+
+/** Chi tiet 1 phieu nhan cho hau kiem anh. */
+export type PhotoReviewDetail = {
+  id: string;
+  doc_no: string;
+  po_id: string | null;
+  supplier_name: string;
+  warehouse_id: string;
+  status: string;
+  receiver_id: string;
+  received_at: string;
+  photo_count: number;
+  photo_review_status: PhotoReviewStatus;
+  photo_reviewed_by: string | null;
+  photo_reviewed_at: string | null;
+  photo_review_reason: string | null;
+  lines: PhotoReviewLineRow[];
+};
+
+/** Danh sach phieu cho hau kiem anh co loc (RPC `receiving_list_photo_reviews`, C2). */
+export async function listPhotoReviews(
+  propertyId: string,
+  opts?: {
+    reviewStatus?: PhotoReviewStatus | null;
+    search?: string | null;
+    limit?: number;
+    offset?: number;
+  },
+): Promise<
+  ReceivingActionResult<{ reviews: PhotoReviewListRow[]; total: number }>
+> {
+  const supabase = await createClient();
+  return callReceivingRpc<{ reviews: PhotoReviewListRow[]; total: number }>(
+    supabase,
+    "receiving_list_photo_reviews",
+    {
+      p_property_id: propertyId,
+      p_review_status: opts?.reviewStatus ?? null,
+      p_search: opts?.search ?? null,
+      p_limit: opts?.limit ?? 20,
+      p_offset: opts?.offset ?? 0,
+    },
+  );
+}
+
+/** Chi tiet 1 phieu nhan cho hau kiem anh (RPC `receiving_get_photo_review`, C2). */
+export async function getPhotoReview(
+  grId: string,
+): Promise<ReceivingActionResult<PhotoReviewDetail>> {
+  const supabase = await createClient();
+  return callReceivingRpc<PhotoReviewDetail>(
+    supabase,
+    "receiving_get_photo_review",
+    { p_gr_id: grId },
+  );
+}
