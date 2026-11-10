@@ -174,7 +174,7 @@ export const NAV_ITEMS: NavItem[] = [
     group: "housekeeping",
     label: vi.minibar.housekeepingTitle,
     href: (propertyId) => `/${propertyId}/housekeeping/minibar`,
-    matchPrefix: (propertyId) => `/${propertyId}/housekeeping`,
+    matchPrefix: (propertyId) => `/${propertyId}/housekeeping/minibar`,
     icon: BedDouble,
     visible: hasAny(
       "minibar.check",
@@ -183,6 +183,24 @@ export const NAV_ITEMS: NavItem[] = [
       "minibar.reconcile",
       "report.view.rpt_minibar",
     ),
+  },
+  {
+    key: "housekeeping-standards",
+    group: "housekeeping",
+    label: vi.housekeeping.standardsTitle,
+    href: (propertyId) => `/${propertyId}/housekeeping/standards`,
+    matchPrefix: (propertyId) => `/${propertyId}/housekeeping/standards`,
+    icon: ClipboardList,
+    visible: hasAny("hk.standard.manage", "hk.trolley.operate"),
+  },
+  {
+    key: "housekeeping-trolleys",
+    group: "housekeeping",
+    label: vi.housekeeping.trolleysTitle,
+    href: (propertyId) => `/${propertyId}/housekeeping/trolleys`,
+    matchPrefix: (propertyId) => `/${propertyId}/housekeeping/trolleys`,
+    icon: Package,
+    visible: hasAny("hk.trolley.operate", "hk.standard.manage"),
   },
   {
     key: "reports",

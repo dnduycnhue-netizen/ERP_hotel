@@ -67,6 +67,10 @@ export function FrontdeskCheckList({
   const [requestingRoomId, setRequestingRoomId] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  /** Loại kiểm đã chọn cho từng phòng (mặc định trả phòng — C7). */
+  const [triggerByRoom, setTriggerByRoom] = useState<
+    Record<string, MinibarCheckRow["trigger"]>
+  >({});
 
   const openByRoom = new Map(openChecks.map((c) => [c.room_id, c]));
 
@@ -77,7 +81,7 @@ export function FrontdeskCheckList({
     const res = await requestCheckAction({
       propertyId,
       roomId,
-      trigger: "checkout",
+      trigger: triggerByRoom[roomId] ?? "checkout",
     });
     setRequestingRoomId(null);
     if (!res.ok) {
@@ -93,6 +97,15 @@ export function FrontdeskCheckList({
 
   return (
     <div className="flex flex-col gap-8">
+      {openChecks.length > 0 ? (
+        <p className="flex items-start gap-2 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
+          <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
+          <span>
+            {vi.minibar.pendingHandoverWarning}{" "}
+            {openChecks.map((c) => c.room_no).join(", ")}
+          </span>
+        </p>
+      ) : null}
       <section className="space-y-3">
         <h2 className="text-lg font-semibold">{vi.minibar.roomsTitle}</h2>
         {message ? (
@@ -144,17 +157,40 @@ export function FrontdeskCheckList({
                       </Link>
                     </div>
                   ) : canRequestCheck ? (
-                    <Button
-                      type="button"
-                      size="sm"
-                      className="mt-3"
-                      disabled={requestingRoomId === room.id}
-                      onClick={() => handleRequest(room.id)}
-                    >
-                      {requestingRoomId === room.id
-                        ? vi.minibar.requesting
-                        : vi.minibar.requestCheckButton}
-                    </Button>
+                    <div className="mt-3 flex flex-wrap items-center gap-2">
+                      <select
+                        aria-label={vi.minibar.trigger}
+                        value={triggerByRoom[room.id] ?? "checkout"}
+                        onChange={(e) =>
+                          setTriggerByRoom((prev) => ({
+                            ...prev,
+                            [room.id]: e.target
+                              .value as MinibarCheckRow["trigger"],
+                          }))
+                        }
+                        className="h-9 rounded-md border bg-background px-2 text-sm"
+                      >
+                        <option value="checkout">
+                          {vi.minibar.triggers.checkout}
+                        </option>
+                        <option value="daily">
+                          {vi.minibar.triggers.daily}
+                        </option>
+                        <option value="audit">
+                          {vi.minibar.triggers.audit}
+                        </option>
+                      </select>
+                      <Button
+                        type="button"
+                        size="sm"
+                        disabled={requestingRoomId === room.id}
+                        onClick={() => handleRequest(room.id)}
+                      >
+                        {requestingRoomId === room.id
+                          ? vi.minibar.requesting
+                          : vi.minibar.requestCheckButton}
+                      </Button>
+                    </div>
                   ) : null}
                 </li>
               );

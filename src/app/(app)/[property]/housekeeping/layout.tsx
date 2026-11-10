@@ -3,8 +3,9 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
 /**
- * Khu buồng phòng — minibar văn phòng (T-035).
- * Chặn người không có quyền minibar/văn phòng nào ở tầng layout.
+ * Khu buồng phòng — minibar văn phòng (T-035) + tiêu chuẩn phòng và
+ * ca xe đẩy (C7). Chặn người không có quyền buồng phòng nào ở tầng
+ * layout; từng màn tự kiểm quyền chi tiết của mình.
  */
 export default async function HousekeepingLayout({
   children,
@@ -26,7 +27,9 @@ export default async function HousekeepingLayout({
     perms.has("minibar.refill") ||
     perms.has("minibar.price.manage") ||
     perms.has("minibar.reconcile") ||
-    perms.has("report.view.rpt_minibar");
+    perms.has("report.view.rpt_minibar") ||
+    perms.has("hk.standard.manage") ||
+    perms.has("hk.trolley.operate");
 
   if (!canAccess) {
     notFound();
