@@ -114,6 +114,28 @@ Các RPC danh mục dưới đây thuộc các task sau, chưa được triển 
 | `pms_daily_upsert(p_property_id, p_date, p_stats jsonb)` | Lễ tân nhập hằng ngày |
 | `pos_import_commit(p_import_id)` (P2) | |
 
+## 8. Nhà hàng (M06)
+
+| RPC | Ghi chú |
+|---|---|
+| `recipe_save(p_property_id, p_recipe jsonb)` | Upsert món + tạo version mới `active`, version cũ `retired`; kiểm tra loại món, mã trùng, mỗi dòng đúng một trong `item_id`/`sub_recipe_id`, `qty > 0`, `loss_pct` 0–100, không tự tham chiếu chính mình |
+| `recipe_set_active(p_recipe_id, p_active)` | Bật/tắt món |
+| `recipe_foodcost(p_recipe_id)` / `recipe_foodcost_list(p_property_id)` | Foodcost mỗi phần theo giá trần hiện tại; dòng chưa có giá trần hoặc chưa có hệ số đổi đơn vị → foodcost `NULL` + `has_unknown_cost = true` (không dùng giá Excel 2018–2020) |
+| `restaurant_kitchen_today(p_property_id, p_date)` | Món đang bán + phiên buffet + tiệc đã xác nhận/đang diễn ra hôm đó + bảng NVL cần chuẩn bị (gộp theo món, tính theo `portions_per_batch`) |
+| `restaurant_sales_summary(p_property_id, p_from, p_to)` | Tổng doanh thu/foodcost/lãi gộp + theo món + theo ngày (đã trừ dòng hủy) |
+| `dish_sale_record(p_property_id, p_recipe_id, p_business_date, p_qty, p_unit_price)` | Ghi bán tay; chặn ngày tương lai (giờ VN), `qty > 0`, món phải đang bán |
+| `dish_sale_void(p_sale_id)` | Chỉ dòng bán tay; đánh dấu hủy, không xóa |
+| `buffet_session_save(p_property_id, p_session jsonb)` | Tạo/sửa phiên buffet (mỗi buổi/ngày 1 phiên trừ khi hủy) |
+| `buffet_session_close(p_session_id, p_guests, p_price_per_guest)` | Đóng phiên → sinh dòng bán `source='buffet'`, doanh thu = khách × giá/khách |
+| `buffet_session_cancel(p_session_id, p_reason)` | Lý do bắt buộc |
+| `banquet_save(p_property_id, p_banquet jsonb)` | Tạo/sửa tiệc; kiểm tra `end_time > start_time` |
+| `banquet_confirm(p_banquet_id)` | Kiểm tra trùng sảnh: cùng khách sạn + cùng sảnh + cùng ngày + khung giờ giao nhau + trạng thái `confirmed`/`in_progress` → `ERR_BANQUET_HALL_CONFLICT` |
+| `banquet_start(p_banquet_id)` / `banquet_complete(p_banquet_id)` | Hoàn thành → sinh dòng bán `source='banquet'` theo thực đơn tiệc |
+| `banquet_cancel(p_banquet_id, p_reason)` | Lý do bắt buộc |
+| `report_get(..., 'RPT_FNB_REVENUE', ...)` | Báo cáo doanh thu F&B: mỗi dòng theo món + 1 dòng tổng buffet; foodcost theo giá trần hiện tại |
+
+Quyền mới (seed 500000): `restaurant.view`, `restaurant.dish.manage`, `restaurant.sale.record`, `restaurant.buffet.manage`, `restaurant.banquet.manage`, `report.view.rpt_fnb_revenue`.
+
 ## 9. Phân quyền (quản trị)
 
 Mọi RPC dưới đây yêu cầu `admin.roles.manage` hoặc `admin.users.manage` (ghi rõ ở cột), ghi `audit_log`, tạo alert `PERMISSION_CRITICAL_CHANGED` nếu đụng quyền mức `critical`.

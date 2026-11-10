@@ -11,6 +11,7 @@ import {
   PackageCheck,
   Settings,
   Wallet,
+  UtensilsCrossed,
   type LucideIcon,
 } from "lucide-react";
 import { vi } from "@/i18n/vi";
@@ -128,6 +129,21 @@ export const NAV_ITEMS: NavItem[] = [
       "payment.approve",
       "payment.mark_paid",
       "advance.settle",
+    ),
+  },
+  {
+    key: "restaurant",
+    group: "operations",
+    label: vi.restaurant.title,
+    href: (propertyId) => `/${propertyId}/restaurant/kitchen`,
+    matchPrefix: (propertyId) => `/${propertyId}/restaurant`,
+    icon: UtensilsCrossed,
+    visible: hasAny(
+      "restaurant.view",
+      "restaurant.dish.manage",
+      "restaurant.sale.record",
+      "restaurant.buffet.manage",
+      "restaurant.banquet.manage",
     ),
   },
   {
@@ -270,6 +286,11 @@ export function buildJumpDestinations(propertyId: string): JumpDestination[] {
     item("inventory", vi.inventory.nav.stock, "/inventory/stock"),
     item("inventory", vi.inventory.nav.counts, "/inventory/counts"),
     item("inventory", vi.count.openTitle, "/inventory/counts/new"),
+    item("restaurant", vi.restaurant.navDishes, "/restaurant/dishes"),
+    item("restaurant", vi.restaurant.navKitchen, "/restaurant/kitchen"),
+    item("restaurant", vi.restaurant.navSales, "/restaurant/sales"),
+    item("restaurant", vi.restaurant.navBuffet, "/restaurant/buffet"),
+    item("restaurant", vi.restaurant.navBanquets, "/restaurant/banquets"),
     item("finance", vi.finance.navInvoices, "/finance/invoices"),
     item("finance", vi.finance.newInvoice, "/finance/invoices/new"),
     item("finance", vi.finance.navPayables, "/finance/payables"),

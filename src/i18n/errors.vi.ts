@@ -59,6 +59,8 @@ export const rpcErrorMessages: Record<string, string> = {
   ERR_NOT_APPROVER: "Bạn không phải người duyệt được giao cho bước này.",
   ERR_PRICE_NOT_SET:
     "Đơn hàng còn dòng chưa có đơn giá. Hãy nhập giá cho các dòng giá tay trước khi gửi duyệt.",
+  ERR_BANQUET_HALL_CONFLICT:
+    "Sảnh này đã có tiệc khác trong khung giờ đã chọn. Hãy đổi sảnh hoặc đổi giờ.",
   ERR_CHANNEL_NOT_ALLOWED: "Mặt hàng này không được mua theo kênh đã chọn.",
   ERR_ITEM_NOT_FOUND: "Không tìm thấy mặt hàng.",
   ERR_PHOTO_REQUIRED: "Thiếu ảnh bắt buộc. Hãy chụp ảnh rồi gửi lại.",

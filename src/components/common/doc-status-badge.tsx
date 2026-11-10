@@ -52,6 +52,9 @@ export type DocStatus =
   | "issued"
   | "locked"
   | "open"
+  | "new"
+  | "confirmed"
+  | "in_progress"
   | "counting"
   | "recount"
   | "adjusted";
@@ -217,6 +220,23 @@ const STATUS_META: Record<DocStatus, DocStatusMeta> = {
     className:
       "bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-200",
     Icon: CircleDashed,
+  },
+  new: {
+    label: vi.components.docStatus.new,
+    className: "bg-muted text-muted-foreground",
+    Icon: CircleDashed,
+  },
+  confirmed: {
+    label: vi.components.docStatus.confirmed,
+    className:
+      "bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-200",
+    Icon: CheckCircle2,
+  },
+  in_progress: {
+    label: vi.components.docStatus.inProgress,
+    className:
+      "bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-200",
+    Icon: Clock,
   },
   counting: {
     label: vi.components.docStatus.counting,
