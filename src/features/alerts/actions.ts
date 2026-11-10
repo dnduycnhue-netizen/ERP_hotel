@@ -25,3 +25,32 @@ export async function ackAlert(
   }
   return result;
 }
+
+export type PushSubscriptionResult = {
+  ok: boolean;
+  endpoint: string;
+};
+
+/** Dang ky web push cho thiet bi hien tai (RPC `push_subscribe`, T-045). */
+export async function subscribePush(
+  endpoint: string,
+  p256dh: string,
+  auth: string,
+): Promise<AlertActionResult<PushSubscriptionResult>> {
+  const supabase = await createClient();
+  return callAlertRpc<PushSubscriptionResult>(supabase, "push_subscribe", {
+    p_endpoint: endpoint,
+    p_p256dh: p256dh,
+    p_auth: auth,
+  });
+}
+
+/** Huy dang ky web push (RPC `push_unsubscribe`, T-045). */
+export async function unsubscribePush(
+  endpoint: string,
+): Promise<AlertActionResult<PushSubscriptionResult>> {
+  const supabase = await createClient();
+  return callAlertRpc<PushSubscriptionResult>(supabase, "push_unsubscribe", {
+    p_endpoint: endpoint,
+  });
+}

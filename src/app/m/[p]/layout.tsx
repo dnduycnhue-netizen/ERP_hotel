@@ -4,6 +4,7 @@ import { notFound, redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { MobileNav } from "@/components/common/mobile-nav";
 import { OfflineBanner } from "@/components/common/offline-banner";
+import { InstallPrompt } from "@/components/pwa/install-prompt";
 import { vi } from "@/i18n/vi";
 import { PermissionsProvider } from "@/lib/permissions/permissions-provider";
 import { listAccessibleProperties } from "@/lib/supabase/access";
@@ -99,6 +100,7 @@ export default async function MobilePropertyLayout({
         <main className="mx-auto max-w-2xl px-4 py-6">
           <MobileNav propertyId={currentProperty.id} />
           <div className="mb-4">
+            <InstallPrompt />
             <OfflineBanner />
           </div>
           {children}

@@ -37,6 +37,7 @@ export async function proxy(request: NextRequest) {
   if (
     !data?.claims &&
     pathname !== "/login" &&
+    pathname !== "/offline" &&
     pathname !== "/auth/callback" &&
     !pathname.startsWith("/api/")
   ) {
