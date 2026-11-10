@@ -68,8 +68,7 @@ export function MobileMinibarList({
           {checked.length > 0 ? (
             <div className="space-y-2">
               <h2 className="text-sm font-medium text-muted-foreground">
-                {vi.minibar.statuses.pendingCharge} —{" "}
-                {vi.minibar.checkedBy}
+                {vi.minibar.statuses.pendingCharge} — {vi.minibar.checkedBy}
               </h2>
               <ul className="flex flex-col gap-2">
                 {checked.map((check) => (

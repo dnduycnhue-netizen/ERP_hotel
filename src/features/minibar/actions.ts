@@ -25,10 +25,7 @@ import {
   type MinibarSubmitCheckInput,
   type MinibarWriteOffInput,
 } from "./schemas";
-import type {
-  MinibarReconcileResult,
-  MinibarRecallRow,
-} from "./queries";
+import type { MinibarReconcileResult, MinibarRecallRow } from "./queries";
 import { getRecallList } from "./queries";
 
 export type RequestCheckResult = {
@@ -363,14 +360,10 @@ export async function reconcileAction(
     return validationError(parsed.error.issues);
   }
   const supabase = await createClient();
-  return callMinibarRpc<MinibarReconcileResult>(
-    supabase,
-    "minibar_reconcile",
-    {
-      p_property_id: parsed.data.propertyId,
-      p_date: parsed.data.date,
-    },
-  );
+  return callMinibarRpc<MinibarReconcileResult>(supabase, "minibar_reconcile", {
+    p_property_id: parsed.data.propertyId,
+    p_date: parsed.data.date,
+  });
 }
 
 /** Danh sách thu hồi hàng sắp hết hạn (RPC `minibar_recall_list`). */

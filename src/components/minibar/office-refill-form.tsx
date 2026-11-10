@@ -88,7 +88,8 @@ export function OfficeRefillForm({
             <option value="">{vi.common.all}</option>
             {floors.map((f) => (
               <option key={f} value={f}>
-                {vi.minibar.floor} {f} ({rooms.filter((r) => r.floor === f).length}{" "}
+                {vi.minibar.floor} {f} (
+                {rooms.filter((r) => r.floor === f).length}{" "}
                 {vi.minibar.roomNo.toLowerCase()})
               </option>
             ))}

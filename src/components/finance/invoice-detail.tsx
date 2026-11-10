@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { MoneyText, formatNumber } from "@/components/common/money-text";
@@ -44,6 +45,7 @@ export function InvoiceDetailView({
   const [pending, setPending] = useState<"match" | "approve" | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [errorCode, setErrorCode] = useState<string | null>(null);
 
   const { invoice, lines } = detail;
   const canMatch =
@@ -55,6 +57,7 @@ export function InvoiceDetailView({
     setPending("match");
     setMessage(null);
     setError(null);
+    setErrorCode(null);
     const res = await matchInvoiceAction({
       propertyId,
       invoiceId: invoice.id,
@@ -62,6 +65,7 @@ export function InvoiceDetailView({
     setPending(null);
     if (!res.ok) {
       setError(res.error);
+      setErrorCode(res.code ?? null);
       return;
     }
     setMessage(
@@ -76,6 +80,7 @@ export function InvoiceDetailView({
     setPending("approve");
     setMessage(null);
     setError(null);
+    setErrorCode(null);
     const res = await approveInvoiceAction({
       propertyId,
       invoiceId: invoice.id,
@@ -83,6 +88,7 @@ export function InvoiceDetailView({
     setPending(null);
     if (!res.ok) {
       setError(res.error);
+      setErrorCode(res.code ?? null);
       return;
     }
     setMessage(vi.finance.invoiceApproved);
@@ -161,6 +167,18 @@ export function InvoiceDetailView({
         ) : null}
         {error ? (
           <p className="mt-3 text-sm font-medium text-red-800">{error}</p>
+        ) : null}
+        {errorCode === "ERR_SERVICE_NOT_ACCEPTED" ? (
+          <p className="mt-3 rounded-md bg-amber-50 p-3 text-sm text-amber-800">
+            <span className="font-medium">{vi.service.blockedTitle}. </span>
+            {vi.service.blockedHint}{" "}
+            <Link
+              href={`/${propertyId}/procurement/service-contracts/schedules`}
+              className="font-medium underline"
+            >
+              {vi.service.goToSchedules}
+            </Link>
+          </p>
         ) : null}
       </div>
 

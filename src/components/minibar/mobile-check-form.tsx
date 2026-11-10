@@ -157,19 +157,14 @@ export function MobileCheckForm({
       <div className="flex flex-col gap-3">
         {lines.map((line, index) => {
           const price =
-            line.itemId !== ""
-              ? priceToday(prices, line.itemId)
-              : null;
+            line.itemId !== "" ? priceToday(prices, line.itemId) : null;
           const qty = Number(line.missingQty);
           const lineTotal =
             price !== null && Number.isFinite(qty) && qty > 0
               ? qty * price
               : null;
           return (
-            <div
-              key={index}
-              className="rounded-xl border bg-card p-4"
-            >
+            <div key={index} className="rounded-xl border bg-card p-4">
               <label className="block text-sm">
                 {vi.minibar.itemName}
                 <select

@@ -13,11 +13,7 @@ import { vi } from "@/i18n/vi";
  * ngày trước vẫn tính vào lệch (Q52). Lệch ≠ 0 → hệ thống tạo cảnh
  * báo MINIBAR_MISMATCH (dedupe theo ngày).
  */
-export function OfficeReconcilePanel({
-  propertyId,
-}: {
-  propertyId: string;
-}) {
+export function OfficeReconcilePanel({ propertyId }: { propertyId: string }) {
   const today = new Date().toISOString().slice(0, 10);
   const [date, setDate] = useState(today);
   const [pending, setPending] = useState(false);

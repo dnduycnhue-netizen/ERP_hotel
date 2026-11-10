@@ -51,7 +51,9 @@ function readUuidArray(value: unknown): string[] | null {
   const ids = value.filter(
     (item): item is string =>
       typeof item === "string" &&
-      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(item),
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+        item,
+      ),
   );
   return ids.length === value.length ? ids : null;
 }
@@ -199,7 +201,8 @@ Deno.serve(async (request) => {
   }
 
   const loginEmail =
-    input.email ?? `${input.employeeCode.toLowerCase()}@${INTERNAL_EMAIL_DOMAIN}`;
+    input.email ??
+    `${input.employeeCode.toLowerCase()}@${INTERNAL_EMAIL_DOMAIN}`;
   const tempPassword = generateTempPassword();
 
   const { data: created, error: createError } =

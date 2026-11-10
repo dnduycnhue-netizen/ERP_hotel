@@ -1,10 +1,7 @@
 import { ErrorState } from "@/components/common/error-state";
 import { FrontdeskCheckList } from "@/components/minibar/frontdesk-check-list";
 import { listRooms } from "@/features/master/queries";
-import {
-  getMinibarPerms,
-  listMinibarChecks,
-} from "@/features/minibar/queries";
+import { getMinibarPerms, listMinibarChecks } from "@/features/minibar/queries";
 import { vi } from "@/i18n/vi";
 
 /** Màn lễ tân — minibar (T-035): phòng chờ kiểm + phiếu đang mở. */

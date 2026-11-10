@@ -9,8 +9,7 @@ import type { Database } from "@/lib/database.types";
  * không throw ra client, lỗi dịch sang tiếng Việt.
  */
 export type MinibarActionResult<T = unknown> =
-  | { ok: true; data: T }
-  | { ok: false; error: string };
+  { ok: true; data: T } | { ok: false; error: string };
 
 type RpcClient = SupabaseClient<Database>;
 
