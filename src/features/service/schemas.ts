@@ -53,11 +53,8 @@ export type ScheduleGenerateInput = z.infer<typeof scheduleGenerateSchema>;
 /**
  * Nghiệm thu kỳ hợp đồng HOẶC PO dịch vụ lẻ (RPC `service_accept`).
  * Đúng 1 trong 2 id được truyền (Q75). Rating 1–5 tùy chọn, ảnh là danh
- * sách id attachment đã upload (xem `uploadCapturedPhoto`).
- *
- * LƯU Ý: RPC hiện không nhận ghi chú (`note`) dù bảng
- * `service_acceptances` có cột này — xem Q81. Form nghiệm thu vì vậy
- * không có ô ghi chú.
+ * sách id attachment đã upload (xem `uploadCapturedPhoto`), note là ghi
+ * chú tùy chọn lưu vào `service_acceptances.note` (Q81).
  */
 export const serviceAcceptSchema = z
   .object({
@@ -69,6 +66,12 @@ export const serviceAcceptSchema = z
       .int("Đánh giá phải là số nguyên.")
       .min(1, "Đánh giá từ 1 đến 5 sao.")
       .max(5, "Đánh giá từ 1 đến 5 sao.")
+      .optional()
+      .nullable(),
+    note: z
+      .string()
+      .trim()
+      .max(1000, "Ghi chú tối đa 1000 ký tự.")
       .optional()
       .nullable(),
     photos: z.array(uuidSchema).default([]),

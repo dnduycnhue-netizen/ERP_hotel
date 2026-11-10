@@ -78,8 +78,27 @@ Lấy id property TEST47 trong SQL Editor:
 | `write/01-procurement.spec.ts` (W1–W4) | 4 | Skip (cần property test) |
 | `write/02-receiving.spec.ts` (W5–W6) | 2 | Skip (cần property test) |
 | `write/03-finance.spec.ts` (W7–W10) | 4 | Skip (cần property test) |
+| `write/04-admin-create-user-multirole.spec.ts` (W11) | 1 | Skip (cần tài khoản quản trị) |
 
-Tổng: 13 Vitest + 44 Playwright (5 public chạy được trên VM).
+Tổng: 16 Vitest + 45 Playwright (5 public chạy được trên VM).
+
+### W11 — tạo tài khoản đa vai trò (ngoại lệ tầng ghi)
+
+W11 hồi quy cho vụ owner 10/11 (tạo tài khoản tick đủ 17 vai trò nhưng
+DB chỉ có 1 dòng `sys_admin`). Khác 3 file ghi còn lại, W11 **không cần
+property test** (tạo tài khoản là phạm vi chuỗi) — cần:
+
+```bash
+TEST_WRITE_ENABLED=1 \
+TEST_ADMIN_EMAIL=<tài khoản có admin.users.manage> TEST_ADMIN_PASSWORD=<mật khẩu> \
+pnpm e2e --project=write tests/e2e/write/04-admin-create-user-multirole.spec.ts
+```
+
+Tác dụng phụ: mỗi lần chạy tạo 1 tài khoản auth thật với email duy nhất
+(`e2e-multirole-<timestamp>@example.com`, 2 vai trò purchaser +
+storekeeper, phạm vi toàn chuỗi). Không có chức năng xóa tài khoản nên
+tài khoản này ở lại trong auth (giống TEST01–TEST05 Duy tạo tay).
+Chỉ chạy khi `TEST_WRITE_ENABLED=1`.
 
 ## Dữ liệu mẫu (fixture)
 

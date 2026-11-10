@@ -12,6 +12,8 @@ import {
 import { DocStatusBadge } from "@/components/common/doc-status-badge";
 import { MoneyText } from "@/components/common/money-text";
 import { PageHeader } from "@/components/shell/page-header";
+import { BoardView, type BoardColumn } from "@/components/shell/board-view";
+import { ViewToggle, type ListViewMode } from "@/components/shell/view-toggle";
 import { vi } from "@/i18n/vi";
 import type { PoRow } from "@/features/procurement/queries";
 
@@ -72,6 +74,7 @@ export function PoList({
 }) {
   const router = useRouter();
   const [search, setSearch] = useState(currentSearch);
+  const [view, setView] = useState<ListViewMode>("list");
 
   function applyFilters(newParams: {
     search?: string;
@@ -141,11 +144,43 @@ export function PoList({
       cell: (row) => String(row.line_count),
     },
     {
+      key: "created_by_name",
+      header: vi.procurement.list.createdBy,
+      cell: (row) => row.created_by_name ?? "—",
+    },
+    {
       key: "status",
       header: vi.procurement.list.status,
       cell: (row) => <DocStatusBadge status={row.status} />,
     },
   ];
+
+  /** Board chỉ đọc: nhóm các dòng của trang hiện tại theo trạng thái. */
+  const boardColumns: BoardColumn[] = PO_STATUSES.map((status) => ({
+    key: status,
+    label: poStatusLabel(status),
+    cards: initialPos
+      .filter((row) => row.status === status)
+      .map((row) => (
+        <Link
+          key={row.id}
+          href={`/${propertyId}/procurement/po/${row.id}`}
+          className="block rounded-lg border bg-card p-3 shadow-sm outline-none transition-colors hover:border-brand/60 focus-visible:ring-2 focus-visible:ring-brand/40"
+        >
+          <span className="font-mono text-xs font-bold text-primary">
+            {row.doc_no}
+          </span>
+          <span className="mt-1 block truncate text-sm font-medium">
+            {row.supplier_name ?? vi.procurement.po.marketSupplier}
+          </span>
+          <span className="mt-1 block text-xs text-muted-foreground">
+            {new Date(row.order_date).toLocaleDateString("vi-VN")}
+            {" · "}
+            <MoneyText amount={row.total_amount} />
+          </span>
+        </Link>
+      )),
+  }));
 
   return (
     <div className="space-y-4">
@@ -184,18 +219,23 @@ export function PoList({
         <Button variant="outline" onClick={() => applyFilters({})}>
           {vi.common.search}
         </Button>
+        <ViewToggle value={view} onChange={setView} />
       </div>
 
-      <DataTable
-        columns={columns}
-        rows={initialPos}
-        pagination={{
-          page: currentPage,
-          pageSize,
-          total,
-          onPageChange: (page) => applyFilters({ page }),
-        }}
-      />
+      {view === "board" ? (
+        <BoardView columns={boardColumns} />
+      ) : (
+        <DataTable
+          columns={columns}
+          rows={initialPos}
+          pagination={{
+            page: currentPage,
+            pageSize,
+            total,
+            onPageChange: (page) => applyFilters({ page }),
+          }}
+        />
+      )}
     </div>
   );
 }

@@ -7,6 +7,7 @@ import {
   listDeliveries,
 } from "@/features/alerts/queries";
 import { vi } from "@/i18n/vi";
+import { PageHeader } from "@/components/shell/page-header";
 
 /** Lich su canh bao + lich su gui thong bao (T-045, man toi thieu). */
 export default async function AlertsPage({
@@ -30,9 +31,11 @@ export default async function AlertsPage({
   }
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-xl font-semibold">{vi.alerts.indexTitle}</h1>
-      <p className="text-sm text-muted-foreground">{vi.alerts.indexHint}</p>
+    <div className="space-y-4">
+      <PageHeader
+        title={vi.alerts.indexTitle}
+        description={vi.alerts.indexHint}
+      />
       <PushSubscriptionToggle />
       {!canView ? (
         <p className="text-sm text-muted-foreground">

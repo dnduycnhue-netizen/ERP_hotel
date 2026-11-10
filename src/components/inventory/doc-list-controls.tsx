@@ -1,8 +1,10 @@
 import Link from "next/link";
+import { Search } from "lucide-react";
 import { vi } from "@/i18n/vi";
 
 /**
  * Chip lọc trạng thái dùng chung cho các danh sách chứng từ kho (T-031).
+ * Kiểu ClickUp (ADR-008): chip đang chọn nền brand nhạt + chữ brand.
  * `hrefForStatus` tự giữ lại các tham số lọc khác (vd. từ khóa tìm kiếm).
  */
 export function StatusFilter({
@@ -15,16 +17,16 @@ export function StatusFilter({
   hrefForStatus: (status: string) => string;
 }) {
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className="flex flex-wrap gap-1.5">
       {options.map(({ value, label }) => (
         <Link
           key={value}
           href={hrefForStatus(value)}
           aria-current={status === value ? "page" : undefined}
-          className={`rounded-lg border px-3 py-1.5 text-sm font-medium ${
+          className={`rounded-full border px-3 py-1.5 text-sm font-medium outline-none transition-colors focus-visible:ring-2 focus-visible:ring-brand/40 ${
             status === value
-              ? "bg-primary text-primary-foreground"
-              : "bg-card hover:border-ring"
+              ? "border-brand/40 bg-brand/10 text-brand"
+              : "bg-background text-muted-foreground hover:text-foreground"
           }`}
         >
           {label}
@@ -55,7 +57,7 @@ export function DocPagination({
       {page > 1 ? (
         <Link
           href={hrefForPage(page - 1)}
-          className="rounded-lg border bg-card px-3 py-1.5 hover:border-ring"
+          className="flex h-9 items-center rounded-md border bg-background px-3 font-medium outline-none transition-colors hover:bg-accent focus-visible:ring-2 focus-visible:ring-brand/40"
         >
           ← {vi.common.back}
         </Link>
@@ -66,7 +68,7 @@ export function DocPagination({
       {page < totalPages ? (
         <Link
           href={hrefForPage(page + 1)}
-          className="rounded-lg border bg-card px-3 py-1.5 hover:border-ring"
+          className="flex h-9 items-center rounded-md border bg-background px-3 font-medium outline-none transition-colors hover:bg-accent focus-visible:ring-2 focus-visible:ring-brand/40"
         >
           {vi.common.next} →
         </Link>
@@ -91,16 +93,23 @@ export function DocSearchForm({
   return (
     <form method="get" className="flex gap-2">
       {status ? <input type="hidden" name="status" value={status} /> : null}
-      <input
-        type="search"
-        name="search"
-        defaultValue={defaultValue}
-        placeholder={placeholder}
-        className="w-full max-w-sm rounded-lg border bg-card px-3 py-1.5 text-sm outline-none focus:border-ring"
-      />
+      <div className="relative w-full max-w-sm">
+        <Search
+          className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
+          aria-hidden
+        />
+        <input
+          type="search"
+          name="search"
+          defaultValue={defaultValue}
+          placeholder={placeholder}
+          aria-label={placeholder}
+          className="h-9 w-full rounded-md border bg-background pr-3 pl-9 text-sm outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
+        />
+      </div>
       <button
         type="submit"
-        className="rounded-lg border bg-card px-3 py-1.5 text-sm font-medium hover:border-ring"
+        className="h-9 shrink-0 rounded-md border bg-background px-3 text-sm font-medium outline-none transition-colors hover:bg-accent focus-visible:ring-2 focus-visible:ring-brand/40"
       >
         {vi.common.search}
       </button>

@@ -7,7 +7,7 @@
 -- voi fixture T-020 (d020).
 begin;
 create extension if not exists pgtap;
-select plan(56);
+select plan(58);
 
 -- ---------------------------------------------------------------------------
 -- Fixture: org, legal entity, property, uom, vat tu, gia tran, vai tro,
@@ -446,6 +446,26 @@ select ok(
     (select id from public.purchase_orders where channel = 'market')
   ) ->> 'ok')::boolean,
   'po_submit PO market (tong < 5tr, khong vuot tran)'
+);
+
+-- T-022A (tu phe duyet 10/11, phuong an A): PO cho duoc mien kiem tra
+-- gia — dong khong gia/khong gia tran (unit_price 0, manual) van submit
+-- duoc. 2 assertion nay ghim hanh vi mien tru: submit qua duoc (trang
+-- thai submitted, cho duyet 1 buoc) ma dong 0 dong van giu gia 0 (khong
+-- phai do gia duoc dien sau). PO thuong van bi chan ERR_PRICE_NOT_SET
+-- (suite T-020 muc 22 giu assertion nay, khong lap lai o day).
+select is(
+  (select status from public.purchase_orders where channel = 'market'),
+  'submitted',
+  'PO market sau submit o trang thai submitted (cho duyet 1 buoc)'
+);
+
+select is(
+  (select unit_price from public.purchase_order_lines pol
+    join public.purchase_orders po on po.id = pol.po_id
+    where po.channel = 'market' and pol.item_id = 'd0220000-0200-4000-8000-000000000503'),
+  0::numeric,
+  'dong PO market khong gia van 0 sau khi submit (mien kiem tra gia)'
 );
 
 select _t022_as('d0220000-0200-4000-8000-000000000a02');

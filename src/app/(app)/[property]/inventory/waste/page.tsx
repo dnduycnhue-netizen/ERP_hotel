@@ -13,6 +13,7 @@ import {
 import { MoneyText, formatNumber } from "@/components/common/money-text";
 import { listWasteAction } from "@/features/inventory/actions";
 import { vi } from "@/i18n/vi";
+import { PageHeader } from "@/components/shell/page-header";
 
 const STATUSES = [
   "draft",
@@ -76,7 +77,7 @@ export default async function WastePage({
 
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="text-2xl font-semibold">{vi.inventory.wasteTitle}</h1>
+      <PageHeader title={vi.inventory.wasteTitle} />
 
       <StatusFilter
         status={status}
@@ -108,27 +109,33 @@ export default async function WastePage({
           description={vi.inventory.wasteEmpty}
         />
       ) : (
-        <div className="overflow-x-auto rounded-xl border bg-card shadow-sm">
+        <div className="overflow-x-auto rounded-lg border bg-card">
           <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b text-left text-muted-foreground">
-                <th className="px-4 py-3 font-medium">{vi.inventory.docNo}</th>
-                <th className="px-4 py-3 font-medium">{vi.common.status}</th>
-                <th className="px-4 py-3 font-medium">
+            <thead className="bg-muted/40 text-left">
+              <tr>
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                  {vi.inventory.docNo}
+                </th>
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                  {vi.common.status}
+                </th>
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
                   {vi.inventory.businessDate}
                 </th>
-                <th className="px-4 py-3 font-medium">{vi.inventory.reason}</th>
-                <th className="px-4 py-3 font-medium">
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                  {vi.inventory.reason}
+                </th>
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
                   {vi.inventory.warehouse}
                 </th>
-                <th className="px-4 py-3 text-right font-medium">
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase text-right">
                   {vi.inventory.lineCount}
                 </th>
-                <th className="px-4 py-3 text-right font-medium">
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase text-right">
                   {vi.inventory.totalQty}
                 </th>
                 {showValue ? (
-                  <th className="px-4 py-3 text-right font-medium">
+                  <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase text-right">
                     {vi.inventory.totalValue}
                   </th>
                 ) : null}
@@ -136,8 +143,8 @@ export default async function WastePage({
             </thead>
             <tbody>
               {rows.map((row) => (
-                <tr key={row.id} className="border-b last:border-b-0">
-                  <td className="px-4 py-3">
+                <tr key={row.id} className="border-t hover:bg-muted/40">
+                  <td className="px-3 py-3 align-middle">
                     <Link
                       href={`/${propertyId}/inventory/waste/${row.id}`}
                       className="font-medium hover:underline"
@@ -145,20 +152,26 @@ export default async function WastePage({
                       {row.doc_no}
                     </Link>
                   </td>
-                  <td className="px-4 py-3">
+                  <td className="px-3 py-3 align-middle">
                     <DocStatusBadge status={row.status} />
                   </td>
-                  <td className="px-4 py-3 whitespace-nowrap">
+                  <td className="px-3 py-3 whitespace-nowrap align-middle">
                     {row.business_date}
                   </td>
-                  <td className="px-4 py-3">{reasonLabel(row.reason_code)}</td>
-                  <td className="px-4 py-3">{row.warehouse_name ?? "—"}</td>
-                  <td className="px-4 py-3 text-right">{row.line_count}</td>
-                  <td className="px-4 py-3 text-right">
+                  <td className="px-3 py-3 align-middle">
+                    {reasonLabel(row.reason_code)}
+                  </td>
+                  <td className="px-3 py-3 align-middle">
+                    {row.warehouse_name ?? "—"}
+                  </td>
+                  <td className="px-3 py-3 text-right align-middle">
+                    {row.line_count}
+                  </td>
+                  <td className="px-3 py-3 text-right align-middle">
                     {formatNumber(row.total_qty_stock)}
                   </td>
                   {showValue ? (
-                    <td className="px-4 py-3 text-right">
+                    <td className="px-3 py-3 text-right align-middle">
                       <MoneyText amount={row.total_value} />
                     </td>
                   ) : null}

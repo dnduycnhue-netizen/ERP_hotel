@@ -20,6 +20,7 @@ import type {
   CountRow,
 } from "@/features/count/queries";
 import { vi } from "@/i18n/vi";
+import { PageHeader } from "@/components/shell/page-header";
 import { cn } from "@/lib/utils";
 import { CountExportButton } from "./count-export-button";
 import { formatQty, formatYmd, interpolate } from "./count-utils";
@@ -208,11 +209,15 @@ export function CountReportView({
     <div className="flex flex-col gap-4">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold">{count.doc_no}</h1>
-          <p className="text-sm text-muted-foreground">
-            {count.warehouse_name ?? vi.common.noData} ·{" "}
-            {formatYmd(count.business_date)} · {kindLabel(count.kind)}
-          </p>
+          <PageHeader
+            title={count.doc_no}
+            description={
+              <>
+                {count.warehouse_name ?? vi.common.noData} ·{" "}
+                {formatYmd(count.business_date)} · {kindLabel(count.kind)}
+              </>
+            }
+          />
           <p className="text-sm text-muted-foreground">
             {interpolate(vi.count.countersCount, {
               count: count.counter_ids.length,
@@ -246,40 +251,44 @@ export function CountReportView({
       ) : result.length === 0 ? (
         <EmptyState title={vi.count.reportEmpty} />
       ) : (
-        <div className="overflow-x-auto rounded-xl border bg-card">
+        <div className="overflow-x-auto rounded-lg border bg-card">
           <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b text-left text-muted-foreground">
-                <th className="px-3 py-2 font-medium">
+            <thead className="bg-muted/40 text-left">
+              <tr>
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
                   {vi.count.exportColumns.itemCode}
                 </th>
-                <th className="px-3 py-2 font-medium">
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
                   {vi.count.exportColumns.itemName}
                 </th>
-                <th className="px-3 py-2 font-medium">
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
                   {vi.count.exportColumns.uom}
                 </th>
-                <th className="px-3 py-2 text-right font-medium">
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase text-right">
                   {vi.count.countedQty1}
                 </th>
-                <th className="px-3 py-2 text-right font-medium">
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase text-right">
                   {vi.count.countedQty2}
                 </th>
-                <th className="px-3 py-2 text-right font-medium">
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase text-right">
                   {vi.count.finalQty}
                 </th>
-                <th className="px-3 py-2 text-right font-medium">
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase text-right">
                   {vi.count.bookQty}
                 </th>
-                <th className="px-3 py-2 text-right font-medium">
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase text-right">
                   {vi.count.varianceQty}
                 </th>
-                <th className="px-3 py-2 text-right font-medium">
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase text-right">
                   {vi.count.variancePct}
                 </th>
-                <th className="px-3 py-2 font-medium">{vi.count.flag}</th>
-                <th className="px-3 py-2 font-medium">{vi.count.reasonCode}</th>
-                <th className="px-3 py-2 font-medium">
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                  {vi.count.flag}
+                </th>
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                  {vi.count.reasonCode}
+                </th>
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
                   {vi.count.explanation}
                 </th>
               </tr>
@@ -294,40 +303,42 @@ export function CountReportView({
                     row.flag === "recount" && "bg-amber-50/60",
                   )}
                 >
-                  <td className="px-3 py-2 font-medium">{row.item_code}</td>
-                  <td className="px-3 py-2">{row.item_name}</td>
-                  <td className="px-3 py-2">{row.stock_uom}</td>
-                  <td className="px-3 py-2 text-right tabular-nums">
+                  <td className="px-3 py-3 font-medium align-middle">
+                    {row.item_code}
+                  </td>
+                  <td className="px-3 py-3 align-middle">{row.item_name}</td>
+                  <td className="px-3 py-3 align-middle">{row.stock_uom}</td>
+                  <td className="px-3 py-3 text-right tabular-nums align-middle">
                     {row.counted_qty_1 === null
                       ? vi.common.noData
                       : formatQty(row.counted_qty_1)}
                   </td>
-                  <td className="px-3 py-2 text-right tabular-nums">
+                  <td className="px-3 py-3 text-right tabular-nums align-middle">
                     {row.counted_qty_2 === null
                       ? vi.common.noData
                       : formatQty(row.counted_qty_2)}
                   </td>
-                  <td className="px-3 py-2 text-right font-medium tabular-nums">
+                  <td className="px-3 py-3 text-right font-medium tabular-nums align-middle">
                     {row.final_qty === null
                       ? vi.common.noData
                       : formatQty(row.final_qty)}
                   </td>
-                  <td className="px-3 py-2 text-right tabular-nums">
+                  <td className="px-3 py-3 text-right tabular-nums align-middle">
                     {row.book_qty === null
                       ? vi.common.noData
                       : formatQty(row.book_qty)}
                   </td>
-                  <td className="px-3 py-2 text-right tabular-nums">
+                  <td className="px-3 py-3 text-right tabular-nums align-middle">
                     {row.variance_qty === null
                       ? vi.common.noData
                       : formatQty(row.variance_qty)}
                   </td>
-                  <td className="px-3 py-2 text-right tabular-nums">
+                  <td className="px-3 py-3 text-right tabular-nums align-middle">
                     {row.variance_pct === null
                       ? vi.common.noData
                       : `${formatQty(row.variance_pct)}%`}
                   </td>
-                  <td className="px-3 py-2">
+                  <td className="px-3 py-3 align-middle">
                     <span
                       className={cn(
                         "rounded px-2 py-0.5 text-xs font-medium",
@@ -339,8 +350,10 @@ export function CountReportView({
                       {flagLabel(row.flag)}
                     </span>
                   </td>
-                  <td className="px-3 py-2">{reasonLabel(row.reason_code)}</td>
-                  <td className="px-3 py-2">
+                  <td className="px-3 py-3 align-middle">
+                    {reasonLabel(row.reason_code)}
+                  </td>
+                  <td className="px-3 py-3 align-middle">
                     {row.explanation ?? vi.common.noData}
                   </td>
                 </tr>
@@ -351,7 +364,7 @@ export function CountReportView({
       )}
 
       {adjustment ? (
-        <div className="rounded-xl border bg-card p-4">
+        <div className="rounded-lg border bg-card p-4">
           <p className="text-sm font-medium">{vi.count.adjustment}</p>
           <p className="mt-1 text-sm text-muted-foreground">
             {adjustment.status === "approved"
@@ -387,7 +400,7 @@ export function CountReportView({
       ) : null}
 
       {canLockNow ? (
-        <div className="flex flex-col gap-3 rounded-xl border bg-card p-4">
+        <div className="flex flex-col gap-3 rounded-lg border bg-card p-4">
           <p className="text-sm font-medium">{vi.count.lockTitle}</p>
           <p className="text-xs text-muted-foreground">{vi.count.lockHint}</p>
           {redLines.length === 0 ? (
@@ -465,7 +478,7 @@ export function CountReportView({
       ) : null}
 
       {canAdjustNow ? (
-        <div className="flex flex-col gap-2 rounded-xl border bg-card p-4">
+        <div className="flex flex-col gap-2 rounded-lg border bg-card p-4">
           <p className="text-sm font-medium">{vi.count.adjustTitle}</p>
           <Button disabled={adjusting} onClick={() => setAdjustOpen(true)}>
             {adjusting ? vi.count.adjusting : vi.count.adjustButton}
@@ -474,7 +487,7 @@ export function CountReportView({
       ) : null}
 
       {canCancelNow ? (
-        <div className="flex flex-col gap-2 rounded-xl border bg-card p-4">
+        <div className="flex flex-col gap-2 rounded-lg border bg-card p-4">
           <p className="text-sm font-medium">{vi.count.cancelTitle}</p>
           <label className="flex flex-col gap-1.5 text-sm font-medium">
             {vi.count.cancelReason} *

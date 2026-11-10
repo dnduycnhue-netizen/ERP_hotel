@@ -94,7 +94,7 @@ export function ScheduleList({
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-end gap-3 rounded-xl border bg-card p-4">
+      <div className="flex flex-wrap items-end gap-3 rounded-lg border bg-card p-4">
         <label className="block text-sm">
           {vi.service.monthLabel}
           <input
@@ -153,7 +153,7 @@ export function ScheduleList({
         />
       ) : null}
 
-      <div className="rounded-xl border bg-card p-4">
+      <div className="rounded-lg border bg-card p-4">
         <h2 className="font-medium">{vi.service.schedulesTitle}</h2>
         <p className="mt-1 text-sm text-muted-foreground">
           {vi.service.schedulesHint}
@@ -207,6 +207,11 @@ export function ScheduleList({
                         ? ` · ${s.acceptance.photo_ids.length} ảnh`
                         : ""}
                     </p>
+                    {s.acceptance.note ? (
+                      <p className="mt-1 text-sm">
+                        {vi.service.note}: {s.acceptance.note}
+                      </p>
+                    ) : null}
                     {s.acceptance.photo_ids.length > 0 ? (
                       <div className="mt-2">
                         <AttachmentGallery

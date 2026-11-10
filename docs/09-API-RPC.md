@@ -26,8 +26,10 @@ Các RPC danh mục dưới đây thuộc các task sau, chưa được triển 
 | `pr_submit(p_pr_id)` / `pr_decide(p_pr_id, p_decision, p_comment)` | |
 | `po_create_from_pr(p_pr_line_ids uuid[], p_supplier_id, p_channel)` | Tự lấy giá theo thứ tự hợp đồng → báo giá → giá trần |
 | `po_save_draft(p_po jsonb)` | Không cho sửa `unit_price` nếu `price_source <> 'manual'` |
-| `po_submit(p_po_id)` | Sinh các bước `approvals` theo `approval_rules` |
+| `po_submit(p_po_id)` | Sinh các bước `approvals` theo `approval_rules`; chặn `ERR_PRICE_NOT_SET` khi PO **thường** (contract/quote) có dòng `manual` giá ≤ 0 — **PO chợ (`channel = 'market'`) được miễn** kiểm tra giá (T-022A, tự phê duyệt 10/11) |
 | `approval_decide(p_doc_type, p_doc_id, p_decision, p_comment)` | Kiểm `SOD_PO_CREATOR_APPROVER` |
+| `pr_list(p_property_id, p_status, p_search, p_limit, p_offset)` / `po_list(...)` | Trả `created_by_name` (join `profiles`, Q18); `total` + `rows` |
+| `approval_timeline(p_property_id, p_doc_type, p_doc_id)` | `p_doc_type` 'pr'/'po'/'payment_request' (Q73: 'payment_request' cần `payment.request`/`payment.approve`/`payment.mark_paid`); trả `steps` kèm tên vai trò + tên người quyết |
 | `po_send(p_po_id)` | Trạng thái `sent`; sinh PDF ở route `/api/export/po/[id]` |
 | `po_close(p_po_id, p_reason)` | Đóng phần còn thiếu |
 | `market_order_create(p_lines jsonb, p_advance_amount)` | Tạo PO `market` + `advances` `requested` |
@@ -107,10 +109,32 @@ Các RPC danh mục dưới đây thuộc các task sau, chưa được triển 
 | `invoice_save_draft`, `invoice_match(p_invoice_id)` | Trả kết quả khớp từng dòng |
 | `invoice_approve(p_invoice_id)` | Ghi `ap_ledger` (+) |
 | `advance_request`, `advance_decide`, `advance_disburse`, `advance_settle(p_id, p_lines)` | Quyết toán theo số thực nhận |
-| `payment_request_create`, `payment_request_decide`, `payment_mark_paid(p_id, p_bank_ref)` | `ap_ledger` (−) khi paid |
-| `service_contract_save`, `service_schedule_generate(p_month)`, `service_accept(p_schedule_id, p_rating, p_photos)` | |
+| `payment_request_create`, `payment_request_decide`, `payment_mark_paid(p_id, p_bank_ref)` | `ap_ledger` (−) khi paid; timeline duyệt đọc qua `approval_timeline(..., 'payment_request', ...)` (Q73) |
+| `service_contract_save`, `service_schedule_generate(p_month)`, `service_accept(p_schedule_id, p_rating, p_photos, p_po_id, p_note)` | `p_note` tuy chon, luu vao `service_acceptances.note` (Q81) |
 | `pms_daily_upsert(p_property_id, p_date, p_stats jsonb)` | Lễ tân nhập hằng ngày |
 | `pos_import_commit(p_import_id)` (P2) | |
+
+## 8. Nhà hàng (M06)
+
+| RPC | Ghi chú |
+|---|---|
+| `recipe_save(p_property_id, p_recipe jsonb)` | Upsert món + tạo version mới `active`, version cũ `retired`; kiểm tra loại món, mã trùng, mỗi dòng đúng một trong `item_id`/`sub_recipe_id`, `qty > 0`, `loss_pct` 0–100, không tự tham chiếu chính mình |
+| `recipe_set_active(p_recipe_id, p_active)` | Bật/tắt món |
+| `recipe_foodcost(p_recipe_id)` / `recipe_foodcost_list(p_property_id)` | Foodcost mỗi phần theo giá trần hiện tại; dòng chưa có giá trần hoặc chưa có hệ số đổi đơn vị → foodcost `NULL` + `has_unknown_cost = true` (không dùng giá Excel 2018–2020) |
+| `restaurant_kitchen_today(p_property_id, p_date)` | Món đang bán + phiên buffet + tiệc đã xác nhận/đang diễn ra hôm đó + bảng NVL cần chuẩn bị (gộp theo món, tính theo `portions_per_batch`) |
+| `restaurant_sales_summary(p_property_id, p_from, p_to)` | Tổng doanh thu/foodcost/lãi gộp + theo món + theo ngày (đã trừ dòng hủy) |
+| `dish_sale_record(p_property_id, p_recipe_id, p_business_date, p_qty, p_unit_price)` | Ghi bán tay; chặn ngày tương lai (giờ VN), `qty > 0`, món phải đang bán |
+| `dish_sale_void(p_sale_id)` | Chỉ dòng bán tay; đánh dấu hủy, không xóa |
+| `buffet_session_save(p_property_id, p_session jsonb)` | Tạo/sửa phiên buffet (mỗi buổi/ngày 1 phiên trừ khi hủy) |
+| `buffet_session_close(p_session_id, p_guests, p_price_per_guest)` | Đóng phiên → sinh dòng bán `source='buffet'`, doanh thu = khách × giá/khách |
+| `buffet_session_cancel(p_session_id, p_reason)` | Lý do bắt buộc |
+| `banquet_save(p_property_id, p_banquet jsonb)` | Tạo/sửa tiệc; kiểm tra `end_time > start_time` |
+| `banquet_confirm(p_banquet_id)` | Kiểm tra trùng sảnh: cùng khách sạn + cùng sảnh + cùng ngày + khung giờ giao nhau + trạng thái `confirmed`/`in_progress` → `ERR_BANQUET_HALL_CONFLICT` |
+| `banquet_start(p_banquet_id)` / `banquet_complete(p_banquet_id)` | Hoàn thành → sinh dòng bán `source='banquet'` theo thực đơn tiệc |
+| `banquet_cancel(p_banquet_id, p_reason)` | Lý do bắt buộc |
+| `report_get(..., 'RPT_FNB_REVENUE', ...)` | Báo cáo doanh thu F&B: mỗi dòng theo món + 1 dòng tổng buffet; foodcost theo giá trần hiện tại |
+
+Quyền mới (seed 500000): `restaurant.view`, `restaurant.dish.manage`, `restaurant.sale.record`, `restaurant.buffet.manage`, `restaurant.banquet.manage`, `report.view.rpt_fnb_revenue`.
 
 ## 9. Phân quyền (quản trị)
 

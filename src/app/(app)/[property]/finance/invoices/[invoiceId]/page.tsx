@@ -2,7 +2,6 @@ import { ErrorState } from "@/components/common/error-state";
 import { InvoiceDetailView } from "@/components/finance/invoice-detail";
 import { getFinancePerms, getInvoice } from "@/features/finance/queries";
 import { createClient } from "@/lib/supabase/server";
-import { vi } from "@/i18n/vi";
 
 /** Chi tiết hóa đơn (T-041): dòng + kết quả khớp + Khớp / Duyệt. */
 export default async function InvoiceDetailPage({
@@ -24,8 +23,7 @@ export default async function InvoiceDetailPage({
   }
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-xl font-semibold">{vi.finance.invoicesTitle}</h1>
+    <div className="space-y-4">
       <InvoiceDetailView
         propertyId={propertyId}
         detail={detailRes.data}

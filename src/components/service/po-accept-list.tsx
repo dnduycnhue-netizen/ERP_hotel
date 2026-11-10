@@ -22,7 +22,7 @@ export function PoAcceptList({
   onAcceptPo: (po: ServicePoRow) => void;
 }) {
   return (
-    <div className="rounded-xl border bg-card p-4">
+    <div className="rounded-lg border bg-card p-4">
       <h2 className="font-medium">{vi.service.pendingPosTitle}</h2>
       <p className="mt-1 text-sm text-muted-foreground">
         {vi.service.pendingPosHint}
@@ -34,22 +34,32 @@ export function PoAcceptList({
       ) : (
         <div className="mt-3 overflow-x-auto">
           <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b text-left text-muted-foreground">
-                <th className="px-3 py-2">{vi.service.poDocNo}</th>
-                <th className="px-3 py-2">{vi.finance.supplier}</th>
-                <th className="px-3 py-2">{vi.service.contractTitle}</th>
-                <th className="px-3 py-2">{vi.service.orderDate}</th>
-                <th className="px-3 py-2 text-right">
+            <thead className="bg-muted/40 text-left">
+              <tr>
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                  {vi.service.poDocNo}
+                </th>
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                  {vi.finance.supplier}
+                </th>
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                  {vi.service.contractTitle}
+                </th>
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                  {vi.service.orderDate}
+                </th>
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase text-right">
                   {vi.finance.totalAmount}
                 </th>
-                <th className="px-3 py-2">{vi.common.actions}</th>
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                  {vi.common.actions}
+                </th>
               </tr>
             </thead>
             <tbody>
               {pos.map((po) => (
-                <tr key={po.id} className="border-b last:border-0">
-                  <td className="px-3 py-2">
+                <tr key={po.id} className="border-t hover:bg-muted/40">
+                  <td className="px-3 py-3 align-middle">
                     <a
                       href={`/${propertyId}/procurement/po/${po.id}`}
                       className="font-medium hover:underline"
@@ -57,17 +67,17 @@ export function PoAcceptList({
                       {po.doc_no}
                     </a>
                   </td>
-                  <td className="px-3 py-2">
+                  <td className="px-3 py-3 align-middle">
                     {po.supplier_name ?? vi.common.noData}
                   </td>
-                  <td className="px-3 py-2">
+                  <td className="px-3 py-3 align-middle">
                     {po.contract_title ?? vi.common.noData}
                   </td>
-                  <td className="px-3 py-2">{po.order_date}</td>
-                  <td className="px-3 py-2 text-right">
+                  <td className="px-3 py-3 align-middle">{po.order_date}</td>
+                  <td className="px-3 py-3 text-right align-middle">
                     <MoneyText amount={po.total_amount} />
                   </td>
-                  <td className="px-3 py-2">
+                  <td className="px-3 py-3 align-middle">
                     {canAccept ? (
                       <Button
                         type="button"

@@ -93,7 +93,7 @@ export const createUserSchema = z.object({
   phone: z.string().trim().optional(),
   password: z
     .string()
-    .min(8, "Mật khẩu tạm phải có ít nhất 8 ký tự.")
+    .min(12, "Mật khẩu tạm phải có ít nhất 12 ký tự.")
     .max(128, "Mật khẩu tạm tối đa 128 ký tự.")
     .optional()
     .or(z.literal("")),
@@ -105,7 +105,7 @@ export const resetPasswordSchema = z.object({
   userId: uuid,
   password: z
     .string()
-    .min(8, "Mật khẩu tạm phải có ít nhất 8 ký tự.")
+    .min(12, "Mật khẩu tạm phải có ít nhất 12 ký tự.")
     .max(128, "Mật khẩu tạm tối đa 128 ký tự.")
     .optional()
     .or(z.literal("")),

@@ -4,6 +4,7 @@ import { ErrorState } from "@/components/common/error-state";
 import { MoneyText, formatNumber } from "@/components/common/money-text";
 import { getStockCardAction } from "@/features/inventory/actions";
 import { vi } from "@/i18n/vi";
+import { PageHeader } from "@/components/shell/page-header";
 
 /**
  * Thẻ kho của 1 mặt hàng tại 1 kho (T-031).
@@ -103,15 +104,15 @@ export default async function StockCardPage({
         ← {vi.common.back}
       </Link>
 
-      <div>
-        <h1 className="text-2xl font-semibold">
-          {vi.inventory.stockCardTitle}
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          {card.item.code} — {card.item.name} · {card.warehouse.name} ·{" "}
-          {card.item.stock_uom}
-        </p>
-      </div>
+      <PageHeader
+        title={vi.inventory.stockCardTitle}
+        description={
+          <>
+            {card.item.code} — {card.item.name} · {card.warehouse.name} ·{" "}
+            {card.item.stock_uom}
+          </>
+        }
+      />
 
       <form method="get" className="flex flex-wrap items-end gap-2">
         <label className="flex flex-col gap-1 text-sm">
@@ -120,7 +121,7 @@ export default async function StockCardPage({
             type="date"
             name="from"
             defaultValue={from}
-            className="rounded-lg border bg-card px-3 py-1.5 outline-none focus:border-ring"
+            className="h-9 rounded-md border bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
           />
         </label>
         <label className="flex flex-col gap-1 text-sm">
@@ -129,26 +130,26 @@ export default async function StockCardPage({
             type="date"
             name="to"
             defaultValue={to}
-            className="rounded-lg border bg-card px-3 py-1.5 outline-none focus:border-ring"
+            className="h-9 rounded-md border bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
           />
         </label>
         <button
           type="submit"
-          className="rounded-lg border bg-card px-3 py-1.5 text-sm font-medium hover:border-ring"
+          className="h-9 rounded-md border bg-background px-3 text-sm font-medium outline-none transition-colors hover:bg-accent focus-visible:ring-2 focus-visible:ring-brand/40"
         >
           {vi.inventory.filter}
         </button>
         {from !== "" || to !== "" ? (
           <Link
             href={`/${propertyId}/inventory/stock/${warehouseId}/${itemId}`}
-            className="rounded-lg border bg-card px-3 py-1.5 text-sm font-medium hover:border-ring"
+            className="inline-flex h-9 items-center rounded-md border bg-background px-3 text-sm font-medium outline-none transition-colors hover:bg-accent focus-visible:ring-2 focus-visible:ring-brand/40"
           >
             {vi.common.all}
           </Link>
         ) : null}
       </form>
 
-      <dl className="grid grid-cols-2 gap-x-6 gap-y-3 rounded-xl border bg-card p-4 text-sm sm:grid-cols-3 lg:grid-cols-5">
+      <dl className="grid grid-cols-2 gap-x-6 gap-y-3 rounded-lg border bg-card p-4 text-sm sm:grid-cols-3 lg:grid-cols-5">
         <div>
           <dt className="text-muted-foreground">{strings.opening}</dt>
           <dd className="text-base font-semibold">
@@ -208,33 +209,39 @@ export default async function StockCardPage({
           description={strings.noMoves}
         />
       ) : (
-        <div className="overflow-x-auto rounded-xl border bg-card shadow-sm">
+        <div className="overflow-x-auto rounded-lg border bg-card">
           <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b text-left text-muted-foreground">
-                <th className="px-4 py-3 font-medium">
+            <thead className="bg-muted/40 text-left">
+              <tr>
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
                   {vi.inventory.businessDate}
                 </th>
-                <th className="px-4 py-3 font-medium">{strings.doc}</th>
-                <th className="px-4 py-3 font-medium">{strings.moveType}</th>
-                <th className="px-4 py-3 font-medium">{vi.inventory.lot}</th>
-                <th className="px-4 py-3 text-right font-medium">
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                  {strings.doc}
+                </th>
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                  {strings.moveType}
+                </th>
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                  {vi.inventory.lot}
+                </th>
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase text-right">
                   {strings.inQty}
                 </th>
-                <th className="px-4 py-3 text-right font-medium">
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase text-right">
                   {strings.outQty}
                 </th>
                 {card.canViewValue ? (
                   <>
-                    <th className="px-4 py-3 text-right font-medium">
+                    <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase text-right">
                       {vi.inventory.unitCost}
                     </th>
-                    <th className="px-4 py-3 text-right font-medium">
+                    <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase text-right">
                       {vi.inventory.lineAmount}
                     </th>
                   </>
                 ) : null}
-                <th className="px-4 py-3 text-right font-medium">
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase text-right">
                   {strings.runningBalance}
                 </th>
               </tr>
@@ -246,11 +253,11 @@ export default async function StockCardPage({
                   move.source_doc_id,
                 );
                 return (
-                  <tr key={move.id} className="border-b last:border-b-0">
-                    <td className="px-4 py-3 whitespace-nowrap">
+                  <tr key={move.id} className="border-t hover:bg-muted/40">
+                    <td className="px-3 py-3 whitespace-nowrap align-middle">
                       {move.business_date}
                     </td>
-                    <td className="px-4 py-3">
+                    <td className="px-3 py-3 align-middle">
                       {href && move.source_doc_no ? (
                         <Link
                           href={href}
@@ -272,7 +279,7 @@ export default async function StockCardPage({
                         </>
                       )}
                     </td>
-                    <td className="px-4 py-3">
+                    <td className="px-3 py-3 align-middle">
                       {moveTypeLabel(move.move_type)}
                       {move.reverses_move_id !== null ? (
                         <span className="block text-xs text-muted-foreground">
@@ -280,7 +287,7 @@ export default async function StockCardPage({
                         </span>
                       ) : null}
                     </td>
-                    <td className="px-4 py-3">
+                    <td className="px-3 py-3 align-middle">
                       {move.lot_no ?? "—"}
                       {move.expiry_date ? (
                         <span className="block text-xs text-muted-foreground">
@@ -288,23 +295,23 @@ export default async function StockCardPage({
                         </span>
                       ) : null}
                     </td>
-                    <td className="px-4 py-3 text-right text-green-700">
+                    <td className="px-3 py-3 text-right align-middle text-green-700">
                       {move.qty > 0 ? formatNumber(move.qty) : "—"}
                     </td>
-                    <td className="px-4 py-3 text-right text-red-700">
+                    <td className="px-3 py-3 text-right align-middle text-red-700">
                       {move.qty < 0 ? formatNumber(Math.abs(move.qty)) : "—"}
                     </td>
                     {card.canViewValue ? (
                       <>
-                        <td className="px-4 py-3 text-right">
+                        <td className="px-3 py-3 text-right align-middle">
                           <MoneyText amount={move.unit_cost} />
                         </td>
-                        <td className="px-4 py-3 text-right">
+                        <td className="px-3 py-3 text-right align-middle">
                           <MoneyText amount={move.amount} />
                         </td>
                       </>
                     ) : null}
-                    <td className="px-4 py-3 text-right font-medium">
+                    <td className="px-3 py-3 text-right font-medium align-middle">
                       {formatNumber(move.running_balance)}
                     </td>
                   </tr>

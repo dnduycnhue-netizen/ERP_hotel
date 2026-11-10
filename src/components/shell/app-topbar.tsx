@@ -1,7 +1,8 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { LogOut, Menu, UserRound } from "lucide-react";
+import Link from "next/link";
+import { KeyRound, LogOut, Menu, UserRound } from "lucide-react";
 import { vi } from "@/i18n/vi";
 import { switchProperty } from "@/app/(app)/actions";
 import { signOut } from "@/app/(auth)/login/actions";
@@ -84,6 +85,14 @@ export function AppTopbar({
                 className="fixed inset-0 z-40 cursor-default"
               />
               <div className="absolute right-0 z-50 mt-2 w-44 overflow-hidden rounded-lg border bg-popover py-1 shadow-lg">
+                <Link
+                  href="/settings/password"
+                  onClick={() => setUserMenuOpen(false)}
+                  className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm font-medium text-foreground hover:bg-accent"
+                >
+                  <KeyRound className="size-4" aria-hidden />
+                  {vi.password.changePasswordTitle}
+                </Link>
                 <form action={signOut}>
                   <button
                     type="submit"

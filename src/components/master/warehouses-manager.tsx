@@ -9,6 +9,7 @@ import {
 } from "@/components/common/data-table";
 import { useCan } from "@/lib/permissions/permissions-provider";
 import { vi } from "@/i18n/vi";
+import { PageHeader } from "@/components/shell/page-header";
 import type { WarehouseRow, OutletRow } from "@/features/master/queries";
 import type { WarehouseSaveInput } from "@/features/master/schemas";
 import {
@@ -173,21 +174,17 @@ export function WarehousesManager({
         </div>
       ) : null}
 
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-lg font-semibold">
-            {vi.master.warehouses.title}
-          </h2>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            {vi.master.warehouses.description}
-          </p>
-        </div>
-        {canManage ? (
-          <Button size="sm" onClick={startCreate}>
-            + {vi.master.warehouses.addWarehouse}
-          </Button>
-        ) : null}
-      </div>
+      <PageHeader
+        title={vi.master.warehouses.title}
+        description={vi.master.warehouses.description}
+        actions={
+          canManage ? (
+            <Button size="sm" onClick={startCreate}>
+              + {vi.master.warehouses.addWarehouse}
+            </Button>
+          ) : null
+        }
+      />
 
       <DataTable columns={columns} rows={warehouses} />
 

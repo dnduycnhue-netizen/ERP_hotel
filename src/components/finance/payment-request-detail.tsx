@@ -3,12 +3,16 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { DocStatusBadge } from "@/components/common/doc-status-badge";
 import { MoneyText } from "@/components/common/money-text";
+import { PageHeader } from "@/components/shell/page-header";
+import { ApprovalTimeline } from "@/components/procurement/approval-timeline";
 import {
   decidePaymentRequestAction,
   markPaymentPaidAction,
 } from "@/features/finance/actions";
 import type { PaymentRequestDetail } from "@/features/finance/queries";
+import type { ApprovalStepRow } from "@/features/procurement/queries";
 import { vi } from "@/i18n/vi";
 
 const STATUS_LABELS: Record<string, string> = {
@@ -26,22 +30,23 @@ const STATUS_LABELS: Record<string, string> = {
  * Chi tiết đề nghị thanh toán (T-041): dòng hóa đơn + tiến trình duyệt
  * theo trạng thái + nút Duyệt/Từ chối + ghi nhận đã trả.
  *
- * LƯU Ý (Q73): bước duyệt chi tiết (ai duyệt bước nào, có bước owner
- * không) KHÔNG đọc được từ client — policy `approvals_select` và RPC
- * `approval_timeline` chỉ hỗ trợ chứng từ PR/PO. Màn này chỉ hiện tiến
- * trình theo trạng thái đề nghị + ghi chú; nút Duyệt/Từ chối chỉ hiện
- * với người có `payment.approve`, RPC kiểm tra lại người duyệt được
- * giao ở bước đang chờ (`ERR_NOT_APPROVER` nếu không phải).
+ * Q73 (đã xong, migration 20261109410000): từng bước duyệt chi tiết
+ * (ai duyệt bước nào, có bước owner không) đọc được qua RPC
+ * `approval_timeline` với doc_type 'payment_request' — hiện ở dưới
+ * tiến trình theo trạng thái bằng `ApprovalTimeline` (chỉ xem; nút
+ * Duyệt/Từ chối vẫn ở khung này vì cần thêm ghi nhận đã trả).
  */
 export function PaymentRequestDetailView({
   propertyId,
   detail,
+  approvalSteps,
   canApprovePayment,
   canMarkPaid,
   bankChangedRecently,
 }: {
   propertyId: string;
   detail: PaymentRequestDetail;
+  approvalSteps: ApprovalStepRow[];
   canApprovePayment: boolean;
   canMarkPaid: boolean;
   bankChangedRecently: boolean;
@@ -131,20 +136,23 @@ export function PaymentRequestDetailView({
 
   return (
     <div className="space-y-6">
-      <div className="rounded-xl border bg-card p-4">
+      <div className="rounded-lg border bg-card p-4">
         <div className="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <h1 className="text-xl font-semibold">{request.doc_no}</h1>
-            <p className="mt-1 text-sm text-muted-foreground">
-              {request.supplier_name ?? vi.common.noData} ·{" "}
-              {STATUS_LABELS[request.status] ?? request.status}
-            </p>
+          <PageHeader
+            title={request.doc_no}
+            description={
+              <>
+                {request.supplier_name ?? vi.common.noData} ·{" "}
+                <DocStatusBadge status={request.status} />
+              </>
+            }
+          >
             {bankChangedRecently && request.status === "submitted" ? (
               <p className="mt-2 rounded-md bg-amber-50 p-3 text-sm text-amber-900">
                 {vi.finance.bankChangedNote}
               </p>
             ) : null}
-          </div>
+          </PageHeader>
           <div className="text-right text-sm">
             <p className="font-semibold">
               {vi.finance.totalAmount}: <MoneyText amount={request.total} />
@@ -184,9 +192,15 @@ export function PaymentRequestDetailView({
               </li>
             ))}
           </ol>
-          <p className="mt-2 text-xs text-muted-foreground">
-            {vi.finance.timelineStepsNote}
-          </p>
+          {approvalSteps.length > 0 ? (
+            <div className="mt-3">
+              <ApprovalTimeline steps={approvalSteps} readOnly />
+            </div>
+          ) : (
+            <p className="mt-2 text-xs text-muted-foreground">
+              {vi.finance.timelineStepsNote}
+            </p>
+          )}
         </div>
 
         {canDecide ? (
@@ -265,7 +279,7 @@ export function PaymentRequestDetailView({
         ) : null}
       </div>
 
-      <div className="rounded-xl border bg-card p-4">
+      <div className="rounded-lg border bg-card p-4">
         <h2 className="font-medium">{vi.finance.selectInvoices}</h2>
         {lines.length === 0 ? (
           <p className="mt-2 text-sm text-muted-foreground">
@@ -274,35 +288,41 @@ export function PaymentRequestDetailView({
         ) : (
           <div className="mt-3 overflow-x-auto">
             <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b text-left text-muted-foreground">
-                  <th className="px-3 py-2">{vi.finance.invoiceSymbol}</th>
-                  <th className="px-3 py-2">{vi.finance.invoiceNo}</th>
-                  <th className="px-3 py-2 text-right">
+              <thead className="bg-muted/40 text-left">
+                <tr>
+                  <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                    {vi.finance.invoiceSymbol}
+                  </th>
+                  <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                    {vi.finance.invoiceNo}
+                  </th>
+                  <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase text-right">
                     {vi.finance.totalAmount}
                   </th>
-                  <th className="px-3 py-2 text-right">
+                  <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase text-right">
                     {vi.finance.requestAmount}
                   </th>
-                  <th className="px-3 py-2">{vi.common.status}</th>
+                  <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                    {vi.common.status}
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {lines.map((l) => (
-                  <tr key={l.id} className="border-b last:border-0">
-                    <td className="px-3 py-2">
+                  <tr key={l.id} className="border-t hover:bg-muted/40">
+                    <td className="px-3 py-3 align-middle">
                       {l.invoice_symbol ?? vi.common.noData}
                     </td>
-                    <td className="px-3 py-2">
+                    <td className="px-3 py-3 align-middle">
                       {l.invoice_no ?? vi.common.noData}
                     </td>
-                    <td className="px-3 py-2 text-right">
+                    <td className="px-3 py-3 text-right align-middle">
                       <MoneyText amount={l.invoice_total} />
                     </td>
-                    <td className="px-3 py-2 text-right">
+                    <td className="px-3 py-3 text-right align-middle">
                       <MoneyText amount={l.amount} />
                     </td>
-                    <td className="px-3 py-2">
+                    <td className="px-3 py-3 align-middle">
                       {l.invoice_status
                         ? (STATUS_LABELS[l.invoice_status] ?? l.invoice_status)
                         : vi.common.noData}

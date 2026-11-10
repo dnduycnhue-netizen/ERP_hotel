@@ -136,7 +136,7 @@ Quyền mức `critical` khi được gán/bỏ → tạo alert `PERMISSION_CRIT
 | Thủ kho | `receiving.perform`, `receiving.post`, `receiving.view`, `requisition.issue`, `transfer.*`, `stock.view_qty`, `count.open`, `count.perform`, `supplier_return.post`, `item.temp.create` |
 | Nhận hàng ca sáng | `receiving.perform`, `receiving.post` (không `po.view_qty`, không `stock.view_*`) |
 | Trưởng bộ phận | `pr.create`, `pr.approve`, `requisition.create`, `requisition.approve`, `requisition.receive`, `waste.propose` |
-| Bếp trưởng | như Trưởng bộ phận + `count.perform`, `hk`/`recipe` (P2) |
+| Bếp trưởng | như Trưởng bộ phận + `count.perform`, `purpose_issue.post`, `receiving.view`, `stock.view_qty`, `item.view`, `attachment.view`/`attachment.upload`; `hk`/`recipe` (P2) |
 | Giám sát buồng | `hk.standard.manage`, `hk.trolley.operate`, `minibar.refill`, `requisition.*` (kho tầng), `waste.propose` |
 | Nhân viên buồng | `hk.trolley.operate`, `minibar.check` |
 | Lễ tân | `minibar.request_check`, `minibar.charge.confirm`, `minibar.waive.request`, `pms.input` |

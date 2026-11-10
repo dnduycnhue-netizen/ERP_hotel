@@ -280,7 +280,7 @@ export function PoDetail({
         </div>
       ) : null}
 
-      <div className="rounded-xl border p-4">
+      <div className="rounded-lg border p-4">
         <h3 className="font-semibold text-sm mb-3">
           {vi.procurement.list.lines} ({lines.length})
         </h3>
@@ -291,34 +291,38 @@ export function PoDetail({
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b text-left text-xs text-muted-foreground">
-                  <th className="py-2 pr-2">{vi.procurement.form.item}</th>
-                  <th className="py-2 pr-2 text-right">
+              <thead className="bg-muted/40 text-left">
+                <tr>
+                  <th className="py-2.5 pr-3 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                    {vi.procurement.form.item}
+                  </th>
+                  <th className="py-2.5 pr-3 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase text-right">
                     {vi.procurement.form.qty}
                   </th>
-                  <th className="py-2 pr-2">{vi.procurement.form.uom}</th>
-                  <th className="py-2 pr-2 text-right">
+                  <th className="py-2.5 pr-3 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                    {vi.procurement.form.uom}
+                  </th>
+                  <th className="py-2.5 pr-3 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase text-right">
                     {vi.procurement.detail.unitPrice}
                   </th>
-                  <th className="py-2 pr-2">
+                  <th className="py-2.5 pr-3 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
                     {vi.procurement.detail.priceSource}
                   </th>
-                  <th className="py-2 pr-2 text-right">
+                  <th className="py-2.5 pr-3 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase text-right">
                     {vi.procurement.detail.ceilingPrice}
                   </th>
-                  <th className="py-2 pr-2 text-right">
+                  <th className="py-2.5 pr-3 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase text-right">
                     {vi.procurement.detail.receivedQty}
                   </th>
-                  <th className="py-2 pr-2 text-right">
+                  <th className="py-2.5 pr-3 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase text-right">
                     {vi.procurement.detail.amount}
                   </th>
                 </tr>
               </thead>
               <tbody>
                 {lines.map((line) => (
-                  <tr key={line.id} className="border-b last:border-0">
-                    <td className="py-2 pr-2">
+                  <tr key={line.id} className="border-t hover:bg-muted/40">
+                    <td className="py-3 pr-3 align-middle">
                       {line.item_code ? (
                         <>
                           <span className="font-mono text-xs font-bold">
@@ -345,27 +349,27 @@ export function PoDetail({
                         </p>
                       ) : null}
                     </td>
-                    <td className="py-2 pr-2 text-right tabular-nums">
+                    <td className="py-3 pr-3 text-right tabular-nums align-middle">
                       {formatNumber(line.qty)}
                     </td>
-                    <td className="py-2 pr-2">{line.uom}</td>
-                    <td className="py-2 pr-2 text-right tabular-nums">
+                    <td className="py-3 pr-3 align-middle">{line.uom}</td>
+                    <td className="py-3 pr-3 text-right tabular-nums align-middle">
                       <MoneyText amount={line.unit_price} />
                     </td>
-                    <td className="py-2 pr-2">
+                    <td className="py-3 pr-3 align-middle">
                       {priceSourceLabel(line.price_source)}
                     </td>
-                    <td className="py-2 pr-2 text-right tabular-nums">
+                    <td className="py-3 pr-3 text-right tabular-nums align-middle">
                       {line.ceiling_price !== null ? (
                         <MoneyText amount={line.ceiling_price} />
                       ) : (
                         "—"
                       )}
                     </td>
-                    <td className="py-2 pr-2 text-right tabular-nums">
+                    <td className="py-3 pr-3 text-right tabular-nums align-middle">
                       {formatNumber(line.received_qty_stock)}
                     </td>
-                    <td className="py-2 pr-2 text-right tabular-nums">
+                    <td className="py-3 pr-3 text-right tabular-nums align-middle">
                       <MoneyText amount={line.qty * line.unit_price} />
                     </td>
                   </tr>

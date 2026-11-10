@@ -9,6 +9,7 @@ import {
 } from "@/components/common/data-table";
 import { useCan } from "@/lib/permissions/permissions-provider";
 import { vi } from "@/i18n/vi";
+import { PageHeader } from "@/components/shell/page-header";
 import type { ExpenseCategoryRow } from "@/features/master/queries";
 import {
   saveExpenseCategoryAction,
@@ -163,21 +164,17 @@ export function ExpenseCategoriesManager({
         </div>
       ) : null}
 
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-lg font-semibold">
-            {vi.master.expenseCategories.title}
-          </h2>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            {vi.master.expenseCategories.description}
-          </p>
-        </div>
-        {canManage ? (
-          <Button size="sm" onClick={startCreate}>
-            + {vi.master.expenseCategories.addCategory}
-          </Button>
-        ) : null}
-      </div>
+      <PageHeader
+        title={vi.master.expenseCategories.title}
+        description={vi.master.expenseCategories.description}
+        actions={
+          canManage ? (
+            <Button size="sm" onClick={startCreate}>
+              + {vi.master.expenseCategories.addCategory}
+            </Button>
+          ) : null
+        }
+      />
 
       <DataTable columns={columns} rows={categories} />
 

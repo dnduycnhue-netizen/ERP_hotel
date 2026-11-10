@@ -6,6 +6,7 @@ import {
 } from "@/features/service/queries";
 import { listSuppliers } from "@/features/master/queries";
 import { vi } from "@/i18n/vi";
+import { PageHeader } from "@/components/shell/page-header";
 
 /** Danh sách hợp đồng dịch vụ (T-042). */
 export default async function ServiceContractsPage({
@@ -26,13 +27,11 @@ export default async function ServiceContractsPage({
   }
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-xl font-semibold">{vi.service.listTitle}</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          {vi.service.listHint}
-        </p>
-      </div>
+    <div className="space-y-4">
+      <PageHeader
+        title={vi.service.listTitle}
+        description={vi.service.listHint}
+      />
       <ContractList
         propertyId={propertyId}
         contracts={contractsRes.data}

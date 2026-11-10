@@ -9,6 +9,7 @@ import {
 } from "@/components/common/data-table";
 import { useCan } from "@/lib/permissions/permissions-provider";
 import { vi } from "@/i18n/vi";
+import { PageHeader } from "@/components/shell/page-header";
 import type { UomRow } from "@/features/master/queries";
 import { saveUomAction } from "@/features/master/actions";
 
@@ -101,19 +102,17 @@ export function UomsManager({
         </div>
       ) : null}
 
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-lg font-semibold">{vi.master.uoms.title}</h2>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            {vi.master.uoms.description}
-          </p>
-        </div>
-        {canManage ? (
-          <Button size="sm" onClick={startCreate}>
-            + {vi.master.uoms.addUom}
-          </Button>
-        ) : null}
-      </div>
+      <PageHeader
+        title={vi.master.uoms.title}
+        description={vi.master.uoms.description}
+        actions={
+          canManage ? (
+            <Button size="sm" onClick={startCreate}>
+              + {vi.master.uoms.addUom}
+            </Button>
+          ) : null
+        }
+      />
 
       <DataTable
         columns={columns}

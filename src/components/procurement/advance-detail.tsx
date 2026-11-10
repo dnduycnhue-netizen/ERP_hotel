@@ -199,7 +199,7 @@ export function AdvanceDetail({
         </div>
       ) : null}
 
-      <div className="rounded-xl border p-4">
+      <div className="rounded-lg border p-4">
         <h3 className="font-semibold text-sm mb-3">
           {vi.procurement.detail.info}
         </h3>

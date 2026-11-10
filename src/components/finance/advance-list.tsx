@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { MoneyText } from "@/components/common/money-text";
+import { DocStatusBadge } from "@/components/common/doc-status-badge";
 import type { AdvanceRow } from "@/features/procurement/queries";
 import { vi } from "@/i18n/vi";
 
@@ -49,28 +50,38 @@ export function AdvanceList({
         </select>
       </label>
       {filtered.length === 0 ? (
-        <p className="rounded-xl border bg-card p-4 text-sm text-muted-foreground">
+        <p className="rounded-lg border bg-card p-4 text-sm text-muted-foreground">
           {vi.components.table.emptyDescription}
         </p>
       ) : (
-        <div className="overflow-x-auto rounded-xl border bg-card">
+        <div className="overflow-x-auto rounded-lg border bg-card">
           <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b text-left text-muted-foreground">
-                <th className="px-3 py-2">{vi.finance.advanceDocNo}</th>
-                <th className="px-3 py-2">{vi.finance.employee}</th>
-                <th className="px-3 py-2">{vi.finance.purpose}</th>
-                <th className="px-3 py-2 text-right">
+            <thead className="bg-muted/40 text-left">
+              <tr>
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                  {vi.finance.advanceDocNo}
+                </th>
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                  {vi.finance.employee}
+                </th>
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                  {vi.finance.purpose}
+                </th>
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase text-right">
                   {vi.finance.totalAmount}
                 </th>
-                <th className="px-3 py-2">{vi.finance.dueSettle}</th>
-                <th className="px-3 py-2">{vi.common.status}</th>
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                  {vi.finance.dueSettle}
+                </th>
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                  {vi.common.status}
+                </th>
               </tr>
             </thead>
             <tbody>
               {filtered.map((a) => (
-                <tr key={a.id} className="border-b last:border-0">
-                  <td className="px-3 py-2">
+                <tr key={a.id} className="border-t hover:bg-muted/40">
+                  <td className="px-3 py-3 align-middle">
                     <Link
                       href={`/${propertyId}/finance/advances/${a.id}`}
                       className="font-medium hover:underline"
@@ -78,24 +89,18 @@ export function AdvanceList({
                       {a.doc_no}
                     </Link>
                   </td>
-                  <td className="px-3 py-2">
+                  <td className="px-3 py-3 align-middle">
                     {a.employee_name ?? vi.common.noData}
                   </td>
-                  <td className="px-3 py-2">{a.purpose}</td>
-                  <td className="px-3 py-2 text-right">
+                  <td className="px-3 py-3 align-middle">{a.purpose}</td>
+                  <td className="px-3 py-3 text-right align-middle">
                     <MoneyText amount={a.amount} />
                   </td>
-                  <td className="px-3 py-2">
+                  <td className="px-3 py-3 align-middle">
                     {a.due_settle_at ?? vi.common.noData}
                   </td>
-                  <td
-                    className={
-                      a.status === "overdue"
-                        ? "px-3 py-2 font-medium text-red-800"
-                        : "px-3 py-2"
-                    }
-                  >
-                    {STATUS_LABELS[a.status] ?? a.status}
+                  <td className="px-3 py-3 align-middle">
+                    <DocStatusBadge status={a.status} />
                   </td>
                 </tr>
               ))}

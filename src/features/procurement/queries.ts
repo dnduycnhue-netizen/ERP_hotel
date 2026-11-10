@@ -13,6 +13,7 @@ export type PrRow = {
   outlet_id: string | null;
   outlet_name: string | null;
   created_by: string;
+  created_by_name: string | null;
   created_at: string;
   updated_at: string;
   line_count: number;
@@ -47,6 +48,7 @@ export type PoRow = {
   status: string;
   over_ceiling_reason: string | null;
   created_by: string;
+  created_by_name: string | null;
   created_at: string;
   updated_at: string;
   line_count: number;
@@ -272,10 +274,10 @@ export async function getPo(
   return { ok: true, data: { po: res.data.po, lines: res.data.lines ?? [] } };
 }
 
-/** Timeline duyệt của 1 chứng từ qua RPC `approval_timeline` (T-020). */
+/** Timeline duyệt của 1 chứng từ qua RPC `approval_timeline` (T-020; Q73: thêm 'payment_request'). */
 export async function listApprovalSteps(
   propertyId: string,
-  docType: "pr" | "po",
+  docType: "pr" | "po" | "payment_request",
   docId: string,
 ): Promise<ProcurementActionResult<ApprovalStepRow[]>> {
   const supabase = await createClient();

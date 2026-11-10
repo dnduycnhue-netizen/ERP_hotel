@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { MoneyText } from "@/components/common/money-text";
+import { DocStatusBadge } from "@/components/common/doc-status-badge";
 import type {
   PaymentRequestRow,
   PaymentRequestStatus,
@@ -111,27 +112,35 @@ export function PaymentRequestList({
       </div>
 
       {filtered.length === 0 ? (
-        <p className="rounded-xl border bg-card p-4 text-sm text-muted-foreground">
+        <p className="rounded-lg border bg-card p-4 text-sm text-muted-foreground">
           {vi.components.table.emptyDescription}
         </p>
       ) : (
-        <div className="overflow-x-auto rounded-xl border bg-card">
+        <div className="overflow-x-auto rounded-lg border bg-card">
           <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b text-left text-muted-foreground">
-                <th className="px-3 py-2">{vi.finance.requestDocNo}</th>
-                <th className="px-3 py-2">{vi.finance.supplier}</th>
-                <th className="px-3 py-2 text-right">
+            <thead className="bg-muted/40 text-left">
+              <tr>
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                  {vi.finance.requestDocNo}
+                </th>
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                  {vi.finance.supplier}
+                </th>
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase text-right">
                   {vi.finance.totalAmount}
                 </th>
-                <th className="px-3 py-2">{vi.finance.dueDate}</th>
-                <th className="px-3 py-2">{vi.common.status}</th>
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                  {vi.finance.dueDate}
+                </th>
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                  {vi.common.status}
+                </th>
               </tr>
             </thead>
             <tbody>
               {filtered.map((r) => (
-                <tr key={r.id} className="border-b last:border-0">
-                  <td className="px-3 py-2">
+                <tr key={r.id} className="border-t hover:bg-muted/40">
+                  <td className="px-3 py-3 align-middle">
                     <Link
                       href={`/${propertyId}/finance/payment-requests/${r.id}`}
                       className="font-medium hover:underline"
@@ -139,16 +148,18 @@ export function PaymentRequestList({
                       {r.doc_no}
                     </Link>
                   </td>
-                  <td className="px-3 py-2">
+                  <td className="px-3 py-3 align-middle">
                     {r.supplier_name ?? vi.common.noData}
                   </td>
-                  <td className="px-3 py-2 text-right">
+                  <td className="px-3 py-3 text-right align-middle">
                     <MoneyText amount={r.total} />
                   </td>
-                  <td className="px-3 py-2">
+                  <td className="px-3 py-3 align-middle">
                     {r.due_date ?? vi.common.noData}
                   </td>
-                  <td className="px-3 py-2">{STATUS_LABELS[r.status]}</td>
+                  <td className="px-3 py-3 align-middle">
+                    <DocStatusBadge status={r.status} />
+                  </td>
                 </tr>
               ))}
             </tbody>

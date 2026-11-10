@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Search } from "lucide-react";
 import { EmptyState } from "@/components/common/empty-state";
 import { ErrorState } from "@/components/common/error-state";
 import { DocPagination } from "@/components/inventory/doc-list-controls";
@@ -8,6 +9,7 @@ import {
   listStockAction,
 } from "@/features/inventory/actions";
 import { vi } from "@/i18n/vi";
+import { PageHeader } from "@/components/shell/page-header";
 
 /**
  * Tồn kho theo kho + mặt hàng (T-031).
@@ -60,13 +62,14 @@ export default async function StockPage({
 
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="text-2xl font-semibold">{vi.inventory.stockTitle}</h1>
+      <PageHeader title={vi.inventory.stockTitle} />
 
       <form method="get" className="flex flex-wrap gap-2">
         <select
           name="warehouse"
           defaultValue={warehouseId}
-          className="rounded-lg border bg-card px-3 py-1.5 text-sm outline-none focus:border-ring"
+          aria-label={vi.inventory.warehouse}
+          className="h-9 rounded-md border bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
         >
           <option value="">{vi.inventory.allWarehouses}</option>
           {filterWarehouses.map((warehouse) => (
@@ -75,16 +78,23 @@ export default async function StockPage({
             </option>
           ))}
         </select>
-        <input
-          type="search"
-          name="search"
-          defaultValue={search}
-          placeholder={vi.inventory.searchPlaceholder}
-          className="w-full max-w-sm rounded-lg border bg-card px-3 py-1.5 text-sm outline-none focus:border-ring"
-        />
+        <div className="relative w-full max-w-sm flex-1">
+          <Search
+            className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
+            aria-hidden
+          />
+          <input
+            type="search"
+            name="search"
+            defaultValue={search}
+            placeholder={vi.inventory.searchPlaceholder}
+            aria-label={vi.inventory.searchPlaceholder}
+            className="h-9 w-full rounded-md border bg-background pr-3 pl-9 text-sm outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
+          />
+        </div>
         <button
           type="submit"
-          className="rounded-lg border bg-card px-3 py-1.5 text-sm font-medium hover:border-ring"
+          className="h-9 shrink-0 rounded-md border bg-background px-3 text-sm font-medium outline-none transition-colors hover:bg-accent focus-visible:ring-2 focus-visible:ring-brand/40"
         >
           {vi.inventory.filter}
         </button>
@@ -100,34 +110,34 @@ export default async function StockPage({
           description={vi.inventory.stockEmpty}
         />
       ) : (
-        <div className="overflow-x-auto rounded-xl border bg-card shadow-sm">
+        <div className="overflow-x-auto rounded-lg border bg-card">
           <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b text-left text-muted-foreground">
-                <th className="px-4 py-3 font-medium">
+            <thead className="bg-muted/40 text-left">
+              <tr>
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
                   {vi.inventory.warehouse}
                 </th>
-                <th className="px-4 py-3 font-medium">
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
                   {vi.inventory.itemCode}
                 </th>
-                <th className="px-4 py-3 font-medium">
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
                   {vi.inventory.itemName}
                 </th>
-                <th className="px-4 py-3 font-medium">
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
                   {vi.inventory.stockUom}
                 </th>
-                <th className="px-4 py-3 text-right font-medium">
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase text-right">
                   {vi.inventory.lotCount}
                 </th>
-                <th className="px-4 py-3 text-right font-medium">
+                <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase text-right">
                   {vi.inventory.stockQty}
                 </th>
                 {canViewValue ? (
                   <>
-                    <th className="px-4 py-3 text-right font-medium">
+                    <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase text-right">
                       {vi.inventory.avgCost}
                     </th>
-                    <th className="px-4 py-3 text-right font-medium">
+                    <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase text-right">
                       {vi.inventory.stockValue}
                     </th>
                   </>
@@ -138,11 +148,13 @@ export default async function StockPage({
               {rows.map((row) => (
                 <tr
                   key={`${row.warehouse_id}|${row.item_id}`}
-                  className="border-b last:border-b-0"
+                  className="border-t hover:bg-muted/40"
                 >
-                  <td className="px-4 py-3">{row.warehouse_name}</td>
-                  <td className="px-4 py-3">{row.item_code}</td>
-                  <td className="px-4 py-3">
+                  <td className="px-3 py-3 align-middle">
+                    {row.warehouse_name}
+                  </td>
+                  <td className="px-3 py-3 align-middle">{row.item_code}</td>
+                  <td className="px-3 py-3 align-middle">
                     <Link
                       href={`/${propertyId}/inventory/stock/${row.warehouse_id}/${row.item_id}`}
                       className="font-medium hover:underline"
@@ -150,19 +162,19 @@ export default async function StockPage({
                       {row.item_name}
                     </Link>
                   </td>
-                  <td className="px-4 py-3">{row.stock_uom}</td>
-                  <td className="px-4 py-3 text-right">
+                  <td className="px-3 py-3 align-middle">{row.stock_uom}</td>
+                  <td className="px-3 py-3 text-right align-middle">
                     {row.lot_count === 0 ? "—" : row.lot_count}
                   </td>
-                  <td className="px-4 py-3 text-right">
+                  <td className="px-3 py-3 text-right align-middle">
                     {formatNumber(row.qty)}
                   </td>
                   {canViewValue ? (
                     <>
-                      <td className="px-4 py-3 text-right">
+                      <td className="px-3 py-3 text-right align-middle">
                         <MoneyText amount={row.avg_cost} />
                       </td>
-                      <td className="px-4 py-3 text-right">
+                      <td className="px-3 py-3 text-right align-middle">
                         <MoneyText amount={row.value} />
                       </td>
                     </>
@@ -173,10 +185,10 @@ export default async function StockPage({
             {canViewValue && page_total_value !== null ? (
               <tfoot>
                 <tr className="border-t font-medium">
-                  <td className="px-4 py-3" colSpan={7}>
+                  <td className="px-3 py-3" colSpan={7}>
                     {vi.inventory.pageTotalValue}
                   </td>
-                  <td className="px-4 py-3 text-right">
+                  <td className="px-3 py-3 text-right align-middle">
                     <MoneyText amount={page_total_value} />
                   </td>
                 </tr>

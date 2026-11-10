@@ -1,6 +1,6 @@
 import { vi } from "@/i18n/vi";
 
-/** 10 báo cáo MVP (docs/08-REPORTS-ALERTS.md §1). Slug dùng trên URL. */
+/** 10 báo cáo MVP (docs/08-REPORTS-ALERTS.md §1) + doanh thu F&B (M06). Slug dùng trên URL. */
 export const REPORT_CODES = [
   "RPT_STOCK_CARD",
   "RPT_RECEIVING_QUALITY",
@@ -12,6 +12,7 @@ export const REPORT_CODES = [
   "RPT_MINIBAR",
   "RPT_AMENITY_CPOR",
   "RPT_DAILY_BRIEF",
+  "RPT_FNB_REVENUE",
 ] as const;
 
 export type ReportCode = (typeof REPORT_CODES)[number];
@@ -333,6 +334,28 @@ export const REPORT_META: ReportMeta[] = [
         label: t.totals.costPerRoomnight,
         kind: "money",
       },
+    ],
+  },
+  {
+    code: "RPT_FNB_REVENUE",
+    slug: "fnb-revenue",
+    title: t.titles.fnbRevenue,
+    description: t.descriptions.fnbRevenue,
+    permission: "report.view.rpt_fnb_revenue",
+    paramKind: "range",
+    columns: [
+      { key: "dish_code", label: t.columns.dishCode, kind: "text" },
+      { key: "dish_name", label: t.columns.dishName, kind: "text" },
+      { key: "qty", label: t.columns.qty, kind: "number" },
+      { key: "revenue", label: t.columns.revenue, kind: "money" },
+      { key: "foodcost", label: t.columns.foodcost, kind: "money" },
+      { key: "gross_profit", label: t.columns.grossProfit, kind: "money" },
+      { key: "margin_pct", label: t.columns.marginPct, kind: "pct" },
+    ],
+    totals: [
+      { key: "revenue", label: t.totals.revenue, kind: "money" },
+      { key: "foodcost", label: t.totals.cogs, kind: "money" },
+      { key: "gross_profit", label: t.totals.grossProfit, kind: "money" },
     ],
   },
   {

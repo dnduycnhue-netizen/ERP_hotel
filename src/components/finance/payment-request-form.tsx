@@ -85,7 +85,7 @@ export function PaymentRequestForm({
 
   return (
     <div className="space-y-6">
-      <div className="grid gap-3 rounded-xl border bg-card p-4 sm:grid-cols-2">
+      <div className="grid gap-3 rounded-lg border bg-card p-4 sm:grid-cols-2">
         <label className="block text-sm">
           {vi.finance.supplier}
           <select
@@ -113,15 +113,15 @@ export function PaymentRequestForm({
       </div>
 
       {!payableInvoices ? (
-        <p className="rounded-xl border bg-card p-4 text-sm text-muted-foreground">
+        <p className="rounded-lg border bg-card p-4 text-sm text-muted-foreground">
           {vi.finance.selectSupplier}
         </p>
       ) : payableInvoices.length === 0 ? (
-        <p className="rounded-xl border bg-card p-4 text-sm text-muted-foreground">
+        <p className="rounded-lg border bg-card p-4 text-sm text-muted-foreground">
           {vi.finance.noPayableInvoices}
         </p>
       ) : (
-        <div className="rounded-xl border bg-card p-4">
+        <div className="rounded-lg border bg-card p-4">
           <h2 className="font-medium">{vi.finance.selectInvoices}</h2>
           <div className="mt-3 overflow-x-auto">
             <table className="w-full text-sm">

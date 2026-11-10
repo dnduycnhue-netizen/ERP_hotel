@@ -9,6 +9,7 @@ import {
 } from "@/components/common/data-table";
 import { useCan } from "@/lib/permissions/permissions-provider";
 import { vi } from "@/i18n/vi";
+import { PageHeader } from "@/components/shell/page-header";
 import type { ItemGroupRow } from "@/features/master/queries";
 import type { ItemGroupSaveInput } from "@/features/master/schemas";
 import {
@@ -161,21 +162,17 @@ export function ItemGroupsManager({
         </div>
       ) : null}
 
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-lg font-semibold">
-            {vi.master.itemGroups.title}
-          </h2>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            {vi.master.itemGroups.description}
-          </p>
-        </div>
-        {canManage ? (
-          <Button size="sm" onClick={startCreate}>
-            + {vi.master.itemGroups.addGroup}
-          </Button>
-        ) : null}
-      </div>
+      <PageHeader
+        title={vi.master.itemGroups.title}
+        description={vi.master.itemGroups.description}
+        actions={
+          canManage ? (
+            <Button size="sm" onClick={startCreate}>
+              + {vi.master.itemGroups.addGroup}
+            </Button>
+          ) : null
+        }
+      />
 
       <DataTable columns={columns} rows={groups} />
 

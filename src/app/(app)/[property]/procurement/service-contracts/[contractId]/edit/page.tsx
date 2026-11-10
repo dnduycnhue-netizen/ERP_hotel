@@ -11,6 +11,7 @@ import {
   listSuppliers,
 } from "@/features/master/queries";
 import { vi } from "@/i18n/vi";
+import { PageHeader } from "@/components/shell/page-header";
 
 /** Sửa hợp đồng dịch vụ (T-042). */
 export default async function EditServiceContractPage({
@@ -40,8 +41,8 @@ export default async function EditServiceContractPage({
   ]);
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-xl font-semibold">{vi.service.editTitle}</h1>
+    <div className="space-y-4">
+      <PageHeader title={vi.service.editTitle} />
       <ContractForm
         propertyId={propertyId}
         contract={detailRes.data.contract}
