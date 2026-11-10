@@ -5,6 +5,10 @@ import type {
   ReceivingPostInput,
   ReceivingRecordLineInput,
 } from "@/features/receiving/schemas";
+import type {
+  TrolleyShiftCloseInput,
+  TrolleyShiftOpenInput,
+} from "@/features/trolley/schemas";
 
 /**
  * Ảnh chụp khi offline, nằm trong payload của job record (T-025).
@@ -21,7 +25,13 @@ export type QueuedPhoto = {
   attachmentId: string | null;
 };
 
-export type OfflineJobKind = "record" | "override" | "post" | "count_record";
+export type OfflineJobKind =
+  | "record"
+  | "override"
+  | "post"
+  | "count_record"
+  | "trolley_open"
+  | "trolley_close";
 export type OfflineJobStatus = "pending" | "syncing" | "failed";
 
 export type OfflineJobPayload =
@@ -32,7 +42,33 @@ export type OfflineJobPayload =
     }
   | { kind: "override"; input: ReceivingOverrideLineInput }
   | { kind: "post"; input: ReceivingPostInput }
-  | { kind: "count_record"; input: CountRecordLineInput };
+  | { kind: "count_record"; input: CountRecordLineInput }
+  | { kind: "trolley_open"; input: TrolleyShiftOpenInput }
+  | { kind: "trolley_close"; input: TrolleyShiftCloseInput };
+
+/**
+ * Nháp số đếm xe đẩy đang nhập dở (mở ca / đóng ca). Số đếm lưu dạng
+ * chuỗi như trên NumPad ("" = chưa đếm) để không mất khi mất mạng,
+ * tải lại trang hay chuyển màn. Nháp bị xóa khi ca đã mở/đóng xong
+ * (online hoặc đồng bộ xong). Khác với hàng đợi `jobs` (thao tác đã
+ * gửi chờ đồng bộ), nháp là dữ liệu chưa gửi.
+ */
+export type TrolleyDraftKind = "open" | "close";
+
+export type TrolleyDraft = {
+  id?: number;
+  /** open:${propertyId}:${trolleyWh}:${shift}:${businessDate} | close:${shiftId} */
+  key: string;
+  propertyId: string;
+  shiftId: string | null;
+  trolleyWh: string | null;
+  shift: string | null;
+  businessDate: string | null;
+  kind: TrolleyDraftKind;
+  counts: Array<{ itemId: string; qty: string }>;
+  roomsDone: Array<{ roomId: string; cleanType: string; guests: string }>;
+  updatedAt: number;
+};
 
 /**
  * Một thao tác nhận hàng / kiểm kê xếp hàng chờ đồng bộ (T-025, T-033).
@@ -60,11 +96,17 @@ export type OfflineJob = {
 
 class OfflineDb extends Dexie {
   jobs!: Table<OfflineJob, number>;
+  trolleyDrafts!: Table<TrolleyDraft, number>;
 
   constructor() {
     super("erp-hotel-offline");
     this.version(1).stores({
       jobs: "++id, propertyId, grId, status, createdAt",
+    });
+    // v2: thêm bảng nháp đếm xe đẩy (giữ nguyên dữ liệu bảng jobs).
+    this.version(2).stores({
+      jobs: "++id, propertyId, grId, status, createdAt",
+      trolleyDrafts: "++id, key, propertyId, shiftId, updatedAt",
     });
   }
 }
@@ -150,4 +192,40 @@ export async function discardFailedOfflineJobs(): Promise<void> {
     return;
   }
   await d.jobs.where("status").equals("failed").delete();
+}
+
+/** Nháp đếm xe đẩy theo khóa (mở ca: theo xe + ca + ngày; đóng ca: theo ca). */
+export async function getTrolleyDraft(
+  key: string,
+): Promise<TrolleyDraft | undefined> {
+  const d = getOfflineDb();
+  if (!d) {
+    return undefined;
+  }
+  return d.trolleyDrafts.where("key").equals(key).first();
+}
+
+/** Lưu (upsert theo khóa) nháp đếm xe đẩy. */
+export async function saveTrolleyDraft(
+  draft: Omit<TrolleyDraft, "id">,
+): Promise<void> {
+  const d = getOfflineDb();
+  if (!d) {
+    return;
+  }
+  const existing = await d.trolleyDrafts.where("key").equals(draft.key).first();
+  if (existing?.id !== undefined) {
+    await d.trolleyDrafts.update(existing.id, draft);
+    return;
+  }
+  await d.trolleyDrafts.add(draft);
+}
+
+/** Xóa nháp đếm xe đẩy (sau khi ca đã mở/đóng xong). */
+export async function deleteTrolleyDraft(key: string): Promise<void> {
+  const d = getOfflineDb();
+  if (!d) {
+    return;
+  }
+  await d.trolleyDrafts.where("key").equals(key).delete();
 }

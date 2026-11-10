@@ -35,6 +35,10 @@ export function useOfflineSync(listener?: SyncListener): OfflineSyncState {
       onPostSynced: (grId) => listenerRef.current?.onPostSynced?.(grId),
       onCountRecordSynced: (info) =>
         listenerRef.current?.onCountRecordSynced?.(info),
+      onTrolleyOpenSynced: (info) =>
+        listenerRef.current?.onTrolleyOpenSynced?.(info),
+      onTrolleyCloseSynced: (info) =>
+        listenerRef.current?.onTrolleyCloseSynced?.(info),
     });
   }, []);
 

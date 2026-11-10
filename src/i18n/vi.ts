@@ -18,6 +18,8 @@ export const vi = {
     today: "Hôm nay",
     note: "Ghi chú",
     noData: "—",
+    selectPlaceholder: "Chọn…",
+    submitting: "Đang nộp…",
   },
   components: {
     docStatus: {
@@ -1583,6 +1585,58 @@ export const vi = {
     roomNotFound: "Không tìm thấy phòng.",
     loadError: "Không tải được dữ liệu minibar.",
   },
+  trolley: {
+    title: "Xe đẩy buồng phòng",
+    mobileTitle: "Xe đẩy",
+    shiftsTitle: "Ca xe đẩy",
+    shiftsEmpty: "Chưa có ca xe đẩy nào.",
+    openButton: "Mở ca mới",
+    openTitle: "Mở ca xe đẩy",
+    trolleyWarehouse: "Xe đẩy",
+    shift: "Ca",
+    businessDate: "Ngày nghiệp vụ",
+    noParItems:
+      "Xe đẩy này chưa có mức par nào. Nhờ tổ trưởng buồng phòng cài mức par trước khi mở ca.",
+    noTrolleyWarehouse:
+      "Khách sạn chưa có xe đẩy nào. Nhờ quản trị tạo kho loại xe đẩy trước.",
+    countedProgress: "Đã đếm",
+    countedQty: "Đã đếm",
+    counted: "Đã đếm",
+    notCounted: "Chưa đếm",
+    countAllRequired: "Đếm đủ tất cả các món rồi mới nộp được.",
+    openSubmit: "Mở ca",
+    openSubmitOffline: "Mở ca (xếp hàng khi có mạng)",
+    closeSubmit: "Đóng ca",
+    closeSubmitOffline: "Đóng ca (xếp hàng khi có mạng)",
+    queuedOpen:
+      "Đã xếp hàng mở ca — ca sẽ mở và hiện ở danh sách khi có mạng trở lại. Không cần mở lại.",
+    queuedClose:
+      "Đã xếp hàng đóng ca — ca sẽ đóng khi có mạng trở lại. Không cần đóng lại.",
+    closePendingSync:
+      "Ca này đang chờ đồng bộ thao tác đóng ca. Chờ có mạng rồi mới đóng lại được.",
+    backToList: "Về danh sách",
+    openingCounts: "Số đếm đầu ca",
+    closingCounts: "Đếm cuối ca",
+    topUpRequisition: "Phiếu lĩnh bù tới par",
+    noTopUpRequisition:
+      "Ca này không sinh phiếu lĩnh bù (đủ par, hoặc khách sạn chưa có kho tầng duy nhất).",
+    roomsDone: "Phòng đã dọn",
+    roomPlaceholder: "Chọn phòng",
+    addRoom: "Thêm phòng đã dọn",
+    guests: "Số khách",
+    guestsShort: "khách",
+    removeRoom: "Xóa",
+    consumptionTitle: "Tiêu hao trong ca",
+    openingQty: "Đầu ca",
+    receivedQty: "Đã lĩnh",
+    closingQty: "Cuối ca",
+    consumedQty: "Đã dùng",
+    surplusTitle: "Thừa (đầu + lĩnh − cuối âm)",
+    purposeIssue: "Phiếu tiêu hao buồng phòng",
+    pendingOpen: "Chờ đồng bộ — ca sẽ mở khi có mạng.",
+    shiftNotFound: "Không tìm thấy ca xe đẩy.",
+    loadError: "Không tải được dữ liệu xe đẩy.",
+  },
   pmsDaily: {
     title: "Số liệu PMS ngày",
     frontdeskTitle: "Số liệu PMS ngày — Lễ tân",
@@ -2221,11 +2275,13 @@ export const vi = {
     startNeedsOnline:
       "Cần có mạng để mở phiếu nhận mới. Phiếu đã mở vẫn ghi dòng offline được.",
     queueUnavailable: "Không lưu được thao tác offline. Hãy thử lại.",
+    offlineQueuedNote:
+      "Mất mạng — thao tác sẽ xếp hàng chờ đồng bộ khi có mạng trở lại.",
   },
   pwa: {
     offlinePageTitle: "Bạn đang ngoại tuyến",
     offlinePageHint:
-      "Không có kết nối mạng. Các màn nhận hàng, kiểm kê và kiểm minibar đã mở trước đó vẫn dùng được — thao tác ghi nhận sẽ tự đồng bộ khi có mạng trở lại.",
+      "Không có kết nối mạng. Các màn nhận hàng, kiểm kê, xe đẩy buồng phòng và kiểm minibar đã mở trước đó vẫn dùng được — thao tác ghi nhận sẽ tự đồng bộ khi có mạng trở lại.",
     tryAgain: "Thử lại",
     installTitle: "Cài Mini-ERP lên màn hình chính",
     installHint:

@@ -9,6 +9,12 @@ import {
   recordReceivingLineAction,
 } from "@/features/receiving/actions";
 import {
+  closeTrolleyShiftAction,
+  getTrolleyShiftAction,
+  listOpenTrolleyShiftAction,
+  openTrolleyShiftAction,
+} from "@/features/trolley/actions";
+import {
   countOfflineJobsByStatus,
   deleteOfflineJob,
   discardFailedOfflineJobs,
@@ -44,6 +50,8 @@ export type SyncListener = {
   onOverrideSynced?: (info: { grId: string; grLineId: string }) => void;
   onPostSynced?: (grId: string) => void;
   onCountRecordSynced?: (info: { countId: string; itemId: string }) => void;
+  onTrolleyOpenSynced?: (info: { shiftId: string }) => void;
+  onTrolleyCloseSynced?: (info: { shiftId: string }) => void;
 };
 
 let state: OfflineSyncState = initialSyncState;
@@ -170,7 +178,10 @@ type JobResult = { ok: true } | { ok: false; error: string };
 
 async function processJob(job: OfflineJob): Promise<JobResult> {
   // Job nhận hàng bắt buộc có grId; job kiểm kê bắt buộc có countId.
-  if (job.payload.kind !== "count_record" && !job.grId) {
+  // Job xe đẩy không dùng grId/countId (mở ca chưa có shiftId).
+  const trolleyKind =
+    job.payload.kind === "trolley_open" || job.payload.kind === "trolley_close";
+  if (!trolleyKind && job.payload.kind !== "count_record" && !job.grId) {
     return { ok: false, error: "Thiếu mã phiếu nhận." };
   }
   if (job.payload.kind === "count_record" && !job.countId) {
@@ -181,6 +192,10 @@ async function processJob(job: OfflineJob): Promise<JobResult> {
       return processRecordJob(job);
     case "count_record":
       return processCountRecordJob(job);
+    case "trolley_open":
+      return processTrolleyOpenJob(job);
+    case "trolley_close":
+      return processTrolleyCloseJob(job);
     case "override": {
       const grId = job.grId;
       if (!grId) {
@@ -249,6 +264,75 @@ async function processCountRecordJob(job: OfflineJob): Promise<JobResult> {
     listener.onCountRecordSynced?.({ countId, itemId: input.itemId });
   }
   return { ok: true };
+}
+
+/**
+ * Mở ca xe đẩy xếp hàng (màn xe đẩy mobile): gửi lại toàn bộ số đếm
+ * đầu ca. RPC `trolley_shift_open` không có clientUuid nên gửi lại sau
+ * khi mất phản hồi sẽ gặp ERR_INVALID_STATUS ("đã có ca đang mở") —
+ * khi đó tra lại ca đang mở của xe/ngày/tên ca, nếu đúng 1 ca thì coi
+ * như đã đồng bộ (mẫu khôi phục của job `post`, T-025).
+ */
+async function processTrolleyOpenJob(job: OfflineJob): Promise<JobResult> {
+  if (job.payload.kind !== "trolley_open") {
+    return { ok: false, error: "Loại thao tác không hợp lệ." };
+  }
+  const { input } = job.payload;
+  const res = await openTrolleyShiftAction(input);
+  if (res.ok) {
+    for (const listener of syncListeners) {
+      listener.onTrolleyOpenSynced?.({ shiftId: res.data.shift_id });
+    }
+    return { ok: true };
+  }
+  if (res.code === "ERR_INVALID_STATUS") {
+    const found = await listOpenTrolleyShiftAction(
+      input.propertyId,
+      input.trolleyWh,
+      input.businessDate,
+      input.shift,
+    );
+    if (found.ok && found.data.length === 1) {
+      const shift = found.data[0];
+      if (shift) {
+        for (const listener of syncListeners) {
+          listener.onTrolleyOpenSynced?.({ shiftId: shift.id });
+        }
+        return { ok: true };
+      }
+    }
+  }
+  return { ok: false, error: res.error };
+}
+
+/**
+ * Đóng ca xe đẩy xếp hàng: gửi lại toàn bộ số đếm cuối ca + phòng đã
+ * dọn. Ghi sổ (purpose_issue) có thể đã chạy xong nhưng mất phản hồi —
+ * khi đó kiểm tra trạng thái ca: đã 'closed' thì coi như xong, không
+ * gửi lại (mẫu khôi phục của job `post`, T-025).
+ */
+async function processTrolleyCloseJob(job: OfflineJob): Promise<JobResult> {
+  if (job.payload.kind !== "trolley_close") {
+    return { ok: false, error: "Loại thao tác không hợp lệ." };
+  }
+  const { input } = job.payload;
+  const res = await closeTrolleyShiftAction(input);
+  if (res.ok) {
+    for (const listener of syncListeners) {
+      listener.onTrolleyCloseSynced?.({ shiftId: res.data.shift_id });
+    }
+    return { ok: true };
+  }
+  if (res.code === "ERR_INVALID_STATUS") {
+    const shiftRes = await getTrolleyShiftAction(input.shiftId);
+    if (shiftRes.ok && shiftRes.data.shift.status === "closed") {
+      for (const listener of syncListeners) {
+        listener.onTrolleyCloseSynced?.({ shiftId: input.shiftId });
+      }
+      return { ok: true };
+    }
+  }
+  return { ok: false, error: res.error };
 }
 
 async function processRecordJob(job: OfflineJob): Promise<JobResult> {

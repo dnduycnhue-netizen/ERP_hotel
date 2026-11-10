@@ -8,8 +8,9 @@ import { vi } from "@/i18n/vi";
 
 /**
  * Điều hướng nhanh màn hình hiện trường (T-035): Nhận hàng / Kiểm kê /
- * Kiểm minibar. Chỉ hiện mục mà user có quyền dùng. Mobile trước đây
- * không có nav chung nên các màn chỉ liên kết qua lại bằng link "←".
+ * Kiểm minibar / Xe đẩy. Chỉ hiện mục mà user có quyền dùng. Mobile
+ * trước đây không có nav chung nên các màn chỉ liên kết qua lại bằng
+ * link "←".
  */
 export function MobileNav({ propertyId }: { propertyId: string }) {
   const pathname = usePathname();
@@ -23,6 +24,7 @@ export function MobileNav({ propertyId }: { propertyId: string }) {
   const canCountLock = useCan("count.lock");
   const canCountAdjustApprove = useCan("count.adjust.approve");
   const canMinibarCheck = useCan("minibar.check");
+  const canTrolleyOperate = useCan("hk.trolley.operate");
 
   const canCount =
     canCountOpen ||
@@ -48,6 +50,12 @@ export function MobileNav({ propertyId }: { propertyId: string }) {
     links.push({
       href: `/m/${propertyId}/minibar`,
       label: vi.minibar.mobileTitle,
+    });
+  }
+  if (canTrolleyOperate) {
+    links.push({
+      href: `/m/${propertyId}/trolley`,
+      label: vi.trolley.mobileTitle,
     });
   }
 
