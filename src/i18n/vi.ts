@@ -1942,7 +1942,7 @@ export const vi = {
     timelineRejected: "Đã từ chối",
     timelinePaid: "Đã thanh toán",
     timelineStepsNote:
-      "Chi tiết từng bước duyệt (ai duyệt bước nào) chưa đọc được từ dữ liệu hiện tại — xem Q73. Nút duyệt chỉ hiện với người có quyền duyệt bước đang chờ; hệ thống kiểm tra lại khi bấm.",
+      "Chưa có bước duyệt nào hiển thị — đề nghị có thể chưa sinh bước duyệt, hoặc bạn chưa có quyền xem chi tiết duyệt (cần payment.request, payment.approve hoặc payment.mark_paid).",
     bankChangedNote:
       "Nhà cung cấp này đổi số tài khoản trong 30 ngày gần nhất nên đề nghị cần thêm bước duyệt của chủ đầu tư.",
     noPermissionPayment:

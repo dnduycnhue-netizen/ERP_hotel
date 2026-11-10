@@ -6,11 +6,13 @@ import { Button } from "@/components/ui/button";
 import { DocStatusBadge } from "@/components/common/doc-status-badge";
 import { MoneyText } from "@/components/common/money-text";
 import { PageHeader } from "@/components/shell/page-header";
+import { ApprovalTimeline } from "@/components/procurement/approval-timeline";
 import {
   decidePaymentRequestAction,
   markPaymentPaidAction,
 } from "@/features/finance/actions";
 import type { PaymentRequestDetail } from "@/features/finance/queries";
+import type { ApprovalStepRow } from "@/features/procurement/queries";
 import { vi } from "@/i18n/vi";
 
 const STATUS_LABELS: Record<string, string> = {
@@ -28,22 +30,23 @@ const STATUS_LABELS: Record<string, string> = {
  * Chi tiết đề nghị thanh toán (T-041): dòng hóa đơn + tiến trình duyệt
  * theo trạng thái + nút Duyệt/Từ chối + ghi nhận đã trả.
  *
- * LƯU Ý (Q73): bước duyệt chi tiết (ai duyệt bước nào, có bước owner
- * không) KHÔNG đọc được từ client — policy `approvals_select` và RPC
- * `approval_timeline` chỉ hỗ trợ chứng từ PR/PO. Màn này chỉ hiện tiến
- * trình theo trạng thái đề nghị + ghi chú; nút Duyệt/Từ chối chỉ hiện
- * với người có `payment.approve`, RPC kiểm tra lại người duyệt được
- * giao ở bước đang chờ (`ERR_NOT_APPROVER` nếu không phải).
+ * Q73 (đã xong, migration 20261109410000): từng bước duyệt chi tiết
+ * (ai duyệt bước nào, có bước owner không) đọc được qua RPC
+ * `approval_timeline` với doc_type 'payment_request' — hiện ở dưới
+ * tiến trình theo trạng thái bằng `ApprovalTimeline` (chỉ xem; nút
+ * Duyệt/Từ chối vẫn ở khung này vì cần thêm ghi nhận đã trả).
  */
 export function PaymentRequestDetailView({
   propertyId,
   detail,
+  approvalSteps,
   canApprovePayment,
   canMarkPaid,
   bankChangedRecently,
 }: {
   propertyId: string;
   detail: PaymentRequestDetail;
+  approvalSteps: ApprovalStepRow[];
   canApprovePayment: boolean;
   canMarkPaid: boolean;
   bankChangedRecently: boolean;
@@ -189,9 +192,15 @@ export function PaymentRequestDetailView({
               </li>
             ))}
           </ol>
-          <p className="mt-2 text-xs text-muted-foreground">
-            {vi.finance.timelineStepsNote}
-          </p>
+          {approvalSteps.length > 0 ? (
+            <div className="mt-3">
+              <ApprovalTimeline steps={approvalSteps} readOnly />
+            </div>
+          ) : (
+            <p className="mt-2 text-xs text-muted-foreground">
+              {vi.finance.timelineStepsNote}
+            </p>
+          )}
         </div>
 
         {canDecide ? (

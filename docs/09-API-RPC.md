@@ -28,6 +28,8 @@ Các RPC danh mục dưới đây thuộc các task sau, chưa được triển 
 | `po_save_draft(p_po jsonb)` | Không cho sửa `unit_price` nếu `price_source <> 'manual'` |
 | `po_submit(p_po_id)` | Sinh các bước `approvals` theo `approval_rules` |
 | `approval_decide(p_doc_type, p_doc_id, p_decision, p_comment)` | Kiểm `SOD_PO_CREATOR_APPROVER` |
+| `pr_list(p_property_id, p_status, p_search, p_limit, p_offset)` / `po_list(...)` | Trả `created_by_name` (join `profiles`, Q18); `total` + `rows` |
+| `approval_timeline(p_property_id, p_doc_type, p_doc_id)` | `p_doc_type` 'pr'/'po'/'payment_request' (Q73: 'payment_request' cần `payment.request`/`payment.approve`/`payment.mark_paid`); trả `steps` kèm tên vai trò + tên người quyết |
 | `po_send(p_po_id)` | Trạng thái `sent`; sinh PDF ở route `/api/export/po/[id]` |
 | `po_close(p_po_id, p_reason)` | Đóng phần còn thiếu |
 | `market_order_create(p_lines jsonb, p_advance_amount)` | Tạo PO `market` + `advances` `requested` |
@@ -107,7 +109,7 @@ Các RPC danh mục dưới đây thuộc các task sau, chưa được triển 
 | `invoice_save_draft`, `invoice_match(p_invoice_id)` | Trả kết quả khớp từng dòng |
 | `invoice_approve(p_invoice_id)` | Ghi `ap_ledger` (+) |
 | `advance_request`, `advance_decide`, `advance_disburse`, `advance_settle(p_id, p_lines)` | Quyết toán theo số thực nhận |
-| `payment_request_create`, `payment_request_decide`, `payment_mark_paid(p_id, p_bank_ref)` | `ap_ledger` (−) khi paid |
+| `payment_request_create`, `payment_request_decide`, `payment_mark_paid(p_id, p_bank_ref)` | `ap_ledger` (−) khi paid; timeline duyệt đọc qua `approval_timeline(..., 'payment_request', ...)` (Q73) |
 | `service_contract_save`, `service_schedule_generate(p_month)`, `service_accept(p_schedule_id, p_rating, p_photos)` | |
 | `pms_daily_upsert(p_property_id, p_date, p_stats jsonb)` | Lễ tân nhập hằng ngày |
 | `pos_import_commit(p_import_id)` (P2) | |

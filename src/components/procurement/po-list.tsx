@@ -144,6 +144,11 @@ export function PoList({
       cell: (row) => String(row.line_count),
     },
     {
+      key: "created_by_name",
+      header: vi.procurement.list.createdBy,
+      cell: (row) => row.created_by_name ?? "—",
+    },
+    {
       key: "status",
       header: vi.procurement.list.status,
       cell: (row) => <DocStatusBadge status={row.status} />,
