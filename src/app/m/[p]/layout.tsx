@@ -2,6 +2,7 @@ import type { Viewport } from "next";
 import type { ReactNode } from "react";
 import { notFound, redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { MobileNav } from "@/components/common/mobile-nav";
 import { OfflineBanner } from "@/components/common/offline-banner";
 import { vi } from "@/i18n/vi";
 import { PermissionsProvider } from "@/lib/permissions/permissions-provider";
@@ -96,6 +97,7 @@ export default async function MobilePropertyLayout({
           </div>
         </header>
         <main className="mx-auto max-w-2xl px-4 py-6">
+          <MobileNav propertyId={currentProperty.id} />
           <div className="mb-4">
             <OfflineBanner />
           </div>

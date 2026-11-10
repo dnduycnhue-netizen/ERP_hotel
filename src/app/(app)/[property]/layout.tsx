@@ -1,6 +1,8 @@
 import type { ReactNode } from "react";
 import { notFound } from "next/navigation";
 import { AdminLink } from "@/components/common/admin-link";
+import { FrontdeskLink } from "@/components/common/frontdesk-link";
+import { HousekeepingLink } from "@/components/common/housekeeping-link";
 import { InventoryLink } from "@/components/common/inventory-link";
 import { MasterLink } from "@/components/common/master-link";
 import { ProcurementLink } from "@/components/common/procurement-link";
@@ -57,6 +59,8 @@ export default async function PropertyLayout({
               <ProcurementLink propertyId={currentProperty.id} />
               <ReceivingLink propertyId={currentProperty.id} />
               <InventoryLink propertyId={currentProperty.id} />
+              <FrontdeskLink propertyId={currentProperty.id} />
+              <HousekeepingLink propertyId={currentProperty.id} />
               <AdminLink />
               <PropertySwitcher
                 currentPropertyId={currentProperty.id}
