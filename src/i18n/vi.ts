@@ -2658,6 +2658,7 @@ export const vi = {
     navCount: "Kiểm kê",
     navTrolley: "Buồng phòng",
     navMinibar: "Minibar",
+    navRestaurant: "Nhà hàng",
     chooseProperty: "Chọn khách sạn",
     choosePropertyHint:
       "Chọn khách sạn để mở màn hình hiện trường trên điện thoại.",

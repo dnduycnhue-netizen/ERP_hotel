@@ -1,6 +1,5 @@
 import { ErrorState } from "@/components/common/error-state";
 import { formatMoney, formatNumber } from "@/components/common/money-text";
-import { MobileRestaurantNav } from "@/components/restaurant/mobile-restaurant-nav";
 import {
   MobileSaleForm,
   MobileVoidSaleButton,
@@ -64,7 +63,6 @@ export default async function MobileSalesPage({
 
   return (
     <div className="space-y-6">
-      <MobileRestaurantNav propertyId={propertyId} />
       <div>
         <h1 className="text-xl font-semibold">{vi.restaurant.salesTitle}</h1>
         <p className="mt-1 text-base text-muted-foreground">

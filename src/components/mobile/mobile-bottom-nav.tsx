@@ -5,6 +5,7 @@ import {
   ClipboardList,
   PackageCheck,
   Refrigerator,
+  UtensilsCrossed,
   type LucideIcon,
 } from "lucide-react";
 import Link from "next/link";
@@ -46,6 +47,7 @@ export function MobileBottomNav({ propertyId }: { propertyId: string }) {
   const canCountAdjustApprove = useCan("count.adjust.approve");
   const canMinibarCheck = useCan("minibar.check");
   const canTrolleyOperate = useCan("hk.trolley.operate");
+  const canRestaurantView = useCan("restaurant.view");
 
   const canCount =
     canCountOpen ||
@@ -67,6 +69,13 @@ export function MobileBottomNav({ propertyId }: { propertyId: string }) {
       href: `/m/${propertyId}/count`,
       label: vi.mobile.navCount,
       Icon: ClipboardList,
+    });
+  }
+  if (canRestaurantView) {
+    items.push({
+      href: `/m/${propertyId}/restaurant`,
+      label: vi.mobile.navRestaurant,
+      Icon: UtensilsCrossed,
     });
   }
   if (canTrolleyOperate) {

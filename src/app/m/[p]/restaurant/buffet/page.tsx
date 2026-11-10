@@ -4,7 +4,6 @@ import {
   MobileBuffetCancelButton,
   MobileBuffetCloseForm,
 } from "@/components/restaurant/mobile-restaurant-actions";
-import { MobileRestaurantNav } from "@/components/restaurant/mobile-restaurant-nav";
 import {
   getBuffetSession,
   getRestaurantPerms,
@@ -65,7 +64,6 @@ export default async function MobileBuffetPage({
 
   return (
     <div className="space-y-6">
-      <MobileRestaurantNav propertyId={propertyId} />
       <div>
         <h1 className="text-xl font-semibold">{vi.restaurant.buffetTitle}</h1>
         <p className="mt-1 text-base text-muted-foreground">
