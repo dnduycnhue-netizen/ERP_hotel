@@ -112,6 +112,10 @@ export const NAV_ITEMS: NavItem[] = [
       "waste.approve.large",
       "stock.view_qty",
       "stock.view_value",
+      "day.lock",
+      "day.unlock",
+      "period.close",
+      "period.reopen",
     ),
   },
   {
@@ -285,6 +289,7 @@ export function buildJumpDestinations(propertyId: string): JumpDestination[] {
     item("inventory", vi.inventory.nav.waste, "/inventory/waste"),
     item("inventory", vi.inventory.nav.stock, "/inventory/stock"),
     item("inventory", vi.inventory.nav.counts, "/inventory/counts"),
+    item("inventory", vi.inventory.nav.locks, "/inventory/locks"),
     item("inventory", vi.count.openTitle, "/inventory/counts/new"),
     item("restaurant", vi.restaurant.navDishes, "/restaurant/dishes"),
     item("restaurant", vi.restaurant.navKitchen, "/restaurant/kitchen"),

@@ -40,6 +40,10 @@ export default async function InventoryLayout({
     perms.has("count.view_variance") ||
     perms.has("count.lock") ||
     perms.has("count.adjust.approve") ||
+    perms.has("day.lock") ||
+    perms.has("day.unlock") ||
+    perms.has("period.close") ||
+    perms.has("period.reopen") ||
     perms.has("stock.view_qty") ||
     perms.has("stock.view_value");
 
