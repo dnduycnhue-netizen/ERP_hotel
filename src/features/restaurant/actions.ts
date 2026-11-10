@@ -56,6 +56,11 @@ function restaurantPath(propertyId: string, sub = ""): string {
   return `/${propertyId}/restaurant${sub}`;
 }
 
+/** Route mobile tương ứng (W4) — revalidate cùng lúc với bản desktop. */
+function mobileRestaurantPath(propertyId: string, sub = ""): string {
+  return `/m/${propertyId}/restaurant${sub}`;
+}
+
 /** Tạo / cập nhật món ăn + công thức (RPC `recipe_save`). */
 export async function saveRecipeAction(
   input: RecipeSaveInput,
@@ -193,6 +198,8 @@ export async function closeBuffetSessionAction(
       ),
     );
     revalidatePath(restaurantPath(parsed.data.propertyId, "/sales"));
+    revalidatePath(mobileRestaurantPath(parsed.data.propertyId, "/buffet"));
+    revalidatePath(mobileRestaurantPath(parsed.data.propertyId, "/sales"));
   }
   return res;
 }
@@ -217,6 +224,7 @@ export async function cancelBuffetSessionAction(
   );
   if (res.ok) {
     revalidatePath(restaurantPath(parsed.data.propertyId, "/buffet"));
+    revalidatePath(mobileRestaurantPath(parsed.data.propertyId, "/buffet"));
   }
   return res;
 }
@@ -239,6 +247,7 @@ export async function recordDishSaleAction(
   });
   if (res.ok) {
     revalidatePath(restaurantPath(parsed.data.propertyId, "/sales"));
+    revalidatePath(mobileRestaurantPath(parsed.data.propertyId, "/sales"));
   }
   return res;
 }
@@ -258,6 +267,7 @@ export async function voidDishSaleAction(
   });
   if (res.ok) {
     revalidatePath(restaurantPath(parsed.data.propertyId, "/sales"));
+    revalidatePath(mobileRestaurantPath(parsed.data.propertyId, "/sales"));
   }
   return res;
 }
@@ -321,6 +331,10 @@ async function banquetStatusAction(
     if (fn === "banquet_complete") {
       revalidatePath(restaurantPath(propertyId, "/sales"));
     }
+    revalidatePath(mobileRestaurantPath(propertyId, "/banquets"));
+    if (fn === "banquet_complete") {
+      revalidatePath(mobileRestaurantPath(propertyId, "/sales"));
+    }
   }
   return res;
 }
@@ -383,6 +397,8 @@ export async function completeBanquetAction(
       ),
     );
     revalidatePath(restaurantPath(parsed.data.propertyId, "/sales"));
+    revalidatePath(mobileRestaurantPath(parsed.data.propertyId, "/banquets"));
+    revalidatePath(mobileRestaurantPath(parsed.data.propertyId, "/sales"));
   }
   return res;
 }
@@ -409,6 +425,7 @@ export async function cancelBanquetAction(
         `/banquets/${parsed.data.banquetId}`,
       ),
     );
+    revalidatePath(mobileRestaurantPath(parsed.data.propertyId, "/banquets"));
   }
   return res;
 }

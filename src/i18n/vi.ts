@@ -2343,6 +2343,25 @@ export const vi = {
     searchDish: "Tìm theo tên / mã món",
     allKinds: "Tất cả loại",
     allStatuses: "Tất cả trạng thái",
+    // Mobile (màn hiện trường /m/[p]/restaurant — W4)
+    mobile: {
+      hubHint:
+        "Bếp, bán theo món, buffet và đặt tiệc — bản di động cho ca làm việc.",
+      selectDish: "Chọn món",
+      todaySales: "Dòng bán trong ngày",
+      upcomingBanquets: "Tiệc 7 ngày tới",
+      statusPlanned: "Đã lên lịch",
+      statusOpen: "Đang mở",
+      statusClosed: "Đã đóng",
+      statusCancelled: "Đã hủy",
+      statusNew: "Mới",
+      statusConfirmed: "Đã xác nhận",
+      statusInProgress: "Đang diễn ra",
+      statusCompleted: "Đã hoàn thành",
+      noBuffetToday: "Hôm nay chưa có phiên buffet nào.",
+      noBanquetsUpcoming: "7 ngày tới chưa có tiệc nào.",
+      amountPreview: "Tạm tính",
+    },
   },
   reports: {
     title: "Báo cáo",
