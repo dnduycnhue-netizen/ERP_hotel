@@ -943,6 +943,6 @@ values (
   '20261109310000_housekeeping_trolley',
   'INSERT',
   '{"tables": ["room_setup_standards", "trolley_par_levels", "trolley_shifts"], "rpcs": ["room_setup_standard_set", "trolley_par_set", "trolley_shift_open", "trolley_shift_close"]}'::jsonb,
-  'migration',
-  'T-034 housekeeping trolley foundation'
+  auth.uid(),
+  jsonb_build_object('source', 'migration', 'task', 'T-034')
 );
