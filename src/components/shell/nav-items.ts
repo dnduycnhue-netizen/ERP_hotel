@@ -137,6 +137,8 @@ export const NAV_ITEMS: NavItem[] = [
       "payment.approve",
       "payment.mark_paid",
       "advance.settle",
+      "export.accounting",
+      "po.view",
     ),
   },
   {
@@ -316,6 +318,7 @@ export function buildJumpDestinations(propertyId: string): JumpDestination[] {
       vi.finance.navNoInvoiceListings,
       "/finance/no-invoice-listings",
     ),
+    item("finance", vi.finance.navExport, "/finance/export"),
     item("frontdesk", vi.minibar.frontdeskTitle, "/frontdesk/minibar"),
     item("pms-daily", vi.pmsDaily.frontdeskTitle, "/frontdesk/pms-daily"),
     item("housekeeping", vi.minibar.housekeepingTitle, "/housekeeping/minibar"),

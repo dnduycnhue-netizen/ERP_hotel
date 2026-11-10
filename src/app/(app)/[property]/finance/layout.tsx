@@ -52,13 +52,19 @@ export default async function FinanceLayout({
     perms.has("invoice.manage") ||
     perms.has("invoice.approve") ||
     perms.has("ap.view");
+  const canExport =
+    perms.has("export.accounting") ||
+    perms.has("po.view") ||
+    perms.has("payment.approve") ||
+    perms.has("payment.mark_paid");
 
   if (
     !canInvoices &&
     !canPayables &&
     !canAdvances &&
     !canPaymentRequests &&
-    !canListings
+    !canListings &&
+    !canExport
   ) {
     notFound();
   }
@@ -69,6 +75,7 @@ export default async function FinanceLayout({
     canAdvances,
     canPaymentRequests,
     canListings,
+    canExport,
   };
 
   return (
