@@ -147,8 +147,11 @@ insert into public.goods_receipt_lines (id, gr_id, org_id, property_id, po_line_
   ('d0440000-0000-4000-8000-000000000d11', 'd0440000-0000-4000-8000-000000000d01', 'd0440000-0000-4000-8000-000000000001', 'd0440000-0000-4000-8000-000000000201', 'd0440000-0000-4000-8000-000000000c11', 'd0440000-0000-4000-8000-000000000501', 95, 5, 'kg', 90, 10000, 90, 'pass', 1, null, null),
   ('d0440000-0000-4000-8000-000000000d12', 'd0440000-0000-4000-8000-000000000d01', 'd0440000-0000-4000-8000-000000000001', 'd0440000-0000-4000-8000-000000000201', 'd0440000-0000-4000-8000-000000000c12', 'd0440000-0000-4000-8000-000000000503', 20, 0, 'kg', 20, 5000, 0, 'fail', 2, 20, 0);
 
-insert into public.supplier_returns (id, org_id, legal_entity_id, property_id, gr_id, po_id, supplier_id, doc_no, status) values
-  ('d0440000-0000-4000-8000-000000000d21', 'd0440000-0000-4000-8000-000000000001', 'd0440000-0000-4000-8000-000000000101', 'd0440000-0000-4000-8000-000000000201', 'd0440000-0000-4000-8000-000000000d01', 'd0440000-0000-4000-8000-000000000c01', 'd0440000-0000-4000-8000-000000000701', 'RET-044-001', 'posted');
+-- Phieu tra 20 MUOI. created_at ghim 2026-11-09: _report_receiving_quality
+-- loc returns theo created_at (khong phai ngay chung tu); mac dinh now() luc
+-- chay test (11-11+) nam ngoai khoang from/to 11-09..11-10 -> return_count 0.
+insert into public.supplier_returns (id, org_id, legal_entity_id, property_id, gr_id, po_id, supplier_id, doc_no, status, created_at) values
+  ('d0440000-0000-4000-8000-000000000d21', 'd0440000-0000-4000-8000-000000000001', 'd0440000-0000-4000-8000-000000000101', 'd0440000-0000-4000-8000-000000000201', 'd0440000-0000-4000-8000-000000000d01', 'd0440000-0000-4000-8000-000000000c01', 'd0440000-0000-4000-8000-000000000701', 'RET-044-001', 'posted', '2026-11-09 10:00:00+07');
 
 insert into public.supplier_return_lines (id, return_id, org_id, gr_line_id, item_id, qty_stock, unit_cost) values
   ('d0440000-0000-4000-8000-000000000d22', 'd0440000-0000-4000-8000-000000000d21', 'd0440000-0000-4000-8000-000000000001', 'd0440000-0000-4000-8000-000000000d12', 'd0440000-0000-4000-8000-000000000503', 20, 5000);
@@ -196,17 +199,17 @@ insert into public.minibar_check_lines (id, check_id, org_id, property_id, item_
   ('d0440000-0000-4000-8000-000000000b33', 'd0440000-0000-4000-8000-000000000b23', 'd0440000-0000-4000-8000-000000000001', 'd0440000-0000-4000-8000-000000000201', 'd0440000-0000-4000-8000-000000000504', 3, 10000, 30000);
 
 -- PMS: 10 ngay 11-01..11-10, moi ngay ban 10 phong -> thang 100 dem.
-insert into public.pms_daily_stats (org_id, legal_entity_id, property_id, business_date, rooms_available, rooms_sold, guests, breakfast_pax, extra_beds, checkouts, entered_by) values
-  ('d0440000-0000-4000-8000-000000000001', 'd0440000-0000-4000-8000-000000000101', 'd0440000-0000-4000-8000-000000000201', '2026-11-01', 20, 10, 15, 10, 0, 5, 'd0440000-0000-4000-8000-000000000a05'),
-  ('d0440000-0000-4000-8000-000000000001', 'd0440000-0000-4000-8000-000000000101', 'd0440000-0000-4000-8000-000000000201', '2026-11-02', 20, 10, 15, 10, 0, 5, 'd0440000-0000-4000-8000-000000000a05'),
-  ('d0440000-0000-4000-8000-000000000001', 'd0440000-0000-4000-8000-000000000101', 'd0440000-0000-4000-8000-000000000201', '2026-11-03', 20, 10, 15, 10, 0, 5, 'd0440000-0000-4000-8000-000000000a05'),
-  ('d0440000-0000-4000-8000-000000000001', 'd0440000-0000-4000-8000-000000000101', 'd0440000-0000-4000-8000-000000000201', '2026-11-04', 20, 10, 15, 10, 0, 5, 'd0440000-0000-4000-8000-000000000a05'),
-  ('d0440000-0000-4000-8000-000000000001', 'd0440000-0000-4000-8000-000000000101', 'd0440000-0000-4000-8000-000000000201', '2026-11-05', 20, 10, 15, 10, 0, 5, 'd0440000-0000-4000-8000-000000000a05'),
-  ('d0440000-0000-4000-8000-000000000001', 'd0440000-0000-4000-8000-000000000101', 'd0440000-0000-4000-8000-000000000201', '2026-11-06', 20, 10, 15, 10, 0, 5, 'd0440000-0000-4000-8000-000000000a05'),
-  ('d0440000-0000-4000-8000-000000000001', 'd0440000-0000-4000-8000-000000000101', 'd0440000-0000-4000-8000-000000000201', '2026-11-07', 20, 10, 15, 10, 0, 5, 'd0440000-0000-4000-8000-000000000a05'),
-  ('d0440000-0000-4000-8000-000000000001', 'd0440000-0000-4000-8000-000000000101', 'd0440000-0000-4000-8000-000000000201', '2026-11-08', 20, 10, 15, 10, 0, 5, 'd0440000-0000-4000-8000-000000000a05'),
-  ('d0440000-0000-4000-8000-000000000001', 'd0440000-0000-4000-8000-000000000101', 'd0440000-0000-4000-8000-000000000201', '2026-11-09', 20, 10, 15, 10, 0, 5, 'd0440000-0000-4000-8000-000000000a05'),
-  ('d0440000-0000-4000-8000-000000000001', 'd0440000-0000-4000-8000-000000000101', 'd0440000-0000-4000-8000-000000000201', '2026-11-10', 20, 10, 15, 10, 0, 5, 'd0440000-0000-4000-8000-000000000a05');
+insert into public.pms_daily_stats (org_id, legal_entity_id, property_id, business_date, rooms_available, rooms_sold, guests, breakfast_pax, extra_beds, checkouts, entered_by, created_by) values
+  ('d0440000-0000-4000-8000-000000000001', 'd0440000-0000-4000-8000-000000000101', 'd0440000-0000-4000-8000-000000000201', '2026-11-01', 20, 10, 15, 10, 0, 5, 'd0440000-0000-4000-8000-000000000a05', 'd0440000-0000-4000-8000-000000000a05'),
+  ('d0440000-0000-4000-8000-000000000001', 'd0440000-0000-4000-8000-000000000101', 'd0440000-0000-4000-8000-000000000201', '2026-11-02', 20, 10, 15, 10, 0, 5, 'd0440000-0000-4000-8000-000000000a05', 'd0440000-0000-4000-8000-000000000a05'),
+  ('d0440000-0000-4000-8000-000000000001', 'd0440000-0000-4000-8000-000000000101', 'd0440000-0000-4000-8000-000000000201', '2026-11-03', 20, 10, 15, 10, 0, 5, 'd0440000-0000-4000-8000-000000000a05', 'd0440000-0000-4000-8000-000000000a05'),
+  ('d0440000-0000-4000-8000-000000000001', 'd0440000-0000-4000-8000-000000000101', 'd0440000-0000-4000-8000-000000000201', '2026-11-04', 20, 10, 15, 10, 0, 5, 'd0440000-0000-4000-8000-000000000a05', 'd0440000-0000-4000-8000-000000000a05'),
+  ('d0440000-0000-4000-8000-000000000001', 'd0440000-0000-4000-8000-000000000101', 'd0440000-0000-4000-8000-000000000201', '2026-11-05', 20, 10, 15, 10, 0, 5, 'd0440000-0000-4000-8000-000000000a05', 'd0440000-0000-4000-8000-000000000a05'),
+  ('d0440000-0000-4000-8000-000000000001', 'd0440000-0000-4000-8000-000000000101', 'd0440000-0000-4000-8000-000000000201', '2026-11-06', 20, 10, 15, 10, 0, 5, 'd0440000-0000-4000-8000-000000000a05', 'd0440000-0000-4000-8000-000000000a05'),
+  ('d0440000-0000-4000-8000-000000000001', 'd0440000-0000-4000-8000-000000000101', 'd0440000-0000-4000-8000-000000000201', '2026-11-07', 20, 10, 15, 10, 0, 5, 'd0440000-0000-4000-8000-000000000a05', 'd0440000-0000-4000-8000-000000000a05'),
+  ('d0440000-0000-4000-8000-000000000001', 'd0440000-0000-4000-8000-000000000101', 'd0440000-0000-4000-8000-000000000201', '2026-11-08', 20, 10, 15, 10, 0, 5, 'd0440000-0000-4000-8000-000000000a05', 'd0440000-0000-4000-8000-000000000a05'),
+  ('d0440000-0000-4000-8000-000000000001', 'd0440000-0000-4000-8000-000000000101', 'd0440000-0000-4000-8000-000000000201', '2026-11-09', 20, 10, 15, 10, 0, 5, 'd0440000-0000-4000-8000-000000000a05', 'd0440000-0000-4000-8000-000000000a05'),
+  ('d0440000-0000-4000-8000-000000000001', 'd0440000-0000-4000-8000-000000000101', 'd0440000-0000-4000-8000-000000000201', '2026-11-10', 20, 10, 15, 10, 0, 5, 'd0440000-0000-4000-8000-000000000a05', 'd0440000-0000-4000-8000-000000000a05');
 
 -- Hop dong dich vu: het han 11-20 (trong 30 ngay bao truoc) + ky 11 da nghiem thu + ky 10 chua nghiem thu.
 insert into public.service_contracts (id, org_id, legal_entity_id, property_id, supplier_id, expense_category_id, cost_center_id, title, start_date, end_date, billing_cycle, amount_per_cycle, renew_notice_days, status) values
@@ -220,6 +223,13 @@ insert into public.service_schedules (id, org_id, legal_entity_id, property_id, 
 insert into public.alerts (property_id, code, severity, title, doc_type, doc_id) values
   ('d0440000-0000-4000-8000-000000000201', 'ADVANCE_OVERDUE', 'red', 'Tạm ứng quá hạn', 'advance', 'd0440000-0000-4000-8000-000000000a21'),
   ('d0440000-0000-4000-8000-000000000201', 'MINIBAR_LOSS', 'red', 'Minibar thất thoát', 'waste', 'd0440000-0000-4000-8000-000000000b01');
+
+-- C10 (529000): _report_stock_card doc tu mv_report_stock_card_daily, chi
+-- moi sau moi lan lam moi. Fixture stock_moves chen sau lan lam moi cuoi nen
+-- phai lam moi MV truoc khi goi report_get, neu khong the kho tra 0 dong
+-- (tien le report_matview_dashboard_test.sql §A/§C: MV cu khong thay move moi).
+-- Goi duoi quyen postgres (auth.uid() null) nen bo qua kiem tra quyen.
+select public.report_refresh_stock_card_mv();
 
 -- ---------------------------------------------------------------------------
 -- 0c. Bang tam luu ket qua + helper doc so.
@@ -299,7 +309,7 @@ select throws_ok(
 );
 select is(
   (select count(*) from public.permissions where code like 'report.view.%'),
-  10::bigint, 'catalog has 10 report.view.* permission codes'
+  11::bigint, 'catalog has 11 report.view.* permission codes (10 T-044 + rpt_fnb_revenue, 500000)'
 );
 
 -- ---------------------------------------------------------------------------
@@ -344,7 +354,11 @@ select is(public._t044_num('open_po', 'doc_no', 'PO-044-001', 'remaining_amount'
 select is(public._t044_num('open_po', 'doc_no', 'PO-044-001', 'overdue_days'), 2::numeric, 'PO1 overdue 2 days');
 select is(public._t044_num('open_po', 'doc_no', 'PO-044-002', 'remaining_amount'), 600000::numeric, 'PO2 remaining 600.000');
 select is(public._t044_total('open_po', 'open_po_count'), 2::numeric, 'open PO count 2');
-select is(public._t044_total('open_po', 'open_po_remaining_amount'), 700000::numeric, 'open PO remaining total 700.000');
+-- Tong = tong cac dong: PO1 200.000 (GAO 100.000 + MUOI 100.000) + PO2 600.000.
+-- MUOI van tinh: remaining = (qty_stock - received_qty_stock) * unit_price,
+-- MUOI nhan 0 (QC fail, accepted 0) nen con 20kg x 5.000; tra hang khong
+-- tru vao remaining (NCC van no hang) — ham tong = sum(rows) theo dung spec.
+select is(public._t044_total('open_po', 'open_po_remaining_amount'), 800000::numeric, 'open PO remaining total 800.000');
 select is(public._t044_total('open_po', 'on_hold_count'), 1::numeric, 'on_hold invoice count 1');
 select is(public._t044_total('open_po', 'on_hold_amount'), 1100000::numeric, 'on_hold invoice amount 1.100.000');
 
@@ -372,7 +386,7 @@ select is(public._t044_rows('advances'), 2::bigint, 'advances has 2 rows');
 select is(public._t044_total('advances', 'remaining_amount'), 3000000::numeric, 'advances remaining total 3.000.000');
 select is(public._t044_total('advances', 'overdue_count'), 1::numeric, 'advances overdue count 1');
 select ok(public._t044_num('advances', 'doc_no', 'ADV-044-001', 'overdue_hours') > 0, 'ADV1 overdue_hours > 0');
-select ok(public._t044_num('advances', 'doc_no', 'ADV-044-002', 'overdue_hours') is null, 'ADV2 overdue_hours is null');
+select is(public._t044_num('advances', 'doc_no', 'ADV-044-002', 'overdue_hours'), 0::numeric, 'ADV2 overdue_hours is 0 (not yet due; null only when due_settle_at is null — greatest(0, ...) in _report_advances)');
 
 -- ---------------------------------------------------------------------------
 -- G. RPT_WASTE (owner).
