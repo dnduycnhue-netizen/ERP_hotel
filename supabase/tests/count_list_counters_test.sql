@@ -148,8 +148,12 @@ select throws_ok(
 );
 
 -- 5. Nguoi dem bi vo hieu (active = false) khong xuat hien.
+-- profiles chi co SELECT policy + SELECT grant cho authenticated (khong co
+-- UPDATE) nen phai doi ve role postgres de sua fixture (tien le T-032).
+set local role postgres;
 update public.profiles set active = false
 where id = 'd0330000-0000-4000-8000-000000000a02';
+set local role authenticated;
 select is(
   (select count(*) from public.count_list_counters(
     'd0330000-0000-4000-8000-000000000201',
