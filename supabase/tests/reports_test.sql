@@ -224,6 +224,13 @@ insert into public.alerts (property_id, code, severity, title, doc_type, doc_id)
   ('d0440000-0000-4000-8000-000000000201', 'ADVANCE_OVERDUE', 'red', 'Tạm ứng quá hạn', 'advance', 'd0440000-0000-4000-8000-000000000a21'),
   ('d0440000-0000-4000-8000-000000000201', 'MINIBAR_LOSS', 'red', 'Minibar thất thoát', 'waste', 'd0440000-0000-4000-8000-000000000b01');
 
+-- C10 (529000): _report_stock_card doc tu mv_report_stock_card_daily, chi
+-- moi sau moi lan lam moi. Fixture stock_moves chen sau lan lam moi cuoi nen
+-- phai lam moi MV truoc khi goi report_get, neu khong the kho tra 0 dong
+-- (tien le report_matview_dashboard_test.sql §A/§C: MV cu khong thay move moi).
+-- Goi duoi quyen postgres (auth.uid() null) nen bo qua kiem tra quyen.
+select public.report_refresh_stock_card_mv();
+
 -- ---------------------------------------------------------------------------
 -- 0c. Bang tam luu ket qua + helper doc so.
 -- ---------------------------------------------------------------------------
