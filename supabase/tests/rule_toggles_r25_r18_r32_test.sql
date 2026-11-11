@@ -323,8 +323,8 @@ insert into rt_resp values ('alert_po', jsonb_build_object('n', (select count(*)
 insert into rt_resp values ('alert_adv', jsonb_build_object('n', (select count(*) from public.alerts where code = 'PERIOD_CLOSE_WARNING' and payload ->> 'reason' = 'advance_overdue')));
 set local role authenticated;
 select is(
-  (select ((resp ->> 'n')::int from rt_resp where key = 'alerts_after')
-    - ((resp ->> 'n')::int from rt_resp where key = 'alerts_before')),
+  (select (resp ->> 'n')::int from rt_resp where key = 'alerts_after')
+    - (select (resp ->> 'n')::int from rt_resp where key = 'alerts_before'),
   2, 'R32 TAT: sinh dung 2 alert PERIOD_CLOSE_WARNING (1 PO + 1 tam ung)'
 );
 select is(
