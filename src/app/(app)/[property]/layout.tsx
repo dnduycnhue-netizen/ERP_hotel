@@ -23,12 +23,13 @@ export default async function PropertyLayout({
   // lý không phụ thuộc nhau nên chạy song song. Đếm cảnh báo chạy qua
   // RLS của bảng alerts (chỉ dòng có quyền alert.receive.<code> tương
   // ứng) nên người không có quyền nào vẫn ra 0 — không cần chặn riêng.
-  const [properties, { data: myPermissions }, unreadAlerts] =
-    await Promise.all([
+  const [properties, { data: myPermissions }, unreadAlerts] = await Promise.all(
+    [
       listAccessibleProperties(supabase),
       supabase.rpc("my_permissions", { p_property: propertyId }),
       countUnreadAlerts(propertyId),
-    ]);
+    ],
+  );
 
   const currentProperty = properties.find(({ id }) => id === propertyId);
 

@@ -87,9 +87,7 @@ export async function canViewAlerts(propertyId: string): Promise<boolean> {
  * tiếp qua client là đúng; head-only nên chỉ trả số đếm, không tải dòng.
  * Lỗi truy vấn trả 0 (không badge) thay vì làm sập vỏ app.
  */
-export async function countUnreadAlerts(
-  propertyId: string,
-): Promise<number> {
+export async function countUnreadAlerts(propertyId: string): Promise<number> {
   const supabase = await createClient();
   const { count, error } = await untyped(supabase)
     .from("alerts")
