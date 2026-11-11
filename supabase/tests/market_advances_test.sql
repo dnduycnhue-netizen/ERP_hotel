@@ -530,11 +530,17 @@ select ok(
 -- 5. AC T-022: tam ung qua han -> chan tam ung moi + cron danh dau
 -- ---------------------------------------------------------------------------
 -- Gia lap qua han: dua due_settle_at ve qua khu (can bypass guard).
+-- UPDATE truc tiep bi RLS chan duoi role authenticated (advances chi co
+-- SELECT policy, khong co UPDATE policy -> update 0 dong, khong bao loi)
+-- nen ve role postgres (mau c8 / legal-entity test), xong quay lai
+-- authenticated. Guard van can bypass='on' vi trigger chay ca voi postgres.
 select set_config('app.advance_guard_bypass', 'on', true);
 
+reset role;
 update public.advances
 set due_settle_at = now() - interval '2 hours'
 where purpose = 'Mua gạo + muối chợ sớm';
+set local role authenticated;
 
 select _t022_as('d0220000-0200-4000-8000-000000000a01');
 
