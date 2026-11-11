@@ -8,6 +8,8 @@
 -- Run via: supabase test db (needs Docker; cannot run on the agent VM).
 
 begin;
+create extension if not exists pgtap with schema extensions;
+set local search_path = public, extensions;
 select plan(4);
 
 -- 1. accountant co attachment.upload (de tai anh bien lai)
