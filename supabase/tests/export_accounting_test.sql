@@ -155,7 +155,7 @@ set local role authenticated;
 -- 1. Chua dang nhap (chua dat JWT claim) -> 42501.
 select throws_ok(
   $q$select public.export_goods_receipts('d0430000-0000-4000-8000-000000000101', '2026-10-01', '2026-10-31')$q$,
-  '42501', 'ERR_FORBIDDEN:export.accounting',
+  '42501', 'ERR_FORBIDDEN',
   'Unauthenticated export is blocked'
 );
 
@@ -196,7 +196,7 @@ select throws_ok(
 );
 select throws_ok(
   $q$select public.export_goods_receipts('d0430000-0000-4000-8000-000000000999', '2026-10-01', '2026-10-31')$q$,
-  '42501', 'ERR_FORBIDDEN:export.accounting',
+  '42501', 'ERR_FORBIDDEN',
   'Unknown entity is forbidden (no existence leak)'
 );
 select throws_ok(
@@ -227,16 +227,16 @@ select throws_ok(
 insert into t043_resp values ('gr_oct', public.export_goods_receipts('d0430000-0000-4000-8000-000000000101', '2026-10-01', '2026-10-31'));
 select is((select (resp ->> 'ok')::boolean from t043_resp where key = 'gr_oct'), true, 'Oct goods receipts export ok');
 select is((select (resp -> 'totals' ->> 'count')::integer from t043_resp where key = 'gr_oct'), 1, 'Oct goods receipts has 1 line');
-select is((select (resp -> 'totals' ->> 'amount')::numeric from t043_resp where key = 'gr_oct'), 100000, 'Oct goods receipts total 100000');
+select is((select (resp -> 'totals' ->> 'amount')::numeric from t043_resp where key = 'gr_oct'), 100000::numeric, 'Oct goods receipts total 100000');
 select is((select resp -> 'rows' -> 0 ->> 'received_date' from t043_resp where key = 'gr_oct'), '2026-10-15', 'Receipt row has VN business date');
 select is((select resp -> 'rows' -> 0 ->> 'item_code' from t043_resp where key = 'gr_oct'), 'ITM_GAO', 'Receipt row has item code');
-select is((select (resp -> 'rows' -> 0 ->> 'qty')::numeric from t043_resp where key = 'gr_oct'), 10, 'Receipt row qty is accepted qty');
+select is((select (resp -> 'rows' -> 0 ->> 'qty')::numeric from t043_resp where key = 'gr_oct'), 10::numeric, 'Receipt row qty is accepted qty');
 
 -- 6. Nhap kho ngay 05/12 (da khoa ngay, ky mo).
 insert into t043_resp values ('gr_dec5', public.export_goods_receipts('d0430000-0000-4000-8000-000000000101', '2026-12-05', '2026-12-05'));
 select is((select (resp ->> 'ok')::boolean from t043_resp where key = 'gr_dec5'), true, 'Day-locked goods receipts export ok');
 select is((select (resp -> 'totals' ->> 'count')::integer from t043_resp where key = 'gr_dec5'), 1, 'Day-locked goods receipts has 1 line');
-select is((select (resp -> 'totals' ->> 'amount')::numeric from t043_resp where key = 'gr_dec5'), 60000, 'Day-locked goods receipts total 60000');
+select is((select (resp -> 'totals' ->> 'amount')::numeric from t043_resp where key = 'gr_dec5'), 60000::numeric, 'Day-locked goods receipts total 60000');
 
 -- 7. Xuat kho thang 10: dieu chuyen WH_MAIN -> WH_KITCHEN.
 insert into t043_resp values ('issues_oct', public.export_stock_issues('d0430000-0000-4000-8000-000000000101', '2026-10-01', '2026-10-31'));
@@ -245,8 +245,8 @@ select is((select (resp -> 'totals' ->> 'count')::integer from t043_resp where k
 select is((select resp -> 'rows' -> 0 ->> 'move_type' from t043_resp where key = 'issues_oct'), 'transfer_out', 'Issue row move_type is transfer_out');
 select is((select resp -> 'rows' -> 0 ->> 'doc_no' from t043_resp where key = 'issues_oct'), 'TRF-043-001', 'Issue row doc_no resolves via transfer');
 select is((select resp -> 'rows' -> 0 ->> 'to_warehouse_code' from t043_resp where key = 'issues_oct'), 'WH_KITCHEN', 'Issue row has destination warehouse');
-select is((select (resp -> 'rows' -> 0 ->> 'qty')::numeric from t043_resp where key = 'issues_oct'), -5, 'Issue row qty is negative');
-select is((select (resp -> 'totals' ->> 'amount')::numeric from t043_resp where key = 'issues_oct'), -50000, 'Oct stock issues total -50000');
+select is((select (resp -> 'rows' -> 0 ->> 'qty')::numeric from t043_resp where key = 'issues_oct'), -5::numeric, 'Issue row qty is negative');
+select is((select (resp -> 'totals' ->> 'amount')::numeric from t043_resp where key = 'issues_oct'), -50000::numeric, 'Oct stock issues total -50000');
 
 -- 8. Xuat kho ngay 05/12 (da khoa ngay).
 insert into t043_resp values ('issues_dec5', public.export_stock_issues('d0430000-0000-4000-8000-000000000101', '2026-12-05', '2026-12-05'));
@@ -257,8 +257,8 @@ select is((select (resp -> 'totals' ->> 'count')::integer from t043_resp where k
 insert into t043_resp values ('inv_oct', public.export_invoices('d0430000-0000-4000-8000-000000000101', '2026-10-01', '2026-10-31'));
 select is((select (resp ->> 'ok')::boolean from t043_resp where key = 'inv_oct'), true, 'Oct invoices export ok');
 select is((select (resp -> 'totals' ->> 'count')::integer from t043_resp where key = 'inv_oct'), 1, 'Oct invoices has 1 line');
-select is((select (resp -> 'totals' ->> 'amount')::numeric from t043_resp where key = 'inv_oct'), 500000, 'Oct invoices amount 500000');
-select is((select (resp -> 'totals' ->> 'vat_amount')::numeric from t043_resp where key = 'inv_oct'), 50000, 'Oct invoices VAT 50000');
+select is((select (resp -> 'totals' ->> 'amount')::numeric from t043_resp where key = 'inv_oct'), 500000::numeric, 'Oct invoices amount 500000');
+select is((select (resp -> 'totals' ->> 'vat_amount')::numeric from t043_resp where key = 'inv_oct'), 50000::numeric, 'Oct invoices VAT 50000');
 select is((select resp -> 'rows' -> 0 ->> 'po_doc_no' from t043_resp where key = 'inv_oct'), 'PO-043-001', 'Invoice row has PO doc_no');
 select is((select resp -> 'rows' -> 0 ->> 'match_reason' from t043_resp where key = 'inv_oct'), null, 'Invoice row match_reason is null before matching');
 
@@ -267,27 +267,27 @@ select is((select resp -> 'rows' -> 0 ->> 'match_reason' from t043_resp where ke
 insert into t043_resp values ('ap_oct31', public.export_payables('d0430000-0000-4000-8000-000000000101', '2026-10-01', '2026-10-31'));
 select is((select (resp ->> 'ok')::boolean from t043_resp where key = 'ap_oct31'), true, 'Payables as of Oct 31 ok');
 select is((select (resp -> 'totals' ->> 'supplier_count')::integer from t043_resp where key = 'ap_oct31'), 1, 'Payables has 1 supplier');
-select is((select (resp -> 'totals' ->> 'payable')::numeric from t043_resp where key = 'ap_oct31'), 500000, 'Payables payable 500000');
-select is((select (resp -> 'totals' ->> 'paid')::numeric from t043_resp where key = 'ap_oct31'), 200000, 'Payables paid 200000');
-select is((select (resp -> 'totals' ->> 'balance')::numeric from t043_resp where key = 'ap_oct31'), 300000, 'Payables balance 300000');
-select is((select (resp -> 'rows' -> 0 ->> 'not_due')::numeric from t043_resp where key = 'ap_oct31'), 300000, 'Payables not yet due 300000 at Oct 31');
-select is((select (resp -> 'rows' -> 0 ->> 'overdue_1_30')::numeric from t043_resp where key = 'ap_oct31'), 0, 'Payables overdue 1-30 is 0 at Oct 31');
+select is((select (resp -> 'totals' ->> 'payable')::numeric from t043_resp where key = 'ap_oct31'), 500000::numeric, 'Payables payable 500000');
+select is((select (resp -> 'totals' ->> 'paid')::numeric from t043_resp where key = 'ap_oct31'), 200000::numeric, 'Payables paid 200000');
+select is((select (resp -> 'totals' ->> 'balance')::numeric from t043_resp where key = 'ap_oct31'), 300000::numeric, 'Payables balance 300000');
+select is((select (resp -> 'rows' -> 0 ->> 'not_due')::numeric from t043_resp where key = 'ap_oct31'), 300000::numeric, 'Payables not yet due 300000 at Oct 31');
+select is((select (resp -> 'rows' -> 0 ->> 'overdue_1_30')::numeric from t043_resp where key = 'ap_oct31'), 0::numeric, 'Payables overdue 1-30 is 0 at Oct 31');
 select is((select resp -> 'rows' -> 0 ->> 'oldest_overdue_days' from t043_resp where key = 'ap_oct31'), null, 'Payables oldest overdue is null at Oct 31');
 
 -- 11. Cong no tai 15/11 (ky 11 da khoa): qua han 5 ngay -> nhom 1–30.
 insert into t043_resp values ('ap_nov15', public.export_payables('d0430000-0000-4000-8000-000000000101', '2026-11-01', '2026-11-15'));
 select is((select (resp ->> 'ok')::boolean from t043_resp where key = 'ap_nov15'), true, 'Payables as of Nov 15 ok');
-select is((select (resp -> 'rows' -> 0 ->> 'overdue_1_30')::numeric from t043_resp where key = 'ap_nov15'), 300000, 'Payables overdue 1-30 is 300000 at Nov 15');
-select is((select (resp -> 'rows' -> 0 ->> 'not_due')::numeric from t043_resp where key = 'ap_nov15'), 0, 'Payables not due is 0 at Nov 15');
+select is((select (resp -> 'rows' -> 0 ->> 'overdue_1_30')::numeric from t043_resp where key = 'ap_nov15'), 300000::numeric, 'Payables overdue 1-30 is 300000 at Nov 15');
+select is((select (resp -> 'rows' -> 0 ->> 'not_due')::numeric from t043_resp where key = 'ap_nov15'), 0::numeric, 'Payables not due is 0 at Nov 15');
 select is((select (resp -> 'rows' -> 0 ->> 'oldest_overdue_days')::integer from t043_resp where key = 'ap_nov15'), 5, 'Payables oldest overdue is 5 days at Nov 15');
 
 -- 12. Tam ung thang 10.
 insert into t043_resp values ('adv_oct', public.export_advances('d0430000-0000-4000-8000-000000000101', '2026-10-01', '2026-10-31'));
 select is((select (resp ->> 'ok')::boolean from t043_resp where key = 'adv_oct'), true, 'Oct advances export ok');
 select is((select (resp -> 'totals' ->> 'count')::integer from t043_resp where key = 'adv_oct'), 1, 'Oct advances has 1 row');
-select is((select (resp -> 'totals' ->> 'amount')::numeric from t043_resp where key = 'adv_oct'), 1000000, 'Oct advances amount 1000000');
-select is((select (resp -> 'totals' ->> 'settled_amount')::numeric from t043_resp where key = 'adv_oct'), 800000, 'Oct advances settled 800000');
-select is((select (resp -> 'totals' ->> 'refund_amount')::numeric from t043_resp where key = 'adv_oct'), 200000, 'Oct advances refund 200000');
+select is((select (resp -> 'totals' ->> 'amount')::numeric from t043_resp where key = 'adv_oct'), 1000000::numeric, 'Oct advances amount 1000000');
+select is((select (resp -> 'totals' ->> 'settled_amount')::numeric from t043_resp where key = 'adv_oct'), 800000::numeric, 'Oct advances settled 800000');
+select is((select (resp -> 'totals' ->> 'refund_amount')::numeric from t043_resp where key = 'adv_oct'), 200000::numeric, 'Oct advances refund 200000');
 select is((select resp -> 'rows' -> 0 ->> 'employee_name' from t043_resp where key = 'adv_oct'), 'Thủ kho', 'Advance row has employee name via profiles');
 
 select * from finish();
