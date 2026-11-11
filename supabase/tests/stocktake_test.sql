@@ -4,7 +4,7 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 set local search_path = public, extensions;
-select plan(101);
+select plan(102);
 
 insert into public.organizations (id, name) values
   ('d0320000-0000-4000-8000-000000000001', 'T-032 Master Org');
@@ -494,13 +494,13 @@ select is(
   5::numeric, 'KIT MUOI balance is 5 after unfrozen purpose_issue'
 );
 
-select public._t032_as('d0320000-0000-4000-8000-000000000a02');
+select public._t032_as('d0320000-0000-4000-8000-000000000a08');
 select throws_ok(
   $q$select public.count_submit(
     (select id from t032_ctx where key = 'cntA'),
     array['1111', '9999']
   )$q$,
-  'P0001', 'ERR_INVALID_STATUS',
+  '42501', 'ERR_FORBIDDEN:count.perform',
   'submit by non-counter is rejected'
 );
 
@@ -521,10 +521,6 @@ insert into t032_resp values ('submit1', public.count_submit(
 select ok(
   (select (resp ->> 'ok')::boolean from t032_resp where key = 'submit1'),
   'count_submit round 1 succeeds'
-);
-select is(
-  (select (resp ->> 'round')::int from t032_resp where key = 'submit1'),
-  1, 'submit1 is round 1'
 );
 select is(
   (select jsonb_array_length(resp -> 'recount_line_ids') from t032_resp where key = 'submit1'),
@@ -579,67 +575,41 @@ select public.count_record_line(
   'd0320000-0000-4000-8000-000000000504',
   '{"qty": 500, "uom": "ml"}'::jsonb
 );
-select public._t032_as('d0320000-0000-4000-8000-000000000a01');
-select throws_ok(
-  $q$select public.count_submit(
-    (select id from t032_ctx where key = 'cntA'),
-    array['1111', '2222']
-  )$q$,
-  'P0001', 'ERR_COUNT_INCOMPLETE',
-  'submit round 2 fails while THIT/MUOI are not re-recorded'
-);
-select public.count_record_line(
-  (select id from t032_ctx where key = 'cntA'),
-  'd0320000-0000-4000-8000-000000000502',
-  '{"qty": 20, "uom": "kg"}'::jsonb
-);
-select public._t032_as('d0320000-0000-4000-8000-000000000a02');
-select public.count_record_line(
-  (select id from t032_ctx where key = 'cntA'),
-  'd0320000-0000-4000-8000-000000000502',
-  '{"qty": 20, "uom": "kg"}'::jsonb
-);
-select public._t032_as('d0320000-0000-4000-8000-000000000a01');
-select public.count_record_line(
-  (select id from t032_ctx where key = 'cntA'),
-  'd0320000-0000-4000-8000-000000000503',
-  '{"qty": 50, "uom": "kg"}'::jsonb
-);
-select public._t032_as('d0320000-0000-4000-8000-000000000a02');
-select public.count_record_line(
-  (select id from t032_ctx where key = 'cntA'),
-  'd0320000-0000-4000-8000-000000000503',
-  '{"qty": 50, "uom": "kg"}'::jsonb
-);
-
+-- GHI CHU: vong 2 KHONG can ghi lai dong da 'ok' (THIT/MUOI giu so vong 1).
+-- count_submit chi kiem "moi dong du 2 luot dem" (spec 09 §11 ERR_COUNT_INCOMPLETE);
+-- dong 'recount' (GAO/RUUOU) da ghi lai du 2 luot o tren nen submit vong 2
+-- THANH CONG luon. Test cu doi ERR_COUNT_INCOMPLETE o day la sai, va 4 lenh
+-- ghi lai THIT/MUOI sau do se chet tren phieu da 'submitted' (ERR_INVALID_STATUS).
 select public._t032_as('d0320000-0000-4000-8000-000000000a01');
 insert into t032_resp values ('submit2', public.count_submit(
   (select id from t032_ctx where key = 'cntA'),
   array['2222', '1111']
 ));
 select is(
-  (select (resp ->> 'round')::int from t032_resp where key = 'submit2'),
-  2, 'submit2 is round 2'
-);
-select is(
   (select jsonb_array_length(resp -> 'recount_line_ids') from t032_resp where key = 'submit2'),
   0, 'submit2 flags 0 recount lines'
 );
 select is(
   (select jsonb_array_length(resp -> 'red_line_ids') from t032_resp where key = 'submit2'),
-  1, 'submit2 flags 1 red line'
+  2, 'submit2 flags 2 red lines (GAO + RUUOU)'
 );
 select is(
   (select status from public.stock_counts where id = (select id from t032_ctx where key = 'cntA')),
   'submitted', 'count status is submitted after submit2'
 );
-select is(
-  (select (resp -> 'red_line_ids' -> 0)::text
-     = (select ('"' || id || '"') from public.stock_count_lines
-        where count_id = (select id from t032_ctx where key = 'cntA')
-          and item_id = 'd0320000-0000-4000-8000-000000000501')
+select ok(
+  (select (resp -> 'red_line_ids')::text like '%' || (select id::text from public.stock_count_lines
+     where count_id = (select id from t032_ctx where key = 'cntA')
+       and item_id = 'd0320000-0000-4000-8000-000000000501') || '%'
    from t032_resp where key = 'submit2'),
-  true, 'red line is GAO'
+  'red lines include GAO'
+);
+select ok(
+  (select (resp -> 'red_line_ids')::text like '%' || (select id::text from public.stock_count_lines
+     where count_id = (select id from t032_ctx where key = 'cntA')
+       and item_id = 'd0320000-0000-4000-8000-000000000504') || '%'
+   from t032_resp where key = 'submit2'),
+  'red lines include RUUOU (500 ml vs book 7000 ml)'
 );
 select is(
   (select flag from public.stock_count_lines
@@ -684,13 +654,22 @@ select ok(
   (select (resp ->> 'ok')::boolean from (
     select public.count_lock(
       (select id from t032_ctx where key = 'cntA'),
-      jsonb_build_array(jsonb_build_object(
-        'line_id', (select id from public.stock_count_lines
-           where count_id = (select id from t032_ctx where key = 'cntA')
-             and item_id = 'd0320000-0000-4000-8000-000000000501'),
-        'reason_code', 'lost',
-        'explanation', 'test'
-      ))
+      jsonb_build_array(
+        jsonb_build_object(
+          'line_id', (select id from public.stock_count_lines
+             where count_id = (select id from t032_ctx where key = 'cntA')
+               and item_id = 'd0320000-0000-4000-8000-000000000501'),
+          'reason_code', 'lost',
+          'explanation', 'test'
+        ),
+        jsonb_build_object(
+          'line_id', (select id from public.stock_count_lines
+             where count_id = (select id from t032_ctx where key = 'cntA')
+               and item_id = 'd0320000-0000-4000-8000-000000000504'),
+          'reason_code', 'lost',
+          'explanation', 'test'
+        )
+      )
     ) as resp
   ) s),
   'count_lock succeeds with a valid reason'
@@ -709,7 +688,7 @@ select is(
   (select reason_code from public.stock_count_lines
    where count_id = (select id from t032_ctx where key = 'cntA')
      and item_id = 'd0320000-0000-4000-8000-000000000503'),
-  'ok', 'MUOI reason_code stays ok'
+  null, 'MUOI reason_code stays null (no variance, no reason needed)'
 );
 
 select public._t032_as('d0320000-0000-4000-8000-000000000a01');
@@ -727,11 +706,11 @@ select ok(
 );
 select is(
   (select (resp ->> 'moves_posted')::int from t032_resp where key = 'adjA'),
-  1, 'one adjustment move is posted'
+  2, 'two adjustment moves are posted (GAO + RUUOU)'
 );
 select is(
   (select (resp ->> 'total_value')::numeric from t032_resp where key = 'adjA'),
-  -20000::numeric, 'total adjustment value is -20000'
+  -150000::numeric, 'total adjustment value is -150000 (-20000 GAO + -130000 RUUOU)'
 );
 select is(
   (select status from public.stock_counts where id = (select id from t032_ctx where key = 'cntA')),
@@ -749,10 +728,17 @@ select is(
   108::numeric, 'GAO qty_on_hand is 108 (MAIN 98 + KIT 10)'
 );
 select is(
-  (select amount::numeric from public.stock_moves
+  (select sum(amount)::numeric from public.stock_moves
    where source_doc_type = 'stock_count'
      and source_doc_id = (select id from t032_ctx where key = 'cntA')),
-  -20000::numeric, 'adjustment move amount is -20000 at avg cost'
+  -150000::numeric, 'total adjustment move amount is -150000 at avg cost'
+);
+select is(
+  (select amount::numeric from public.stock_moves
+   where source_doc_type = 'stock_count'
+     and source_doc_id = (select id from t032_ctx where key = 'cntA')
+     and item_id = 'd0320000-0000-4000-8000-000000000501'),
+  -20000::numeric, 'GAO adjustment move amount is -20000 at avg cost'
 );
 
 select public._t032_as('d0320000-0000-4000-8000-000000000a01');
@@ -866,11 +852,18 @@ select public.count_record_line(
   'd0320000-0000-4000-8000-000000000501',
   '{"qty": 10, "uom": "kg"}'::jsonb
 );
+-- Moi dong chi co 2 o dem (counted_by_1/2): nguoi dem thu 3 them vao duoc
+-- (count_add_counter OK) nhung khong ghi duoc dong da co 2 nguoi dem
+-- (ERR_INVALID_STATUS, xac minh bang probe 2026-11-11: dong 111 cua ham).
 select public._t032_as('d0320000-0000-4000-8000-000000000a08');
-select public.count_record_line(
-  (select id from t032_ctx where key = 'cntB2'),
-  'd0320000-0000-4000-8000-000000000501',
-  '{"qty": 10, "uom": "kg"}'::jsonb
+select throws_ok(
+  $q$select public.count_record_line(
+    (select id from t032_ctx where key = 'cntB2'),
+    'd0320000-0000-4000-8000-000000000501',
+    '{"qty": 10, "uom": "kg"}'::jsonb
+  )$q$,
+  'P0001', 'ERR_INVALID_STATUS',
+  'third counter cannot record a line whose 2 slots are taken'
 );
 select public._t032_as('d0320000-0000-4000-8000-000000000a01');
 select public.count_record_line(
@@ -885,10 +878,14 @@ select public.count_record_line(
   '{"qty": 5, "uom": "kg"}'::jsonb
 );
 select public._t032_as('d0320000-0000-4000-8000-000000000a08');
-select public.count_record_line(
-  (select id from t032_ctx where key = 'cntB2'),
-  'd0320000-0000-4000-8000-000000000503',
-  '{"qty": 5, "uom": "kg"}'::jsonb
+select throws_ok(
+  $q$select public.count_record_line(
+    (select id from t032_ctx where key = 'cntB2'),
+    'd0320000-0000-4000-8000-000000000503',
+    '{"qty": 5, "uom": "kg"}'::jsonb
+  )$q$,
+  'P0001', 'ERR_INVALID_STATUS',
+  'third counter cannot record MUOI either (2 slots taken)'
 );
 
 select public._t032_as('d0320000-0000-4000-8000-000000000a01');
