@@ -31,12 +31,12 @@ insert into public.item_groups (id, org_id, code_prefix, name, kind) values
   ('d0350000-0000-4000-8000-000000000401', 'd0350000-0000-4000-8000-000000000001', 'MB', 'Minibar', 'minibar'),
   ('d0350000-0000-4000-8000-000000000402', 'd0350000-0000-4000-8000-000000000001', 'COMP', 'Complimentary', 'complimentary');
 
-insert into public.items (id, org_id, code, name, group_id, stock_uom, is_key_item, track_lot, shelf_life_days, allowed_channels, is_temp) values
-  ('d0350000-0000-4000-8000-000000000501', 'd0350000-0000-4000-8000-000000000001', 'ITM_LAVIE', 'Nước Lavie', 'd0350000-0000-4000-8000-000000000401', 'chai', false, false, null, array['contract', 'market'], false),
-  ('d0350000-0000-4000-8000-000000000502', 'd0350000-0000-4000-8000-000000000001', 'ITM_TIGER', 'Bia Tiger', 'd0350000-0000-4000-8000-000000000401', 'lon', false, false, null, array['contract', 'market'], false),
-  ('d0350000-0000-4000-8000-000000000503', 'd0350000-0000-4000-8000-000000000001', 'ITM_COCA', 'Coca', 'd0350000-0000-4000-8000-000000000401', 'lon', false, false, null, array['contract', 'market'], false),
-  ('d0350000-0000-4000-8000-000000000504', 'd0350000-0000-4000-8000-000000000001', 'ITM_DASANI', 'Nước Dasani', 'd0350000-0000-4000-8000-000000000402', 'chai', false, false, null, array['contract', 'market'], false),
-  ('d0350000-0000-4000-8000-000000000505', 'd0350000-0000-4000-8000-000000000001', 'TMP-035-1', 'Mã tạm 1', 'd0350000-0000-4000-8000-000000000401', 'chai', false, false, null, array['contract', 'market'], true);
+insert into public.items (id, org_id, code, name, group_id, stock_uom, is_key_item, track_lot, shelf_life_days, allowed_channels, is_temp, temp_created_at) values
+  ('d0350000-0000-4000-8000-000000000501', 'd0350000-0000-4000-8000-000000000001', 'ITM_LAVIE', 'Nước Lavie', 'd0350000-0000-4000-8000-000000000401', 'chai', false, false, null, array['contract', 'market'], false, null),
+  ('d0350000-0000-4000-8000-000000000502', 'd0350000-0000-4000-8000-000000000001', 'ITM_TIGER', 'Bia Tiger', 'd0350000-0000-4000-8000-000000000401', 'lon', false, false, null, array['contract', 'market'], false, null),
+  ('d0350000-0000-4000-8000-000000000503', 'd0350000-0000-4000-8000-000000000001', 'ITM_COCA', 'Coca', 'd0350000-0000-4000-8000-000000000401', 'lon', false, false, null, array['contract', 'market'], false, null),
+  ('d0350000-0000-4000-8000-000000000504', 'd0350000-0000-4000-8000-000000000001', 'ITM_DASANI', 'Nước Dasani', 'd0350000-0000-4000-8000-000000000402', 'chai', false, false, null, array['contract', 'market'], false, null),
+  ('d0350000-0000-4000-8000-000000000505', 'd0350000-0000-4000-8000-000000000001', 'TMP-035-1', 'Mã tạm 1', 'd0350000-0000-4000-8000-000000000401', 'chai', false, false, null, array['contract', 'market'], true, now());
 
 insert into public.outlet_types (id, org_id, code, name) values
   ('d0350000-0000-4000-8000-000000000801', 'd0350000-0000-4000-8000-000000000001', 'HK', 'Buồng phòng');
