@@ -237,7 +237,7 @@ select throws_ok(
     'd0320000-0000-4000-8000-000000000301', 'monthly_full', '2026-11-09', null,
     array['d0320000-0000-4000-8000-000000000a01', 'd0320000-0000-4000-8000-000000000a08']::uuid[]
   )$q$,
-  'P0001', 'ERR_COUNT_INDEPENDENT',
+  'P0001', 'ERR_SOD_COUNT_INDEPENDENT',
   'team without an independent counter is rejected at open'
 );
 insert into t032_resp values ('openA', public.count_open(
