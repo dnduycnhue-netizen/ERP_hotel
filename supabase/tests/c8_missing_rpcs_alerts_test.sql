@@ -417,25 +417,32 @@ select is(
 set local role authenticated;
 
 select public._c8_as('d8c80000-0000-4000-8000-000000000a03');
+-- GHI CHU: throws_ok so khop message CHINH XAC. trolley_shift_cancel
+-- raise 2 message co hau to ('ERR_INVALID_STATUS: ca khong o trang
+-- thai mo', 'ERR_INVALID_VALUE: ca xe day khong ton tai') — giong
+-- tien le write-guard o T-023 (test doi theo message day du, khong
+-- sua app). UI tach ma bang extractRpcCode nen hau to khong anh
+-- huong hien thi loi; 2 RPC anh em trong cung migration raise bare
+-- message nen test cua chung giu nguyen.
 select throws_ok(
   $q$select public.trolley_shift_cancel(
     'd8c80000-0000-4000-8000-000000000e11', 'Hủy lần nữa'
   )$q$,
-  'P0001', 'ERR_INVALID_STATUS',
+  'P0001', 'ERR_INVALID_STATUS: ca khong o trang thai mo',
   'second cancel on the same shift is refused'
 );
 select throws_ok(
   $q$select public.trolley_shift_cancel(
     'd8c80000-0000-4000-8000-000000000e12', 'Hủy ca đã đóng'
   )$q$,
-  'P0001', 'ERR_INVALID_STATUS',
+  'P0001', 'ERR_INVALID_STATUS: ca khong o trang thai mo',
   'cancel on a closed shift is refused'
 );
 select throws_ok(
   $q$select public.trolley_shift_cancel(
     'd8c80000-0000-4000-8000-000000000fff', 'Không có ca này'
   )$q$,
-  'P0001', 'ERR_INVALID_VALUE',
+  'P0001', 'ERR_INVALID_VALUE: ca xe day khong ton tai',
   'cancel on a missing shift is refused'
 );
 
