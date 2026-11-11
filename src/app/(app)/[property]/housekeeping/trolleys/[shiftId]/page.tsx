@@ -2,10 +2,6 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ErrorState } from "@/components/common/error-state";
 import { DocStatusBadge } from "@/components/common/doc-status-badge";
-import {
-  DataTable,
-  type DataTableColumn,
-} from "@/components/common/data-table";
 import { EmptyState } from "@/components/common/empty-state";
 import { vi } from "@/i18n/vi";
 import { PageHeader } from "@/components/shell/page-header";
@@ -14,11 +10,10 @@ import {
   getTrolleyPerms,
   getTrolleyShift,
   listTrolleyRooms,
-  type TrolleyConsumptionRow,
-  type TrolleyCountLine,
 } from "@/features/trolley/queries";
 import { createClient, getAuthenticatedUserId } from "@/lib/supabase/server";
 import type { RoomCleanType } from "@/features/housekeeping/schemas";
+import { ShiftConsumptionTable, ShiftCountTable } from "./shift-detail-tables";
 
 /**
  * Chi tiết 1 ca xe đẩy desktop (C7): số đếm đầu/cuối ca + bảng tiêu
@@ -63,64 +58,6 @@ export default async function TrolleyShiftDetailPage({
     currentUserId && shift.attendant_id === currentUserId
       ? vi.housekeeping.you
       : shift.attendant_id.slice(0, 8);
-
-  const countColumns: DataTableColumn<TrolleyCountLine & { id: string }>[] = [
-    {
-      key: "item_code",
-      header: vi.minibar.itemCode,
-      cell: (row) => row.item_code,
-    },
-    {
-      key: "item_name",
-      header: vi.minibar.itemName,
-      cell: (row) => row.item_name,
-    },
-    {
-      key: "qty",
-      header: vi.trolley.countedQty,
-      align: "right",
-      cell: (row) => `${row.qty}${row.stock_uom ? ` ${row.stock_uom}` : ""}`,
-    },
-  ];
-
-  const consumptionColumns: DataTableColumn<
-    TrolleyConsumptionRow & { id: string }
-  >[] = [
-    {
-      key: "item_code",
-      header: vi.minibar.itemCode,
-      cell: (row) => row.item_code,
-    },
-    {
-      key: "item_name",
-      header: vi.minibar.itemName,
-      cell: (row) => row.item_name,
-    },
-    {
-      key: "opening_qty",
-      header: vi.trolley.openingQty,
-      align: "right",
-      cell: (row) => row.opening_qty,
-    },
-    {
-      key: "received_qty",
-      header: vi.trolley.receivedQty,
-      align: "right",
-      cell: (row) => row.received_qty,
-    },
-    {
-      key: "closing_qty",
-      header: vi.trolley.closingQty,
-      align: "right",
-      cell: (row) => row.closing_qty,
-    },
-    {
-      key: "consumed_qty",
-      header: vi.trolley.consumedQty,
-      align: "right",
-      cell: (row) => row.consumed_qty,
-    },
-  ];
 
   return (
     <div className="space-y-6">
@@ -184,13 +121,11 @@ export default async function TrolleyShiftDetailPage({
         <h2 className="text-lg font-semibold">
           {vi.housekeeping.openingCounts}
         </h2>
-        <DataTable
-          columns={countColumns}
+        <ShiftCountTable
           rows={detail.opening_counts.map((line) => ({
             ...line,
             id: line.item_id,
           }))}
-          emptyTitle={vi.trolley.shiftsEmpty}
         />
       </section>
 
@@ -201,13 +136,11 @@ export default async function TrolleyShiftDetailPage({
         {detail.closing_counts === null ? (
           <EmptyState title={vi.housekeeping.notClosedYet} />
         ) : (
-          <DataTable
-            columns={countColumns}
+          <ShiftCountTable
             rows={detail.closing_counts.map((line) => ({
               ...line,
               id: line.item_id,
             }))}
-            emptyTitle={vi.trolley.shiftsEmpty}
           />
         )}
       </section>
@@ -219,13 +152,11 @@ export default async function TrolleyShiftDetailPage({
         {detail.consumption.length === 0 ? (
           <EmptyState title={vi.housekeeping.notClosedYet} />
         ) : (
-          <DataTable
-            columns={consumptionColumns}
+          <ShiftConsumptionTable
             rows={detail.consumption.map((line) => ({
               ...line,
               id: line.item_id,
             }))}
-            emptyTitle={vi.trolley.shiftsEmpty}
           />
         )}
       </section>

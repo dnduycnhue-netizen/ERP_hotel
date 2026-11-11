@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { connection } from "next/server";
 import { notFound } from "next/navigation";
-import { DataTable } from "@/components/common/data-table";
 import { hasChainPerm, listOrganizations } from "@/features/admin";
 import { vi } from "@/i18n/vi";
 import { createClient } from "@/lib/supabase/server";
+import { OrganizationsTable } from "./organizations-table";
 
 /** Danh sách tổ chức (C5): mỗi tổ chức gồm pháp nhân + khách sạn. */
 export default async function OrganizationsPage() {
@@ -37,40 +37,7 @@ export default async function OrganizationsPage() {
         </Link>
       </div>
 
-      <DataTable
-        columns={[
-          {
-            key: "name",
-            header: vi.admin.orgName,
-            cell: (row) => (
-              <Link
-                href={`/admin/organizations/${row.id}`}
-                className="font-medium text-primary hover:underline"
-              >
-                {row.name}
-              </Link>
-            ),
-          },
-          {
-            key: "legalEntities",
-            header: vi.admin.legalSection,
-            cell: (row) =>
-              row.legalEntities
-                .map((entity) => `${entity.code} — ${entity.name}`)
-                .join(", ") || "—",
-          },
-          {
-            key: "properties",
-            header: vi.admin.propertySection,
-            cell: (row) =>
-              row.properties
-                .map((property) => `${property.code} — ${property.name}`)
-                .join(", ") || "—",
-          },
-        ]}
-        rows={organizations}
-        emptyTitle={vi.admin.orgListEmpty}
-      />
+      <OrganizationsTable organizations={organizations} />
     </div>
   );
 }
