@@ -218,7 +218,7 @@ select is(
   true, 'key_item x -> true');
 select is(
   (select (normalized_data ->> 'vat_rate')::numeric from public.import_rows where batch_id = (select id from public.import_batches where file_name = 'nvl-test.xlsx') and row_no = 6),
-  8, 'vat 8 -> vat_rate 8');
+  8::numeric, 'vat 8 -> vat_rate 8');
 select is(
   (select (normalized_data ->> 'shelf_life_days')::integer from public.import_rows where batch_id = (select id from public.import_batches where file_name = 'nvl-test.xlsx') and row_no = 6),
   365, 'han dung 365 -> shelf_life_days 365');
