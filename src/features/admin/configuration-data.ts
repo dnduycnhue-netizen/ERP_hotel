@@ -17,7 +17,10 @@ export type SettingEntry = {
     | "count_random_items"
     | "count_variance_threshold_pct"
     | "count_without_cc_factor"
-    | "invoice_price_tolerance_pct";
+    | "invoice_price_tolerance_pct"
+    | "rule.R25.enabled"
+    | "rule.R18.enabled"
+    | "rule.R32.enabled";
   value: string;
   source: "property" | "organization" | "default";
 };
