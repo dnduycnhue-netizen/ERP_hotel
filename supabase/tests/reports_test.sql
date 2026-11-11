@@ -299,7 +299,7 @@ select throws_ok(
 );
 select is(
   (select count(*) from public.permissions where code like 'report.view.%'),
-  10::bigint, 'catalog has 10 report.view.* permission codes'
+  11::bigint, 'catalog has 11 report.view.* permission codes (10 T-044 + rpt_fnb_revenue, 500000)'
 );
 
 -- ---------------------------------------------------------------------------
