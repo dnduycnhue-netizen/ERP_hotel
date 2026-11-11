@@ -1,5 +1,5 @@
 -- ============================================================================
--- R26 + R30 (Q215) — 20261109538000_recount_threshold_zero_count
+-- R26 + R30 (Q215) — 20261109543000_recount_threshold_zero_count
 --   R26: count_submit doi tu nguong tuyet doi (>0.0001 la dem lai) sang
 --     nguong lech % cau hinh (settings count_recount_threshold_pct, mac
 --     dinh 5). Dong khop khi 2 nguoi dem bang nhau VA |lech| <= nguong %
@@ -13,7 +13,11 @@
 --     constraint cua bang settings + them vao _admin_setting_default,
 --     admin_settings_list, admin_setting_save. Danh sach CHECK BAO GOM
 --     CA 3 key 'rule.R25/R18/R32.enabled' cua migration 537000 (da ap
---     dung tren production): thu tu ap dung 537000 TRUOC, 538000 SAU.
+--     dung tren production): thu tu ap dung 537000 TRUOC, 543000 SAU.
+--     (Danh lai tu 538000 -> 543000 ngay 11/11/2026: db push ap dung theo
+--     thu tu version; neu giu 538000 thi migration 542000 (Q216) ap dung
+--     SAU se ghi de count_submit bang ban khong co R26, lam mat nguong %.
+--     543000 > 542000 nen count_submit cuoi cung la ban nay: R25 + R26.)
 --     Gia tri rule.* luu dang so 1/0 (cot settings.value chi chap nhan
 --     jsonb number). admin_settings_list o day DA gom ca 3 key rule.*
 --     (thua tu 90/100/110 nhu 537000) vi 537000 da len production.
