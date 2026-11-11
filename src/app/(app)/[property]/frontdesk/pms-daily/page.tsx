@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { connection } from "next/server";
 import { ErrorState } from "@/components/common/error-state";
 import { PmsDailyForm } from "@/components/pms-daily/pms-daily-form";
 import {
@@ -97,6 +98,9 @@ export default async function FrontdeskPmsDailyPage({
   params: Promise<{ property: string }>;
   searchParams: Promise<{ date?: string | string[] }>;
 }) {
+  // Chặn prerender (Q202): trang đọc session Supabase — không có dòng
+  // này, Next 16 thử prerender và nổ lỗi `Date.now()` khi nạp session.
+  await connection();
   const { property: propertyId } = await params;
   const sp = await searchParams;
   const today = new Date().toLocaleDateString("en-CA", {

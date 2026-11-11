@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
+import { connection } from "next/server";
 import { redirect } from "next/navigation";
 import { ErrorState } from "@/components/common/error-state";
 import { hasChainPerm } from "@/features/admin";
@@ -10,14 +11,21 @@ import { createClient, getAuthenticatedUser } from "@/lib/supabase/server";
 
 /**
  * Mọi trang quản trị đều đọc session + quyền qua cookies() nên không thể
- * prerender tĩnh (Next 16 Cache Components): opt-out theo đúng hướng dẫn
- * của Next cho route đọc session — giữ chặn trên server theo request.
+ * prerender tĩnh (Next 16 Cache Components).
+ * - `export const instant = false`: opt-out khỏi instant navigation
+ *   validation (route đọc session thì không prefetch được) — cấu hình
+ *   thật của Next, giữ nguyên.
+ * - `await connection()` dưới đây mới là thứ chặn prerender: không có
+ *   nó, Next thử prerender trang và nổ lỗi `Date.now()` khi Supabase
+ *   nạp session (gặp ngày 11/11/2026 ở /admin/organizations,
+ *   /admin/roles). Xem `docs/OPEN-QUESTIONS.md` Q202.
  */
 export const instant = false;
 
 export default async function AdminLayout({
   children,
 }: Readonly<{ children: ReactNode }>) {
+  await connection();
   const supabase = await createClient();
   const user = await getAuthenticatedUser(supabase);
   if (!user) {

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { connection } from "next/server";
 import { DataTable } from "@/components/common/data-table";
 import { DocStatusBadge } from "@/components/common/doc-status-badge";
 import { ErrorState } from "@/components/common/error-state";
@@ -49,6 +50,9 @@ export default async function FinanceExportPage({
 }: {
   params: Promise<{ property: string }>;
 }) {
+  // Chặn prerender (Q202): trang đọc session Supabase — không có dòng
+  // này, Next 16 thử prerender và nổ lỗi `Date.now()` khi nạp session.
+  await connection();
   const { property: propertyId } = await params;
 
   const [perms, entity, poResults, requestsRes, historyRes, exportedMapRes] =

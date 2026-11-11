@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { connection } from "next/server";
 import { notFound } from "next/navigation";
 import { DataTable } from "@/components/common/data-table";
 import { hasChainPerm, listOrganizations } from "@/features/admin";
@@ -7,6 +8,9 @@ import { createClient } from "@/lib/supabase/server";
 
 /** Danh sách tổ chức (C5): mỗi tổ chức gồm pháp nhân + khách sạn. */
 export default async function OrganizationsPage() {
+  // Chặn prerender (Q202): trang đọc session Supabase — không có dòng
+  // này, Next 16 thử prerender và nổ lỗi `Date.now()` khi nạp session.
+  await connection();
   const supabase = await createClient();
   const canManage = await hasChainPerm(supabase, "admin.org.manage");
   if (!canManage) {

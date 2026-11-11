@@ -1,4 +1,5 @@
 import { RoleList } from "@/components/admin/role-list";
+import { connection } from "next/server";
 import {
   getAdminOrgId,
   hasChainPerm,
@@ -9,6 +10,9 @@ import { vi } from "@/i18n/vi";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function RolesPage() {
+  // Chặn prerender (Q202): trang đọc session Supabase — không có dòng
+  // này, Next 16 thử prerender và nổ lỗi `Date.now()` khi nạp session.
+  await connection();
   const supabase = await createClient();
   const [orgId, roles, permissions] = await Promise.all([
     getAdminOrgId(supabase),

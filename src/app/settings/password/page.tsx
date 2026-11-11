@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { connection } from "next/server";
 import { redirect } from "next/navigation";
 import { ChangePasswordForm } from "@/components/settings/change-password-form";
 import { vi } from "@/i18n/vi";
@@ -10,10 +11,14 @@ import { createClient, getAuthenticatedUser } from "@/lib/supabase/server";
  * dùng root layout, không sửa layout khu vực. proxy.ts đã chặn người
  * chưa đăng nhập; kiểm tra lại ở đây để chắc chắn.
  * Trang đọc session qua cookies() nên không thể prerender tĩnh (Next 16
- * Cache Components): opt-out như admin/layout.tsx.
+ * Cache Components): `await connection()` buộc render theo request —
+ * không có nó, Next thử prerender và nổ lỗi `Date.now()` khi Supabase
+ * nạp session (xem Q202). `export const instant = false` là opt-out
+ * khỏi instant navigation validation, giữ nguyên.
  */
 export const instant = false;
 export default async function ChangePasswordPage() {
+  await connection();
   const supabase = await createClient();
   const user = await getAuthenticatedUser(supabase);
   if (!user) {

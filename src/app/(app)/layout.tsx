@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { Suspense } from "react";
+import { connection } from "next/server";
 import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { vi } from "@/i18n/vi";
@@ -20,6 +21,12 @@ export default function AppLayout({
 async function AuthenticatedApp({
   children,
 }: Readonly<{ children: ReactNode }>) {
+  // Buộc render theo request (Next 16 Cache Components): mọi trang con đều
+  // đọc session Supabase (getClaims/getUser dùng Date.now() khi nạp
+  // session) nên không được prerender tĩnh — lỗi `Date.now()` ngày
+  // 11/11/2026 ở /admin/organizations, /finance/export, /admin/roles,
+  // pms-daily đều do thiếu dòng này.
+  await connection();
   const supabase = await createClient();
   // Chỉ cần id để kiểm tra active — dùng getClaims() tại chỗ (0
   // round-trip) thay vì getUser() gọi sang máy chủ Auth mỗi request.
