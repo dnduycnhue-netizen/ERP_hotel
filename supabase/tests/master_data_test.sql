@@ -80,7 +80,10 @@ select ok((select bool_and(relrowsecurity) from pg_class where oid in (
   'public.price_agreements'::regclass, 'public.price_agreement_lines'::regclass, 'public.ceiling_prices'::regclass,
   'public.expense_categories'::regclass, 'public.doc_sequences'::regclass)), 'RLS enabled on all new tables');
 select ok(not has_table_privilege('authenticated', 'public.supplier_bank_accounts', 'insert'), 'bank account workflow cannot be bypassed');
-select ok(not has_table_privilege('authenticated', 'public.items', 'insert'), 'catalog writes wait for controlled workflows');
+-- T-012 (20261109130000) grants insert/update/delete on items to authenticated;
+-- writes are gated by the RLS items_insert policy (item.manage), not by privilege.
+-- The item.view-only client insert is still blocked (42501 via RLS) — see throws_ok below.
+select ok(has_table_privilege('authenticated', 'public.items', 'insert'), 'catalog writes granted at privilege level, gated by RLS item.manage (T-012)');
 select is((select count(*) from public.audit_log where table_name = 'items' and row_id = 'd0100000-0100-4000-8000-000000000401'), 1::bigint, 'item creation is audited');
 select set_config('request.jwt.claim.sub', 'd0100000-0100-4000-8000-000000000a01', true);
 select set_config('request.jwt.claims', '{"sub":"d0100000-0100-4000-8000-000000000a01","role":"authenticated"}', true);
