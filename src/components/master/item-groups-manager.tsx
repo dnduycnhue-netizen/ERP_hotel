@@ -18,18 +18,21 @@ import {
 } from "@/features/master/actions";
 
 const groupKinds = [
-  { value: "food", label: "Thực phẩm (Food)" },
-  { value: "beverage", label: "Đồ uống (Beverage)" },
-  { value: "amenity", label: "Đồ dùng phòng (Amenity)" },
-  { value: "complimentary", label: "Đồ miễn phí (Complimentary)" },
-  { value: "collateral", label: "Ấn phẩm quảng cáo (Collateral)" },
-  { value: "linen", label: "Đồ vải (Linen)" },
-  { value: "chemical", label: "Hóa chất tẩy rửa (Chemical)" },
-  { value: "tool", label: "Dụng cụ (Tool)" },
-  { value: "minibar", label: "Hàng bán Minibar (Minibar)" },
-  { value: "engineering", label: "Vật tư kỹ thuật (Engineering)" },
-  { value: "ccdc", label: "Công cụ dụng cụ (CCDC)" },
-  { value: "other", label: "Khác (Other)" },
+  { value: "food", label: vi.master.itemGroups.kindLabels.food },
+  { value: "beverage", label: vi.master.itemGroups.kindLabels.beverage },
+  { value: "amenity", label: vi.master.itemGroups.kindLabels.amenity },
+  {
+    value: "complimentary",
+    label: vi.master.itemGroups.kindLabels.complimentary,
+  },
+  { value: "collateral", label: vi.master.itemGroups.kindLabels.collateral },
+  { value: "linen", label: vi.master.itemGroups.kindLabels.linen },
+  { value: "chemical", label: vi.master.itemGroups.kindLabels.chemical },
+  { value: "tool", label: vi.master.itemGroups.kindLabels.tool },
+  { value: "minibar", label: vi.master.itemGroups.kindLabels.minibar },
+  { value: "engineering", label: vi.master.itemGroups.kindLabels.engineering },
+  { value: "ccdc", label: vi.master.itemGroups.kindLabels.ccdc },
+  { value: "other", label: vi.master.itemGroups.kindLabels.other },
 ];
 
 export function ItemGroupsManager({
@@ -220,7 +223,7 @@ export function ItemGroupsManager({
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="VD: Thịt tươi, Nước ngọt lon"
+                  placeholder={vi.master.itemGroups.examplePlaceholder}
                   className="mt-1 h-9 w-full rounded-md border bg-background px-3 text-sm"
                 />
               </div>

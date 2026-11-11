@@ -311,7 +311,7 @@ export function RoomsManager({
                   className="text-xs font-medium text-muted-foreground"
                   htmlFor="typeCode"
                 >
-                  Mã loại phòng *
+                  {vi.master.roomTypes.codeLabel}
                 </label>
                 <input
                   id="typeCode"
@@ -328,7 +328,7 @@ export function RoomsManager({
                   className="text-xs font-medium text-muted-foreground"
                   htmlFor="typeName"
                 >
-                  Tên loại phòng *
+                  {vi.master.roomTypes.nameLabel}
                 </label>
                 <input
                   id="typeName"

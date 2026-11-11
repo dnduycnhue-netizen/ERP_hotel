@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { vi } from "@/i18n/vi";
 
 /**
  * Tự đổi mật khẩu của chính mình. Mật khẩu mới tối thiểu 12 ký tự
@@ -6,19 +7,19 @@ import { z } from "zod";
  */
 export const changePasswordSchema = z
   .object({
-    currentPassword: z.string().min(1, "Vui lòng nhập mật khẩu hiện tại."),
+    currentPassword: z.string().min(1, vi.password.enterCurrentPassword),
     newPassword: z
       .string()
-      .min(12, "Mật khẩu mới phải có ít nhất 12 ký tự.")
-      .max(128, "Mật khẩu mới tối đa 128 ký tự."),
-    confirmPassword: z.string().min(1, "Vui lòng nhập lại mật khẩu mới."),
+      .min(12, vi.password.passwordTooShort)
+      .max(128, vi.password.tooLong),
+    confirmPassword: z.string().min(1, vi.password.enterNewPasswordAgain),
   })
   .refine((value) => value.newPassword === value.confirmPassword, {
-    message: "Mật khẩu nhập lại không khớp.",
+    message: vi.password.passwordMismatch,
     path: ["confirmPassword"],
   })
   .refine((value) => value.newPassword !== value.currentPassword, {
-    message: "Mật khẩu mới phải khác mật khẩu hiện tại.",
+    message: vi.password.mustDiffer,
     path: ["newPassword"],
   });
 

@@ -1,14 +1,15 @@
 import { z } from "zod";
+import { vi } from "@/i18n/vi";
 
-const uuidSchema = z.string().uuid("Mã định danh không hợp lệ.");
+const uuidSchema = z.string().uuid(vi.common.invalidId);
 const dateSchema = z
   .string()
-  .regex(/^\d{4}-\d{2}-\d{2}$/, "Ngày phải có dạng YYYY-MM-DD.");
+  .regex(/^\d{4}-\d{2}-\d{2}$/, vi.common.dateFormatInvalid);
 
 /** 1 dòng thiếu trong phiếu kiểm: { item_id, missing_qty, near_expiry? }. */
 export const minibarSubmitLineSchema = z.object({
   itemId: uuidSchema,
-  missingQty: z.number().positive("Số thiếu phải lớn hơn 0."),
+  missingQty: z.number().positive(vi.minibar.missingQuantityPositive),
   nearExpiry: z.boolean().optional(),
 });
 export type MinibarSubmitLineInput = z.infer<typeof minibarSubmitLineSchema>;
@@ -29,7 +30,7 @@ export const minibarSubmitCheckSchema = z.object({
   checkId: uuidSchema,
   lines: z
     .array(minibarSubmitLineSchema)
-    .min(1, "Cần ít nhất một món thiếu để gửi kết quả kiểm."),
+    .min(1, vi.minibar.needAtLeastOneMissingToSubmit),
   clientUuid: uuidSchema,
 });
 export type MinibarSubmitCheckInput = z.infer<typeof minibarSubmitCheckSchema>;
@@ -38,7 +39,7 @@ export type MinibarSubmitCheckInput = z.infer<typeof minibarSubmitCheckSchema>;
 export const minibarConfirmChargeSchema = z.object({
   propertyId: uuidSchema,
   checkId: uuidSchema,
-  folioNo: z.string().trim().min(1, "Số folio không được để trống."),
+  folioNo: z.string().trim().min(1, vi.minibar.folioNumberRequired),
 });
 export type MinibarConfirmChargeInput = z.infer<
   typeof minibarConfirmChargeSchema
@@ -48,7 +49,7 @@ export type MinibarConfirmChargeInput = z.infer<
 export const minibarRequestWaiveSchema = z.object({
   propertyId: uuidSchema,
   checkId: uuidSchema,
-  reason: z.string().trim().min(1, "Lý do miễn không được để trống."),
+  reason: z.string().trim().min(1, vi.minibar.waiveReasonRequired),
 });
 export type MinibarRequestWaiveInput = z.infer<
   typeof minibarRequestWaiveSchema
@@ -62,7 +63,7 @@ export const minibarDecideWaiveSchema = z.object({
   note: z
     .string()
     .trim()
-    .max(1000, "Ghi chú tối đa 1000 ký tự.")
+    .max(1000, vi.common.noteMax1000)
     .optional()
     .nullable(),
 });
@@ -75,7 +76,7 @@ export const minibarMarkLateChargeSchema = z.object({
   note: z
     .string()
     .trim()
-    .max(1000, "Ghi chú tối đa 1000 ký tự.")
+    .max(1000, vi.common.noteMax1000)
     .optional()
     .nullable(),
 });
@@ -87,14 +88,14 @@ export type MinibarMarkLateChargeInput = z.infer<
 export const minibarWriteOffSchema = z.object({
   propertyId: uuidSchema,
   checkId: uuidSchema,
-  reason: z.string().trim().min(1, "Lý do xóa sổ không được để trống."),
+  reason: z.string().trim().min(1, vi.minibar.writeOffReasonRequired),
 });
 export type MinibarWriteOffInput = z.infer<typeof minibarWriteOffSchema>;
 
 /** 1 dòng bổ sung: { item_id, qty, lot_id? } (RPC `minibar_refill`). */
 export const minibarRefillLineSchema = z.object({
   itemId: uuidSchema,
-  qty: z.number().positive("Số lượng phải lớn hơn 0."),
+  qty: z.number().positive(vi.common.quantityPositive),
   lotId: uuidSchema.optional().nullable(),
 });
 export type MinibarRefillLineInput = z.infer<typeof minibarRefillLineSchema>;
@@ -105,7 +106,7 @@ export const minibarRefillSchema = z.object({
   roomId: uuidSchema,
   lines: z
     .array(minibarRefillLineSchema)
-    .min(1, "Cần ít nhất một món để bổ sung."),
+    .min(1, vi.minibar.needAtLeastOneToTopUp),
 });
 export type MinibarRefillInput = z.infer<typeof minibarRefillSchema>;
 
@@ -113,7 +114,7 @@ export type MinibarRefillInput = z.infer<typeof minibarRefillSchema>;
 export const minibarPriceSetSchema = z.object({
   propertyId: uuidSchema,
   itemId: uuidSchema,
-  price: z.number().positive("Giá bán phải lớn hơn 0."),
+  price: z.number().positive(vi.minibar.salePricePositive),
   validFrom: dateSchema,
   validTo: dateSchema.optional().nullable(),
 });

@@ -79,7 +79,7 @@ export function ItemFormDialog({
     if (marketChannel) allowedChannels.push("market");
 
     if (allowedChannels.length === 0) {
-      setError("Vui lòng chọn ít nhất 1 kênh mua hàng (Hợp đồng hoặc Chợ).");
+      setError(vi.master.items.selectAtLeastOneChannel);
       setSaving(false);
       return;
     }
@@ -243,7 +243,7 @@ export function ItemFormDialog({
                 onChange={(e) => setRecipeUom(e.target.value)}
                 className="mt-1 h-9 w-full rounded-md border bg-background px-3 text-sm"
               >
-                <option value="">— Không dùng —</option>
+                <option value="">{vi.master.items.noUseOption}</option>
                 {uoms.map((u) => (
                   <option key={u.code} value={u.code}>
                     {u.code} ({u.name_vi})
@@ -285,10 +285,10 @@ export function ItemFormDialog({
                 onChange={(e) => setAbcClass(e.target.value)}
                 className="mt-1 h-9 w-full rounded-md border bg-background px-3 text-sm"
               >
-                <option value="">— Chưa phân loại —</option>
-                <option value="A">Loại A (Giá trị cao)</option>
-                <option value="B">Loại B (Trung bình)</option>
-                <option value="C">Loại C (Giá trị thấp)</option>
+                <option value="">{vi.master.items.unclassifiedOption}</option>
+                <option value="A">{vi.master.items.abcClassA}</option>
+                <option value="B">{vi.master.items.abcClassB}</option>
+                <option value="C">{vi.master.items.abcClassC}</option>
               </select>
             </div>
             <div>
@@ -340,7 +340,7 @@ export function ItemFormDialog({
                 type="text"
                 value={storageCondition}
                 onChange={(e) => setStorageCondition(e.target.value)}
-                placeholder="VD: Bảo quản mát 0–4°C"
+                placeholder={vi.master.items.storageExamplePlaceholder}
                 className="mt-1 h-9 w-full rounded-md border bg-background px-3 text-sm"
               />
             </div>
@@ -358,7 +358,7 @@ export function ItemFormDialog({
                 min="0"
                 value={tareG}
                 onChange={(e) => setTareG(e.target.value)}
-                placeholder="VD: 450 (vỏ chai rượu)"
+                placeholder={vi.master.items.densityExamplePlaceholder}
                 className="mt-1 h-9 w-full rounded-md border bg-background px-3 text-sm"
               />
             </div>

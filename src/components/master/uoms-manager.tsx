@@ -162,7 +162,7 @@ export function UomsManager({
                   required
                   value={nameVi}
                   onChange={(e) => setNameVi(e.target.value)}
-                  placeholder="VD: Thùng, Hộp, Lon"
+                  placeholder={vi.master.uoms.examplePlaceholder}
                   className="mt-1 h-9 w-full rounded-md border bg-background px-3 text-sm"
                 />
               </div>

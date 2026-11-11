@@ -1,4 +1,5 @@
 "use server";
+import { vi } from "@/i18n/vi";
 
 import { createClient } from "@/lib/supabase/server";
 import {
@@ -32,7 +33,7 @@ import type { InventoryActionResult } from "./rpc";
 function validationError(
   issues: { message: string }[],
 ): InventoryActionResult<never> {
-  return { ok: false, error: issues[0]?.message ?? "Dữ liệu không hợp lệ." };
+  return { ok: false, error: issues[0]?.message ?? vi.common.invalidData };
 }
 
 /** Danh sách phiếu lĩnh (RPC `requisition_list`, T-030). */
@@ -130,7 +131,7 @@ export async function listInventoryWarehousesAction(propertyId: string) {
     .eq("property_id", propertyId)
     .order("name", { ascending: true });
   if (error) {
-    return { ok: false as const, error: "Không tải được danh sách kho." };
+    return { ok: false as const, error: vi.inventory.warehouseListLoadFailed };
   }
   return {
     ok: true as const,

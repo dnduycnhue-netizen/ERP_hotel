@@ -1,4 +1,5 @@
 "use server";
+import { vi } from "@/i18n/vi";
 
 import { createClient } from "@/lib/supabase/server";
 import { callCountRpc, type CountActionResult } from "./rpc";
@@ -70,7 +71,7 @@ export type CountCancelResult = {
 function validationError(
   issues: { message: string }[],
 ): CountActionResult<never> {
-  return { ok: false, error: issues[0]?.message ?? "Dữ liệu không hợp lệ." };
+  return { ok: false, error: issues[0]?.message ?? vi.common.invalidData };
 }
 
 /** Mo dot kiem ke (RPC `count_open`, T-032). */

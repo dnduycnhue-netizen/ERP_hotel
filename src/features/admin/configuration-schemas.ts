@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { vi } from "@/i18n/vi";
 
 const uuid = z.string().uuid();
 export const configRuleIdSchema = z.object({ ruleId: uuid });
@@ -17,7 +18,7 @@ const settingKey = z.enum([
 const decimalString = z
   .string()
   .trim()
-  .regex(/^\d+(?:\.\d+)?$/, "Vui lòng nhập một số không âm.");
+  .regex(/^\d+(?:\.\d+)?$/, vi.admin.enterNonNegativeNumber);
 
 const jsonObjectString = z
   .string()
@@ -31,7 +32,7 @@ const jsonObjectString = z
     } catch {
       return false;
     }
-  }, "Giá trị phải là một đối tượng JSON hợp lệ.");
+  }, vi.admin.configValueMustBeValidJson);
 
 export const settingSaveSchema = z.object({
   orgId: uuid,
@@ -48,7 +49,7 @@ export const approvalRuleSaveSchema = z
     docType: z
       .string()
       .trim()
-      .regex(/^[a-z][a-z0-9_]{1,39}$/, "Mã chứng từ không hợp lệ."),
+      .regex(/^[a-z][a-z0-9_]{1,39}$/, vi.admin.docCodeInvalid),
     minAmount: decimalString,
     maxAmount: z.union([decimalString, z.literal("")]),
     itemGroupId: z.union([uuid, z.literal("")]),
@@ -59,13 +60,13 @@ export const approvalRuleSaveSchema = z
     requiredPerm: z
       .string()
       .trim()
-      .regex(/^[a-z0-9._]+$/, "Mã quyền không hợp lệ."),
+      .regex(/^[a-z0-9._]+$/, vi.admin.permissionCodeInvalid),
   })
   .refine(
     (value) =>
       (value.approverRoleId === null) !== (value.approverUserId === null),
     {
-      message: "Chọn đúng một vai trò hoặc người duyệt.",
+      message: vi.admin.configSelectExactlyOneRoleOrApprover,
       path: ["approverRoleId"],
     },
   );
@@ -77,7 +78,7 @@ export const alertRuleSaveSchema = z.object({
   code: z
     .string()
     .trim()
-    .regex(/^[A-Z][A-Z0-9_]{1,63}$/, "Mã cảnh báo không hợp lệ."),
+    .regex(/^[A-Z][A-Z0-9_]{1,63}$/, vi.admin.alertCodeInvalid),
   threshold: jsonObjectString,
   channels: z.array(z.enum(["app", "email", "webpush", "zalo"])).min(1),
   urgent: z.boolean(),

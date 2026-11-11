@@ -1,4 +1,5 @@
 "use server";
+import { vi } from "@/i18n/vi";
 
 import { createClient } from "@/lib/supabase/server";
 import { callAttachmentsRpc, type AttachmentActionResult } from "./rpc";
@@ -30,7 +31,7 @@ const SIGNED_URL_EXPIRES_IN_SECONDS = 300;
 function validationError(
   issues: { message: string }[],
 ): AttachmentActionResult<never> {
-  return { ok: false, error: issues[0]?.message ?? "Dữ liệu không hợp lệ." };
+  return { ok: false, error: issues[0]?.message ?? vi.common.invalidData };
 }
 
 /**

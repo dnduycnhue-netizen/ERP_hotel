@@ -162,7 +162,7 @@ export function MarketOrderForm({
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
           <div>
             <label className="text-xs font-medium text-muted-foreground">
-              {vi.procurement.market.advanceAmount} (đ) *
+              {vi.procurement.market.advanceAmount} {vi.common.vndSuffix} *
             </label>
             <input
               type="number"

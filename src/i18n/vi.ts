@@ -551,12 +551,15 @@ export const vi = {
         "Dịch vụ đặt lại mật khẩu chưa sẵn sàng.",
     },
     alertCodeInvalid: "Mã cảnh báo không hợp lệ.",
-    codeFormat: "Mã chỉ gồm chữ hoa, số, gạch dưới và gạch ngang, dài 2–20 ký tự.",
-    configSelectExactlyOneRoleOrApprover: "Chọn đúng một vai trò hoặc người duyệt.",
+    codeFormat:
+      "Mã chỉ gồm chữ hoa, số, gạch dưới và gạch ngang, dài 2–20 ký tự.",
+    configSelectExactlyOneRoleOrApprover:
+      "Chọn đúng một vai trò hoặc người duyệt.",
     configValueMustBeValidJson: "Giá trị phải là một đối tượng JSON hợp lệ.",
     docCodeInvalid: "Mã chứng từ không hợp lệ.",
     emailInvalidFormat: "Email không đúng định dạng.",
-    employeeCodeFormat: "Mã nhân viên chỉ gồm chữ hoa, số, gạch dưới và gạch ngang, dài 2–20 ký tự.",
+    employeeCodeFormat:
+      "Mã nhân viên chỉ gồm chữ hoa, số, gạch dưới và gạch ngang, dài 2–20 ký tự.",
     enterFullName: "Vui lòng nhập họ tên.",
     enterLegalEntityName: "Vui lòng nhập tên pháp nhân.",
     enterNewRoleName: "Vui lòng nhập tên vai trò mới.",
@@ -569,7 +572,8 @@ export const vi = {
     idInvalidFormat: "ID không đúng định dạng.",
     legalEntityNameMax200: "Tên pháp nhân tối đa 200 ký tự.",
     permissionCodeInvalid: "Mã quyền không hợp lệ.",
-    roleCodeFormat: "Mã vai trò chỉ gồm chữ thường, số và gạch dưới, dài 2–40 ký tự.",
+    roleCodeFormat:
+      "Mã vai trò chỉ gồm chữ thường, số và gạch dưới, dài 2–40 ký tự.",
     roomCountMustBeInteger: "Số phòng phải là số nguyên.",
     roomCountNonNegative: "Số phòng không được âm.",
     selectAtLeastOneRole: "Vui lòng chọn ít nhất một vai trò.",
@@ -769,8 +773,16 @@ export const vi = {
         "Gộp mã tạm {from} vào mã chính {into}? Tồn kho sẽ chuyển sang mã chính và không thể hoàn tác.",
       densityExamplePlaceholder: "VD: 450 (vỏ chai rượu)",
       recipeUomHeader: "ĐVT Công thức",
-      selectAtLeastOneChannel: "Vui lòng chọn ít nhất 1 kênh mua hàng (Hợp đồng hoặc Chợ).",
+      selectAtLeastOneChannel:
+        "Vui lòng chọn ít nhất 1 kênh mua hàng (Hợp đồng hoặc Chợ).",
       storageExamplePlaceholder: "VD: Bảo quản mát 0–4°C",
+      abcClassA: "Loại A (Giá trị cao)",
+      abcClassB: "Loại B (Trung bình)",
+      abcClassC: "Loại C (Giá trị thấp)",
+      channelContractShort: "HĐ",
+      noUseOption: "— Không dùng —",
+      purchaseUomHeader: "ĐVT Mua",
+      unclassifiedOption: "— Chưa phân loại —",
     },
     itemGroups: {
       title: "Nhóm hàng",
@@ -827,7 +839,8 @@ export const vi = {
       savedSuccess: "Đã lưu thông tin kho.",
       deletedSuccess: "Đã xóa kho.",
       examplePlaceholder: "VD: Kho tổng khách sạn, Kho bếp chính",
-      outletRequired: "Loại kho này bắt buộc phải gắn với một Outlet phụ trách.",
+      outletRequired:
+        "Loại kho này bắt buộc phải gắn với một Outlet phụ trách.",
       kindLabels: {
         disposal: "Kho chờ hủy (Disposal)",
         floor: "Kho tầng (Floor)",
@@ -838,6 +851,7 @@ export const vi = {
         transit: "Kho trung chuyển (Transit)",
         trolley: "Xe đẩy buồng phòng (Trolley)",
       },
+      selectOutlet: "— Chọn Outlet phụ trách —",
     },
     rooms: {
       title: "Danh mục phòng & Loại phòng",
@@ -873,6 +887,7 @@ export const vi = {
       typeExamplePlaceholder: "VD: Bếp, Quầy Bar, Nhà hàng",
       typeCodeLabel: "Mã loại outlet *",
       typeNameLabel: "Tên loại outlet *",
+      noCostCenter: "— Chưa gắn trung tâm chi phí —",
     },
     expenseCategories: {
       title: "Khoản mục chi phí",
@@ -889,6 +904,7 @@ export const vi = {
       savedSuccess: "Đã lưu khoản mục chi phí.",
       deletedSuccess: "Đã xóa khoản mục chi phí.",
       examplePlaceholder: "VD: Chi phí thực phẩm, Chi phí đồ giặt",
+      noUsaliGroup: "— Chưa phân nhóm USALI —",
     },
     suppliers: {
       title: "Nhà cung cấp",
@@ -1142,22 +1158,27 @@ export const vi = {
       templateNameMax100: "Tên mẫu tối đa 100 ký tự",
       variantMax30: "Biến thể tối đa 30 ký tự",
       warningSuffix: " (cảnh báo)",
+      errorsUnit: "lỗi",
+      rowsUnit: "dòng",
     },
-    bankAccountExists: "Số tài khoản này đã tồn tại cho nhà cung cấp (đang chờ duyệt hoặc đang dùng).",
+    bankAccountExists:
+      "Số tài khoản này đã tồn tại cho nhà cung cấp (đang chờ duyệt hoặc đang dùng).",
     bankAccountHolderMax200: "Tên chủ tài khoản tối đa 200 ký tự",
     bankAccountHolderRequired: "Tên chủ tài khoản không được để trống",
     bankAccountNumberMax50: "Số tài khoản tối đa 50 ký tự",
     bankAccountNumberRequired: "Số tài khoản không được để trống",
     bankNameMax100: "Tên ngân hàng tối đa 100 ký tự",
     bankNameRequired: "Tên ngân hàng không được để trống",
-    cannotChangeStockUomWithTransactions: "Không thể đổi đơn vị tính lưu kho của vật tư đã có phát sinh giao dịch kho.",
+    cannotChangeStockUomWithTransactions:
+      "Không thể đổi đơn vị tính lưu kho của vật tư đã có phát sinh giao dịch kho.",
     ceilingPriceNonNegative: "Giá trần không được âm",
     codeExists: "Mã đã tồn tại trong danh mục.",
     codePrefixFormat: "Tiền tố mã chỉ chứa chữ, số, gạch nối hoặc gạch dưới",
     codePrefixMax20: "Tiền tố mã tối đa 20 ký tự",
     codePrefixRequired: "Tiền tố mã không được để trống",
     conversionFactorPositive: "Hệ số quy đổi phải lớn hơn 0",
-    deleteBlockedByRelations: "Không thể xóa vì còn dữ liệu liên quan. Hãy xóa các dữ liệu liên quan trước.",
+    deleteBlockedByRelations:
+      "Không thể xóa vì còn dữ liệu liên quan. Hãy xóa các dữ liệu liên quan trước.",
     duplicateRecord: "Dữ liệu bị trùng lặp với bản ghi đã có trong hệ thống.",
     endDateInvalidFormat: "Ngày kết thúc không hợp lệ (YYYY-MM-DD)",
     enterReasonForAction: "Vui lòng nhập lý do cho thao tác này.",
@@ -1172,8 +1193,10 @@ export const vi = {
     itemCodeRequired: "Mã vật tư không được để trống",
     itemGroupNameMax100: "Tên nhóm hàng tối đa 100 ký tự",
     itemGroupNameRequired: "Tên nhóm hàng không được để trống",
-    itemHasTransactionsCannotDelete: "Vật tư đã có phát sinh giao dịch kho, không thể xóa (chỉ có thể chuyển sang ngừng dùng).",
-    itemNameExists: "Tên vật tư đã tồn tại trong danh mục (kể cả khi khác chữ hoa/thường hoặc khoảng trắng).",
+    itemHasTransactionsCannotDelete:
+      "Vật tư đã có phát sinh giao dịch kho, không thể xóa (chỉ có thể chuyển sang ngừng dùng).",
+    itemNameExists:
+      "Tên vật tư đã tồn tại trong danh mục (kể cả khi khác chữ hoa/thường hoặc khoảng trắng).",
     itemNameMax200: "Tên vật tư tối đa 200 ký tự",
     itemNameRequired: "Tên vật tư không được để trống",
     orgUnknown: "Không xác định được tổ chức.",
@@ -1185,11 +1208,13 @@ export const vi = {
     outletTypeCodeRequired: "Mã loại outlet không được để trống",
     outletTypeNameMax100: "Tên loại outlet tối đa 100 ký tự",
     outletTypeNameRequired: "Tên loại outlet không được để trống",
-    overlappingAgreementExists: "Đã có hợp đồng khung khác của cùng nhà cung cấp còn hiệu lực trong khoảng thời gian này cho cùng vật tư và đơn vị tính.",
+    overlappingAgreementExists:
+      "Đã có hợp đồng khung khác của cùng nhà cung cấp còn hiệu lực trong khoảng thời gian này cho cùng vật tư và đơn vị tính.",
     paymentDaysNonNegative: "Số ngày thanh toán không được âm",
     propertyOrgUnknown: "Không xác định được tổ chức của khách sạn.",
     reasonMax500: "Lý do tối đa 500 ký tự",
-    recordInvalidStatus: "Bản ghi đang ở trạng thái không phù hợp với thao tác này.",
+    recordInvalidStatus:
+      "Bản ghi đang ở trạng thái không phù hợp với thao tác này.",
     roomNumberExists: "Số phòng đã tồn tại trong khách sạn.",
     roomNumberMax20: "Số phòng tối đa 20 ký tự",
     roomNumberRequired: "Số phòng không được để trống",
@@ -1207,19 +1232,23 @@ export const vi = {
     selectStockUom: "Vui lòng chọn đơn vị tính kho",
     selectSupplier: "Vui lòng chọn nhà cung cấp",
     selectUom: "Vui lòng chọn đơn vị tính",
-    sodViolation: "Thao tác vi phạm quy tắc tách biệt nhiệm vụ: người thực hiện bước trước không được thực hiện bước này.",
+    sodViolation:
+      "Thao tác vi phạm quy tắc tách biệt nhiệm vụ: người thực hiện bước trước không được thực hiện bước này.",
     startDateInvalidFormat: "Ngày bắt đầu không hợp lệ (YYYY-MM-DD)",
-    supplierCodeFormat: "Mã nhà cung cấp chỉ chứa chữ, số, gạch nối hoặc gạch dưới",
+    supplierCodeFormat:
+      "Mã nhà cung cấp chỉ chứa chữ, số, gạch nối hoặc gạch dưới",
     supplierCodeMax50: "Mã nhà cung cấp tối đa 50 ký tự",
     supplierCodeRequired: "Mã nhà cung cấp không được để trống",
-    supplierHasBankAccountCannotDelete: "Nhà cung cấp đã có tài khoản ngân hàng nên không thể xóa. Hãy tạm ngưng hoặc cấm nhà cung cấp thay vì xóa.",
+    supplierHasBankAccountCannotDelete:
+      "Nhà cung cấp đã có tài khoản ngân hàng nên không thể xóa. Hãy tạm ngưng hoặc cấm nhà cung cấp thay vì xóa.",
     supplierNameMax200: "Tên nhà cung cấp tối đa 200 ký tự",
     supplierNameRequired: "Tên nhà cung cấp không được để trống",
     unitPriceNonNegative: "Đơn giá không được âm",
     uomCodeFormat: "Mã ĐVT chỉ gồm chữ thường không dấu, số hoặc gạch dưới",
     uomCodeMax20: "Mã ĐVT tối đa 20 ký tự",
     uomCodeRequired: "Mã ĐVT không được để trống",
-    vietnameseDisplayNameRequired: "Tên hiển thị tiếng Việt không được để trống",
+    vietnameseDisplayNameRequired:
+      "Tên hiển thị tiếng Việt không được để trống",
     vietnameseNameMax50: "Tên tiếng Việt tối đa 50 ký tự",
     warehouseCodeFormat: "Mã kho chỉ chứa chữ, số, gạch nối hoặc gạch dưới",
     warehouseCodeMax50: "Mã kho tối đa 50 ký tự",
@@ -1231,7 +1260,8 @@ export const vi = {
       factorExamplePlaceholder: "VD: 24 (thùng 24 lon)",
       defaultLabel: "Mặc định",
       delete: "Xóa",
-      noCustomUnitPrefix: "Chưa có quy cách mua riêng. Mặc định mua theo ĐVT kho (",
+      noCustomUnitPrefix:
+        "Chưa có quy cách mua riêng. Mặc định mua theo ĐVT kho (",
       stockUomLabel: "ĐVT kho:",
     },
     tempItem: {
@@ -2192,7 +2222,8 @@ export const vi = {
     loadError: "Không tải được dữ liệu minibar.",
     folioNumberRequired: "Số folio không được để trống.",
     missingQuantityPositive: "Số thiếu phải lớn hơn 0.",
-    needAtLeastOneMissingToSubmit: "Cần ít nhất một món thiếu để gửi kết quả kiểm.",
+    needAtLeastOneMissingToSubmit:
+      "Cần ít nhất một món thiếu để gửi kết quả kiểm.",
     needAtLeastOneToTopUp: "Cần ít nhất một món để bổ sung.",
     salePricePositive: "Giá bán phải lớn hơn 0.",
     waiveReasonRequired: "Lý do miễn không được để trống.",
@@ -2347,7 +2378,8 @@ export const vi = {
     historyCreated: "Tạo mới",
     historyUpdated: "Sửa",
     loadError: "Không tải được số liệu PMS ngày.",
-    soldNotExceedSellable: "Số phòng đã bán không được lớn hơn số phòng có thể bán.",
+    soldNotExceedSellable:
+      "Số phòng đã bán không được lớn hơn số phòng có thể bán.",
     labels: {
       breakfasts: "Số suất ăn sáng",
       checkouts: "Số lượt trả phòng",
@@ -2526,7 +2558,8 @@ export const vi = {
     invoiceSymbolRequired: "Ký hiệu hóa đơn không được để trống.",
     lineItemNameRequired: "Tên hàng không được để trống.",
     needAtLeastOneActualLine: "Cần ít nhất một dòng chi thực tế.",
-    needAtLeastOneInvoiceForPayment: "Cần ít nhất một hóa đơn để đề nghị thanh toán.",
+    needAtLeastOneInvoiceForPayment:
+      "Cần ít nhất một hóa đơn để đề nghị thanh toán.",
     needAtLeastOneInvoiceLine: "Cần ít nhất một dòng hóa đơn.",
     rejectPaymentRequiresReason: "Từ chối đề nghị thanh toán phải nhập lý do.",
     sellerNameRequired: "Tên người bán không được để trống.",
@@ -2852,7 +2885,8 @@ export const vi = {
     blockedHint:
       "Hóa đơn / đề nghị thanh toán này có dòng dịch vụ chưa nghiệm thu nên bị chặn. Hãy nghiệm thu kỳ tương ứng rồi thử lại.",
     goToSchedules: "Xem lịch kỳ dịch vụ",
-    acceptExactlyOnePeriodOrPo: "Nghiệm thu đúng một kỳ hợp đồng hoặc một đơn mua dịch vụ.",
+    acceptExactlyOnePeriodOrPo:
+      "Nghiệm thu đúng một kỳ hợp đồng hoặc một đơn mua dịch vụ.",
     amountPerPeriodNonNegative: "Số tiền mỗi kỳ không được âm.",
     contractNameRequired: "Tên hợp đồng không được để trống.",
     ratingMustBeInteger: "Đánh giá phải là số nguyên.",
@@ -3065,7 +3099,8 @@ export const vi = {
     hallNameNotEntered: "Chưa nhập tên sảnh.",
     hallNotEntered: "Chưa nhập sảnh / khu vực.",
     hallPlaceholder: "Sảnh A",
-    lineMustHaveOneIngredientOrSubRecipe: "Mỗi dòng phải có đúng 1 NVL hoặc 1 món con.",
+    lineMustHaveOneIngredientOrSubRecipe:
+      "Mỗi dòng phải có đúng 1 NVL hoặc 1 món con.",
     pricePerGuestNonNegative: "Giá / khách không được âm.",
     servingsPositive: "Số phần phải lớn hơn 0.",
     timeInvalid: "Giờ không hợp lệ.",
@@ -3383,7 +3418,8 @@ export const vi = {
     filePathMax500: "Đường dẫn file tối đa 500 ký tự.",
     filePathRequired: "Đường dẫn file không được để trống.",
     sha256InvalidFormat: "Mã SHA-256 không đúng định dạng.",
-    uploadFailedCheckNetwork: "Không tải được ảnh lên. Hãy kiểm tra mạng rồi thử lại.",
+    uploadFailedCheckNetwork:
+      "Không tải được ảnh lên. Hãy kiểm tra mạng rồi thử lại.",
   },
   errors: {
     pageTitle: "Không thể tải trang",

@@ -1,11 +1,12 @@
 import { z } from "zod";
+import { vi } from "@/i18n/vi";
 
-const uuidSchema = z.string().uuid("Mã định danh không hợp lệ.");
+const uuidSchema = z.string().uuid(vi.common.invalidId);
 const docTypeSchema = z
   .string()
   .trim()
-  .min(1, "Loại chứng từ không được để trống.")
-  .max(50, "Loại chứng từ tối đa 50 ký tự.");
+  .min(1, vi.attachments.docTypeRequired)
+  .max(50, vi.attachments.docTypeMax50);
 
 export const attachmentPrepareUploadSchema = z.object({
   propertyId: uuidSchema,
@@ -18,11 +19,11 @@ export const attachmentRegisterSchema = z.object({
   path: z
     .string()
     .trim()
-    .min(1, "Đường dẫn file không được để trống.")
-    .max(500, "Đường dẫn file tối đa 500 ký tự."),
+    .min(1, vi.attachments.filePathRequired)
+    .max(500, vi.attachments.filePathMax500),
   sha256: z
     .string()
-    .regex(/^[0-9a-f]{64}$/, "Mã SHA-256 không đúng định dạng."),
+    .regex(/^[0-9a-f]{64}$/, vi.attachments.sha256InvalidFormat),
   docType: docTypeSchema,
   docId: uuidSchema,
   lineId: uuidSchema.optional().nullable(),

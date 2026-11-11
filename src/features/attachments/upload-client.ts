@@ -7,6 +7,7 @@ import {
   type RegisterAttachmentResult,
 } from "./actions";
 import type { CapturedPhoto } from "@/components/common/camera-capture";
+import { vi } from "@/i18n/vi";
 
 export type UploadCapturedPhotoResult =
   | { ok: true; data: RegisterAttachmentResult & { path: string } }
@@ -47,7 +48,7 @@ export async function uploadCapturedPhoto(args: {
   if (uploadError) {
     return {
       ok: false,
-      error: "Không tải được ảnh lên. Hãy kiểm tra mạng rồi thử lại.",
+      error: vi.attachments.uploadFailedCheckNetwork,
     };
   }
 

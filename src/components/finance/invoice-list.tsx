@@ -95,7 +95,7 @@ export function InvoiceList({
             </select>
           </label>
           <label className="block text-sm">
-            {vi.finance.invoiceDate} (từ)
+            {vi.finance.invoiceDate} {vi.finance.dateFromSuffix}
             <input
               type="date"
               value={from}
@@ -104,7 +104,7 @@ export function InvoiceList({
             />
           </label>
           <label className="block text-sm">
-            {vi.finance.invoiceDate} (đến)
+            {vi.finance.invoiceDate} {vi.finance.dateToSuffix}
             <input
               type="date"
               value={to}

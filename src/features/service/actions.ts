@@ -1,4 +1,5 @@
 "use server";
+import { vi } from "@/i18n/vi";
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
@@ -42,7 +43,7 @@ export type ServiceAcceptResult = {
 function validationError(
   issues: { message: string }[],
 ): ServiceActionResult<never> {
-  return { ok: false, error: issues[0]?.message ?? "Dữ liệu không hợp lệ." };
+  return { ok: false, error: issues[0]?.message ?? vi.common.invalidData };
 }
 
 function contractsPath(propertyId: string): string {

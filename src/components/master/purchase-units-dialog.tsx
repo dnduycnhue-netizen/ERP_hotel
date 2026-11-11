@@ -62,7 +62,7 @@ export function PurchaseUnitsDialog({
   }
 
   async function handleDelete(unitId: string) {
-    if (!confirm("Bạn có chắc muốn xóa quy cách mua này?")) return;
+    if (!confirm(vi.master.purchaseUnits.confirmDelete)) return;
     const res = await deletePurchaseUnitAction(propertyId, unitId);
     if (res.ok) {
       onRefresh();
@@ -80,7 +80,7 @@ export function PurchaseUnitsDialog({
               {vi.master.items.purchaseUnits}
             </h2>
             <p className="text-xs text-muted-foreground mt-0.5">
-              {item.code} - {item.name} (ĐVT kho:{" "}
+              {item.code} - {item.name} ({vi.master.purchaseUnits.stockUomLabel}{" "}
               <span className="font-semibold">{item.stock_uom}</span>)
             </p>
           </div>
@@ -120,7 +120,7 @@ export function PurchaseUnitsDialog({
                     colSpan={4}
                     className="p-4 text-center text-xs text-muted-foreground"
                   >
-                    Chưa có quy cách mua riêng. Mặc định mua theo ĐVT kho (
+                    {vi.master.purchaseUnits.noCustomUnitPrefix}
                     {item.stock_uom}).
                   </td>
                 </tr>
@@ -136,7 +136,7 @@ export function PurchaseUnitsDialog({
                     <td className="px-3 py-3 align-middle">
                       {u.is_default ? (
                         <span className="rounded bg-primary/10 px-1.5 py-0.5 text-xs font-semibold text-primary">
-                          Mặc định
+                          {vi.master.purchaseUnits.defaultLabel}
                         </span>
                       ) : (
                         "—"
@@ -149,7 +149,7 @@ export function PurchaseUnitsDialog({
                         className="text-destructive hover:bg-destructive/10"
                         onClick={() => handleDelete(u.id)}
                       >
-                        Xóa
+                        {vi.master.purchaseUnits.delete}
                       </Button>
                     </td>
                   </tr>
@@ -197,7 +197,7 @@ export function PurchaseUnitsDialog({
                 required
                 value={factorToStock}
                 onChange={(e) => setFactorToStock(e.target.value)}
-                placeholder="VD: 24 (thùng 24 lon)"
+                placeholder={vi.master.purchaseUnits.factorExamplePlaceholder}
                 className="mt-1 h-9 w-full rounded-md border bg-background px-3 text-sm"
               />
             </div>

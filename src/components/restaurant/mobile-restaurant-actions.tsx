@@ -183,7 +183,7 @@ export function MobileBanquetStatusButtons({
     const res = await fn({ propertyId, banquetId });
     setPending(false);
     if (!res.ok) {
-      setError(res.error ?? "Có lỗi xảy ra.");
+      setError(res.error ?? vi.common.genericError);
       return;
     }
     router.refresh();

@@ -98,7 +98,7 @@ export function AlertsHistory({
                     {vi.alerts.severity}
                   </th>
                   <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
-                    Tiêu đề
+                    {vi.alerts.titleColumn}
                   </th>
                   <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
                     {vi.alerts.sentAt}
@@ -162,7 +162,7 @@ export function AlertsHistory({
                     {vi.alerts.recipient}
                   </th>
                   <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
-                    Tiêu đề
+                    {vi.alerts.titleColumn}
                   </th>
                   <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
                     {vi.alerts.status}

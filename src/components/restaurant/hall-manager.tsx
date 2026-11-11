@@ -94,7 +94,7 @@ export function HallManager({
               <input
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Sảnh A"
+                placeholder={vi.restaurant.hallPlaceholder}
                 className="h-9 w-full rounded-lg border border-border bg-background px-2.5"
               />
             </label>

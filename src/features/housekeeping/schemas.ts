@@ -1,6 +1,7 @@
 import { z } from "zod";
+import { vi } from "@/i18n/vi";
 
-const uuidSchema = z.string().uuid("Mã định danh không hợp lệ.");
+const uuidSchema = z.string().uuid(vi.common.invalidId);
 
 /**
  * Loại dọn phòng của chuẩn setup (M07 §07.02, migration 310000):
@@ -21,7 +22,7 @@ export const roomSetupStandardSaveSchema = z.object({
   roomTypeId: uuidSchema,
   cleanType: roomCleanTypeSchema,
   itemId: uuidSchema,
-  qty: z.number().min(0, "Số lượng không được âm."),
+  qty: z.number().min(0, vi.common.quantityNonNegative),
   perGuest: z.boolean().default(false),
 });
 export type RoomSetupStandardSaveInput = z.infer<

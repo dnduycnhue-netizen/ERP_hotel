@@ -1,9 +1,10 @@
 import { z } from "zod";
+import { vi } from "@/i18n/vi";
 
-const uuidSchema = z.string().uuid("Mã định danh không hợp lệ.");
+const uuidSchema = z.string().uuid(vi.common.invalidId);
 const dateSchema = z
   .string()
-  .regex(/^\d{4}-\d{2}-\d{2}$/, "Ngày phải có dạng YYYY-MM-DD.");
+  .regex(/^\d{4}-\d{2}-\d{2}$/, vi.common.dateFormatInvalid);
 
 /** Tên ca xe đẩy (T-034, Q46): ca mặc định 'day'; KS 2 ca dùng thêm 'morning'/'evening'. */
 export const trolleyShiftSchema = z.enum(["day", "morning", "evening"]);
@@ -21,7 +22,7 @@ export type TrolleyCleanType = z.infer<typeof trolleyCleanTypeSchema>;
 /** 1 dòng đếm: mã vật tư + số lượng đã đếm (RPC `_hk_parse_counts`, T-034). */
 export const trolleyCountItemSchema = z.object({
   itemId: uuidSchema,
-  qty: z.number().min(0, "Số lượng không được âm."),
+  qty: z.number().min(0, vi.common.quantityNonNegative),
 });
 export type TrolleyCountItem = z.infer<typeof trolleyCountItemSchema>;
 
@@ -29,7 +30,7 @@ export type TrolleyCountItem = z.infer<typeof trolleyCountItemSchema>;
 export const trolleyRoomsDoneItemSchema = z.object({
   roomId: uuidSchema,
   cleanType: trolleyCleanTypeSchema,
-  guests: z.number().int().min(0, "Số khách không được âm.").optional(),
+  guests: z.number().int().min(0, vi.trolley.guestCountNonNegative).optional(),
 });
 export type TrolleyRoomsDoneItem = z.infer<typeof trolleyRoomsDoneItemSchema>;
 

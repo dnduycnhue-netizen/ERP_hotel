@@ -1,15 +1,16 @@
 import { z } from "zod";
+import { vi } from "@/i18n/vi";
 
 const uuid = z
   .string()
   .regex(
     /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i,
-    "ID không đúng định dạng.",
+    vi.admin.idInvalidFormat,
   );
 
 const dateString = z
   .string()
-  .regex(/^\d{4}-\d{2}-\d{2}$/, "Ngày phải có dạng YYYY-MM-DD.");
+  .regex(/^\d{4}-\d{2}-\d{2}$/, vi.common.dateFormatInvalid);
 
 const nullableDate = dateString.nullable();
 
@@ -17,22 +18,19 @@ const roleCode = z
   .string()
   .trim()
   .toLowerCase()
-  .regex(
-    /^[a-z0-9_]{2,40}$/,
-    "Mã vai trò chỉ gồm chữ thường, số và gạch dưới, dài 2–40 ký tự.",
-  );
+  .regex(/^[a-z0-9_]{2,40}$/, vi.admin.roleCodeFormat);
 
 export const saveRoleSchema = z.object({
   id: uuid.optional(),
   orgId: uuid,
   code: roleCode,
-  nameVi: z.string().trim().min(1, "Vui lòng nhập tên vai trò."),
+  nameVi: z.string().trim().min(1, vi.admin.enterRoleName),
   description: z.string().trim().nullable().optional(),
 });
 
 export const copyRoleSchema = z.object({
   roleId: uuid,
-  newName: z.string().trim().min(1, "Vui lòng nhập tên vai trò mới."),
+  newName: z.string().trim().min(1, vi.admin.enterNewRoleName),
 });
 
 export const roleIdSchema = z.object({ roleId: uuid });
@@ -40,7 +38,7 @@ export const roleIdSchema = z.object({ roleId: uuid });
 export const setRolePermissionsSchema = z.object({
   roleId: uuid,
   permissionCodes: z
-    .array(z.string().regex(/^[a-z0-9._]+$/, "Mã quyền không hợp lệ."))
+    .array(z.string().regex(/^[a-z0-9._]+$/, vi.admin.permissionCodeInvalid))
     .default([]),
 });
 
@@ -56,21 +54,23 @@ export const assignRoleSchema = z.object({
 
 export const revokeRoleSchema = z.object({
   assignmentId: uuid,
-  reason: z.string().trim().min(1, "Vui lòng nhập lý do thu hồi."),
+  reason: z.string().trim().min(1, vi.admin.enterRevokeReason),
 });
 
 export const setOverrideSchema = z.object({
   userId: uuid,
   propertyId: uuid.nullable(),
-  permissionCode: z.string().regex(/^[a-z0-9._]+$/, "Mã quyền không hợp lệ."),
+  permissionCode: z
+    .string()
+    .regex(/^[a-z0-9._]+$/, vi.admin.permissionCodeInvalid),
   effect: z.enum(["allow", "deny"]),
   validTo: nullableDate,
-  reason: z.string().trim().min(1, "Vui lòng nhập lý do."),
+  reason: z.string().trim().min(1, vi.admin.enterReason),
 });
 
 export const setPinSchema = z.object({
   userId: uuid,
-  pin: z.string().regex(/^[0-9]{4,6}$/, "Mã PIN phải gồm 4–6 chữ số."),
+  pin: z.string().regex(/^[0-9]{4,6}$/, vi.common.pinFormat),
 });
 
 export const createUserSchema = z.object({
@@ -78,26 +78,23 @@ export const createUserSchema = z.object({
     .string()
     .trim()
     .toUpperCase()
-    .regex(
-      /^[A-Z0-9_-]{2,20}$/,
-      "Mã nhân viên chỉ gồm chữ hoa, số, gạch dưới và gạch ngang, dài 2–20 ký tự.",
-    ),
-  fullName: z.string().trim().min(1, "Vui lòng nhập họ tên."),
+    .regex(/^[A-Z0-9_-]{2,20}$/, vi.admin.employeeCodeFormat),
+  fullName: z.string().trim().min(1, vi.admin.enterFullName),
   email: z
     .string()
     .trim()
     .toLowerCase()
-    .email("Email không đúng định dạng.")
+    .email(vi.admin.emailInvalidFormat)
     .optional()
     .or(z.literal("")),
   phone: z.string().trim().optional(),
   password: z
     .string()
-    .min(12, "Mật khẩu tạm phải có ít nhất 12 ký tự.")
-    .max(128, "Mật khẩu tạm tối đa 128 ký tự.")
+    .min(12, vi.admin.tempPasswordTooShort)
+    .max(128, vi.admin.tempPasswordTooLong)
     .optional()
     .or(z.literal("")),
-  roleIds: z.array(uuid).min(1, "Vui lòng chọn ít nhất một vai trò."),
+  roleIds: z.array(uuid).min(1, vi.admin.selectAtLeastOneRole),
   propertyId: uuid.nullable(),
 });
 
@@ -105,8 +102,8 @@ export const resetPasswordSchema = z.object({
   userId: uuid,
   password: z
     .string()
-    .min(12, "Mật khẩu tạm phải có ít nhất 12 ký tự.")
-    .max(128, "Mật khẩu tạm tối đa 128 ký tự.")
+    .min(12, vi.admin.tempPasswordTooShort)
+    .max(128, vi.admin.tempPasswordTooLong)
     .optional()
     .or(z.literal("")),
 });
@@ -115,10 +112,7 @@ const orgCode = z
   .string()
   .trim()
   .toUpperCase()
-  .regex(
-    /^[A-Z0-9_-]{2,20}$/,
-    "Mã chỉ gồm chữ hoa, số, gạch dưới và gạch ngang, dài 2–20 ký tự.",
-  );
+  .regex(/^[A-Z0-9_-]{2,20}$/, vi.admin.codeFormat);
 
 /**
  * Tạo tổ chức + pháp nhân + khách sạn trong 1 lần (C5, RPC admin_org_create).
@@ -128,20 +122,20 @@ const orgCode = z
  * sod_profile with_cc/without_cc, rooms_count >= 0).
  */
 export const createOrgSchema = z.object({
-  orgName: z.string().trim().min(1, "Vui lòng nhập tên tổ chức."),
+  orgName: z.string().trim().min(1, vi.admin.enterOrgName),
   legalCode: orgCode,
-  legalName: z.string().trim().min(1, "Vui lòng nhập tên pháp nhân."),
+  legalName: z.string().trim().min(1, vi.admin.enterLegalEntityName),
   taxCode: z.string().trim().optional().or(z.literal("")),
   accountingRegime: z.enum(["TT99", "TT133"]).default("TT99"),
   costingMethod: z.enum(["moving_avg", "fifo"]).default("moving_avg"),
   propertyCode: orgCode,
-  propertyName: z.string().trim().min(1, "Vui lòng nhập tên khách sạn."),
+  propertyName: z.string().trim().min(1, vi.admin.enterPropertyName),
   address: z.string().trim().optional().or(z.literal("")),
   sodProfile: z.enum(["with_cc", "without_cc"]).default("with_cc"),
   roomsCount: z
     .number()
-    .int("Số phòng phải là số nguyên.")
-    .min(0, "Số phòng không được âm.")
+    .int(vi.admin.roomCountMustBeInteger)
+    .min(0, vi.admin.roomCountNonNegative)
     .default(0),
 });
 
@@ -159,8 +153,8 @@ export const updateLegalEntityNameSchema = z.object({
   name: z
     .string()
     .trim()
-    .min(1, "Vui lòng nhập tên pháp nhân.")
-    .max(200, "Tên pháp nhân tối đa 200 ký tự."),
+    .min(1, vi.admin.enterLegalEntityName)
+    .max(200, vi.admin.legalEntityNameMax200),
 });
 
 export type UpdateLegalEntityNameInput = z.infer<

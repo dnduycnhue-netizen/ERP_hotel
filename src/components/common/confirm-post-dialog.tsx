@@ -44,7 +44,7 @@ export function ConfirmPostDialog({
               </Dialog.Title>
               {docNo ? (
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Chứng từ: {docNo}
+                  {vi.components.confirmPost.documentLabel}: {docNo}
                 </p>
               ) : null}
               <Dialog.Description className="mt-2 text-sm leading-6">
