@@ -79,7 +79,7 @@ export default async function ReportDetailPage({
     "warehouse_id",
     "supplier_id",
   ]) {
-    const v = (payload.params as Record<string, unknown>)[key];
+    const v = ((payload.params ?? {}) as Record<string, unknown>)[key];
     initial[key] = typeof v === "string" ? v : undefined;
   }
 
