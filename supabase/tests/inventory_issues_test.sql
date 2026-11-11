@@ -324,14 +324,14 @@ select is(
    where warehouse_id = 'd0300000-0000-4000-8000-000000000301'
      and item_id = 'd0300000-0000-4000-8000-000000000501'
      and lot_id is null),
-  194, 'issue: main GAO balance 200 -> 194'
+  194::numeric, 'issue: main GAO balance 200 -> 194'
 );
 select is(
   (select qty from public.stock_balances
    where warehouse_id = 'd0300000-0000-4000-8000-000000000302'
      and item_id = 'd0300000-0000-4000-8000-000000000501'
      and lot_id is null),
-  6, 'issue: transit GAO balance 6'
+  6::numeric, 'issue: transit GAO balance 6'
 );
 select throws_ok(
   $q$select public.requisition_issue(
@@ -370,14 +370,14 @@ select is(
    where warehouse_id = 'd0300000-0000-4000-8000-000000000302'
      and item_id = 'd0300000-0000-4000-8000-000000000501'
      and lot_id is null),
-  1, 'confirm: transit GAO balance 1 after short receipt'
+  1::numeric, 'confirm: transit GAO balance 1 after short receipt'
 );
 select is(
   (select qty from public.stock_balances
    where warehouse_id = 'd0300000-0000-4000-8000-000000000303'
      and item_id = 'd0300000-0000-4000-8000-000000000501'
      and lot_id is null),
-  5, 'confirm: kitchen GAO balance 5'
+  5::numeric, 'confirm: kitchen GAO balance 5'
 );
 select public._t030_as('d0300000-0000-4000-8000-000000000a02');
 insert into t030_resp values ('r1rcv2', public.requisition_confirm_receipt(
@@ -489,19 +489,19 @@ select is(
    where warehouse_id = 'd0300000-0000-4000-8000-000000000301'
      and item_id = 'd0300000-0000-4000-8000-000000000503'
      and lot_id is null),
-  40, 'transfer send: main MUOI balance 50 -> 40'
+  40::numeric, 'transfer send: main MUOI balance 50 -> 40'
 );
 select is(
   (select qty from public.stock_balances
    where warehouse_id = 'd0300000-0000-4000-8000-000000000302'
      and item_id = 'd0300000-0000-4000-8000-000000000503'
      and lot_id is null),
-  10, 'transfer send: transit MUOI balance 10'
+  10::numeric, 'transfer send: transit MUOI balance 10'
 );
 select is(
   (select coalesce(sum(qty), 0) from public.stock_balances
    where item_id = 'd0300000-0000-4000-8000-000000000503'),
-  50, 'transfer send: entity total MUOI unchanged at 50'
+  50::numeric, 'transfer send: entity total MUOI unchanged at 50'
 );
 insert into t030_resp values ('t1rcv', public.transfer_receive(
   (select id from t030_ctx where key = 't1'),
@@ -520,7 +520,7 @@ select is(
    where warehouse_id = 'd0300000-0000-4000-8000-000000000304'
      and item_id = 'd0300000-0000-4000-8000-000000000503'
      and lot_id is null),
-  10, 'transfer receive: floor MUOI balance 10'
+  10::numeric, 'transfer receive: floor MUOI balance 10'
 );
 
 insert into t030_resp values ('t2', public.transfer_save_draft(
@@ -670,7 +670,7 @@ select is(
    where warehouse_id = 'd0300000-0000-4000-8000-000000000301'
      and item_id = 'd0300000-0000-4000-8000-000000000501'
      and lot_id is null),
-  186, 'purpose issue: main GAO balance 188 -> 186'
+  186::numeric, 'purpose issue: main GAO balance 188 -> 186'
 );
 select public._t030_as('d0300000-0000-4000-8000-000000000a02');
 select throws_ok(
@@ -702,14 +702,14 @@ select is(
    where warehouse_id = 'd0300000-0000-4000-8000-000000000301'
      and item_id = 'd0300000-0000-4000-8000-000000000501'
      and lot_id is null),
-  188, 'purpose issue reverse: main GAO balance back to 188'
+  188::numeric, 'purpose issue reverse: main GAO balance back to 188'
 );
 select is(
   (select count(*) from public.stock_moves
    where source_doc_type = 'purpose_issue'
      and source_doc_id = (select id from t030_ctx where key = 'pi1')
      and move_type = 'reversal'),
-  1, 'purpose issue reverse writes one reversal move'
+  1::bigint, 'purpose issue reverse writes one reversal move'
 );
 select public._t030_as('d0300000-0000-4000-8000-000000000a04');
 select throws_ok(
@@ -745,7 +745,7 @@ select is(
   (select (public.purpose_issue_get(
     (select id from t030_ctx where key = 'pi1')
   ) -> 'lines' -> 0 ->> 'unit_cost')::numeric),
-  10000, 'purpose_issue_get shows unit_cost 10000 to cost_controller'
+  10000::numeric, 'purpose_issue_get shows unit_cost 10000 to cost_controller'
 );
 select public._t030_as('d0300000-0000-4000-8000-000000000a11');
 select ok(
@@ -792,7 +792,7 @@ insert into t030_resp values ('w1sub', public.waste_submit(
 ));
 select is(
   (select (resp ->> 'total_value')::numeric from t030_resp where key = 'w1sub'),
-  15000, 'waste_submit values W1 at 3kg x 5000 = 15000'
+  15000::numeric, 'waste_submit values W1 at 3kg x 5000 = 15000'
 );
 select is(
   (select (resp ->> 'steps')::integer from t030_resp where key = 'w1sub'),
@@ -825,14 +825,14 @@ select is(
    where warehouse_id = 'd0300000-0000-4000-8000-000000000301'
      and item_id = 'd0300000-0000-4000-8000-000000000503'
      and lot_id is null),
-  37, 'waste: main MUOI balance 40 -> 37'
+  37::numeric, 'waste: main MUOI balance 40 -> 37'
 );
 select public._t030_as('d0300000-0000-4000-8000-000000000a03');
 select is(
   (select (public.waste_get(
     (select id from t030_ctx where key = 'w1')
   ) -> 'lines' -> 0 ->> 'unit_cost')::numeric),
-  5000, 'waste_get shows line unit_cost 5000 to cost_controller'
+  5000::numeric, 'waste_get shows line unit_cost 5000 to cost_controller'
 );
 
 select public._t030_as('d0300000-0000-4000-8000-000000000a02');
@@ -853,7 +853,7 @@ select is(
   (select count(*) from public.alerts
    where property_id = 'd0300000-0000-4000-8000-000000000201'
      and code = 'WASTE_LARGE'),
-  1, 'waste_submit over threshold creates WASTE_LARGE alert'
+  1::bigint, 'waste_submit over threshold creates WASTE_LARGE alert'
 );
 select public._t030_as('d0300000-0000-4000-8000-000000000a03');
 insert into t030_resp values ('w2dec1', public.waste_decide(
@@ -883,7 +883,7 @@ select is(
    where warehouse_id = 'd0300000-0000-4000-8000-000000000301'
      and item_id = 'd0300000-0000-4000-8000-000000000501'
      and lot_id is null),
-  38, 'waste: main GAO balance 188 -> 38 after W2'
+  38::numeric, 'waste: main GAO balance 188 -> 38 after W2'
 );
 
 select public._t030_as('d0300000-0000-4000-8000-000000000a02');
@@ -927,7 +927,7 @@ select is(
   (select (public.waste_get(
     (select id from t030_ctx where key = 'w1')
   ) ->> 'total_value')::numeric),
-  15000, 'waste_get shows total_value 15000 to cost_controller'
+  15000::numeric, 'waste_get shows total_value 15000 to cost_controller'
 );
 select public._t030_as('d0300000-0000-4000-8000-000000000a11');
 select ok(
@@ -1003,13 +1003,13 @@ select is(
    where warehouse_id = 'd0300000-0000-4000-8000-000000000301'
      and item_id = 'd0300000-0000-4000-8000-000000000501'
      and lot_id is null),
-  38, 'final: main GAO balance 38'
+  38::numeric, 'final: main GAO balance 38'
 );
 select is(
   (select qty_on_hand from public.item_costs
    where legal_entity_id = 'd0300000-0000-4000-8000-000000000101'
      and item_id = 'd0300000-0000-4000-8000-000000000501'),
-  50, 'final: entity GAO qty_on_hand 50 (200 - 2 purpose issue + 2 reversal - 150 waste)'
+  50::numeric, 'final: entity GAO qty_on_hand 50 (200 - 2 purpose issue + 2 reversal - 150 waste)'
 );
 
 select * from finish();
