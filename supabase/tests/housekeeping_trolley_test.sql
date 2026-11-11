@@ -923,7 +923,10 @@ select is(
 );
 insert into t034_resp values ('s2c', public.trolley_shift_close(
   p_shift_id := (select (resp ->> 'shift_id')::uuid from t034_resp where key = 's2'),
-  p_counts := '[{"item_id": "d0340000-0000-4000-8000-000000000501", "qty": 25}, {"item_id": "d0340000-0000-4000-8000-000000000502", "qty": 9}, {"item_id": "d0340000-0000-4000-8000-000000000503", "qty": 18}, {"item_id": "d0340000-0000-4000-8000-000000000504", "qty": 7}]'::jsonb
+  -- Dem cuoi = dau + linh (15/30/10) de tieu hao = 0, chi BANCHAI thua 5
+  -- (25 - 20); dem 9/18/7 nhu ban cu se ra tieu hao 6/12/3, mau thuan
+  -- voi ky vong consumption_lines = 0 + khong co purpose_issue o duoi.
+  p_counts := '[{"item_id": "d0340000-0000-4000-8000-000000000501", "qty": 25}, {"item_id": "d0340000-0000-4000-8000-000000000502", "qty": 15}, {"item_id": "d0340000-0000-4000-8000-000000000503", "qty": 30}, {"item_id": "d0340000-0000-4000-8000-000000000504", "qty": 10}]'::jsonb
 ));
 select is(
   (select resp ->> 'ok' from t034_resp where key = 's2c'),
