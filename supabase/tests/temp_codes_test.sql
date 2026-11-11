@@ -139,7 +139,7 @@ select throws_ok(
 -- 6. DVT khong ton tai -> ERR_UOM_UNKNOWN.
 select throws_ok(
   $q$select public.item_create_temp(
-    'd0150000-1500-4000-8000-000000000201', 'Mướp chợ', 'd0150000-1500-4000-8000-000000000401', 'thung'
+    'd0150000-1500-4000-8000-000000000201', 'Mướp chợ', 'd0150000-1500-4000-8000-000000000401', 'xyz-unit'
   )$q$,
   'ERR_UOM_UNKNOWN',
   'DVT la bi chan'
