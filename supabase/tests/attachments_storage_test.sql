@@ -361,7 +361,9 @@ select throws_ok(
     'evidence',
     'd0160000-1600-4000-8000-000000000102/receiving/2026/11/d0160000-1600-4000-8000-000000000804.jpg'
   )$q$,
-  'row-level security',
+  -- throws_ok so sanh SQLERRM CHINH XAC (khong LIKE): phai la toan bo message
+  -- cua Postgres khi INSERT vi pham RLS.
+  'new row violates row-level security policy for table "objects"',
   'user KS A khong chen duoc object duoi phap nhan B'
 );
 
