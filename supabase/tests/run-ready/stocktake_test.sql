@@ -205,7 +205,7 @@ select throws_ok(
     'd0320000-0000-4000-8000-000000000301', 'monthly_full', '2026-11-09', null,
     array['d0320000-0000-4000-8000-000000000a01', 'd0320000-0000-4000-8000-000000000a02']::uuid[]
   )$q$,
-  'P0001', 'ERR_FORBIDDEN:count.open',
+  '42501', 'ERR_FORBIDDEN:count.open',
   'owner without count.open cannot open a count'
 );
 select public._t032_as('d0320000-0000-4000-8000-000000000a01');
@@ -237,7 +237,7 @@ select throws_ok(
     'd0320000-0000-4000-8000-000000000301', 'monthly_full', '2026-11-09', null,
     array['d0320000-0000-4000-8000-000000000a01', 'd0320000-0000-4000-8000-000000000a08']::uuid[]
   )$q$,
-  'P0001', 'ERR_SOD_COUNT_INDEPENDENT',
+  'P0001', 'ERR_COUNT_INDEPENDENT',
   'team without an independent counter is rejected at open'
 );
 insert into t032_resp values ('openA', public.count_open(
@@ -306,7 +306,7 @@ select throws_ok(
     'd0320000-0000-4000-8000-000000000501',
     '{"qty": 1, "uom": "kg"}'::jsonb
   )$q$,
-  'P0001', 'ERR_FORBIDDEN:count.perform',
+  '42501', 'ERR_FORBIDDEN:count.perform',
   'non-counter cannot record a line'
 );
 select public._t032_as('d0320000-0000-4000-8000-000000000a08');
@@ -316,7 +316,7 @@ select throws_ok(
     'd0320000-0000-4000-8000-000000000501',
     '{"qty": 1, "uom": "kg"}'::jsonb
   )$q$,
-  'P0001', 'ERR_FORBIDDEN:count.perform',
+  '42501', 'ERR_FORBIDDEN:count.perform',
   'count.perform holder outside the team cannot record'
 );
 select public._t032_as('d0320000-0000-4000-8000-000000000a01');
@@ -557,7 +557,7 @@ select is(
 select public._t032_as('d0320000-0000-4000-8000-000000000a01');
 select throws_ok(
   $q$select public.count_lock((select id from t032_ctx where key = 'cntA'))$q$,
-  'P0001', 'ERR_FORBIDDEN:count.lock',
+  '42501', 'ERR_FORBIDDEN:count.lock',
   'counter cannot lock the count'
 );
 select public._t032_as('d0320000-0000-4000-8000-000000000a06');
@@ -621,7 +621,7 @@ select is(
 select public._t032_as('d0320000-0000-4000-8000-000000000a01');
 select throws_ok(
   $q$select public.count_adjust_post((select id from t032_ctx where key = 'cntA'))$q$,
-  'P0001', 'ERR_FORBIDDEN:count.adjust.approve',
+  '42501', 'ERR_FORBIDDEN:count.adjust.approve',
   'counter cannot post the adjustment'
 );
 select public._t032_as('d0320000-0000-4000-8000-000000000a04');
@@ -811,7 +811,7 @@ select throws_ok(
     (select id from t032_ctx where key = 'cntB2'),
     array['1111', '2222']
   )$q$,
-  'P0001', 'ERR_INVALID_VALUE',
+  'P0001', 'ERR_PIN_INVALID',
   'submit with a PIN per missing counter is rejected'
 );
 insert into t032_resp values ('submitB2', public.count_submit(
@@ -850,7 +850,7 @@ select is(
 select public._t032_as('d0320000-0000-4000-8000-000000000a01');
 select throws_ok(
   $q$select public.day_lock('d0320000-0000-4000-8000-000000000302', '2026-11-09')$q$,
-  'P0001', 'ERR_FORBIDDEN:day.lock',
+  '42501', 'ERR_FORBIDDEN:day.lock',
   'storekeeper cannot day_lock'
 );
 select public._t032_as('d0320000-0000-4000-8000-000000000a06');
@@ -1039,7 +1039,7 @@ select ok(
 select public._t032_as('d0320000-0000-4000-8000-000000000a01');
 select throws_ok(
   $q$select public.period_reopen((select id from t032_ctx where key = 'period_id'), 'thử mở lại')$q$,
-  'P0001', 'ERR_FORBIDDEN:period.reopen',
+  '42501', 'ERR_FORBIDDEN:period.reopen',
   'period_reopen without the permission is rejected'
 );
 select finish();
