@@ -64,6 +64,9 @@ insert into public.user_property_roles (user_id, role_id, property_id) values
   ('c1000000-0000-4000-8000-000000000a07', 'c1000000-0000-4000-8000-000000000605', null);
 
 create temp table c1_resp (key text primary key, resp jsonb);
+-- c1_resp tao duoi role postgres truoc khi chuyen sang authenticated:
+-- phai grant thi authenticated moi INSERT duoc (bay T-043/C7).
+grant all on c1_resp to authenticated;
 
 create or replace function public._c1_as(p_user uuid)
 returns void
