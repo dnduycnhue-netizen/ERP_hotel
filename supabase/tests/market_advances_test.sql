@@ -17,14 +17,15 @@ insert into public.organizations (id, name) values
   ('d0220000-0200-4000-8000-000000000001', 'T-022 Master Org');
 
 insert into public.legal_entities (id, org_id, name, code) values
-  ('d0220000-0200-4000-8000-000000000101', 'd0220000-0200-4000-8000-000000000001', 'T022 Entity', 'T022E');
+  ('d0220000-0200-4000-8000-000000000101', 'd0220000-0200-4000-8000-000000000001', 'T022 Entity', 'T022E'),
+  ('d0220000-0200-4000-8000-000000000102', 'd0220000-0200-4000-8000-000000000001', 'T022 Entity 2', 'T022E2');
 
 insert into public.properties (id, org_id, legal_entity_id, code, name, sod_profile) values
   ('d0220000-0200-4000-8000-000000000201', 'd0220000-0200-4000-8000-000000000001', 'd0220000-0200-4000-8000-000000000101', 'P0221', 'T-022 Property', 'with_cc'),
   -- KS thu 2 (cung org) chi de test advance_get sai KS: has_perm tra false
   -- voi KS khong ton tai nen phai dung KS that de toi duoc guard
   -- ERR_INVALID_STATUS ben trong ham.
-  ('d0220000-0200-4000-8000-000000000202', 'd0220000-0200-4000-8000-000000000001', 'd0220000-0200-4000-8000-000000000101', 'P0222', 'T-022 Property 2', 'with_cc');
+  ('d0220000-0200-4000-8000-000000000202', 'd0220000-0200-4000-8000-000000000001', 'd0220000-0200-4000-8000-000000000102', 'P0222', 'T-022 Property 2', 'with_cc');
 
 insert into public.uoms (code, name_vi) values ('kg', 'Ký'), ('cai', 'Cái')
 on conflict do nothing;
