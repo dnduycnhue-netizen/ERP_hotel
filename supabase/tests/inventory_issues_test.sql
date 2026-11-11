@@ -100,6 +100,7 @@ insert into public.role_permissions (role_id, permission_code) values
   ('d0300000-0000-4000-8000-000000000603', 'waste.approve'),
   ('d0300000-0000-4000-8000-000000000603', 'stock.view_qty'),
   ('d0300000-0000-4000-8000-000000000603', 'stock.view_value'),
+  ('d0300000-0000-4000-8000-000000000603', 'alert.receive.waste_large'),
   ('d0300000-0000-4000-8000-000000000604', 'waste.approve.large'),
   ('d0300000-0000-4000-8000-000000000604', 'purpose_issue.post'),
   ('d0300000-0000-4000-8000-000000000604', 'purpose_issue.reverse'),
@@ -115,6 +116,7 @@ insert into public.role_permissions (role_id, permission_code) values
 
 insert into public.user_property_roles (user_id, role_id, property_id) values
   ('d0300000-0000-4000-8000-000000000a02', 'd0300000-0000-4000-8000-000000000602', 'd0300000-0000-4000-8000-000000000201'),
+  ('d0300000-0000-4000-8000-000000000a02', 'd0300000-0000-4000-8000-000000000603', 'd0300000-0000-4000-8000-000000000201'),
   ('d0300000-0000-4000-8000-000000000a03', 'd0300000-0000-4000-8000-000000000603', 'd0300000-0000-4000-8000-000000000201'),
   ('d0300000-0000-4000-8000-000000000a04', 'd0300000-0000-4000-8000-000000000604', 'd0300000-0000-4000-8000-000000000201'),
   ('d0300000-0000-4000-8000-000000000a05', 'd0300000-0000-4000-8000-000000000605', null),
@@ -745,7 +747,7 @@ select is(
   ) -> 'lines' -> 0 ->> 'unit_cost')::numeric),
   10000, 'purpose_issue_get shows unit_cost 10000 to cost_controller'
 );
-select public._t030_as('d0300000-0000-4000-8000-000000000a02');
+select public._t030_as('d0300000-0000-4000-8000-000000000a11');
 select ok(
   (select (public.purpose_issue_get(
     (select id from t030_ctx where key = 'pi1')
@@ -927,7 +929,7 @@ select is(
   ) ->> 'total_value')::numeric),
   15000, 'waste_get shows total_value 15000 to cost_controller'
 );
-select public._t030_as('d0300000-0000-4000-8000-000000000a02');
+select public._t030_as('d0300000-0000-4000-8000-000000000a11');
 select ok(
   (select (public.waste_get(
     (select id from t030_ctx where key = 'w1')
