@@ -27,9 +27,9 @@ insert into auth.users (id, instance_id, aud, role, email, encrypted_password, e
 values
   ('d0330000-0000-4000-8000-000000000a01', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'u1-stk033@test.com', '', now(), now(), now(), '{}'::jsonb, '{}'::jsonb),
   ('d0330000-0000-4000-8000-000000000a02', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'u2-chef033@test.com', '', now(), now(), now(), '{}'::jsonb, '{}'::jsonb),
-  ('d0330000-0000-4000-8000-000000000a03', '00000000-0000-4000-8000-0000-000000000000', 'authenticated', 'authenticated', 'u3-cc033@test.com', '', now(), now(), now(), '{}'::jsonb, '{}'::jsonb),
-  ('d0330000-0000-4000-8000-000000000a04', '00000000-0000-4000-8000-0000-000000000000', 'authenticated', 'authenticated', 'u4-bar033@test.com', '', now(), now(), now(), '{}'::jsonb, '{}'::jsonb),
-  ('d0330000-0000-4000-8000-000000000a05', '00000000-0000-4000-8000-0000-000000000000', 'authenticated', 'authenticated', 'u5-rec033@test.com', '', now(), now(), now(), '{}'::jsonb, '{}'::jsonb);
+  ('d0330000-0000-4000-8000-000000000a03', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'u3-cc033@test.com', '', now(), now(), now(), '{}'::jsonb, '{}'::jsonb),
+  ('d0330000-0000-4000-8000-000000000a04', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'u4-bar033@test.com', '', now(), now(), now(), '{}'::jsonb, '{}'::jsonb),
+  ('d0330000-0000-4000-8000-000000000a05', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'u5-rec033@test.com', '', now(), now(), now(), '{}'::jsonb, '{}'::jsonb);
 
 insert into public.profiles (id, employee_code, full_name) values
   ('d0330000-0000-4000-8000-000000000a01', 'NV03301', 'Thủ kho'),
@@ -148,8 +148,12 @@ select throws_ok(
 );
 
 -- 5. Nguoi dem bi vo hieu (active = false) khong xuat hien.
+-- profiles chi co SELECT policy + SELECT grant cho authenticated (khong co
+-- UPDATE) nen phai doi ve role postgres de sua fixture (tien le T-032).
+set local role postgres;
 update public.profiles set active = false
 where id = 'd0330000-0000-4000-8000-000000000a02';
+set local role authenticated;
 select is(
   (select count(*) from public.count_list_counters(
     'd0330000-0000-4000-8000-000000000201',
