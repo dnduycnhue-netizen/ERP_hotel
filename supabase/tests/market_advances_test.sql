@@ -7,7 +7,7 @@
 -- voi fixture T-020 (d020).
 begin;
 create extension if not exists pgtap;
-select plan(58);
+select plan(59);
 
 -- ---------------------------------------------------------------------------
 -- Fixture: org, legal entity, property, uom, vat tu, gia tran, vai tro,
@@ -457,7 +457,7 @@ select ok(
 select is(
   (select status from public.purchase_orders where channel = 'market'),
   'submitted',
-  'PO market sau submit o trang thai submitted (cho duyet 1 buoc)'
+  'PO market sau submit o trang thai submitted (cho duyet: outlet_head + gm gia manual)'
 );
 
 select is(
@@ -477,13 +477,31 @@ select ok(
     (select id from public.purchase_orders where channel = 'market'),
     'approved', null
   ) ->> 'ok')::boolean,
-  'outlet_head duyet PO market'
+  'outlet_head duyet PO market (buoc 1)'
+);
+
+-- Buoc gm bo sung: ca 2 dong PO market deu price_source 'manual' (gia
+-- nguoi di cho dua / khong co gia tran) nen _generate_approval_steps
+-- them 1 buoc gm theo 05-BUSINESS-RULES §2 + T-020 quyet dinh 3
+-- (khong co nguon gia -> manual + buoc duyet bo sung cua gm). PO chi
+-- 'approved' sau buoc nay; khong co buoc nay thi advance_disburse
+-- o duoi se bi chan ERR_INVALID_STATUS (PO van submitted).
+select _t022_as('d0220000-0200-4000-8000-000000000a04');
+
+select ok(
+  (public.approval_decide(
+    'd0220000-0200-4000-8000-000000000201',
+    'po',
+    (select id from public.purchase_orders where channel = 'market'),
+    'approved', null
+  ) ->> 'ok')::boolean,
+  'gm duyet buoc bo sung (dong gia manual)'
 );
 
 select is(
   (select status from public.purchase_orders where channel = 'market'),
   'approved',
-  'PO market da approved sau 1 buoc'
+  'PO market da approved sau 2 buoc (outlet_head + gm gia manual)'
 );
 
 select _t022_as('d0220000-0200-4000-8000-000000000a04');
