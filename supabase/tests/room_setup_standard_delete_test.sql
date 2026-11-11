@@ -12,12 +12,14 @@ select plan(9);
 insert into public.organizations (id, name) values
   ('d2600000-0000-4000-8000-000000000001', 'C7 Org');
 
+-- Moi property can 1 legal_entity rieng: properties.legal_entity_id unique.
 insert into public.legal_entities (id, org_id, code, name) values
-  ('d2600000-0000-4000-8000-000000000101', 'd2600000-0000-4000-8000-000000000001', 'C7', 'Entity C7');
+  ('d2600000-0000-4000-8000-000000000101', 'd2600000-0000-4000-8000-000000000001', 'C7', 'Entity C7'),
+  ('d2600000-0000-4000-8000-000000000102', 'd2600000-0000-4000-8000-000000000001', 'C7B', 'Entity C7 B');
 
 insert into public.properties (id, org_id, legal_entity_id, code, name, sod_profile) values
   ('d2600000-0000-4000-8000-000000000201', 'd2600000-0000-4000-8000-000000000001', 'd2600000-0000-4000-8000-000000000101', 'PC71', 'Property C7 A', 'with_cc'),
-  ('d2600000-0000-4000-8000-000000000202', 'd2600000-0000-4000-8000-000000000001', 'd2600000-0000-4000-8000-000000000101', 'PC72', 'Property C7 B', 'with_cc');
+  ('d2600000-0000-4000-8000-000000000202', 'd2600000-0000-4000-8000-000000000001', 'd2600000-0000-4000-8000-000000000102', 'PC72', 'Property C7 B', 'with_cc');
 
 insert into public.uoms (code, name_vi) values
   ('cai', 'Cái'),
@@ -63,6 +65,7 @@ insert into public.user_property_roles (user_id, role_id, property_id) values
   ('d2600000-0000-4000-8000-000000000a02', 'd2600000-0000-4000-8000-000000000602', 'd2600000-0000-4000-8000-000000000201');
 
 create temp table t260_resp (key text primary key, resp jsonb);
+grant all on t260_resp to authenticated;
 
 create or replace function public._t260_as(p_user uuid)
 returns void
@@ -135,7 +138,7 @@ select is(
 select is(
   (select count(*) from public.room_setup_standards
    where id = (select (resp ->> 'id')::uuid from t260_resp where key = 'stdA')),
-  0, 'deleted standard row is gone'
+  0::bigint, 'deleted standard row is gone'
 );
 
 -- F. Xoa lai cung id bao loi (1).
@@ -165,7 +168,7 @@ select lives_ok(
 select is(
   (select count(*) from public.room_setup_standards
    where id = (select (resp ->> 'id')::uuid from t260_resp where key = 'stdB')),
-  0, 'upserted then deleted standard row is gone'
+  0::bigint, 'upserted then deleted standard row is gone'
 );
 
 select * from finish();
