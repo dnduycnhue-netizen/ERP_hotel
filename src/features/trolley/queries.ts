@@ -37,6 +37,7 @@ export type TrolleyShiftRow = {
   status: TrolleyShiftStatus;
   requisition_id: string | null;
   purpose_issue_id: string | null;
+  rooms_done: TrolleyRoomDone[];
   closed_by: string | null;
   closed_at: string | null;
   created_at: string;
@@ -155,7 +156,7 @@ export async function listTrolleyShifts(
   let query = untyped(supabase)
     .from("trolley_shifts")
     .select(
-      "id, org_id, property_id, trolley_warehouse_id, attendant_id, business_date, shift, status, requisition_id, purpose_issue_id, closed_by, closed_at, created_at, trolley_warehouse:warehouses(name, code)",
+      "id, org_id, property_id, trolley_warehouse_id, attendant_id, business_date, shift, status, requisition_id, purpose_issue_id, rooms_done, closed_by, closed_at, created_at, trolley_warehouse:warehouses(name, code)",
     )
     .eq("property_id", propertyId)
     .order("business_date", { ascending: false })
@@ -180,6 +181,7 @@ export async function listTrolleyShifts(
     status: TrolleyShiftStatus;
     requisition_id: string | null;
     purpose_issue_id: string | null;
+    rooms_done: TrolleyRoomDone[];
     closed_by: string | null;
     closed_at: string | null;
     created_at: string;
@@ -200,6 +202,7 @@ export async function listTrolleyShifts(
       status: r.status,
       requisition_id: r.requisition_id,
       purpose_issue_id: r.purpose_issue_id,
+      rooms_done: Array.isArray(r.rooms_done) ? r.rooms_done : [],
       closed_by: r.closed_by,
       closed_at: r.closed_at,
       created_at: r.created_at,

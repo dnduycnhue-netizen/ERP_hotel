@@ -282,7 +282,7 @@ export function MobileLineForm({
         });
       } catch {
         setSubmitting(false);
-        setError("Không lưu được thao tác offline. Hãy thử lại.");
+        setError(vi.offline.queueUnavailable);
         return;
       }
       setSubmitting(false);
@@ -363,7 +363,7 @@ export function MobileLineForm({
         });
       } catch {
         setOverriding(false);
-        setOverrideError("Không lưu được thao tác offline. Hãy thử lại.");
+        setOverrideError(vi.offline.queueUnavailable);
         return;
       }
       setOverriding(false);

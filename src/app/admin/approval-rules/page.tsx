@@ -1,8 +1,10 @@
+import { ApprovalDelegationsEditor } from "@/components/admin/approval-delegations-editor";
 import { ApprovalRulesEditor } from "@/components/admin/approval-rules-editor";
 import { ConfigScopeSelector } from "@/components/admin/config-scope-selector";
 import { ErrorState } from "@/components/common/error-state";
 import {
   listApprovalApprovers,
+  listApprovalDelegations,
   listApprovalRules,
   resolveAdminConfigScope,
 } from "@/features/admin";
@@ -29,9 +31,10 @@ export default async function ApprovalRulesPage({
       />
     );
   }
-  const [rules, approvers] = await Promise.all([
+  const [rules, approvers, delegations] = await Promise.all([
     listApprovalRules(supabase, scope.orgId, scope.propertyId),
     listApprovalApprovers(supabase, scope.orgId, scope.propertyId),
+    listApprovalDelegations(supabase, scope.orgId, scope.propertyId),
   ]);
 
   return (
@@ -54,6 +57,21 @@ export default async function ApprovalRulesPage({
         propertyId={scope.propertyId}
         initialRules={rules}
         approvers={approvers}
+      />
+      <div className="space-y-2">
+        <h2 className="text-xl font-bold tracking-tight">
+          {vi.admin.configDelegationTitle}
+        </h2>
+        <p className="text-sm text-muted-foreground">
+          {vi.admin.configDelegationDescription}
+        </p>
+      </div>
+      <ApprovalDelegationsEditor
+        orgId={scope.orgId}
+        propertyId={scope.propertyId}
+        properties={scope.properties}
+        users={approvers.users}
+        initialDelegations={delegations}
       />
     </div>
   );

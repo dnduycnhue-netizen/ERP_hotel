@@ -57,24 +57,36 @@ Quy ước tiêu chí nghiệm thu (AC): mọi task phải thỏa Definition of 
 |---|---|---|---|---|
 | [x] T-030 | Migration 08: phiếu lĩnh 2 bước, điều chuyển, xuất mục đích, hủy + RPC | CC | T-011 | pgTAP từng loại move; SoD hủy |
 | [x] T-031 | Màn hình chứng từ kho + tồn kho + thẻ kho | AG | T-030 | Thẻ kho khớp tổng `stock_moves` — **xong 09/11/2026: routes `/[p]/inventory/{requisitions,transfers,issues,waste,stock}` + thẻ kho `/stock/[warehouse]/[item]`, dùng 8 RPC list/get T-030; tồn/thẻ kho đọc trực tiếp qua SELECT (RLS đã chặn theo stock.view_qty/view_value, giá trị chỉ hiện khi có stock.view_value), không migration mới; thẻ kho hiện huy hiệu Khớp/Lệch đối chiếu tồn cuối theo thẻ với `stock_balances`. Q28 mới (stock_balance_get trong đặc tả chưa từng được code).** |
-| [ ] T-032 | Migration 09: kiểm kê tháng mù, điều chỉnh, khóa ngày/kỳ + view `v_count_sheet` | CC | T-030 | Người đếm không đọc được `book_qty`; kho đang kiểm → `ERR_COUNT_FREEZE` |
-| [ ] T-033 | Màn hình kiểm kê mobile (đa quy cách, đếm lại) + biên bản chênh lệch + offline | AG + CC | T-032 | Biên bản xuất Excel |
-| [ ] T-034 | Migration 11 buồng phòng: chuẩn setup, kho tầng/xe đẩy, ca xe đẩy | CC | T-030 | Tiêu hao ca = đầu + lĩnh − cuối |
-| [ ] T-035 | Minibar theo phòng: bảng giá, bổ sung, yêu cầu kiểm (lễ tân), kiểm (buồng), xác nhận thu, miễn, late charge, đối soát cuối ngày | CC + AG | T-034 | Kịch bản `11-TESTING.md` mục minibar chạy xanh |
-| [ ] T-036 | Form PMS ngày (`pms_daily_upsert`) | AG | T-012 | Không cho nhập trùng ngày; sửa có nhật ký |
+| [x] T-032 | Migration 09: kiểm kê tháng mù, điều chỉnh, khóa ngày/kỳ + view `v_count_sheet` | CC | T-030 | Người đếm không đọc được `book_qty`; kho đang kiểm → `ERR_COUNT_FREEZE` — **xong 09/11/2026: migration `20261109280000` (3 bảng, view `v_count_sheet` mù + `v_count_result`, trigger `ERR_COUNT_FREEZE`, 7 RPC `count_*`, `period_close` +3 điều kiện); pgTAP 101 assertion chưa chạy.** |
+| [x] T-033 | Màn hình kiểm kê mobile (đa quy cách, đếm lại) + biên bản chênh lệch + offline | AG + CC | T-032 | Biên bản xuất Excel — **xong 09/11/2026: migration `20261109290000`, RPC `count_list_counters`, ghi đếm offline qua Dexie kind `count_record`; pgTAP 8 assertion chưa chạy.** |
+| [x] T-034 | Migration 11 buồng phòng: chuẩn setup, kho tầng/xe đẩy, ca xe đẩy | CC | T-030 | Tiêu hao ca = đầu + lĩnh − cuối — **xong 09/11/2026: migration `20261109310000` (3 bảng + 4 RPC, mở ca đếm mù sinh phiếu lĩnh bù tới par, đóng ca tiêu hao → `purpose_issue` buồng phòng); pgTAP 93 assertion chưa chạy.** |
+| [x] T-035 | Minibar theo phòng: bảng giá, bổ sung, yêu cầu kiểm (lễ tân), kiểm (buồng), xác nhận thu, miễn, late charge, đối soát cuối ngày | CC + AG | T-034 | Kịch bản `11-TESTING.md` mục minibar chạy xanh — **xong 09/11/2026: migration `20261109320000` + fix `20261109460000` (3 bảng + 10 RPC, pg_cron đối soát 23:30, 5 route frontdesk/housekeeping/mobile); pgTAP 104 assertion chưa chạy.** |
+| [x] T-036 | Form PMS ngày (`pms_daily_upsert`) | AG | T-012 | Không cho nhập trùng ngày; sửa có nhật ký — **xong 09/11/2026: migration `20261109330000` (bảng `pms_daily_stats` + RPC `pms_daily_upsert`/`pms_daily_history`); pgTAP 49 assertion chưa chạy.** |
 
 ## Giai đoạn MVP-D — Tài chính, chi phí, báo cáo (tuần 10–12)
 
 | # | Task | Agent | Phụ thuộc | AC chính |
 |---|---|---|---|---|
-| [ ] T-040 | Migration 12: hóa đơn, khớp 3 chiều, `ap_ledger`, bảng kê không hóa đơn, quyết toán tạm ứng | CC | T-023 | Lệch giá > 1% → `on_hold` |
-| [ ] T-041 | Màn hình hóa đơn, công nợ, tạm ứng, đề nghị thanh toán | AG | T-040 | Tuổi nợ đúng theo `due_date` |
-| [ ] T-042 | Mua dịch vụ + nghiệm thu + hợp đồng định kỳ + cron sinh lịch | CC + AG | T-040 | Chưa nghiệm thu → không thanh toán được |
-| [ ] T-043 | Xuất Excel cho kế toán (`/api/export/*`): nhập kho, xuất kho, hóa đơn mua, công nợ, tạm ứng — theo pháp nhân, chỉ kỳ đã khóa hoặc ngày đã khóa | CC | T-040 | File mở được bằng Excel, tiếng Việt có dấu |
-| [ ] T-044 | 10 báo cáo MVP (`08-REPORTS-ALERTS.md`) | AG + CC | T-031, T-041 | Số khớp truy vấn kiểm tra trong pgTAP |
-| [ ] T-045 | Cảnh báo + `send-notifications` (email + web push; adapter Zalo để sẵn) + bản tin 8h + giờ im lặng | CC | T-044 | Cron UTC đúng 08:00 VN; gộp tin |
-| [ ] T-046 | PWA: manifest, icon, cài lên màn hình chính, service worker cho 4 màn offline | AG | T-025, T-033 | Lighthouse PWA đạt; cài được trên Android/iOS |
-| [ ] T-047 | Kiểm thử nghiệm thu thí điểm: Playwright các luồng chính + dữ liệu thật đã làm sạch | AG | tất cả | Danh sách kịch bản `11-TESTING.md` xanh |
+| [x] T-040 | Migration 12: hóa đơn, khớp 3 chiều, `ap_ledger`, bảng kê không hóa đơn, quyết toán tạm ứng | CC | T-023 | Lệch giá > 1% → `on_hold` — **xong 10/11/2026: migration `20261109340000` (9 bảng, 10 RPC, dung sai giá 1%); pgTAP 80 assertion chưa chạy.** |
+| [x] T-041 | Màn hình hóa đơn, công nợ, tạm ứng, đề nghị thanh toán | AG | T-040 | Tuổi nợ đúng theo `due_date` — **xong 10/11/2026: 11 route `/[property]/finance`, không migration mới.** |
+| [x] T-042 | Mua dịch vụ + nghiệm thu + hợp đồng định kỳ + cron sinh lịch | CC + AG | T-040 | Chưa nghiệm thu → không thanh toán được — **xong 10/11/2026: migration `20261109350000` (3 bảng + 4 RPC, pg_cron 01:00 VN) + 5 route UI; pgTAP 67 assertion chưa chạy.** |
+| [x] T-043 | Xuất Excel cho kế toán (`/api/export/*`): nhập kho, xuất kho, hóa đơn mua, công nợ, tạm ứng — theo pháp nhân, chỉ kỳ đã khóa hoặc ngày đã khóa | CC | T-040 | File mở được bằng Excel, tiếng Việt có dấu — **xong 10/11/2026: migration `20261109360000` (5 RPC `export_*`) + 5 route `/api/export/[kind]`; pgTAP 55 assertion chưa chạy.** |
+| [x] T-044 | 10 báo cáo MVP (`08-REPORTS-ALERTS.md`) | AG + CC | T-031, T-041 | Số khớp truy vấn kiểm tra trong pgTAP — **xong 10/11/2026: migration `20261109370000` (bảng `report_snapshots` + RPC `report_get`/`report_build_daily`) + 10 route `/[property]/reports`; pgTAP 82 assertion chưa chạy.** |
+| [x] T-045 | Cảnh báo + `send-notifications` (email + web push; adapter Zalo để sẵn) + bản tin 8h + giờ im lặng | CC | T-044 | Cron UTC đúng 08:00 VN; gộp tin — **xong 10/11/2026: migration `20261109380000` (seed 18 mã `alert_rules` + 4 bảng + Edge Function `send-notification` + 3 cron 07:30/08:00/5 phút) + màn `/[property]/alerts`; pgTAP 54 assertion chưa chạy; chưa gửi được thật — thiếu Resend API key + VAPID keys (Q98/Q99).** |
+| [x] T-046 | PWA: manifest, icon, cài lên màn hình chính, service worker cho 4 màn offline | AG | T-025, T-033 | Lighthouse PWA đạt; cài được trên Android/iOS — **xong 10/11/2026: PWA manifest + icon + service worker + trang `/offline`, không migration mới; Lighthouse PWA 1.0; test offline thật bằng Chrome headless.** |
+| [x] T-047 | Kiểm thử nghiệm thu thí điểm: Playwright các luồng chính + dữ liệu thật đã làm sạch | AG | tất cả | Danh sách kịch bản `11-TESTING.md` xanh — **xong 10/11/2026: Playwright 39 test (2 tầng đọc/ghi) + Vitest 13 test; không migration mới; public 5/5 + Vitest 13/13 PASS trên máy Duy.** |
+
+## Hoàn thiện chức năng — completion wave 1 (10/11/2026)
+
+Các mục sau không có dòng riêng trong bảng trên nhưng đã xong, ghi ở đây để roadmap khỏi lỗi thời:
+
+- **UI-1/UI-2** — sidebar điều hướng theo module kiểu ClickUp, danh sách dạng bảng gọn với trạng thái pill, tìm kiếm + bộ lọc, chuyển List/Board ở PR/PO; đợt redesign đầy đủ theo mẫu ClickUp vẫn làm riêng trước go-live (chỉ thị Duy 10/11 07:34).
+- **Hiệu năng (perf-load)** — Vercel functions về region `bom1` (Mumbai, cùng vùng AWS ap-south-1 với Supabase production); dashboard ~5 round trip, kiểm chứng live 13:57 10/11.
+- **admin-relax** — migration `20261109400000`: tự gán vai trò/quyền cho chính mình được phép có chủ đích; vẫn giữ `ERR_LAST_ADMIN`, cấm tự thu hồi/khóa mình, cấm vô hiệu hóa vai trò hệ thống. Xem `docs/11-TESTING.md` §6.6.
+- **Xe đẩy mobile (Q105)** — migration `20261109390000` (RPC `trolley_shift_get`) + 3 route `/m/[p]/trolley*` + offline queue.
+- **Nhà hàng / đặt tiệc (M06)** — migration `20261109500000` (8 bảng, 21 RPC, 6 mã quyền); trang bếp live tải được 21:04 10/11; pgTAP `restaurant` 69 assertion chưa chạy.
+- **T-022A (miễn kiểm tra giá PO chợ)** — migration `20261109240000`; Q171 đã chốt (tự phê duyệt 10/11); `db push` lần sau cần `--include-all` vì version 240000 cũ hơn các migration đã áp.
+- **Q73/Q18** — migration `20261109410000`: timeline duyệt đề nghị thanh toán + tên người tạo ở danh sách PR/PO.
 
 ## P2 / P3
 

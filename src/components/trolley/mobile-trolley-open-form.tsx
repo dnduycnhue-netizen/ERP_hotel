@@ -35,9 +35,9 @@ function countsToInput(
 }
 
 const SHIFT_OPTIONS: Array<{ value: TrolleyShiftName; label: string }> = [
-  { value: "day", label: "Ca ngày" },
-  { value: "morning", label: "Ca sáng" },
-  { value: "evening", label: "Ca tối" },
+  { value: "day", label: vi.trolley.shiftOptions.day },
+  { value: "morning", label: vi.trolley.shiftOptions.morning },
+  { value: "evening", label: vi.trolley.shiftOptions.evening },
 ];
 
 /**
@@ -227,12 +227,12 @@ export function MobileTrolleyOpenForm({
   if (queued) {
     return (
       <div className="flex flex-col gap-4">
-        <p className="rounded-xl border border-amber-300 bg-amber-50/60 p-4 text-sm">
+        <p className="rounded-xl border border-amber-300 bg-amber-50/60 p-4 text-base">
           {vi.trolley.queuedOpen}
         </p>
         <Button
           onClick={() => router.push(`/m/${propertyId}/trolley`)}
-          className="w-full"
+          className="min-h-11 w-full text-base"
         >
           {vi.trolley.backToList}
         </Button>
@@ -244,12 +244,12 @@ export function MobileTrolleyOpenForm({
     <div className="flex flex-col gap-4">
       <h1 className="text-xl font-semibold">{vi.trolley.openTitle}</h1>
 
-      <label className="flex flex-col gap-1 text-sm font-medium">
+      <label className="flex flex-col gap-1 text-base font-medium">
         {vi.trolley.trolleyWarehouse}
         <select
           value={trolleyWh}
           onChange={(e) => handleTrolleyChange(e.target.value)}
-          className="rounded-md border bg-background px-3 py-2 text-base font-normal"
+          className="min-h-11 rounded-md border bg-background px-3 py-2 text-base font-normal"
         >
           <option value="">{vi.common.selectPlaceholder}</option>
           {trolleyWarehouses.map((w) => (
@@ -261,14 +261,14 @@ export function MobileTrolleyOpenForm({
       </label>
 
       <div className="flex gap-3">
-        <label className="flex flex-1 flex-col gap-1 text-sm font-medium">
+        <label className="flex flex-1 flex-col gap-1 text-base font-medium">
           {vi.trolley.shift}
           <select
             value={shift}
             onChange={(e) =>
               handleShiftChange(e.target.value as TrolleyShiftName)
             }
-            className="rounded-md border bg-background px-3 py-2 text-base font-normal"
+            className="min-h-11 rounded-md border bg-background px-3 py-2 text-base font-normal"
           >
             {SHIFT_OPTIONS.map((o) => (
               <option key={o.value} value={o.value}>
@@ -277,25 +277,27 @@ export function MobileTrolleyOpenForm({
             ))}
           </select>
         </label>
-        <label className="flex flex-1 flex-col gap-1 text-sm font-medium">
+        <label className="flex flex-1 flex-col gap-1 text-base font-medium">
           {vi.trolley.businessDate}
           <input
             type="date"
             value={businessDate}
             onChange={(e) => handleBusinessDateChange(e.target.value)}
-            className="rounded-md border bg-background px-3 py-2 text-base font-normal"
+            className="min-h-11 rounded-md border bg-background px-3 py-2 text-base font-normal"
           />
         </label>
       </div>
 
       {parError ? (
-        <p className="rounded-xl border border-destructive/40 bg-destructive/5 p-3 text-sm text-destructive">
+        <p className="rounded-xl border border-destructive/40 bg-destructive/5 p-3 text-base text-destructive">
           {parError}
         </p>
       ) : null}
 
       {trolleyWh && parItems.length === 0 && !parError ? (
-        <p className="text-sm text-muted-foreground">{vi.trolley.noParItems}</p>
+        <p className="text-base text-muted-foreground">
+          {vi.trolley.noParItems}
+        </p>
       ) : null}
 
       {trolleyWh && parItems.length > 0 ? (
@@ -315,13 +317,13 @@ export function MobileTrolleyOpenForm({
       ) : null}
 
       {!online ? (
-        <p className="rounded-xl border border-amber-300 bg-amber-50/60 p-3 text-sm">
+        <p className="rounded-xl border border-amber-300 bg-amber-50/60 p-3 text-base">
           {vi.offline.offlineQueuedNote}
         </p>
       ) : null}
 
       {error ? (
-        <p className="rounded-xl border border-destructive/40 bg-destructive/5 p-3 text-sm text-destructive">
+        <p className="rounded-xl border border-destructive/40 bg-destructive/5 p-3 text-base text-destructive">
           {error}
         </p>
       ) : null}
@@ -335,7 +337,7 @@ export function MobileTrolleyOpenForm({
           !countedAll ||
           submitting
         }
-        className={cn("w-full", !online && "opacity-90")}
+        className={cn("min-h-11 w-full text-base", !online && "opacity-90")}
       >
         {submitting
           ? vi.common.submitting
@@ -344,7 +346,7 @@ export function MobileTrolleyOpenForm({
             : vi.trolley.openSubmitOffline}
       </Button>
       {!countedAll && parItems.length > 0 ? (
-        <p className="text-sm text-muted-foreground">
+        <p className="text-base text-muted-foreground">
           {vi.trolley.countAllRequired}
         </p>
       ) : null}

@@ -44,6 +44,22 @@ export function requireTestUser(): void {
   );
 }
 
+/**
+ * Tang LIVE-DATA mobile (W5): chay tren property test rieng (TEST47),
+ * khong chay tren SONHOIAN — tai khoan TEST02 chi co vai tro tren
+ * TEST47, mo /m/SONHOIAN se 404 (property khong thuoc quyen).
+ * Can: TEST_PROPERTY_ID=<id TEST47> + TEST_USER_EMAIL/TEST_USER_PASSWORD
+ * (email TEST02) + seed mau da xong (doi dieu phoi vien bao).
+ */
+export function requireMobileLive(): void {
+  test.skip(
+    !hasTestUser || !process.env.TEST_PROPERTY_ID,
+    "Tang LIVE-DATA mobile can TEST_PROPERTY_ID (property test, khong " +
+      "phai SONHOIAN) + TEST_USER_EMAIL/TEST_USER_PASSWORD — xem " +
+      "tests/e2e/README.md muc Mobile (W5).",
+  );
+}
+
 export function requireWrite(): void {
   test.skip(
     !writeEnabled(),

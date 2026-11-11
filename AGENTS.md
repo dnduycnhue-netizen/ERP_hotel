@@ -24,7 +24,7 @@ Mục tiêu: chặn thất thoát ở các khâu mua – nhận – lưu kho –
 | Backend | Supabase: Postgres, Auth, Storage, RLS, RPC (hàm Postgres), Edge Functions, `pg_cron`, `pg_net` |
 | Excel | `exceljs` (xuất), `xlsx`/SheetJS (đọc file import) |
 | Test | pgTAP (`supabase test db`), Vitest, Playwright |
-| Hosting | Vercel (web) + Supabase Cloud (region Singapore) |
+| Hosting | Vercel (web) + Supabase Cloud (region ap-south-1 Mumbai) |
 
 Thêm thư viện mới → ghi lý do vào `docs/decisions/ADR-xxx.md` trước.
 

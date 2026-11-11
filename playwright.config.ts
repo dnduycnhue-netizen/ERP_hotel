@@ -100,5 +100,25 @@ export default defineConfig({
         viewport: { width: 1280, height: 800 },
       },
     },
+    {
+      name: "mobile-local",
+      testMatch: /mobile\/00-local\.spec\.ts/,
+      use: {
+        viewport: { width: 390, height: 844 },
+        hasTouch: true,
+        isMobile: true,
+      },
+    },
+    {
+      name: "mobile-live",
+      testMatch: /mobile\/(0[1-6])-.*\.spec\.ts/,
+      dependencies: ["setup"],
+      use: {
+        viewport: { width: 390, height: 844 },
+        hasTouch: true,
+        isMobile: true,
+        storageState: "tests/e2e/.auth/user.json",
+      },
+    },
   ],
 });

@@ -5,7 +5,7 @@
 -- voi fixture khac. Ngay dung ngay hien tai (gio VN) + ngay mai.
 begin;
 create extension if not exists pgtap;
-select plan(69);
+select plan(109);
 
 -- ---------------------------------------------------------------------------
 -- Fixture: org, legal entity, property, uom, vat tu, gia tran, vai tro,
@@ -37,11 +37,7 @@ insert into public.items (id, org_id, code, name, group_id, stock_uom, recipe_uo
   ('d0600000-0200-4000-8000-000000000502', 'd0600000-0200-4000-8000-000000000001', 'ITM_THIT', 'Thịt ba chỉ', 'd0600000-0200-4000-8000-000000000302', 'kg', null, null, true, array['contract']),
   ('d0600000-0200-4000-8000-000000000503', 'd0600000-0200-4000-8000-000000000001', 'ITM_MUOI', 'Muối hạt', 'd0600000-0200-4000-8000-000000000302', 'kg', 'gr', 1000, false, array['contract', 'market']);
 
-insert into public.ceiling_prices (org_id, property_id, item_id, uom, price, valid_from, valid_to, set_by) values
-  ('d0600000-0200-4000-8000-000000000001', 'd0600000-0200-4000-8000-000000000201', 'd0600000-0200-4000-8000-000000000501', 'kg', 12000, '2026-01-01', '2030-12-31', 'd0600000-0200-4000-8000-000000000a01'),
-  ('d0600000-0200-4000-8000-000000000001', 'd0600000-0200-4000-8000-000000000201', 'd0600000-0200-4000-8000-000000000502', 'kg', 50000, '2026-01-01', '2030-12-31', 'd0600000-0200-4000-8000-000000000a01');
-
-insert into public.auth.users (id, instance_id, aud, role, email, encrypted_password, email_confirmed_at, created_at, updated_at, raw_app_meta_data, raw_user_meta_data)
+insert into auth.users (id, instance_id, aud, role, email, encrypted_password, email_confirmed_at, created_at, updated_at, raw_app_meta_data, raw_user_meta_data)
 values
   ('d0600000-0200-4000-8000-000000000a01', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 't060-chef@example.test', '', now(), now(), now(), '{}'::jsonb, '{}'::jsonb),
   ('d0600000-0200-4000-8000-000000000a02', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 't060-oh@example.test', '', now(), now(), now(), '{}'::jsonb, '{}'::jsonb),
@@ -49,6 +45,10 @@ values
   ('d0600000-0200-4000-8000-000000000a04', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 't060-view@example.test', '', now(), now(), now(), '{}'::jsonb, '{}'::jsonb),
   ('d0600000-0200-4000-8000-000000000a05', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 't060-noperm@example.test', '', now(), now(), now(), '{}'::jsonb, '{}'::jsonb),
   ('d0600000-0200-4000-8000-000000000a06', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 't060-own@example.test', '', now(), now(), now(), '{}'::jsonb, '{}'::jsonb);
+
+insert into public.ceiling_prices (org_id, property_id, item_id, uom, price, valid_from, valid_to, set_by) values
+  ('d0600000-0200-4000-8000-000000000001', 'd0600000-0200-4000-8000-000000000201', 'd0600000-0200-4000-8000-000000000501', 'kg', 12000, '2026-01-01', '2030-12-31', 'd0600000-0200-4000-8000-000000000a01'),
+  ('d0600000-0200-4000-8000-000000000001', 'd0600000-0200-4000-8000-000000000201', 'd0600000-0200-4000-8000-000000000502', 'kg', 50000, '2026-01-01', '2030-12-31', 'd0600000-0200-4000-8000-000000000a01');
 
 insert into public.profiles (id, employee_code, full_name) values
   ('d0600000-0200-4000-8000-000000000a01', 'T060_CHEF', 'Bếp trưởng'),
@@ -94,6 +94,19 @@ insert into public.user_property_roles (user_id, role_id, property_id) values
   ('d0600000-0200-4000-8000-000000000a04', 'd0600000-0200-4000-8000-000000000604', 'd0600000-0200-4000-8000-000000000201'),
   ('d0600000-0200-4000-8000-000000000a05', 'd0600000-0200-4000-8000-000000000606', 'd0600000-0200-4000-8000-000000000201'),
   ('d0600000-0200-4000-8000-000000000a06', 'd0600000-0200-4000-8000-000000000605', 'd0600000-0200-4000-8000-000000000201');
+
+-- C11 (Q169): bo phan Bep chinh (outlet_types KITCHEN) + kho chinh +
+-- kho bep, de banquet_confirm / dish_sale_record tu sinh phieu linh
+-- nhap. Them o fixture goc (truoc `set local role authenticated`).
+insert into public.outlet_types (id, org_id, code, name) values
+  ('d0600000-0200-4000-8000-000000000701', 'd0600000-0200-4000-8000-000000000001', 'KITCHEN', 'Bếp chính');
+
+insert into public.outlets (id, property_id, outlet_type_id, code, name) values
+  ('d0600000-0200-4000-8000-000000000702', 'd0600000-0200-4000-8000-000000000201', 'd0600000-0200-4000-8000-000000000701', 'KITCHEN', 'Bếp chính');
+
+insert into public.warehouses (id, property_id, outlet_id, code, name, kind) values
+  ('d0600000-0200-4000-8000-000000000703', 'd0600000-0200-4000-8000-000000000201', null, 'MAIN', 'Kho chính', 'main'),
+  ('d0600000-0200-4000-8000-000000000704', 'd0600000-0200-4000-8000-000000000201', 'd0600000-0200-4000-8000-000000000702', 'KITCHEN', 'Kho bếp', 'outlet');
 
 -- Helper gia lap nguoi dung dang dang nhap (mau T-020/T-022).
 create or replace function _r060_as(p_user uuid) returns void language plpgsql as $$
@@ -827,6 +840,404 @@ select is(
    where x ->> 'dish_code' = 'MON01'),
   120000::numeric,
   'bao cao F&B: MON01 foodcost 50 x 2400 (gia tran hien hanh)'
+);
+
+-- ---------------------------------------------------------------------------
+-- 13. C11 — Danh muc sanh (Q170b): banquet_hall_save.
+-- ---------------------------------------------------------------------------
+select is(
+  (select count(*) from pg_class
+    where oid = 'public.banquet_halls'::regclass and relrowsecurity),
+  1::bigint,
+  'RLS bat cho banquet_halls'
+);
+
+select throws_ok(
+  $q$insert into public.banquet_halls (org_id, property_id, name)
+    values ('d0600000-0200-4000-8000-000000000001', 'd0600000-0200-4000-8000-000000000201', 'Sảnh X')$q$,
+  'P0001', 'ERR_WRITE_GUARD: banquet_halls chi duoc ghi qua RPC',
+  'ghi truc tiep banquet_halls bi write-guard chan'
+);
+
+select _r060_as('d0600000-0200-4000-8000-000000000a05');
+
+select throws_ok(
+  $q$select public.banquet_hall_save(
+    'd0600000-0200-4000-8000-000000000201',
+    '{"name": "Sảnh A", "capacity": 100}'::jsonb)$q$,
+  '42501', 'ERR_FORBIDDEN:restaurant.banquet.manage',
+  'nguoi khong quyen khong luu duoc sanh'
+);
+
+select _r060_as('d0600000-0200-4000-8000-000000000a03');
+
+select ok(
+  (public.banquet_hall_save(
+    'd0600000-0200-4000-8000-000000000201',
+    '{"name": "Sảnh A", "capacity": 100}'::jsonb
+  ) ->> 'ok')::boolean,
+  'banquet_hall_save Sảnh A tra ok'
+);
+
+select is(
+  (select capacity from public.banquet_halls where name = 'Sảnh A'),
+  100,
+  'sanh Sảnh A luu dung suc chua 100'
+);
+
+select throws_ok(
+  $q$select public.banquet_hall_save(
+    'd0600000-0200-4000-8000-000000000201',
+    '{"name": "sảnh a", "capacity": 50}'::jsonb)$q$,
+  'P0001', 'ERR_INVALID_VALUE',
+  'trung ten sanh (khong phan biet hoa/thuong) -> ERR_INVALID_VALUE'
+);
+
+select ok(
+  (public.banquet_hall_save(
+    'd0600000-0200-4000-8000-000000000201',
+    jsonb_build_object(
+      'id', (select id::text from public.banquet_halls where name = 'Sảnh A'),
+      'name', 'Sảnh A', 'capacity', 120)
+  ) ->> 'ok')::boolean,
+  'banquet_hall_save cap nhat suc chua Sảnh A tra ok'
+);
+
+select is(
+  (select capacity from public.banquet_halls where name = 'Sảnh A'),
+  120,
+  'suc chua Sảnh A da doi thanh 120'
+);
+
+select throws_ok(
+  $q$select public.banquet_hall_save(
+    'd0600000-0200-4000-8000-000000000201',
+    '{"name": "Sảnh B", "capacity": 0}'::jsonb)$q$,
+  'P0001', 'ERR_INVALID_VALUE',
+  'suc chua 0 -> ERR_INVALID_VALUE'
+);
+
+select throws_ok(
+  $q$select public.banquet_hall_save(
+    'd0600000-0200-4000-8000-000000000201',
+    '{"name": "   ", "capacity": 10}'::jsonb)$q$,
+  'P0001', 'ERR_INVALID_VALUE',
+  'ten sanh rong -> ERR_INVALID_VALUE'
+);
+
+select _r060_as('d0600000-0200-4000-8000-000000000a04');
+
+select is(
+  (select count(*) from public.banquet_halls),
+  1::bigint,
+  'nguoi chi xem (restaurant.view) doc duoc danh muc sanh'
+);
+
+select _r060_as('d0600000-0200-4000-8000-000000000a05');
+
+select is(
+  (select count(*) from public.banquet_halls),
+  0::bigint,
+  'nguoi khong quyen thay 0 sanh'
+);
+
+-- ---------------------------------------------------------------------------
+-- 14. C11 — Trang thai coc (Q170a): deposit_status chi ghi nhan,
+--     KHONG ghi ap_ledger. 'paid' doi deposit_amount > 0.
+-- ---------------------------------------------------------------------------
+select _r060_as('d0600000-0200-4000-8000-000000000a03');
+
+select throws_ok(
+  $q$select public.banquet_save(
+    'd0600000-0200-4000-8000-000000000201',
+    jsonb_build_object(
+      'customer_name', 'Khách Cọc', 'event_date',
+      ((now() at time zone 'Asia/Ho_Chi_Minh')::date + 2)::text,
+      'start_time', '18:00', 'end_time', '21:00', 'hall', 'Sảnh A',
+      'guests_count', 10, 'deposit_amount', 0, 'deposit_status', 'paid'))$q$,
+  'P0001', 'ERR_INVALID_VALUE',
+  'deposit_status paid nhung tien coc 0 -> ERR_INVALID_VALUE'
+);
+
+select throws_ok(
+  $q$select public.banquet_save(
+    'd0600000-0200-4000-8000-000000000201',
+    jsonb_build_object(
+      'customer_name', 'Khách Cọc', 'event_date',
+      ((now() at time zone 'Asia/Ho_Chi_Minh')::date + 2)::text,
+      'start_time', '18:00', 'end_time', '21:00', 'hall', 'Sảnh A',
+      'guests_count', 10, 'deposit_amount', 100000,
+      'deposit_status', 'bogus'))$q$,
+  'P0001', 'ERR_INVALID_VALUE',
+  'deposit_status ngoai (unpaid, paid) -> ERR_INVALID_VALUE'
+);
+
+select ok(
+  (public.banquet_save(
+    'd0600000-0200-4000-8000-000000000201',
+    jsonb_build_object(
+      'customer_name', 'Chị Đào', 'event_date',
+      ((now() at time zone 'Asia/Ho_Chi_Minh')::date + 2)::text,
+      'start_time', '18:00', 'end_time', '21:00',
+      'hall_id', (select id::text from public.banquet_halls where name = 'Sảnh A'),
+      'guests_count', 50, 'tables_count', 5,
+      'deposit_amount', 2000000, 'deposit_status', 'paid',
+      'dishes', jsonb_build_array(
+        jsonb_build_object('recipe_id', (select id::text from public.recipes where code = 'MON01'), 'qty', 10, 'unit_price', 45000))
+    )
+  ) ->> 'ok')::boolean,
+  'banquet_save tiec B4 (sanh danh muc + da coc) tra ok'
+);
+
+select is(
+  (select deposit_status || '|' || hall from public.banquets
+    where customer_name = 'Chị Đào'),
+  'paid|Sảnh A',
+  'tiec B4 luu deposit_status paid + hall snapshot theo ten sanh danh muc'
+);
+
+select is(
+  (select hall_id from public.banquets where customer_name = 'Chị Đào'),
+  (select id from public.banquet_halls where name = 'Sảnh A'),
+  'tiec B4 luu hall_id tro toi sanh danh muc'
+);
+
+select ok(
+  (public.banquet_save(
+    'd0600000-0200-4000-8000-000000000201',
+    jsonb_build_object(
+      'id', (select id::text from public.banquets where customer_name = 'Chị Đào'),
+      'customer_name', 'Chị Đào', 'event_date',
+      ((now() at time zone 'Asia/Ho_Chi_Minh')::date + 2)::text,
+      'start_time', '18:00', 'end_time', '21:00',
+      'hall_id', (select id::text from public.banquet_halls where name = 'Sảnh A'),
+      'guests_count', 50, 'tables_count', 5,
+      'deposit_amount', 2000000, 'deposit_status', 'unpaid',
+      'dishes', jsonb_build_array(
+        jsonb_build_object('recipe_id', (select id::text from public.recipes where code = 'MON01'), 'qty', 10, 'unit_price', 45000))
+    )
+  ) ->> 'ok')::boolean,
+  'banquet_save cap nhat deposit_status ve unpaid tra ok'
+);
+
+select is(
+  (select deposit_status from public.banquets where customer_name = 'Chị Đào'),
+  'unpaid',
+  'tiec B4 da doi ve unpaid'
+);
+
+select throws_ok(
+  $q$select public.banquet_save(
+    'd0600000-0200-4000-8000-000000000201',
+    jsonb_build_object(
+      'customer_name', 'Khách Lạ', 'event_date',
+      ((now() at time zone 'Asia/Ho_Chi_Minh')::date + 2)::text,
+      'start_time', '18:00', 'end_time', '21:00',
+      'hall_id', '00000000-0000-4000-8000-000000000099',
+      'guests_count', 10))$q$,
+  'P0001', 'ERR_INVALID_VALUE',
+  'hall_id khong ton tai -> ERR_INVALID_VALUE'
+);
+
+-- ---------------------------------------------------------------------------
+-- 15. C11 — portions_per_batch (Q167): so me trong man bep + foodcost
+--     theo phan. MON03: 1000gr gao / me, 10 phan / me -> foodcost
+--     12000 / 10 = 1200 / phan; buffet 25 phan -> 3 me -> 3000gr gao.
+-- ---------------------------------------------------------------------------
+select _r060_as('d0600000-0200-4000-8000-000000000a01');
+
+select ok(
+  (public.recipe_save(
+    'd0600000-0200-4000-8000-000000000201',
+    jsonb_build_object(
+      'code', 'MON03', 'name', 'Cơm rang', 'kind', 'dish',
+      'sale_price', 60000, 'portions_per_batch', 10,
+      'lines', jsonb_build_array(
+        jsonb_build_object('item_id', 'd0600000-0200-4000-8000-000000000501', 'qty', 1000, 'uom', 'gr'))
+    )
+  ) ->> 'ok')::boolean,
+  'recipe_save MON03 (10 phan/me) tra ok'
+);
+
+select is(
+  (select portions_per_batch from public.recipes where code = 'MON03'),
+  10::numeric,
+  'MON03 luu portions_per_batch = 10'
+);
+
+select is(
+  (select foodcost from public.recipe_foodcost_list('d0600000-0200-4000-8000-000000000201')
+    where recipe_id = (select id from public.recipes where code = 'MON03')),
+  1200::numeric,
+  'foodcost MON03 = 12000 / me / 10 phan = 1200 / phan'
+);
+
+select ok(
+  (public.buffet_session_save(
+    'd0600000-0200-4000-8000-000000000201',
+    jsonb_build_object(
+      'business_date', ((now() at time zone 'Asia/Ho_Chi_Minh')::date + 2)::text,
+      'meal', 'breakfast',
+      'dishes', jsonb_build_array(
+        jsonb_build_object('recipe_id', (select id::text from public.recipes where code = 'MON03'), 'planned_qty', 25))
+    )
+  ) ->> 'ok')::boolean,
+  'buffet_session_save phien sang ngay +2 (MON03 x 25) tra ok'
+);
+
+select is(
+  (select (x ->> 'batches')::numeric
+   from jsonb_array_elements(
+     public.restaurant_kitchen_today(
+       'd0600000-0200-4000-8000-000000000201',
+       (now() at time zone 'Asia/Ho_Chi_Minh')::date + 2
+     ) -> 'buffet_sessions') s,
+   jsonb_array_elements(s -> 'dishes') x
+   where x ->> 'recipe_code' = 'MON03'),
+  3::numeric,
+  'man bep: MON03 25 phan / 10 phan-me = 3 me'
+);
+
+select is(
+  (select (x ->> 'total_qty')::numeric
+   from jsonb_array_elements(
+     public.restaurant_kitchen_today(
+       'd0600000-0200-4000-8000-000000000201',
+       (now() at time zone 'Asia/Ho_Chi_Minh')::date + 2
+     ) -> 'prep') x
+   where x ->> 'item_code' = 'ITM_GAO'),
+  3000::numeric,
+  'NVL chuan bi ngay +2: gao 1000gr x 3 me = 3000gr'
+);
+
+-- ---------------------------------------------------------------------------
+-- 16. C11 — Tu sinh phieu linh nhap khi xac nhan tiec (Q169).
+--     B4 (MON01 x 10, dinh luong v2 200gr gao/phan) -> 2000gr = 2 kg,
+--     kho bep nhan tu kho chinh, trang thai draft, KHONG tu duyet.
+--     B5 (mon MON04 khong co dong dinh luong) -> khong co phieu.
+-- ---------------------------------------------------------------------------
+select _r060_as('d0600000-0200-4000-8000-000000000a03');
+
+select is(
+  (select count(*) from public.outlets
+    where property_id = 'd0600000-0200-4000-8000-000000000201'
+      and code = 'KITCHEN'),
+  1::bigint,
+  'fixture co 1 outlet Bep chinh (KITCHEN)'
+);
+
+select ok(
+  ((public.banquet_confirm(
+    'd0600000-0200-4000-8000-000000000201',
+    (select id from public.banquets where customer_name = 'Chị Đào')
+  ) ->> 'requisition_id') is not null,
+  'banquet_confirm B4 tra ve requisition_id (phieu linh nhap da sinh)'
+);
+
+select is(
+  (select status from public.banquets where customer_name = 'Chị Đào'),
+  'confirmed',
+  'tiec B4 da xac nhan'
+);
+
+select is(
+  (select status from public.requisitions
+    where note = 'Tự động từ tiệc ' || (select doc_no from public.banquets where customer_name = 'Chị Đào')),
+  'draft',
+  'phieu linh tu dong cua B4 o trang thai draft (khong tu duyet)'
+);
+
+select is(
+  (select count(*) from public.requisition_lines
+    where requisition_id = (select id from public.requisitions
+      where note = 'Tự động từ tiệc ' || (select doc_no from public.banquets where customer_name = 'Chị Đào'))),
+  1::bigint,
+  'phieu linh tu dong cua B4 co 1 dong NVL'
+);
+
+select is(
+  (select qty_stock from public.requisition_lines
+    where requisition_id = (select id from public.requisitions
+      where note = 'Tự động từ tiệc ' || (select doc_no from public.banquets where customer_name = 'Chị Đào'))),
+  2::numeric,
+  'phieu linh B4: gao 200gr x 10 phan = 2000gr = 2 kg (stock_uom)'
+);
+
+select is(
+  (select uom from public.requisition_lines
+    where requisition_id = (select id from public.requisitions
+      where note = 'Tự động từ tiệc ' || (select doc_no from public.banquets where customer_name = 'Chị Đào'))),
+  'kg',
+  'phieu linh B4: dong NVL tinh theo stock_uom kg'
+);
+
+select ok(
+  (public.recipe_save(
+    'd0600000-0200-4000-8000-000000000201',
+    '{"code": "MON04", "name": "Món chưa có định lượng", "kind": "dish", "sale_price": 10000, "lines": []}'::jsonb
+  ) ->> 'ok')::boolean,
+  'recipe_save MON04 (khong dong dinh luong) tra ok'
+);
+
+select ok(
+  (public.banquet_save(
+    'd0600000-0200-4000-8000-000000000201',
+    jsonb_build_object(
+      'customer_name', 'Chị Hoa', 'event_date',
+      ((now() at time zone 'Asia/Ho_Chi_Minh')::date + 2)::text,
+      'start_time', '10:00', 'end_time', '12:00', 'hall', 'Sảnh B',
+      'guests_count', 20,
+      'dishes', jsonb_build_array(
+        jsonb_build_object('recipe_id', (select id::text from public.recipes where code = 'MON04'), 'qty', 10, 'unit_price', 10000))
+    )
+  ) ->> 'ok')::boolean,
+  'banquet_save tiec B5 (mon khong dinh luong) tra ok'
+);
+
+select ok(
+  ((public.banquet_confirm(
+    'd0600000-0200-4000-8000-000000000201',
+    (select id from public.banquets where customer_name = 'Chị Hoa')
+  ) ->> 'requisition_id') is null,
+  'banquet_confirm B5 tra requisition_id NULL (mon khong co NVL)'
+);
+
+select is(
+  (select status from public.banquets where customer_name = 'Chị Hoa'),
+  'confirmed',
+  'tiec B5 van xac nhan binh thuong du khong sinh phieu'
+);
+
+-- ---------------------------------------------------------------------------
+-- 17. C11 — Tu sinh phieu linh nhap khi ghi ban mon (Q169).
+--     MON03 x 7 phan -> ceil(7/10) = 1 me -> 1000gr gao = 1 kg.
+-- ---------------------------------------------------------------------------
+select ok(
+  ((public.dish_sale_record(
+    'd0600000-0200-4000-8000-000000000201',
+    (now() at time zone 'Asia/Ho_Chi_Minh')::date,
+    (select id from public.recipes where code = 'MON03'),
+    7, 60000
+  ) ->> 'requisition_id') is not null,
+  'dish_sale_record MON03 x 7 tra ve requisition_id'
+);
+
+select is(
+  (select count(*) from public.requisition_lines
+    where requisition_id = (select id from public.requisitions
+      where note like 'Tự động từ bán món Cơm rang%' 
+      order by created_at desc limit 1)),
+  1::bigint,
+  'phieu linh tu dong cua ban MON03 co 1 dong NVL'
+);
+
+select is(
+  (select qty_stock from public.requisition_lines
+    where requisition_id = (select id from public.requisitions
+      where note like 'Tự động từ bán món Cơm rang%'
+      order by created_at desc limit 1)),
+  1::numeric,
+  'phieu linh ban MON03: gao 1000gr x 1 me = 1 kg'
 );
 
 select * from finish();

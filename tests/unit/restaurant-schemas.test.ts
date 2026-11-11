@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  banquetHallSaveSchema,
   banquetSaveSchema,
   buffetSessionSaveSchema,
   dishSaleRecordSchema,
@@ -131,6 +132,72 @@ describe("banquetSaveSchema", () => {
   it("chặn số khách <= 0", () => {
     expect(
       banquetSaveSchema.safeParse({ ...base, guestsCount: 0 }).success,
+    ).toBe(false);
+  });
+
+  it("chấp nhận tiệc chọn sảnh danh mục + đã cọc", () => {
+    expect(
+      banquetSaveSchema.safeParse({
+        ...base,
+        hallId: "00000000-0000-4000-8000-000000000002",
+        depositAmount: 2000000,
+        depositStatus: "paid",
+      }).success,
+    ).toBe(true);
+  });
+
+  it("chặn đã cọc nhưng tiền cọc bằng 0", () => {
+    expect(
+      banquetSaveSchema.safeParse({
+        ...base,
+        depositAmount: 0,
+        depositStatus: "paid",
+      }).success,
+    ).toBe(false);
+  });
+
+  it("chặn trạng thái cọc ngoài danh mục", () => {
+    expect(
+      banquetSaveSchema.safeParse({
+        ...base,
+        depositAmount: 100000,
+        depositStatus: "partial",
+      }).success,
+    ).toBe(false);
+  });
+
+  it("chặn hallId không phải UUID", () => {
+    expect(
+      banquetSaveSchema.safeParse({ ...base, hallId: "sanh-a" }).success,
+    ).toBe(false);
+  });
+});
+
+describe("banquetHallSaveSchema", () => {
+  const base = {
+    propertyId: "00000000-0000-4000-8000-000000000001",
+    name: "Sảnh A",
+  };
+
+  it("chấp nhận sảnh chỉ có tên", () => {
+    expect(banquetHallSaveSchema.safeParse(base).success).toBe(true);
+  });
+
+  it("chấp nhận sảnh có sức chứa", () => {
+    expect(
+      banquetHallSaveSchema.safeParse({ ...base, capacity: 120 }).success,
+    ).toBe(true);
+  });
+
+  it("chặn tên sảnh rỗng", () => {
+    expect(
+      banquetHallSaveSchema.safeParse({ ...base, name: "   " }).success,
+    ).toBe(false);
+  });
+
+  it("chặn sức chứa <= 0", () => {
+    expect(
+      banquetHallSaveSchema.safeParse({ ...base, capacity: 0 }).success,
     ).toBe(false);
   });
 });

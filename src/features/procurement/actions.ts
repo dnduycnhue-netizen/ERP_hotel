@@ -7,6 +7,7 @@ import {
   advanceDisburseSchema,
   advanceRequestSchema,
   approvalDecideSchema,
+  approvalDelegationDeleteSchema,
   approvalDelegationSaveSchema,
   itemSearchSchema,
   marketOrderCreateSchema,
@@ -24,6 +25,7 @@ import {
   type AdvanceDisburseInput,
   type AdvanceRequestInput,
   type ApprovalDecideInput,
+  type ApprovalDelegationDeleteInput,
   type ApprovalDelegationSaveInput,
   type ItemSearchInput,
   type MarketOrderCreateInput,
@@ -331,6 +333,25 @@ export async function saveApprovalDelegationAction(
         valid_to: parsed.data.validTo,
         reason: parsed.data.reason ?? null,
       },
+    },
+  );
+}
+
+/** Xóa ủy quyền duyệt (RPC `admin_approval_delegation_delete`, T-020). */
+export async function deleteApprovalDelegationAction(
+  input: ApprovalDelegationDeleteInput,
+): Promise<ProcurementActionResult<{ id: string }>> {
+  const parsed = approvalDelegationDeleteSchema.safeParse(input);
+  if (!parsed.success) {
+    return validationError(parsed.error.issues);
+  }
+  const supabase = await createClient();
+  return callProcurementRpc<{ id: string }>(
+    supabase,
+    "admin_approval_delegation_delete",
+    {
+      p_org_id: parsed.data.orgId,
+      p_delegation_id: parsed.data.delegationId,
     },
   );
 }

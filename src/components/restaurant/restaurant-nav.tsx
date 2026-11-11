@@ -54,6 +54,10 @@ export function RestaurantNav({ propertyId }: { propertyId: string }) {
       href: `/${propertyId}/restaurant/banquets`,
       label: vi.restaurant.navBanquets,
     });
+    links.push({
+      href: `/${propertyId}/restaurant/halls`,
+      label: vi.restaurant.navHalls,
+    });
   }
 
   if (links.length === 0) return null;

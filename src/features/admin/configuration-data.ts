@@ -242,6 +242,51 @@ export function listApprovalApprovers(
   });
 }
 
+export type ApprovalDelegation = {
+  id: string;
+  org_id: string;
+  from_user: string;
+  to_user: string;
+  property_id: string | null;
+  valid_from: string;
+  valid_to: string;
+  reason: string | null;
+};
+
+/**
+ * Danh sách ủy quyền duyệt (C9). Đọc trực tiếp bảng `approval_delegations`
+ * (policy `approval_delegations_select`: người ủy quyền / người được ủy
+ * quyền / người có `admin.approval_rules.manage`). `database.types.ts`
+ * chưa có bảng này nên ép kiểu có chủ đích tại đúng chỗ này
+ * (mẫu alerts/queries.ts). Phạm vi chuỗi chỉ liệt kê ủy quyền toàn chuỗi;
+ * phạm vi khách sạn liệt kê ủy quyền của khách sạn đó + toàn chuỗi.
+ */
+export async function listApprovalDelegations(
+  supabase: Client,
+  orgId: string,
+  propertyId: string | null,
+): Promise<ApprovalDelegation[]> {
+  const untyped = supabase as unknown as SupabaseClient;
+  let query = untyped
+    .from("approval_delegations")
+    .select(
+      "id, org_id, from_user, to_user, property_id, valid_from, valid_to, reason",
+    )
+    .eq("org_id", orgId);
+  if (propertyId === null) {
+    query = query.is("property_id", null);
+  } else {
+    query = query.or(`property_id.eq.${propertyId},property_id.is.null`);
+  }
+  const { data, error } = await query.order("valid_from", {
+    ascending: false,
+  });
+  if (error) {
+    throw error;
+  }
+  return (data ?? []) as unknown as ApprovalDelegation[];
+}
+
 export function listAlertRules(
   supabase: Client,
   orgId: string,

@@ -61,6 +61,50 @@ export async function callExportRpc(
   return { ok: true, data: data as ExportPayload };
 }
 
+/**
+ * Goi RPC tra jsonb bat ky (C3: `export_po_data`, `export_bank_transfer`,
+ * `export_batch_record`). Cung quy tac bind nhu `callExportRpc` (xem ghi
+ * chu o tren): `supabase.rpc` doc `this.rest` nen phai `.bind`.
+ */
+export type JsonRpcResult =
+  | { ok: true; data: unknown }
+  | {
+      ok: false;
+      /** Ma loi dang ERR_* (khong kem chi tiet). */
+      code: string | null;
+      /** Chi tiet sau dau ":" (vd danh sach so chung tu), neu co. */
+      detail: string | null;
+      /** SQLSTATE tu PostgREST (42501 / 22023 / P0001...), neu co. */
+      sqlstate: string | null;
+      message: string;
+    };
+
+export async function callJsonRpc(
+  supabase: RpcClient,
+  fn: string,
+  args: Record<string, unknown>,
+): Promise<JsonRpcResult> {
+  const caller = supabase.rpc.bind(supabase) as unknown as (
+    fn: string,
+    args: Record<string, unknown>,
+  ) => Promise<{
+    data: unknown;
+    error: { message: string; code?: string } | null;
+  }>;
+  const { data, error } = await caller(fn, args);
+  if (error) {
+    const parsed = parseRpcError(error.message);
+    return {
+      ok: false,
+      code: parsed.code,
+      detail: parsed.detail,
+      sqlstate: error.code ?? null,
+      message: error.message,
+    };
+  }
+  return { ok: true, data };
+}
+
 /** "ERR_EXPORT_NOT_LOCKED: 03/12/2026" -> { code, detail }. */
 function parseRpcError(message: string): {
   code: string | null;

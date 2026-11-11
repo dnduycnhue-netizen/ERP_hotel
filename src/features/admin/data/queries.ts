@@ -394,3 +394,132 @@ export async function getEffectivePermissions(
   }
   return result.data.permissions;
 }
+
+export type OrgPropertySummary = {
+  id: string;
+  code: string;
+  name: string;
+  sod_profile: string;
+  rooms_count: number;
+};
+
+export type OrgLegalEntitySummary = {
+  id: string;
+  code: string;
+  name: string;
+};
+
+export type OrgSummary = {
+  id: string;
+  name: string;
+  legalEntities: OrgLegalEntitySummary[];
+  properties: OrgPropertySummary[];
+};
+
+export type OrgDetail = {
+  org: { id: string; name: string };
+  legalEntity: OrgLegalEntitySummary & {
+    tax_code: string | null;
+    accounting_regime: string;
+    costing_method: string;
+  };
+  property: OrgPropertySummary & { address: string | null };
+  roles: RoleRow[];
+};
+
+/**
+ * Danh sách tổ chức mà người dùng thấy được (RLS: tổ chức chỉ hiện khi
+ * có ít nhất một property thuộc tổ chức nằm trong my_property_ids()).
+ * Dùng cho /admin/organizations.
+ */
+export async function listOrganizations(
+  supabase: Client,
+): Promise<OrgSummary[]> {
+  const [
+    { data: orgs, error: orgsError },
+    { data: entities },
+    { data: props },
+  ] = await Promise.all([
+    supabase.from("organizations").select("id, name").order("name"),
+    supabase
+      .from("legal_entities")
+      .select("id, org_id, code, name")
+      .order("code"),
+    supabase
+      .from("properties")
+      .select("id, org_id, code, name, sod_profile, rooms_count")
+      .order("code"),
+  ]);
+  if (orgsError) {
+    throw orgsError;
+  }
+  return (orgs ?? []).map((org) => ({
+    id: org.id,
+    name: org.name,
+    legalEntities: (entities ?? [])
+      .filter((entity) => entity.org_id === org.id)
+      .map(({ id, code, name }) => ({ id, code, name })),
+    properties: (props ?? [])
+      .filter((property) => property.org_id === org.id)
+      .map(({ id, code, name, sod_profile, rooms_count }) => ({
+        id,
+        code,
+        name,
+        sod_profile,
+        rooms_count,
+      })),
+  }));
+}
+
+/**
+ * Chi tiết tổ chức mới tạo (tổ chức + pháp nhân đầu tiên + khách sạn đầu
+ * tiên + vai trò mẫu) cho trang thành công /admin/organizations/[id]
+ * kèm wizard gán nhanh. Trả null khi người dùng không thấy tổ chức đó.
+ */
+export async function getOrgDetail(
+  supabase: Client,
+  orgId: string,
+): Promise<OrgDetail | null> {
+  const { data: org, error: orgError } = await supabase
+    .from("organizations")
+    .select("id, name")
+    .eq("id", orgId)
+    .maybeSingle();
+  if (orgError) {
+    throw orgError;
+  }
+  if (!org) {
+    return null;
+  }
+  const [{ data: entities }, { data: props }, { data: roles }] =
+    await Promise.all([
+      supabase
+        .from("legal_entities")
+        .select("id, code, name, tax_code, accounting_regime, costing_method")
+        .eq("org_id", orgId)
+        .order("created_at"),
+      supabase
+        .from("properties")
+        .select("id, code, name, address, sod_profile, rooms_count")
+        .eq("org_id", orgId)
+        .order("created_at"),
+      supabase
+        .from("roles")
+        .select(
+          "id, org_id, code, name_vi, description, is_system, active, copied_from_id, created_at",
+        )
+        .eq("org_id", orgId)
+        .order("name_vi"),
+    ]);
+  const legalEntity = (entities ?? [])[0];
+  const property = (props ?? [])[0];
+  if (!legalEntity || !property) {
+    return null;
+  }
+  return {
+    org,
+    legalEntity,
+    property,
+    roles: (roles ?? []) as RoleRow[],
+  };
+}

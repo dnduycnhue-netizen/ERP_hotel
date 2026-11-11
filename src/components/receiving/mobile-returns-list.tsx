@@ -73,14 +73,18 @@ export function MobileReturnsList({
         {canReturn ? (
           <Link
             href={`/m/${propertyId}/receive/returns/new`}
-            className={cn(buttonVariants({ size: "sm" }))}
+            className={cn(buttonVariants({ size: "sm" }), "min-h-11")}
           >
             {vi.receiving.newReturnTitle}
           </Link>
         ) : null}
       </div>
 
-      <div className="flex gap-2" role="group" aria-label={vi.common.status}>
+      <div
+        className="flex flex-wrap gap-2"
+        role="group"
+        aria-label={vi.common.status}
+      >
         {(
           [
             ["", vi.common.all],
@@ -96,13 +100,14 @@ export function MobileReturnsList({
             variant={status === value ? "default" : "outline"}
             onClick={() => setStatus(value)}
             aria-pressed={status === value}
+            className="min-h-11"
           >
             {label}
           </Button>
         ))}
       </div>
 
-      <p className="text-sm text-muted-foreground">
+      <p className="text-base text-muted-foreground">
         {total} {vi.receiving.returnsListTitle.toLowerCase()}
       </p>
 
@@ -122,18 +127,18 @@ export function MobileReturnsList({
               >
                 <span className="flex items-start justify-between gap-3">
                   <span className="flex min-w-0 flex-col gap-1">
-                    <span className="flex items-center gap-2 font-semibold">
+                    <span className="flex items-center gap-2 text-base font-semibold">
                       <Undo2 className="size-4 shrink-0" aria-hidden />
                       <span className="truncate">{ret.doc_no}</span>
                     </span>
-                    <span className="text-sm text-muted-foreground">
+                    <span className="text-base text-muted-foreground">
                       {ret.supplier_name} · {ret.line_count}{" "}
                       {vi.receiving.taskLineCount}
                     </span>
-                    <span className="text-sm text-muted-foreground">
+                    <span className="text-base text-muted-foreground">
                       {vi.receiving.returnGrDocNo}: {ret.gr_doc_no ?? "—"}
                     </span>
-                    <span className="text-sm text-muted-foreground">
+                    <span className="text-base text-muted-foreground">
                       {formatDate(ret.created_at)}
                     </span>
                   </span>
