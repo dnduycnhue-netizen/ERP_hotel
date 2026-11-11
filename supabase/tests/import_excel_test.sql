@@ -130,10 +130,10 @@ select is(
   1, 'skipped_blank = 1');
 select is(
   (select (counts ->> 'errors')::integer from public.import_batches where file_name = 'nvl-test.xlsx'),
-  7, 'errors = 7 (DUP x2, NO_FACTOR x2, NEAR_DUP, UNKNOWN_UOM, UNKNOWN_GROUP)');
+  8, 'errors = 8 (DUP x2, NO_FACTOR x2, NEAR_DUP x2 dong 7+8, UNKNOWN_UOM, UNKNOWN_GROUP)');
 select is(
   (select (counts ->> 'warnings')::integer from public.import_batches where file_name = 'nvl-test.xlsx'),
-  3, 'warnings = 3 (NO_CODE, EXISTING, INVALID_FACTOR)');
+  2, 'warnings = 2 (NO_CODE, INVALID_FACTOR — EXISTING dong 7 la warning nhung dong mang them NEAR_DUP error nen status=error)');
 select is(
   (select (counts ->> 'dup_code')::integer from public.import_batches where file_name = 'nvl-test.xlsx'),
   2, 'dup_code = 2 dong (NVL0029 x2)');
@@ -148,7 +148,7 @@ select is(
   1, 'unknown_group = 1');
 select is(
   (select (counts ->> 'near_dup')::integer from public.import_batches where file_name = 'nvl-test.xlsx'),
-  1, 'near_dup = 1 (ten trung ma khac)');
+  2, 'near_dup = 2 (dong 7 trung ten chinh NVL0996 + dong 8)');
 select is(
   (select (counts ->> 'no_code')::integer from public.import_batches where file_name = 'nvl-test.xlsx'),
   1, 'no_code = 1');
@@ -172,6 +172,12 @@ select public.import_resolve_row(
   (select id from public.import_batches where file_name = 'nvl-test.xlsx'),
   (select id from public.import_rows where batch_id = (select id from public.import_batches where file_name = 'nvl-test.xlsx') and row_no = 6),
   '{"action":"set_factor","factor":1000}'::jsonb);
+-- Dong 7 (NVL0996 da co, trung ten): mang NEAR_DUP error nen §6 phai
+-- resolve no — skip khop voi §7 (skipped = 2: EXISTING + dong trong).
+select public.import_resolve_row(
+  (select id from public.import_batches where file_name = 'nvl-test.xlsx'),
+  (select id from public.import_rows where batch_id = (select id from public.import_batches where file_name = 'nvl-test.xlsx') and row_no = 7),
+  '{"action":"skip"}'::jsonb);
 select public.import_resolve_row(
   (select id from public.import_batches where file_name = 'nvl-test.xlsx'),
   (select id from public.import_rows where batch_id = (select id from public.import_batches where file_name = 'nvl-test.xlsx') and row_no = 8),
