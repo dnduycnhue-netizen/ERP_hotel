@@ -308,10 +308,18 @@ select throws_ok(
   'P0001', 'ERR_INVALID_VALUE', 'nonexistent schedule is rejected'
 );
 
+-- Lay id lich d01 truoc khi doi sang thu kho: policy
+-- service_schedules_select an lich khoi thu kho (khong co quyen nao
+-- trong danh sach) nen subquery truc tiep tra NULL -> ham nhan
+-- p_schedule_id NULL va raise ERR_INVALID_VALUE thay vi 42501.
+-- (a06 ky su thay duoc lich nen lay luc nay; t042_ctx la bang tam,
+-- khong RLS, thu kho doc duoc.)
+insert into t042_ctx values ('sched_d01', (select id from public.service_schedules where contract_id = 'd0420000-0000-4000-8000-000000000d01'));
+
 -- Sai quyen: thu kho khong co service.accept.
 select public._t042_as('d0420000-0000-4000-8000-000000000a07');
 select throws_ok(
-  $q$select public.service_accept((select id from public.service_schedules where contract_id = 'd0420000-0000-4000-8000-000000000d01'), 5, '[]'::jsonb)$q$,
+  $q$select public.service_accept((select id from t042_ctx where key = 'sched_d01'), 5, '[]'::jsonb)$q$,
   '42501', 'ERR_FORBIDDEN:service.accept', 'storekeeper cannot accept'
 );
 
