@@ -202,8 +202,8 @@ select is(
 select is(
   (select distinct title from public.notification_deliveries
     where alert_id = 'd0450000-4500-4000-8000-000000000901'),
-  '3 cảnh báo mức Vàng',
-  'tieu de tin gom ghi dung so alert + muc'
+  '3 cảnh báo mức Vàng — Property T-045',
+  'tieu de tin gom ghi dung so alert + muc + ten KS (flush them " — <ten KS>")'
 );
 select is(
   (select count(*) from public.notification_deliveries
@@ -369,6 +369,12 @@ select is(
 );
 
 -- 7. Guard + RLS + cron (chay truoc khi doi role).
+-- GHI CHU: fixture da bat app.notification_guard_bypass='on' (set_config
+-- local = het transaction) de chen push_subscriptions; phai tat lai o
+-- day khong thi INSERT truc tiep ben duoi se lot qua guard (khong raise)
+-- va throws_ok rot. Bang alerts khong co guard trigger nen INSERT alert
+-- o §8 sau do van chay duoc.
+select set_config('app.notification_guard_bypass', 'off', true);
 select throws_ok(
   $q$insert into public.notification_deliveries
     (org_id, property_id, kind, channel, recipient_address, title, dedupe_key)
@@ -391,7 +397,7 @@ select is(
     where schemaname = 'public'
       and tablename in ('notification_targets', 'push_subscriptions',
         'notification_deliveries', 'notification_sender_config')
-      and definition ilike '%= any (public.my_property_ids())%'),
+      and (qual ilike '%= any (public.my_property_ids())%' or with_check ilike '%= any (public.my_property_ids())%')),
   0::bigint,
   'khong policy moi nao dung = any (my_property_ids())'
 );
