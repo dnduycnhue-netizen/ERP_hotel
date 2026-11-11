@@ -1,7 +1,7 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 set local search_path = public, extensions;
-select plan(102);
+select plan(103);
 insert into public.organizations (id, name) values
   ('d0320000-0000-4000-8000-000000000001', 'T-032 Master Org');
 insert into public.legal_entities (id, org_id, code, name) values
@@ -695,7 +695,7 @@ select ok(
 );
 insert into t032_ctx values ('cntC', (select (resp ->> 'id')::uuid from t032_resp where key = 'openC'));
 select throws_ok(
-  $q$select public.count_cancel((select id from t032_ctx where key = 'cntC'))$q$,
+  $q$select public.count_cancel((select id from t032_ctx where key = 'cntC'), null)$q$,
   'P0001', 'ERR_REASON_REQUIRED',
   'cancel without a reason is rejected'
 );
@@ -827,6 +827,12 @@ select is(
   (select status from public.stock_counts where id = (select id from t032_ctx where key = 'cntB2')),
   'submitted', 'KIT count is submitted with zero variance'
 );
+select public._t032_as('d0320000-0000-4000-8000-000000000a07');
+select throws_ok(
+  $q$select public.period_close('d0320000-0000-4000-8000-000000000101', 2026, 11)$q$,
+  'P0001', 'ERR_COUNT_NOT_LOCKED',
+  'period_close is blocked while KIT count B2 is only submitted, not locked'
+);
 select public._t032_as('d0320000-0000-4000-8000-000000000a06');
 select ok(
   (select (resp ->> 'ok')::boolean from (
@@ -927,8 +933,8 @@ insert into t032_ctx values ('cntB3', (select (resp ->> 'id')::uuid from t032_re
 select public._t032_as('d0320000-0000-4000-8000-000000000a07');
 select throws_ok(
   $q$select public.period_close('d0320000-0000-4000-8000-000000000101', 2026, 11)$q$,
-  'P0001', 'ERR_COUNT_NOT_LOCKED',
-  'period_close is blocked while KIT count B3 is unfinished'
+  'P0001', 'ERR_PO_UNRESOLVED',
+  'period_close is blocked by the stale PO even while KIT count B3 is unfinished'
 );
 select public._t032_as('d0320000-0000-4000-8000-000000000a01');
 select public.count_record_line(
