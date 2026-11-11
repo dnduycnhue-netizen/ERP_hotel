@@ -7,7 +7,7 @@
 -- voi fixture T-020 (d020).
 begin;
 create extension if not exists pgtap;
-select plan(58);
+select plan(59);
 
 -- ---------------------------------------------------------------------------
 -- Fixture: org, legal entity, property, uom, vat tu, gia tran, vai tro,
@@ -17,10 +17,15 @@ insert into public.organizations (id, name) values
   ('d0220000-0200-4000-8000-000000000001', 'T-022 Master Org');
 
 insert into public.legal_entities (id, org_id, name, code) values
-  ('d0220000-0200-4000-8000-000000000101', 'd0220000-0200-4000-8000-000000000001', 'T022 Entity', 'T022E');
+  ('d0220000-0200-4000-8000-000000000101', 'd0220000-0200-4000-8000-000000000001', 'T022 Entity', 'T022E'),
+  ('d0220000-0200-4000-8000-000000000102', 'd0220000-0200-4000-8000-000000000001', 'T022 Entity 2', 'T022E2');
 
 insert into public.properties (id, org_id, legal_entity_id, code, name, sod_profile) values
-  ('d0220000-0200-4000-8000-000000000201', 'd0220000-0200-4000-8000-000000000001', 'd0220000-0200-4000-8000-000000000101', 'P0221', 'T-022 Property', 'with_cc');
+  ('d0220000-0200-4000-8000-000000000201', 'd0220000-0200-4000-8000-000000000001', 'd0220000-0200-4000-8000-000000000101', 'P0221', 'T-022 Property', 'with_cc'),
+  -- KS thu 2 (cung org) chi de test advance_get sai KS: has_perm tra false
+  -- voi KS khong ton tai nen phai dung KS that de toi duoc guard
+  -- ERR_INVALID_STATUS ben trong ham.
+  ('d0220000-0200-4000-8000-000000000202', 'd0220000-0200-4000-8000-000000000001', 'd0220000-0200-4000-8000-000000000102', 'P0222', 'T-022 Property 2', 'with_cc');
 
 insert into public.uoms (code, name_vi) values ('kg', 'Ký'), ('cai', 'Cái')
 on conflict do nothing;
@@ -91,6 +96,11 @@ insert into public.role_permissions (role_id, permission_code) values
   ('d0220000-0200-4000-8000-000000000604', 'po.approve'),
   ('d0220000-0200-4000-8000-000000000604', 'po.approve.over_ceiling'),
   ('d0220000-0200-4000-8000-000000000604', 'advance.approve'),
+  -- alerts_select doi has_perm(property, 'alert.receive.advance_overdue');
+  -- gan cho gm theo dung 220000 §8 (gm/chief_accountant/cost_controller).
+  -- Chon gm thay vi cost_controller vi subquery doc advances ben trong
+  -- exists() can quyen advance.* (gm co advance.approve, cc khong co).
+  ('d0220000-0200-4000-8000-000000000604', 'alert.receive.advance_overdue'),
   ('d0220000-0200-4000-8000-000000000605', 'po.approve'),
   ('d0220000-0200-4000-8000-000000000605', 'po.close'),
   ('d0220000-0200-4000-8000-000000000606', 'advance.disburse'),
@@ -107,14 +117,17 @@ insert into public.user_property_roles (user_id, role_id, property_id) values
   ('d0220000-0200-4000-8000-000000000a04', 'd0220000-0200-4000-8000-000000000601', 'd0220000-0200-4000-8000-000000000201'),
   ('d0220000-0200-4000-8000-000000000a05', 'd0220000-0200-4000-8000-000000000605', 'd0220000-0200-4000-8000-000000000201'),
   ('d0220000-0200-4000-8000-000000000a06', 'd0220000-0200-4000-8000-000000000606', 'd0220000-0200-4000-8000-000000000201'),
+  -- a06 (ke toan) co vai tro o ca P0222 de advance_get(P0222, ...) vuot
+  -- qua cong kiem quyen roi moi roi vao guard sai KS.
+  ('d0220000-0200-4000-8000-000000000a06', 'd0220000-0200-4000-8000-000000000606', 'd0220000-0200-4000-8000-000000000202'),
   ('d0220000-0200-4000-8000-000000000a07', 'd0220000-0200-4000-8000-000000000607', 'd0220000-0200-4000-8000-000000000201'),
   ('d0220000-0200-4000-8000-000000000a08', 'd0220000-0200-4000-8000-000000000601', 'd0220000-0200-4000-8000-000000000201');
 
 insert into public.approval_rules (org_id, property_id, doc_type, min_amount, max_amount, item_group_id, condition, step, approver_role_id, approver_user_id, required_perm) values
-  ('d0220000-0200-4000-8000-000000000001', 'd0220000-0200-4000-8000-000000000201', 'po', 0, 4999999, '{}', 1, 'd0220000-0200-4000-8000-000000000602', null, 'po.approve'),
-  ('d0220000-0200-4000-8000-000000000001', 'd0220000-0200-4000-8000-000000000201', 'po', 5000000, 19999999, '{}', 2, 'd0220000-0200-4000-8000-000000000603', null, 'po.approve'),
-  ('d0220000-0200-4000-8000-000000000001', 'd0220000-0200-4000-8000-000000000201', 'po', 20000000, 99999999, '{}', 3, 'd0220000-0200-4000-8000-000000000604', null, 'po.approve'),
-  ('d0220000-0200-4000-8000-000000000001', 'd0220000-0200-4000-8000-000000000201', 'po', 100000000, null, '{}', 4, 'd0220000-0200-4000-8000-000000000605', null, 'po.approve');
+  ('d0220000-0200-4000-8000-000000000001', 'd0220000-0200-4000-8000-000000000201', 'po', 0, 4999999, null, '{}', 1, 'd0220000-0200-4000-8000-000000000602', null, 'po.approve'),
+  ('d0220000-0200-4000-8000-000000000001', 'd0220000-0200-4000-8000-000000000201', 'po', 5000000, 19999999, null, '{}', 2, 'd0220000-0200-4000-8000-000000000603', null, 'po.approve'),
+  ('d0220000-0200-4000-8000-000000000001', 'd0220000-0200-4000-8000-000000000201', 'po', 20000000, 99999999, null, '{}', 3, 'd0220000-0200-4000-8000-000000000604', null, 'po.approve'),
+  ('d0220000-0200-4000-8000-000000000001', 'd0220000-0200-4000-8000-000000000201', 'po', 100000000, null, null, '{}', 4, 'd0220000-0200-4000-8000-000000000605', null, 'po.approve');
 
 -- Helper gia lap nguoi dung dang dang nhap (mau T-020).
 create or replace function _t022_as(p_user uuid) returns void language plpgsql as $$
@@ -457,7 +470,7 @@ select ok(
 select is(
   (select status from public.purchase_orders where channel = 'market'),
   'submitted',
-  'PO market sau submit o trang thai submitted (cho duyet 1 buoc)'
+  'PO market sau submit o trang thai submitted (cho duyet: outlet_head + gm gia manual)'
 );
 
 select is(
@@ -477,13 +490,31 @@ select ok(
     (select id from public.purchase_orders where channel = 'market'),
     'approved', null
   ) ->> 'ok')::boolean,
-  'outlet_head duyet PO market'
+  'outlet_head duyet PO market (buoc 1)'
+);
+
+-- Buoc gm bo sung: ca 2 dong PO market deu price_source 'manual' (gia
+-- nguoi di cho dua / khong co gia tran) nen _generate_approval_steps
+-- them 1 buoc gm theo 05-BUSINESS-RULES §2 + T-020 quyet dinh 3
+-- (khong co nguon gia -> manual + buoc duyet bo sung cua gm). PO chi
+-- 'approved' sau buoc nay; khong co buoc nay thi advance_disburse
+-- o duoi se bi chan ERR_INVALID_STATUS (PO van submitted).
+select _t022_as('d0220000-0200-4000-8000-000000000a04');
+
+select ok(
+  (public.approval_decide(
+    'd0220000-0200-4000-8000-000000000201',
+    'po',
+    (select id from public.purchase_orders where channel = 'market'),
+    'approved', null
+  ) ->> 'ok')::boolean,
+  'gm duyet buoc bo sung (dong gia manual)'
 );
 
 select is(
   (select status from public.purchase_orders where channel = 'market'),
   'approved',
-  'PO market da approved sau 1 buoc'
+  'PO market da approved sau 2 buoc (outlet_head + gm gia manual)'
 );
 
 select _t022_as('d0220000-0200-4000-8000-000000000a04');
@@ -512,11 +543,17 @@ select ok(
 -- 5. AC T-022: tam ung qua han -> chan tam ung moi + cron danh dau
 -- ---------------------------------------------------------------------------
 -- Gia lap qua han: dua due_settle_at ve qua khu (can bypass guard).
+-- UPDATE truc tiep bi RLS chan duoi role authenticated (advances chi co
+-- SELECT policy, khong co UPDATE policy -> update 0 dong, khong bao loi)
+-- nen ve role postgres (mau c8 / legal-entity test), xong quay lai
+-- authenticated. Guard van can bypass='on' vi trigger chay ca voi postgres.
 select set_config('app.advance_guard_bypass', 'on', true);
 
+reset role;
 update public.advances
 set due_settle_at = now() - interval '2 hours'
 where purpose = 'Mua gạo + muối chợ sớm';
+set local role authenticated;
 
 select _t022_as('d0220000-0200-4000-8000-000000000a01');
 
@@ -564,6 +601,12 @@ select is(
   'overdue',
   'tam ung qua han co status overdue'
 );
+
+-- Doc alert duoi a04 (gm, co alert.receive.advance_overdue + advance.approve):
+-- alerts_select yeu cau dung quyen theo code, a08 (purchaser) khong co
+-- quyen nay nen exists() tra false du alert da tao; subquery doc advances
+-- ben trong cung can quyen advance.* nen phai la gm, khong phai cc.
+select _t022_as('d0220000-0200-4000-8000-000000000a04');
 
 select ok(
   exists (
@@ -621,10 +664,10 @@ select ok(
 
 select throws_ok(
   $q$select public.advance_get(
-    'd0220000-0200-4000-8000-000000000999',
+    'd0220000-0200-4000-8000-000000000202',
     (select id from public.advances where purpose = 'Mua gạo + muối chợ sớm'))$q$,
   'P0001', 'ERR_INVALID_STATUS',
-  'advance_get sai KS -> ERR_INVALID_STATUS'
+  'advance_get sai KS (P0222, a06 co quyen o do) -> ERR_INVALID_STATUS'
 );
 
 -- RLS: nguoi khong co quyen advance.* khong doc duoc dong advances.
