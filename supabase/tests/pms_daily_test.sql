@@ -15,11 +15,12 @@ insert into public.organizations (id, name) values
   ('d0360000-0000-4000-8000-000000000001', 'T-036 Org');
 
 insert into public.legal_entities (id, org_id, code, name) values
-  ('d0360000-0000-4000-8000-000000000101', 'd0360000-0000-4000-8000-000000000001', 'T036', 'Entity T-036');
+  ('d0360000-0000-4000-8000-000000000101', 'd0360000-0000-4000-8000-000000000001', 'T036', 'Entity T-036'),
+  ('d0360000-0000-4000-8000-000000000102', 'd0360000-0000-4000-8000-000000000001', 'T036B', 'Entity T-036 B');
 
 insert into public.properties (id, org_id, legal_entity_id, code, name, sod_profile) values
   ('d0360000-0000-4000-8000-000000000201', 'd0360000-0000-4000-8000-000000000001', 'd0360000-0000-4000-8000-000000000101', 'P0361', 'Property T-036', 'with_cc'),
-  ('d0360000-0000-4000-8000-000000000202', 'd0360000-0000-4000-8000-000000000001', 'd0360000-0000-4000-8000-000000000101', 'P0362', 'Property T-036 B', 'with_cc');
+  ('d0360000-0000-4000-8000-000000000202', 'd0360000-0000-4000-8000-000000000001', 'd0360000-0000-4000-8000-000000000102', 'P0362', 'Property T-036 B', 'with_cc');
 
 insert into auth.users (id, instance_id, aud, role, email, encrypted_password, email_confirmed_at, created_at, updated_at, raw_app_meta_data, raw_user_meta_data)
 values
