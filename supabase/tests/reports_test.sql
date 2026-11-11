@@ -354,7 +354,11 @@ select is(public._t044_num('open_po', 'doc_no', 'PO-044-001', 'remaining_amount'
 select is(public._t044_num('open_po', 'doc_no', 'PO-044-001', 'overdue_days'), 2::numeric, 'PO1 overdue 2 days');
 select is(public._t044_num('open_po', 'doc_no', 'PO-044-002', 'remaining_amount'), 600000::numeric, 'PO2 remaining 600.000');
 select is(public._t044_total('open_po', 'open_po_count'), 2::numeric, 'open PO count 2');
-select is(public._t044_total('open_po', 'open_po_remaining_amount'), 700000::numeric, 'open PO remaining total 700.000');
+-- Tong = tong cac dong: PO1 200.000 (GAO 100.000 + MUOI 100.000) + PO2 600.000.
+-- MUOI van tinh: remaining = (qty_stock - received_qty_stock) * unit_price,
+-- MUOI nhan 0 (QC fail, accepted 0) nen con 20kg x 5.000; tra hang khong
+-- tru vao remaining (NCC van no hang) — ham tong = sum(rows) theo dung spec.
+select is(public._t044_total('open_po', 'open_po_remaining_amount'), 800000::numeric, 'open PO remaining total 800.000');
 select is(public._t044_total('open_po', 'on_hold_count'), 1::numeric, 'on_hold invoice count 1');
 select is(public._t044_total('open_po', 'on_hold_amount'), 1100000::numeric, 'on_hold invoice amount 1.100.000');
 
