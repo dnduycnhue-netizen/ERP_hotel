@@ -156,20 +156,27 @@ select ok(
   (select (resp->>'ok')::boolean from c10_resp where key = 'refresh_cron'),
   'cron-path refresh (no JWT) succeeds'
 );
-select is(
-  (select (resp->>'row_count')::bigint from c10_resp where key = 'refresh_cron'),
-  4::bigint, 'MV has 4 daily rows after refresh'
-);
 -- Doc truc tiep MV chi duoc khi la postgres: 529000 revoke all tren MV khoi
 -- authenticated (chi doc qua RPC SECURITY DEFINER), nen tam reset role.
+-- row_count tra ve tu RPC la TOAN CHUOI (count(*) ca MV) nen KHONG dung
+-- de assert fixture: production da co 28 stock_moves demo (kiem ke mu
+-- 11/11, property SONHOIAN, amount 0) nen row_count = 32, sum qty = 1008.
+-- Assert theo property fixture thay vi doc so toan chuoi.
 reset role;
 select is(
-  (select sum(qty) from public.mv_report_stock_card_daily),
-  136::numeric, 'MV total qty equals stock_moves total qty'
+  (select count(*) from public.mv_report_stock_card_daily
+   where property_id = 'c1000000-0000-4000-8000-000000000201'),
+  4::bigint, 'MV has 4 daily rows for fixture property after refresh'
 );
 select is(
-  (select sum(amount) from public.mv_report_stock_card_daily),
-  1480000::numeric, 'MV total amount equals stock_moves total amount'
+  (select sum(qty) from public.mv_report_stock_card_daily
+   where property_id = 'c1000000-0000-4000-8000-000000000201'),
+  136::numeric, 'MV total qty for fixture property equals fixture stock_moves total qty'
+);
+select is(
+  (select sum(amount) from public.mv_report_stock_card_daily
+   where property_id = 'c1000000-0000-4000-8000-000000000201'),
+  1480000::numeric, 'MV total amount for fixture property equals fixture stock_moves total amount'
 );
 set local role authenticated;
 
