@@ -21,6 +21,7 @@ const settingRanges: Record<
   },
   count_random_items: { min: "2", max: "3", step: "1" },
   count_variance_threshold_pct: { min: "0", max: "100", step: "0.01" },
+  count_recount_threshold_pct: { min: "0", max: "100", step: "0.01" },
   count_without_cc_factor: { min: "0", max: "1", step: "0.01" },
   invoice_price_tolerance_pct: { min: "0", max: "100", step: "0.01" },
   "rule.R25.enabled": { min: "0", max: "1", step: "1" },
