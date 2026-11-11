@@ -202,12 +202,12 @@ insert into public.ap_ledger (id, org_id, legal_entity_id, property_id, supplier
 select set_config('app.finance_guard_bypass', 'off', true);
 select throws_ok(
   $q$update public.ap_ledger set amount = 200 where id = 'd0400000-0000-4000-8000-000000000f01'$q$,
-  'P0001', 'ERR_IMMUTABLE_LEDGER:ap_ledger:UPDATE',
+  '55000', 'ERR_IMMUTABLE_LEDGER:ap_ledger:UPDATE',
   'ap_ledger UPDATE is blocked by immutable trigger'
 );
 select throws_ok(
   $q$delete from public.ap_ledger where id = 'd0400000-0000-4000-8000-000000000f01'$q$,
-  'P0001', 'ERR_IMMUTABLE_LEDGER:ap_ledger:DELETE',
+  '55000', 'ERR_IMMUTABLE_LEDGER:ap_ledger:DELETE',
   'ap_ledger DELETE is blocked by immutable trigger'
 );
 
@@ -560,12 +560,12 @@ select throws_ok(
   'submitted payment request cannot be marked paid'
 );
 
--- 17. RLS ap_ledger: thu kho khong thay gi; ke toan thay du 6 dong
+-- 17. RLS ap_ledger: thu kho khong thay gi; ke toan thay du 7 dong
 --     (tru dong f01 cua test guard o muc 2).
 select public._t040_as('d0400000-0000-4000-8000-000000000a07');
 select is((select count(*) from public.ap_ledger), 0::bigint, 'storekeeper sees 0 ap_ledger rows');
 select public._t040_as('d0400000-0000-4000-8000-000000000a01');
-select is((select count(*) from public.ap_ledger where id <> 'd0400000-0000-4000-8000-000000000f01'), 6::bigint, 'accountant sees 6 ap_ledger rows (2 invoice + 2 returns + 2 payments)');
+select is((select count(*) from public.ap_ledger where id <> 'd0400000-0000-4000-8000-000000000f01'), 7::bigint, 'accountant sees 7 ap_ledger rows (3 invoice + 2 returns + 2 payments)');
 
 -- 18. Bang ke khong hoa don.
 select public._t040_as('d0400000-0000-4000-8000-000000000a01');
