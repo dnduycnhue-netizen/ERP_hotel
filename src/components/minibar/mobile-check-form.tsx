@@ -15,7 +15,9 @@ import { cn } from "@/lib/utils";
 
 /** Giá đang hiệu lực hôm nay của 1 món (valid_from mới nhất, còn hạn). */
 function priceToday(prices: MinibarPriceRow[], itemId: string): number | null {
-  const today = new Date().toISOString().slice(0, 10);
+  const today = new Date().toLocaleDateString("en-CA", {
+    timeZone: "Asia/Ho_Chi_Minh",
+  });
   const valid = prices
     .filter(
       (p) =>

@@ -14,7 +14,9 @@ import { vi } from "@/i18n/vi";
  * báo MINIBAR_MISMATCH (dedupe theo ngày).
  */
 export function OfficeReconcilePanel({ propertyId }: { propertyId: string }) {
-  const today = new Date().toISOString().slice(0, 10);
+  const today = new Date().toLocaleDateString("en-CA", {
+    timeZone: "Asia/Ho_Chi_Minh",
+  });
   const [date, setDate] = useState(today);
   const [pending, setPending] = useState(false);
   const [result, setResult] = useState<MinibarReconcileResult | null>(null);

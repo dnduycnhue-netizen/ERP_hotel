@@ -27,7 +27,9 @@ export function OfficePriceManager({
   prices: MinibarPriceRow[];
 }) {
   const router = useRouter();
-  const today = new Date().toISOString().slice(0, 10);
+  const today = new Date().toLocaleDateString("en-CA", {
+    timeZone: "Asia/Ho_Chi_Minh",
+  });
   const [itemId, setItemId] = useState("");
   const [price, setPrice] = useState("");
   const [validFrom, setValidFrom] = useState(today);

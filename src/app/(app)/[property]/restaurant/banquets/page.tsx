@@ -40,7 +40,7 @@ export default async function BanquetsPage({
   const sp = await searchParams;
   const today = vnToday();
   const toDate = new Date(today);
-  toDate.setDate(toDate.getDate() + 60);
+  toDate.setUTCDate(toDate.getUTCDate() + 60);
   const to = sp.to ?? toDate.toISOString().slice(0, 10);
   const from = sp.from ?? today;
   const status = sp.status ?? "";
