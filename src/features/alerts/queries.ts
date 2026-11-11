@@ -80,6 +80,26 @@ export async function canViewAlerts(propertyId: string): Promise<boolean> {
   return (data ?? []).some((p: string) => p.startsWith("alert.receive."));
 }
 
+/**
+ * Số cảnh báo chưa xử lý (ack_at null) mà người hiện tại thấy được tại
+ * khách sạn — dùng cho chuông ở topbar (Q208). RLS của bảng alerts chỉ
+ * cho thấy dòng có quyền alert.receive.<code> tương ứng nên đếm trực
+ * tiếp qua client là đúng; head-only nên chỉ trả số đếm, không tải dòng.
+ * Lỗi truy vấn trả 0 (không badge) thay vì làm sập vỏ app.
+ */
+export async function countUnreadAlerts(
+  propertyId: string,
+): Promise<number> {
+  const supabase = await createClient();
+  const { count, error } = await untyped(supabase)
+    .from("alerts")
+    .select("id", { count: "exact", head: true })
+    .eq("property_id", propertyId)
+    .is("ack_at", null);
+  if (error) return 0;
+  return count ?? 0;
+}
+
 export async function listAlerts(
   propertyId: string,
 ): Promise<AlertActionResult<AlertRow[]>> {

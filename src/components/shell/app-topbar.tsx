@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import Link from "next/link";
-import { KeyRound, LogOut, Menu, UserRound } from "lucide-react";
+import { Bell, KeyRound, LogOut, Menu, UserRound } from "lucide-react";
 import { vi } from "@/i18n/vi";
 import { switchProperty } from "@/app/(app)/actions";
 import { signOut } from "@/app/(auth)/login/actions";
@@ -17,10 +17,14 @@ import { JumpSearch } from "./jump-search";
 export function AppTopbar({
   propertyId,
   properties,
+  canViewAlerts,
+  unreadAlerts,
   onOpenMobile,
 }: {
   propertyId: string;
   properties: AccessibleProperty[];
+  canViewAlerts: boolean;
+  unreadAlerts: number;
   onOpenMobile: () => void;
 }) {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
@@ -64,6 +68,26 @@ export function AppTopbar({
               ))}
             </select>
           </form>
+        ) : null}
+
+        {canViewAlerts ? (
+          <Link
+            href={`/${propertyId}/alerts`}
+            aria-label={
+              unreadAlerts > 0
+                ? `${vi.shell.unreadAlerts} (${unreadAlerts > 99 ? "99+" : unreadAlerts})`
+                : vi.shell.alerts
+            }
+            title={vi.shell.alerts}
+            className="relative flex h-9 w-9 items-center justify-center rounded-full border bg-background text-muted-foreground outline-none transition-colors hover:bg-accent hover:text-foreground focus-visible:ring-2 focus-visible:ring-brand/40"
+          >
+            <Bell className="size-4" aria-hidden />
+            {unreadAlerts > 0 ? (
+              <span className="absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[10px] leading-none font-semibold text-destructive-foreground">
+                {unreadAlerts > 99 ? "99+" : unreadAlerts}
+              </span>
+            ) : null}
+          </Link>
         ) : null}
 
         <div className="relative">

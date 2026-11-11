@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { LegalEntityNameForm } from "@/components/admin/legal-entity-name-form";
 import { QuickAssignWizard } from "@/components/admin/quick-assign-wizard";
 import {
   filterQuickAssignRoles,
@@ -77,8 +78,17 @@ export default async function OrganizationDetailPage({
               <dd className="font-mono">{legalEntity.code}</dd>
             </div>
             <div className="flex justify-between gap-2">
-              <dt className="text-muted-foreground">{vi.admin.legalName}</dt>
-              <dd>{legalEntity.name}</dd>
+              <dt className="shrink-0 text-muted-foreground">
+                {vi.admin.legalName}
+              </dt>
+              <dd className="min-w-0 flex-1">
+                <LegalEntityNameForm
+                  key={legalEntity.name}
+                  orgId={org.id}
+                  legalEntityId={legalEntity.id}
+                  currentName={legalEntity.name}
+                />
+              </dd>
             </div>
             <div className="flex justify-between gap-2">
               <dt className="text-muted-foreground">{vi.admin.taxCode}</dt>

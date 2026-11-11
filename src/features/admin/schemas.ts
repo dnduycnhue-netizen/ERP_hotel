@@ -149,6 +149,24 @@ export type CreateUserInput = z.infer<typeof createUserSchema>;
 export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;
 export type CreateOrgInput = z.infer<typeof createOrgSchema>;
 
+/**
+ * Đổi tên pháp nhân (Q209): orgId chỉ để revalidate trang chi tiết sau
+ * khi lưu; RPC chỉ nhận legalEntityId + name.
+ */
+export const updateLegalEntityNameSchema = z.object({
+  orgId: uuid,
+  legalEntityId: uuid,
+  name: z
+    .string()
+    .trim()
+    .min(1, "Vui lòng nhập tên pháp nhân.")
+    .max(200, "Tên pháp nhân tối đa 200 ký tự."),
+});
+
+export type UpdateLegalEntityNameInput = z.infer<
+  typeof updateLegalEntityNameSchema
+>;
+
 export const setActiveSchema = z.object({
   userId: uuid,
   active: z.boolean(),

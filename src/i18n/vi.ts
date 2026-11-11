@@ -14,6 +14,8 @@ export const vi = {
     boardNote:
       "Bảng nhóm các chứng từ của trang hiện tại theo trạng thái — bấm vào thẻ để mở chi tiết.",
     switchProperty: "Đổi khách sạn",
+    alerts: "Cảnh báo",
+    unreadAlerts: "Cảnh báo chưa xử lý",
     groups: {
       overview: "Tổng quan",
       operations: "Nghiệp vụ",
@@ -444,6 +446,7 @@ export const vi = {
     propertySection: "Khách sạn",
     legalCode: "Mã pháp nhân",
     legalName: "Tên pháp nhân",
+    legalNameEdit: "Sửa tên pháp nhân",
     taxCode: "Mã số thuế",
     taxCodeOptional: "Mã số thuế (không bắt buộc)",
     accountingRegime: "Chế độ kế toán",

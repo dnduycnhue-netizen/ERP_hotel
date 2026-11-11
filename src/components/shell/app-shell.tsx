@@ -38,11 +38,15 @@ export function AppShell({
   propertyId,
   propertyName,
   properties,
+  canViewAlerts,
+  unreadAlerts,
   children,
 }: {
   propertyId: string;
   propertyName: string;
   properties: AccessibleProperty[];
+  canViewAlerts: boolean;
+  unreadAlerts: number;
   children: ReactNode;
 }) {
   const collapsed = useSyncExternalStore(
@@ -76,6 +80,8 @@ export function AppShell({
         <AppTopbar
           propertyId={propertyId}
           properties={properties}
+          canViewAlerts={canViewAlerts}
+          unreadAlerts={unreadAlerts}
           onOpenMobile={() => setMobileOpen(true)}
         />
         <main className="mx-auto w-full max-w-[1440px] px-4 py-6 sm:px-6">

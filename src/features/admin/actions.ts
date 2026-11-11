@@ -18,12 +18,14 @@ import {
   setOverrideSchema,
   setPinSchema,
   setRolePermissionsSchema,
+  updateLegalEntityNameSchema,
   type AssignRoleInput,
   type CreateOrgInput,
   type CreateUserInput,
   type ResetPasswordInput,
   type SaveRoleInput,
   type SetOverrideInput,
+  type UpdateLegalEntityNameInput,
 } from "./schemas";
 
 type SetPermissionsResult = {
@@ -187,6 +189,31 @@ export async function createOrgAction(
     },
   );
   if (result.ok) revalidatePath("/admin/organizations");
+  return result;
+}
+
+/**
+ * Đổi tên pháp nhân (Q209, RPC admin_legal_entity_update). RPC tự kiểm
+ * tra quyền admin.org.manage; chỉ đổi cột name, không đổi mã/tổ chức.
+ */
+export async function updateLegalEntityNameAction(
+  input: UpdateLegalEntityNameInput,
+): Promise<AdminActionResult<{ id: string }>> {
+  const gate = await authed();
+  if (gate) return gate;
+  const parsed = updateLegalEntityNameSchema.safeParse(input);
+  if (!parsed.success) return firstIssue(parsed);
+  const supabase = await createClient();
+  const d = parsed.data;
+  const result = await callAdminRpc<{ id: string }>(
+    supabase,
+    "admin_legal_entity_update",
+    {
+      p_legal_entity_id: d.legalEntityId,
+      p_name: d.name,
+    },
+  );
+  if (result.ok) revalidatePath(`/admin/organizations/${d.orgId}`);
   return result;
 }
 
