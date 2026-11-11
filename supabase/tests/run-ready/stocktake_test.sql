@@ -393,38 +393,34 @@ select public.count_record_line(
   '{"qty": 500, "uom": "ml"}'::jsonb
 );
 select public._t032_as('d0320000-0000-4000-8000-000000000a01');
-insert into t032_resp values ('freeze_issue', public.purpose_issue_save_draft(
-  'd0320000-0000-4000-8000-000000000301', 'd0320000-0000-4000-8000-000000000101',
-  jsonb_build_object(
-    'outlet_id', 'd0320000-0000-4000-8000-000000000802',
-    'cost_center_id', 'd0320000-0000-4000-8000-000000000901',
-    'expense_category_id', 'd0320000-0000-4000-8000-000000000902',
-    'lines', jsonb_build_array(jsonb_build_object(
-      'item_id', 'd0320000-0000-4000-8000-000000000503',
-      'qty_stock', 5, 'uom', 'kg'
-    ))
-  ),
-  'd0320000-0000-4000-8000-00000000aa03'
-));
+insert into t032_resp values ('freeze_issue', public.purpose_issue_save_draft(jsonb_build_object(
+  'property_id', 'd0320000-0000-4000-8000-000000000201',
+  'warehouse_id', 'd0320000-0000-4000-8000-000000000301',
+  'purpose_code', 'other',
+  'cost_center_id', 'd0320000-0000-4000-8000-000000000901',
+  'expense_category_id', 'd0320000-0000-4000-8000-000000000902',
+  'lines', jsonb_build_array(jsonb_build_object(
+    'item_id', 'd0320000-0000-4000-8000-000000000503',
+    'qty', 5, 'uom', 'kg'
+  ))
+)));
 insert into t032_ctx values ('pi_main', (select (resp ->> 'id')::uuid from t032_resp where key = 'freeze_issue'));
 select throws_ok(
   $q$select public.purpose_issue_post((select id from t032_ctx where key = 'pi_main'))$q$,
   'P0001', 'ERR_COUNT_FREEZE',
   'purpose_issue into MAIN is frozen while count A is open'
 );
-insert into t032_resp values ('kit_issue', public.purpose_issue_save_draft(
-  'd0320000-0000-4000-8000-000000000302', 'd0320000-0000-4000-8000-000000000101',
-  jsonb_build_object(
-    'outlet_id', 'd0320000-0000-4000-8000-000000000802',
-    'cost_center_id', 'd0320000-0000-4000-8000-000000000901',
-    'expense_category_id', 'd0320000-0000-4000-8000-000000000902',
-    'lines', jsonb_build_array(jsonb_build_object(
-      'item_id', 'd0320000-0000-4000-8000-000000000503',
-      'qty_stock', 5, 'uom', 'kg'
-    ))
-  ),
-  'd0320000-0000-4000-8000-00000000aa04'
-));
+insert into t032_resp values ('kit_issue', public.purpose_issue_save_draft(jsonb_build_object(
+  'property_id', 'd0320000-0000-4000-8000-000000000201',
+  'warehouse_id', 'd0320000-0000-4000-8000-000000000302',
+  'purpose_code', 'other',
+  'cost_center_id', 'd0320000-0000-4000-8000-000000000901',
+  'expense_category_id', 'd0320000-0000-4000-8000-000000000902',
+  'lines', jsonb_build_array(jsonb_build_object(
+    'item_id', 'd0320000-0000-4000-8000-000000000503',
+    'qty', 5, 'uom', 'kg'
+  ))
+)));
 insert into t032_ctx values ('pi_kit', (select (resp ->> 'id')::uuid from t032_resp where key = 'kit_issue'));
 select ok(
   (select (resp ->> 'ok')::boolean from t032_resp where key = 'kit_issue'),
@@ -686,19 +682,17 @@ select is(
   -20000::numeric, 'adjustment move amount is -20000 at avg cost'
 );
 select public._t032_as('d0320000-0000-4000-8000-000000000a01');
-insert into t032_resp values ('unfreeze', public.purpose_issue_save_draft(
-  'd0320000-0000-4000-8000-000000000301', 'd0320000-0000-4000-8000-000000000101',
-  jsonb_build_object(
-    'outlet_id', 'd0320000-0000-4000-8000-000000000802',
-    'cost_center_id', 'd0320000-0000-4000-8000-000000000901',
-    'expense_category_id', 'd0320000-0000-4000-8000-000000000902',
-    'lines', jsonb_build_array(jsonb_build_object(
-      'item_id', 'd0320000-0000-4000-8000-000000000503',
-      'qty_stock', 5, 'uom', 'kg'
-    ))
-  ),
-  'd0320000-0000-4000-8000-00000000aa05'
-));
+insert into t032_resp values ('unfreeze', public.purpose_issue_save_draft(jsonb_build_object(
+  'property_id', 'd0320000-0000-4000-8000-000000000201',
+  'warehouse_id', 'd0320000-0000-4000-8000-000000000301',
+  'purpose_code', 'other',
+  'cost_center_id', 'd0320000-0000-4000-8000-000000000901',
+  'expense_category_id', 'd0320000-0000-4000-8000-000000000902',
+  'lines', jsonb_build_array(jsonb_build_object(
+    'item_id', 'd0320000-0000-4000-8000-000000000503',
+    'qty', 5, 'uom', 'kg'
+  ))
+)));
 insert into t032_ctx values ('pi_main2', (select (resp ->> 'id')::uuid from t032_resp where key = 'unfreeze'));
 select public.purpose_issue_post((select id from t032_ctx where key = 'pi_main2'));
 select is(
