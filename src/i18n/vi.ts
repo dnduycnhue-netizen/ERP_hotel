@@ -350,6 +350,9 @@ export const vi = {
     configSettingsTitle: "Cấu hình nghiệp vụ",
     configSettingsDescription:
       "Điều chỉnh các ngưỡng nghiệp vụ. Giá trị riêng khách sạn ghi đè giá trị toàn chuỗi.",
+    configRuleTogglesTitle: "Bật/tắt ràng buộc",
+    configRuleTogglesDescription:
+      "Tắt một ràng buộc sẽ nới lỏng kiểm soát ở đúng chỗ đó; mặc định tất cả đều bật. Thay đổi có hiệu lực ngay sau khi lưu.",
     configSettingLabels: {
       price_spike_pct: "Ngưỡng cảnh báo tăng giá",
       receiving_tolerance_pct: "Dung sai nhận hàng so với PO",
@@ -359,6 +362,9 @@ export const vi = {
       count_variance_threshold_pct: "Ngưỡng lệch kiểm kê ca",
       count_without_cc_factor: "Hệ số ngưỡng khi không có Cost Controller",
       invoice_price_tolerance_pct: "Dung sai đơn giá hóa đơn",
+      "rule.R25.enabled": "Yêu cầu đủ PIN khi nộp phiếu kiểm kê",
+      "rule.R18.enabled": "Yêu cầu PIN khi post phiếu nhận",
+      "rule.R32.enabled": "Chặn đóng kỳ khi còn PO treo/tạm ứng quá hạn",
     },
     configSettingUnits: {
       price_spike_pct: "%",
@@ -369,6 +375,9 @@ export const vi = {
       count_variance_threshold_pct: "%",
       count_without_cc_factor: "lần",
       invoice_price_tolerance_pct: "%",
+      "rule.R25.enabled": "",
+      "rule.R18.enabled": "",
+      "rule.R32.enabled": "",
     },
     configSettingSaved: "Đã lưu cấu hình.",
     configApprovalTitle: "Quy tắc duyệt",

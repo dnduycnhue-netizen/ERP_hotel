@@ -23,7 +23,16 @@ const settingRanges: Record<
   count_variance_threshold_pct: { min: "0", max: "100", step: "0.01" },
   count_without_cc_factor: { min: "0", max: "1", step: "0.01" },
   invoice_price_tolerance_pct: { min: "0", max: "100", step: "0.01" },
+  "rule.R25.enabled": { min: "0", max: "1", step: "1" },
+  "rule.R18.enabled": { min: "0", max: "1", step: "1" },
+  "rule.R32.enabled": { min: "0", max: "1", step: "1" },
 };
+
+const ruleToggleKeys = new Set<SettingEntry["key"]>([
+  "rule.R25.enabled",
+  "rule.R18.enabled",
+  "rule.R32.enabled",
+]);
 
 function sourceLabel(source: SettingEntry["source"]): string {
   switch (source) {
@@ -75,6 +84,34 @@ export function SettingsEditor({
     router.refresh();
   }
 
+  async function saveToggle(key: SettingEntry["key"], enabled: boolean) {
+    const value = enabled ? "1" : "0";
+    setValues((current) => ({ ...current, [key]: value }));
+    setSavingKey(key);
+    setError(null);
+    setNotice(null);
+    const result = await saveSettingAction({
+      orgId,
+      propertyId,
+      key,
+      value,
+    });
+    setSavingKey(null);
+    if (!result.ok) {
+      setError(result.error);
+      return;
+    }
+    setNotice(vi.admin.configSettingSaved);
+    router.refresh();
+  }
+
+  const numericEntries = initialEntries.filter(
+    (entry) => !ruleToggleKeys.has(entry.key),
+  );
+  const toggleEntries = initialEntries.filter((entry) =>
+    ruleToggleKeys.has(entry.key),
+  );
+
   return (
     <div className="space-y-4">
       <p className="rounded-md border bg-muted/40 p-3 text-sm text-muted-foreground">
@@ -100,7 +137,7 @@ export function SettingsEditor({
             </tr>
           </thead>
           <tbody>
-            {initialEntries.map((entry) => {
+            {numericEntries.map((entry) => {
               const range = settingRanges[entry.key];
               return (
                 <tr key={entry.key} className="border-b last:border-0">
@@ -155,6 +192,44 @@ export function SettingsEditor({
           </tbody>
         </table>
       </div>
+      {toggleEntries.length > 0 ? (
+        <div className="space-y-3">
+          <div>
+            <h2 className="text-lg font-semibold">
+              {vi.admin.configRuleTogglesTitle}
+            </h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {vi.admin.configRuleTogglesDescription}
+            </p>
+          </div>
+          <div className="space-y-2 rounded-lg border bg-card p-4">
+            {toggleEntries.map((entry) => (
+              <label
+                key={entry.key}
+                htmlFor={`setting-${entry.key}`}
+                className="flex items-center gap-3 text-sm"
+              >
+                <input
+                  id={`setting-${entry.key}`}
+                  type="checkbox"
+                  checked={(values[entry.key] ?? entry.value) !== "0"}
+                  disabled={savingKey !== null}
+                  onChange={(event) =>
+                    void saveToggle(entry.key, event.target.checked)
+                  }
+                  className="h-4 w-4 accent-primary"
+                />
+                <span className="font-medium">
+                  {vi.admin.configSettingLabels[entry.key]}
+                </span>
+                <span className="text-xs text-muted-foreground">
+                  {sourceLabel(entry.source)}
+                </span>
+              </label>
+            ))}
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
