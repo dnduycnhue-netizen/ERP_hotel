@@ -463,6 +463,9 @@ select is(
      and item_id = 'd0340000-0000-4000-8000-000000000504'),
   10::numeric, 'top-up CAPHE 10 par - 0 opening = 10'
 );
+-- Doc dem (stock_counts/lines) chi doc duoc voi count.view_variance va
+-- KHONG phai nguoi dem (u2 la counter) -> doc duoi u1 (giam sat).
+select public._t034_as('d0340000-0000-4000-8000-000000000a01');
 select is(
   (select kind from public.stock_counts
    where id = (select (resp ->> 'opening_count_id')::uuid from t034_resp where key = 's1')),
@@ -505,6 +508,7 @@ select is(
   (select resp ->> 'opening_count_id' from t034_resp where key = 's1'),
   'shift links opening_count_id'
 );
+select public._t034_as('d0340000-0000-4000-8000-000000000a02');
 
 -- F. Mo ca: validate (8).
 select throws_ok(
@@ -665,6 +669,8 @@ select is(
   (select resp ->> 'status' from t034_resp where key = 'r1rcv'),
   'received', 'top-up requisition is received'
 );
+-- Ton kho chi doc duoc voi stock.view_qty -> doc duoi u7 (thu kho).
+select public._t034_as('d0340000-0000-4000-8000-000000000a07');
 select is(
   (select qty from public.stock_balances
    where warehouse_id = 'd0340000-0000-4000-8000-000000000304'
@@ -700,6 +706,7 @@ select is(
      and lot_id is null),
   0::numeric, 'transit BANCHAI 0 after full receipt'
 );
+select public._t034_as('d0340000-0000-4000-8000-000000000a02');
 
 -- H. Dong ca 1: dem cuoi 12/9/18/7 -> tieu hao 8/6/12/3 (20).
 insert into t034_resp values ('s1c', public.trolley_shift_close(
@@ -719,6 +726,9 @@ select ok(
   (select resp ->> 'purpose_issue_id' from t034_resp where key = 's1c') is not null,
   'close creates a purpose_issue'
 );
+-- Phieu tieu hao + ton kho chi doc duoc voi stock.view_qty (u7);
+-- expense_categories con doi item.view (da gan cho thu kho o fixture).
+select public._t034_as('d0340000-0000-4000-8000-000000000a07');
 select is(
   (select status from public.purpose_issues
    where id = (select (resp ->> 'purpose_issue_id')::uuid from t034_resp where key = 's1c')),
@@ -793,11 +803,14 @@ select is(
      and lot_id is null),
   7::numeric, 'trolley CAPHE balance 10 - 3 = 7 after close'
 );
+-- Dem dong ca doc duoi u1 nhu dem dau ca (count.view_variance, khong phai counter).
+select public._t034_as('d0340000-0000-4000-8000-000000000a01');
 select ok(
   (select bool_and(book_qty is null) from public.stock_count_lines
    where count_id = (select (resp ->> 'closing_count_id')::uuid from t034_resp where key = 's1c')),
   'closing count is blind (book_qty NULL)'
 );
+select public._t034_as('d0340000-0000-4000-8000-000000000a02');
 select is(
   (select status from public.trolley_shifts
    where id = (select (resp ->> 'shift_id')::uuid from t034_resp where key = 's1')),
@@ -884,6 +897,8 @@ select is(
   (select resp ->> 'status' from t034_resp where key = 'r2rcv'),
   'received', 'shift 2 top-up requisition is received'
 );
+-- Ton kho doc duoi u7 (stock.view_qty).
+select public._t034_as('d0340000-0000-4000-8000-000000000a07');
 select is(
   (select qty from public.stock_balances
    where warehouse_id = 'd0340000-0000-4000-8000-000000000304'
@@ -891,6 +906,7 @@ select is(
      and lot_id is null),
   20::numeric, 'trolley BANCHAI 12 + 8 = 20 before shift 2 close'
 );
+select public._t034_as('d0340000-0000-4000-8000-000000000a02');
 select throws_ok(
   $q$select public.trolley_shift_close(
     p_shift_id := (select (resp ->> 'shift_id')::uuid from t034_resp where key = 's2'),
@@ -934,6 +950,8 @@ select is(
    where id = (select (resp ->> 'shift_id')::uuid from t034_resp where key = 's2')),
   'closed', 'shift 2 status is closed'
 );
+-- Ton kho doc duoi u7 (stock.view_qty).
+select public._t034_as('d0340000-0000-4000-8000-000000000a07');
 select is(
   (select qty from public.stock_balances
    where warehouse_id = 'd0340000-0000-4000-8000-000000000304'
