@@ -55,7 +55,7 @@ on conflict (id) do update set
 insert into public.roles (id, org_id, code, name_vi) values
   ('a7d00000-0000-4000-8000-000000000601', 'a7d00000-0000-4000-8000-000000000001', 'storekeeper', 'Thủ kho'),
   ('a7d00000-0000-4000-8000-000000000602', 'a7d00000-0000-4000-8000-000000000001', 'chef', 'Bếp trưởng'),
-  ('a7d00000-0000-4000-8000-000000000603', 'a7d00000-0000-4000-8000-000000000001', 'sys_admin', 'Quản trị hệ thống');
+  ('a7d00000-0000-4000-8000-000000000603', 'a7d00000-0000-4000-8000-000000000001', 'a7d_admin', 'Quản trị viên A7D');
 insert into public.role_permissions (role_id, permission_code) values
   ('a7d00000-0000-4000-8000-000000000601', 'count.open'),
   ('a7d00000-0000-4000-8000-000000000601', 'count.perform'),
