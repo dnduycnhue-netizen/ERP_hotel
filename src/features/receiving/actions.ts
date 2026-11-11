@@ -1,4 +1,5 @@
 "use server";
+import { vi } from "@/i18n/vi";
 
 import { createClient } from "@/lib/supabase/server";
 import { callReceivingRpc, type ReceivingActionResult } from "./rpc";
@@ -75,7 +76,7 @@ export type SupplierReturnResult = {
 function validationError(
   issues: { message: string }[],
 ): ReceivingActionResult<never> {
-  return { ok: false, error: issues[0]?.message ?? "Dữ liệu không hợp lệ." };
+  return { ok: false, error: issues[0]?.message ?? vi.common.invalidData };
 }
 
 /** Mo phieu nhan nhap cho 1 PO (RPC `receiving_start`, T-023). */

@@ -1,9 +1,10 @@
 import { z } from "zod";
+import { vi } from "@/i18n/vi";
 
-const uuidSchema = z.string().uuid("Mã định danh không hợp lệ.");
+const uuidSchema = z.string().uuid(vi.common.invalidId);
 const dateSchema = z
   .string()
-  .regex(/^\d{4}-\d{2}-\d{2}$/, "Ngày phải có dạng YYYY-MM-DD.");
+  .regex(/^\d{4}-\d{2}-\d{2}$/, vi.common.dateFormatInvalid);
 
 const statSchema = (label: string) =>
   z
@@ -16,15 +17,15 @@ export const pmsDailyUpsertSchema = z
   .object({
     propertyId: uuidSchema,
     businessDate: dateSchema,
-    roomsAvailable: statSchema("Số phòng có thể bán"),
-    roomsSold: statSchema("Số phòng đã bán"),
-    guests: statSchema("Số khách"),
-    breakfastPax: statSchema("Số suất ăn sáng"),
-    extraBeds: statSchema("Số giường phụ"),
-    checkouts: statSchema("Số lượt trả phòng"),
+    roomsAvailable: statSchema(vi.pmsDaily.fields.roomsAvailable),
+    roomsSold: statSchema(vi.pmsDaily.fields.roomsSold),
+    guests: statSchema(vi.pmsDaily.fields.guests),
+    breakfastPax: statSchema(vi.pmsDaily.labels.breakfasts),
+    extraBeds: statSchema(vi.pmsDaily.labels.extraBeds),
+    checkouts: statSchema(vi.pmsDaily.labels.checkouts),
   })
   .refine((d) => d.roomsSold <= d.roomsAvailable, {
-    message: "Số phòng đã bán không được lớn hơn số phòng có thể bán.",
+    message: vi.pmsDaily.soldNotExceedSellable,
     path: ["roomsSold"],
   });
 export type PmsDailyUpsertInput = z.infer<typeof pmsDailyUpsertSchema>;

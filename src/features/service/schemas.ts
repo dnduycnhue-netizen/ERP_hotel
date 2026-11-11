@@ -1,9 +1,10 @@
 import { z } from "zod";
+import { vi } from "@/i18n/vi";
 
-const uuidSchema = z.string().uuid("Mã định danh không hợp lệ.");
+const uuidSchema = z.string().uuid(vi.common.invalidId);
 const dateSchema = z
   .string()
-  .regex(/^\d{4}-\d{2}-\d{2}$/, "Ngày phải có dạng YYYY-MM-DD.");
+  .regex(/^\d{4}-\d{2}-\d{2}$/, vi.common.dateFormatInvalid);
 
 export const billingCycleSchema = z.enum([
   "monthly",
@@ -26,18 +27,18 @@ export type ContractStatus = z.infer<typeof contractStatusSchema>;
 export const contractSaveSchema = z.object({
   propertyId: uuidSchema,
   contractId: uuidSchema.optional().nullable(),
-  title: z.string().trim().min(1, "Tên hợp đồng không được để trống."),
+  title: z.string().trim().min(1, vi.service.contractNameRequired),
   supplierId: uuidSchema,
   expenseCategoryId: uuidSchema,
   costCenterId: uuidSchema,
   startDate: dateSchema,
   endDate: dateSchema.optional().nullable(),
   billingCycle: billingCycleSchema,
-  amountPerCycle: z.number().nonnegative("Số tiền mỗi kỳ không được âm."),
+  amountPerCycle: z.number().nonnegative(vi.service.amountPerPeriodNonNegative),
   renewNoticeDays: z
     .number()
-    .int("Số ngày nhắc gia hạn phải là số nguyên.")
-    .min(0, "Số ngày nhắc gia hạn không được âm.")
+    .int(vi.service.renewalReminderDaysMustBeInteger)
+    .min(0, vi.service.renewalReminderDaysNonNegative)
     .default(30),
   status: contractStatusSchema.default("active"),
 });
@@ -63,20 +64,20 @@ export const serviceAcceptSchema = z
     poId: uuidSchema.optional().nullable(),
     rating: z
       .number()
-      .int("Đánh giá phải là số nguyên.")
-      .min(1, "Đánh giá từ 1 đến 5 sao.")
-      .max(5, "Đánh giá từ 1 đến 5 sao.")
+      .int(vi.service.ratingMustBeInteger)
+      .min(1, vi.service.ratingRange1To5)
+      .max(5, vi.service.ratingRange1To5)
       .optional()
       .nullable(),
     note: z
       .string()
       .trim()
-      .max(1000, "Ghi chú tối đa 1000 ký tự.")
+      .max(1000, vi.common.noteMax1000)
       .optional()
       .nullable(),
     photos: z.array(uuidSchema).default([]),
   })
   .refine((v) => (v.scheduleId == null) !== (v.poId == null), {
-    message: "Nghiệm thu đúng một kỳ hợp đồng hoặc một đơn mua dịch vụ.",
+    message: vi.service.acceptExactlyOnePeriodOrPo,
   });
 export type ServiceAcceptInput = z.infer<typeof serviceAcceptSchema>;

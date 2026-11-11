@@ -1,31 +1,32 @@
 import { z } from "zod";
+import { vi } from "@/i18n/vi";
 
-const uuidSchema = z.string().uuid("Mã định danh không hợp lệ.");
+const uuidSchema = z.string().uuid(vi.common.invalidId);
 const dateSchema = z
   .string()
-  .regex(/^\d{4}-\d{2}-\d{2}$/, "Ngày phải có dạng YYYY-MM-DD.");
+  .regex(/^\d{4}-\d{2}-\d{2}$/, vi.common.dateFormatInvalid);
 const reasonSchema = z
   .string()
   .trim()
-  .min(1, "Lý do không được để trống.")
-  .max(500, "Lý do tối đa 500 ký tự.");
+  .min(1, vi.procurement.detail.reasonRequired)
+  .max(500, vi.common.reasonMax500);
 const yearSchema = z
   .number()
-  .int("Năm phải là số nguyên.")
-  .min(1, "Năm không hợp lệ.")
-  .max(9999, "Năm không hợp lệ.");
+  .int(vi.locks.yearMustBeInteger)
+  .min(1, vi.locks.yearInvalid)
+  .max(9999, vi.locks.yearInvalid);
 const monthSchema = z
   .number()
-  .int("Tháng phải là số nguyên.")
-  .min(1, "Tháng phải từ 1 đến 12.")
-  .max(12, "Tháng phải từ 1 đến 12.");
+  .int(vi.locks.monthMustBeInteger)
+  .min(1, vi.locks.monthRange1To12)
+  .max(12, vi.locks.monthRange1To12);
 
 /** Khoa 1 ngay nghiep vu cua 1 kho (RPC `day_lock`, 120000). */
 export const dayLockSchema = z.object({
   propertyId: uuidSchema,
   warehouseId: uuidSchema,
   businessDate: dateSchema,
-  shift: z.string().trim().max(50, "Ca tối đa 50 ký tự.").optional().nullable(),
+  shift: z.string().trim().max(50, vi.locks.shiftMax50).optional().nullable(),
 });
 export type DayLockInput = z.infer<typeof dayLockSchema>;
 

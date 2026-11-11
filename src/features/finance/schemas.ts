@@ -1,15 +1,16 @@
 import { z } from "zod";
+import { vi } from "@/i18n/vi";
 
-const uuidSchema = z.string().uuid("Mã định danh không hợp lệ.");
+const uuidSchema = z.string().uuid(vi.common.invalidId);
 const dateSchema = z
   .string()
-  .regex(/^\d{4}-\d{2}-\d{2}$/, "Ngày phải có dạng YYYY-MM-DD.");
+  .regex(/^\d{4}-\d{2}-\d{2}$/, vi.common.dateFormatInvalid);
 
 /** 1 dòng hóa đơn: { po_line_id, qty, unit_price, vat_rate?, gr_line_id? }. */
 export const invoiceSaveLineSchema = z.object({
   poLineId: uuidSchema,
-  qty: z.number().positive("Số lượng phải lớn hơn 0."),
-  unitPrice: z.number().nonnegative("Đơn giá không được âm."),
+  qty: z.number().positive(vi.common.quantityPositive),
+  unitPrice: z.number().nonnegative(vi.common.unitPriceNonNegative),
   vatRate: z.number().min(0).max(100).optional().nullable(),
   grLineId: uuidSchema.optional().nullable(),
 });
@@ -20,16 +21,15 @@ export const invoiceSaveDraftSchema = z.object({
   propertyId: uuidSchema,
   supplierId: uuidSchema,
   header: z.object({
-    invoiceSymbol: z
-      .string()
-      .trim()
-      .min(1, "Ký hiệu hóa đơn không được để trống."),
-    invoiceNo: z.string().trim().min(1, "Số hóa đơn không được để trống."),
+    invoiceSymbol: z.string().trim().min(1, vi.finance.invoiceSymbolRequired),
+    invoiceNo: z.string().trim().min(1, vi.finance.invoiceNumberRequired),
     invoiceDate: dateSchema,
     lookupCode: z.string().trim().optional().nullable(),
     xmlPath: z.string().trim().optional().nullable(),
   }),
-  lines: z.array(invoiceSaveLineSchema).min(1, "Cần ít nhất một dòng hóa đơn."),
+  lines: z
+    .array(invoiceSaveLineSchema)
+    .min(1, vi.finance.needAtLeastOneInvoiceLine),
 });
 export type InvoiceSaveDraftInput = z.infer<typeof invoiceSaveDraftSchema>;
 
@@ -49,7 +49,7 @@ export type InvoiceApproveInput = z.infer<typeof invoiceApproveSchema>;
 
 /** 1 dòng quyết toán tạm ứng: { amount, gr_id?, receipt_photo_id? }. */
 export const advanceSettleLineSchema = z.object({
-  amount: z.number().positive("Số tiền phải lớn hơn 0."),
+  amount: z.number().positive(vi.finance.amountPositive),
   grId: uuidSchema.optional().nullable(),
   receiptPhotoId: uuidSchema.optional().nullable(),
 });
@@ -61,14 +61,14 @@ export const advanceSettleSchema = z.object({
   advanceId: uuidSchema,
   lines: z
     .array(advanceSettleLineSchema)
-    .min(1, "Cần ít nhất một dòng chi thực tế."),
+    .min(1, vi.finance.needAtLeastOneActualLine),
 });
 export type AdvanceSettleInput = z.infer<typeof advanceSettleSchema>;
 
 /** 1 dòng đề nghị thanh toán: { invoice_id, amount }. */
 export const paymentRequestLineSchema = z.object({
   invoiceId: uuidSchema,
-  amount: z.number().positive("Số tiền phải lớn hơn 0."),
+  amount: z.number().positive(vi.finance.amountPositive),
 });
 export type PaymentRequestLineInput = z.infer<typeof paymentRequestLineSchema>;
 
@@ -78,7 +78,7 @@ export const paymentRequestCreateSchema = z.object({
   supplierId: uuidSchema,
   lines: z
     .array(paymentRequestLineSchema)
-    .min(1, "Cần ít nhất một hóa đơn để đề nghị thanh toán."),
+    .min(1, vi.finance.needAtLeastOneInvoiceForPayment),
   dueDate: dateSchema.optional().nullable(),
 });
 export type PaymentRequestCreateInput = z.infer<
@@ -94,7 +94,7 @@ export const paymentRequestDecideSchema = z
     comment: z
       .string()
       .trim()
-      .max(1000, "Ghi chú tối đa 1000 ký tự.")
+      .max(1000, vi.common.noteMax1000)
       .optional()
       .nullable(),
   })
@@ -103,7 +103,7 @@ export const paymentRequestDecideSchema = z
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ["comment"],
-        message: "Từ chối đề nghị thanh toán phải nhập lý do.",
+        message: vi.finance.rejectPaymentRequiresReason,
       });
     }
   });
@@ -115,18 +115,15 @@ export type PaymentRequestDecideInput = z.infer<
 export const paymentMarkPaidSchema = z.object({
   propertyId: uuidSchema,
   requestId: uuidSchema,
-  bankRef: z
-    .string()
-    .trim()
-    .min(1, "Số tham chiếu ngân hàng không được để trống."),
+  bankRef: z.string().trim().min(1, vi.finance.bankReferenceRequired),
 });
 export type PaymentMarkPaidInput = z.infer<typeof paymentMarkPaidSchema>;
 
 /** 1 dòng bảng kê: { item_desc, qty, unit_price }. */
 export const noInvoiceListingLineSchema = z.object({
-  itemDesc: z.string().trim().min(1, "Tên hàng không được để trống."),
-  qty: z.number().positive("Số lượng phải lớn hơn 0."),
-  unitPrice: z.number().nonnegative("Đơn giá không được âm."),
+  itemDesc: z.string().trim().min(1, vi.finance.lineItemNameRequired),
+  qty: z.number().positive(vi.common.quantityPositive),
+  unitPrice: z.number().nonnegative(vi.common.unitPriceNonNegative),
 });
 export type NoInvoiceListingLineInput = z.infer<
   typeof noInvoiceListingLineSchema
@@ -136,7 +133,7 @@ export type NoInvoiceListingLineInput = z.infer<
 export const noInvoiceListingSaveSchema = z.object({
   propertyId: uuidSchema,
   listing: z.object({
-    sellerName: z.string().trim().min(1, "Tên người bán không được để trống."),
+    sellerName: z.string().trim().min(1, vi.finance.sellerNameRequired),
     purchaseDate: dateSchema,
     poId: uuidSchema.optional().nullable(),
     grId: uuidSchema.optional().nullable(),
@@ -145,7 +142,7 @@ export const noInvoiceListingSaveSchema = z.object({
   }),
   lines: z
     .array(noInvoiceListingLineSchema)
-    .min(1, "Cần ít nhất một dòng hàng."),
+    .min(1, vi.procurement.form.needAtLeastOneLine),
 });
 export type NoInvoiceListingSaveInput = z.infer<
   typeof noInvoiceListingSaveSchema

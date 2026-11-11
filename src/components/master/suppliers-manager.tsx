@@ -251,7 +251,7 @@ export function SuppliersManager({
       );
       router.refresh();
     } else {
-      setError(res.error ?? "Đã xảy ra lỗi.");
+      setError(res.error ?? vi.common.errorOccurred);
     }
   }
 

@@ -286,7 +286,9 @@ export function DishForm({
                 className="grid gap-2 rounded-lg border p-3 sm:grid-cols-6"
               >
                 <label className="space-y-1 text-sm">
-                  <span className="block font-medium">Loại</span>
+                  <span className="block font-medium">
+                    {vi.restaurant.dishKind}
+                  </span>
                   <select
                     value={l.type}
                     onChange={(e) =>

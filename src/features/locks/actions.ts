@@ -1,4 +1,5 @@
 "use server";
+import { vi } from "@/i18n/vi";
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
@@ -33,7 +34,7 @@ export type PeriodReopenResult = {
 function validationError(
   issues: { message: string }[],
 ): LockActionResult<never> {
-  return { ok: false, error: issues[0]?.message ?? "Dữ liệu không hợp lệ." };
+  return { ok: false, error: issues[0]?.message ?? vi.common.invalidData };
 }
 
 /** Khoa 1 ngay nghiep vu cua 1 kho (RPC `day_lock`, 120000). */

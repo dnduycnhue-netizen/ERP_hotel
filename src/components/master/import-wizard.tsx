@@ -379,7 +379,7 @@ export function ImportWizard({
         selectSheet(first.name, pw.workbook);
       }
     } catch {
-      setError("Không đọc được file Excel. Hãy chọn file .xlsx hợp lệ.");
+      setError(vi.master.import.fileUnreadable);
     }
   }
 
@@ -467,12 +467,12 @@ export function ImportWizard({
     setNotice(null);
     setCommitResult(null);
     if (!workbookRef.current) {
-      setError("Hãy chọn file Excel trước.");
+      setError(vi.master.import.selectFileFirst);
       return;
     }
     const rows = buildRawRows();
     if (rows.length === 0) {
-      setError("File không có dòng dữ liệu nào sau dòng tiêu đề.");
+      setError(vi.master.import.fileNoDataAfterHeader);
       return;
     }
     setBusy(true);
@@ -564,7 +564,7 @@ export function ImportWizard({
         setError(res.error);
         return;
       }
-      setNotice("Đã áp dụng. Kiểm tra lại xong.");
+      setNotice(vi.master.import.appliedRecheckDone);
       router.refresh();
     } finally {
       setBusy(false);
@@ -609,7 +609,7 @@ export function ImportWizard({
   async function handleAddAlias(row: ImportRow): Promise<void> {
     const f = fix[row.id] ?? emptyFix;
     if (!f.alias.trim() || !f.aliasUom) {
-      setError("Nhập biến thể và chọn đơn vị chuẩn.");
+      setError(vi.master.import.enterVariantAndStandardUnit);
       return;
     }
     setBusy(true);
@@ -1145,8 +1145,9 @@ export function ImportWizard({
                   {b.file_name}
                 </button>
                 <span className="text-muted-foreground">
-                  {statusLabel(b.status)} · {b.counts.total} dòng ·{" "}
-                  {b.counts.errors} lỗi ·{" "}
+                  {statusLabel(b.status)} · {b.counts.total}{" "}
+                  {vi.master.import.rowsUnit} · {b.counts.errors}{" "}
+                  {vi.master.import.errorsUnit} ·{" "}
                   {new Date(b.created_at).toLocaleString("vi-VN")}
                 </span>
               </li>
@@ -1207,8 +1208,10 @@ function ImportRowFix({
           {row.issues.map((issue, idx) => (
             <li key={idx} className="text-xs">
               <b>{issueLabel(issue.code)}</b>
-              {issue.severity === "warning" ? " (cảnh báo)" : ""}:{" "}
-              {issue.message}
+              {issue.severity === "warning"
+                ? vi.master.import.warningSuffix
+                : ""}
+              : {issue.message}
             </li>
           ))}
           {row.issues.length === 0 && (

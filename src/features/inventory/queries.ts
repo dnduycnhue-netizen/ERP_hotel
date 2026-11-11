@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import type { Database } from "@/lib/database.types";
 import { callInventoryRpc, type InventoryActionResult } from "./rpc";
 import type { DocListInput, StockCardInput, StockListInput } from "./schemas";
+import { vi } from "@/i18n/vi";
 
 /* ------------------------------------------------------------------ */
 /* Chứng từ kho — qua 8 RPC list/get của T-030 (không giá ở list;      */
@@ -335,7 +336,7 @@ export async function listStock(
   const supabase = await createClient();
   const perms = await getStockPerms(supabase, input.propertyId);
   if (!perms.canViewQty) {
-    return { ok: false, error: "Bạn chưa được cấp quyền xem tồn kho." };
+    return { ok: false, error: vi.inventory.noStockViewPermission };
   }
 
   const { data: property, error: propertyError } = await supabase
@@ -344,7 +345,7 @@ export async function listStock(
     .eq("id", input.propertyId)
     .single();
   if (propertyError || !property) {
-    return { ok: false, error: "Không tìm thấy khách sạn." };
+    return { ok: false, error: vi.inventory.propertyNotFound };
   }
 
   // Tìm mã/tên vật tư trước để lọc theo item_id (balances không có tên).
@@ -359,7 +360,7 @@ export async function listStock(
       .or(`code.ilike.${pattern},name.ilike.${pattern}`)
       .limit(200);
     if (searchError) {
-      return { ok: false, error: "Không tìm kiếm được vật tư." };
+      return { ok: false, error: vi.inventory.itemSearchFailed };
     }
     itemIds = (found ?? []).map((row) => row.id);
     if (itemIds.length === 0) {
@@ -396,7 +397,7 @@ export async function listStock(
     .order("item_id", { ascending: true })
     .limit(5000);
   if (balancesError) {
-    return { ok: false, error: "Không tải được tồn kho." };
+    return { ok: false, error: vi.inventory.stockLoadFailed };
   }
 
   const warehouses = await listWarehouses(supabase, input.propertyId);
@@ -413,7 +414,7 @@ export async function listStock(
       .select("id, code, name, stock_uom")
       .in("id", itemIdSet);
     if (itemsError) {
-      return { ok: false, error: "Không tải được danh mục vật tư." };
+      return { ok: false, error: vi.inventory.itemsLoadFailed };
     }
     for (const item of items ?? []) {
       itemsMap.set(item.id, {
@@ -432,7 +433,7 @@ export async function listStock(
       .eq("legal_entity_id", property.legal_entity_id)
       .in("item_id", itemIdSet);
     if (costsError) {
-      return { ok: false, error: "Không tải được giá vốn bình quân." };
+      return { ok: false, error: vi.inventory.avgCostLoadFailed };
     }
     for (const cost of costs ?? []) {
       avgCosts.set(cost.item_id, Number(cost.avg_cost));
@@ -582,7 +583,7 @@ export async function getStockCard(
   const supabase = await createClient();
   const perms = await getStockPerms(supabase, input.propertyId);
   if (!perms.canViewQty) {
-    return { ok: false, error: "Bạn chưa được cấp quyền xem tồn kho." };
+    return { ok: false, error: vi.inventory.noStockViewPermission };
   }
 
   const [{ data: warehouse }, { data: item }] = await Promise.all([
@@ -599,7 +600,7 @@ export async function getStockCard(
       .single(),
   ]);
   if (!warehouse || !item) {
-    return { ok: false, error: "Không tìm thấy kho hoặc vật tư." };
+    return { ok: false, error: vi.inventory.warehouseOrItemNotFound };
   }
 
   // Giới hạn 1001 dòng để phát hiện tràn: thẻ kho 1 mã trong 1 kho
@@ -634,7 +635,7 @@ export async function getStockCard(
         .order("id", { ascending: true })
         .limit(MOVE_LIMIT);
   if (movesError) {
-    return { ok: false, error: "Không tải được thẻ kho." };
+    return { ok: false, error: vi.inventory.stockCardLoadFailed };
   }
   const truncated = (rawMoves ?? []).length >= MOVE_LIMIT;
   const allMoves = ((rawMoves ?? []) as unknown as StockMoveDbRow[]).slice(
@@ -648,7 +649,7 @@ export async function getStockCard(
     .eq("warehouse_id", input.warehouseId)
     .eq("item_id", input.itemId);
   if (balancesError) {
-    return { ok: false, error: "Không tải được tồn sổ." };
+    return { ok: false, error: vi.inventory.bookStockLoadFailed };
   }
   const ledgerQty = (balanceRows ?? []).reduce(
     (sum, row) => sum + Number(row.qty),

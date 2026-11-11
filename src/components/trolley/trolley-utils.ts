@@ -1,11 +1,12 @@
 /** Tên ca hiển thị (T-034, Q46). */
+import { vi } from "@/i18n/vi";
 export function shiftLabel(shift: string): string {
   switch (shift) {
     case "morning":
-      return "Ca sáng";
+      return vi.trolley.shiftOptions.morning;
     case "evening":
-      return "Ca tối";
+      return vi.trolley.shiftOptions.evening;
     default:
-      return "Ca ngày";
+      return vi.trolley.shiftOptions.day;
   }
 }

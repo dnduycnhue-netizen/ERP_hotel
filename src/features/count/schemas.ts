@@ -1,10 +1,11 @@
 import { z } from "zod";
+import { vi } from "@/i18n/vi";
 
-const uuidSchema = z.string().uuid("Mã định danh không hợp lệ.");
+const uuidSchema = z.string().uuid(vi.common.invalidId);
 const dateSchema = z
   .string()
-  .regex(/^\d{4}-\d{2}-\d{2}$/, "Ngày phải có dạng YYYY-MM-DD.");
-const pinSchema = z.string().regex(/^\d{4,6}$/, "Mã PIN phải gồm 4–6 chữ số.");
+  .regex(/^\d{4}-\d{2}-\d{2}$/, vi.common.dateFormatInvalid);
+const pinSchema = z.string().regex(/^\d{4,6}$/, vi.common.pinFormat);
 
 export const countKindSchema = z.enum(["monthly_full", "cycle"]);
 export type CountKindInput = z.infer<typeof countKindSchema>;
@@ -22,8 +23,8 @@ export type CountReasonCode = z.infer<typeof countReasonCodeSchema>;
 
 /** 1 dong chi tiet dem: { qty, uom } hoac mang cac phan tu nhu vay (RPC `count_record_line`, T-032). */
 export const countDetailItemSchema = z.object({
-  qty: z.number().positive("Số lượng phải lớn hơn 0."),
-  uom: z.string().trim().min(1, "Đơn vị tính không được để trống."),
+  qty: z.number().positive(vi.common.quantityPositive),
+  uom: z.string().trim().min(1, vi.common.uomRequired),
 });
 
 /** Mo dot kiem ke (RPC `count_open`, T-032). */
@@ -33,8 +34,8 @@ export const countOpenSchema = z.object({
   businessDate: dateSchema,
   counterIds: z
     .array(uuidSchema)
-    .min(1, "Cần ít nhất một người đếm.")
-    .max(10, "Tối đa 10 người đếm."),
+    .min(1, vi.count.needAtLeastOneCounter)
+    .max(10, vi.count.max10Counters),
   clientUuid: uuidSchema.optional().nullable(),
 });
 
@@ -48,7 +49,7 @@ export const countRecordLineSchema = z.object({
     .nullable(),
   bottleWeightG: z
     .number()
-    .positive("Cân chai phải lớn hơn 0.")
+    .positive(vi.count.bottleWeightPositive)
     .optional()
     .nullable(),
   clientUuid: uuidSchema.optional().nullable(),
@@ -59,8 +60,8 @@ export const countSubmitSchema = z.object({
   countId: uuidSchema,
   pins: z
     .array(pinSchema)
-    .min(1, "Cần ít nhất một mã PIN.")
-    .max(10, "Tối đa 10 mã PIN."),
+    .min(1, vi.count.needAtLeastOnePin)
+    .max(10, vi.count.max10Pins),
 });
 
 /** 1 ly do cho dong do khi khoa dot (RPC `count_lock`, T-032). */
@@ -70,7 +71,7 @@ export const countLockReasonSchema = z.object({
   explanation: z
     .string()
     .trim()
-    .max(1000, "Giải thích tối đa 1000 ký tự.")
+    .max(1000, vi.count.explanationMax1000)
     .optional()
     .nullable(),
 });
@@ -95,7 +96,7 @@ export const countAddCounterSchema = z.object({
 /** Huy dot kiem ke (RPC `count_cancel`, T-032). */
 export const countCancelSchema = z.object({
   countId: uuidSchema,
-  reason: z.string().trim().min(1, "Lý do hủy không được để trống."),
+  reason: z.string().trim().min(1, vi.common.cancelReasonRequired),
 });
 
 /** Liet ke nguoi duoc dem tai kho (RPC `count_list_counters`, T-033). */

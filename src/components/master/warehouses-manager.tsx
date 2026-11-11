@@ -18,14 +18,14 @@ import {
 } from "@/features/master/actions";
 
 const warehouseKinds = [
-  { value: "main", label: "Kho tổng (Main)" },
-  { value: "outlet", label: "Kho điểm bán (Outlet)" },
-  { value: "floor", label: "Kho tầng (Floor)" },
-  { value: "trolley", label: "Xe đẩy buồng phòng (Trolley)" },
-  { value: "minibar_main", label: "Kho minibar tổng (Minibar Main)" },
-  { value: "transit", label: "Kho trung chuyển (Transit)" },
-  { value: "quarantine", label: "Kho cách ly / Chờ xử lý (Quarantine)" },
-  { value: "disposal", label: "Kho chờ hủy (Disposal)" },
+  { value: "main", label: vi.master.warehouses.kindLabels.main },
+  { value: "outlet", label: vi.master.warehouses.kindLabels.outlet },
+  { value: "floor", label: vi.master.warehouses.kindLabels.floor },
+  { value: "trolley", label: vi.master.warehouses.kindLabels.trolley },
+  { value: "minibar_main", label: vi.master.warehouses.kindLabels.minibarMain },
+  { value: "transit", label: vi.master.warehouses.kindLabels.transit },
+  { value: "quarantine", label: vi.master.warehouses.kindLabels.quarantine },
+  { value: "disposal", label: vi.master.warehouses.kindLabels.disposal },
 ];
 
 export function WarehousesManager({
@@ -78,7 +78,7 @@ export function WarehousesManager({
 
     // Validate: outlet_id required for outlet, floor, trolley
     if (["outlet", "floor", "trolley"].includes(kind) && !outletId) {
-      setError("Loại kho này bắt buộc phải gắn với một Outlet phụ trách.");
+      setError(vi.master.warehouses.outletRequired);
       setSaving(false);
       return;
     }
@@ -232,7 +232,7 @@ export function WarehousesManager({
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="VD: Kho tổng khách sạn, Kho bếp chính"
+                  placeholder={vi.master.warehouses.examplePlaceholder}
                   className="mt-1 h-9 w-full rounded-md border bg-background px-3 text-sm"
                 />
               </div>
@@ -276,7 +276,9 @@ export function WarehousesManager({
                     onChange={(e) => setOutletId(e.target.value)}
                     className="mt-1 h-9 w-full rounded-md border bg-background px-3 text-sm"
                   >
-                    <option value="">— Chọn Outlet phụ trách —</option>
+                    <option value="">
+                      {vi.master.warehouses.selectOutlet}
+                    </option>
                     {outlets.map((o) => (
                       <option key={o.id} value={o.id}>
                         {o.code} - {o.name}

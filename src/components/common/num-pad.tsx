@@ -3,6 +3,7 @@
 import { Delete } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { vi } from "@/i18n/vi";
 
 /**
  * Bàn phím số lớn cho màn hình hiện trường (docs/06-UI-UX.md mục 4):
@@ -92,14 +93,14 @@ export function NumPad({
           disabled={disabled}
           onClick={pressSign}
           className="h-10 touch-manipulation select-none"
-          aria-label="Đổi dấu âm dương"
+          aria-label={vi.components.numPad.toggleSign}
         >
-          Âm / Dương (±)
+          {vi.components.numPad.toggleSignLabel}
         </Button>
       ) : null}
       <div
         role="group"
-        aria-label={label ?? "Bàn phím số"}
+        aria-label={label ?? vi.components.numPad.keyboardLabel}
         className="grid grid-cols-3 gap-2"
       >
         {["1", "2", "3", "4", "5", "6", "7", "8", "9"].map((digit) => (
@@ -121,7 +122,7 @@ export function NumPad({
           disabled={disabled || !allowDecimal}
           onClick={pressDecimal}
           className={keyClass}
-          aria-label="Dấu thập phân"
+          aria-label={vi.components.numPad.decimalPoint}
         >
           .
         </Button>
@@ -131,7 +132,7 @@ export function NumPad({
           disabled={disabled}
           onClick={() => pressDigit("0")}
           className={keyClass}
-          aria-label="Số 0"
+          aria-label={vi.components.numPad.zero}
         >
           0
         </Button>
@@ -141,7 +142,7 @@ export function NumPad({
           disabled={disabled}
           onClick={pressBackspace}
           className={keyClass}
-          aria-label="Xóa một chữ số"
+          aria-label={vi.components.numPad.backspace}
         >
           <Delete className="size-6" aria-hidden />
         </Button>
@@ -155,9 +156,9 @@ export function NumPad({
           "h-10 touch-manipulation select-none",
           "text-muted-foreground",
         )}
-        aria-label="Xóa hết"
+        aria-label={vi.components.numPad.clearAll}
       >
-        Xóa hết
+        {vi.components.numPad.clearAll}
       </Button>
     </div>
   );

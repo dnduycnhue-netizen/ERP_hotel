@@ -81,7 +81,7 @@ function StatusButton({
     const res = await onAction();
     setPending(false);
     if (!res.ok) {
-      setError(res.error ?? "Có lỗi xảy ra.");
+      setError(res.error ?? vi.common.genericError);
       return;
     }
     router.refresh();

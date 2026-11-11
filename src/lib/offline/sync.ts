@@ -25,6 +25,7 @@ import {
   type OfflineJob,
   type QueuedPhoto,
 } from "./db";
+import { vi } from "@/i18n/vi";
 
 export type OfflineSyncState = {
   online: boolean;
@@ -182,10 +183,10 @@ async function processJob(job: OfflineJob): Promise<JobResult> {
   const trolleyKind =
     job.payload.kind === "trolley_open" || job.payload.kind === "trolley_close";
   if (!trolleyKind && job.payload.kind !== "count_record" && !job.grId) {
-    return { ok: false, error: "Thiếu mã phiếu nhận." };
+    return { ok: false, error: vi.offline.missingReceivingId };
   }
   if (job.payload.kind === "count_record" && !job.countId) {
-    return { ok: false, error: "Thiếu mã đợt kiểm kê." };
+    return { ok: false, error: vi.offline.missingCountId };
   }
   switch (job.payload.kind) {
     case "record":
@@ -199,7 +200,7 @@ async function processJob(job: OfflineJob): Promise<JobResult> {
     case "override": {
       const grId = job.grId;
       if (!grId) {
-        return { ok: false, error: "Thiếu mã phiếu nhận." };
+        return { ok: false, error: vi.offline.missingReceivingId };
       }
       const res = await overrideReceivingLineAction(job.payload.input);
       if (!res.ok) {
@@ -216,7 +217,7 @@ async function processJob(job: OfflineJob): Promise<JobResult> {
     case "post": {
       const grId = job.grId;
       if (!grId) {
-        return { ok: false, error: "Thiếu mã phiếu nhận." };
+        return { ok: false, error: vi.offline.missingReceivingId };
       }
       const res = await postReceivingAction(job.payload.input);
       if (res.ok) {
@@ -246,11 +247,11 @@ async function processJob(job: OfflineJob): Promise<JobResult> {
  */
 async function processCountRecordJob(job: OfflineJob): Promise<JobResult> {
   if (job.payload.kind !== "count_record") {
-    return { ok: false, error: "Loại thao tác không hợp lệ." };
+    return { ok: false, error: vi.offline.invalidJobKind };
   }
   const countId = job.countId;
   if (!countId) {
-    return { ok: false, error: "Thiếu mã đợt kiểm kê." };
+    return { ok: false, error: vi.offline.missingCountId };
   }
   const { input } = job.payload;
   const res = await recordCountLineAction({
@@ -275,7 +276,7 @@ async function processCountRecordJob(job: OfflineJob): Promise<JobResult> {
  */
 async function processTrolleyOpenJob(job: OfflineJob): Promise<JobResult> {
   if (job.payload.kind !== "trolley_open") {
-    return { ok: false, error: "Loại thao tác không hợp lệ." };
+    return { ok: false, error: vi.offline.invalidJobKind };
   }
   const { input } = job.payload;
   const res = await openTrolleyShiftAction(input);
@@ -313,7 +314,7 @@ async function processTrolleyOpenJob(job: OfflineJob): Promise<JobResult> {
  */
 async function processTrolleyCloseJob(job: OfflineJob): Promise<JobResult> {
   if (job.payload.kind !== "trolley_close") {
-    return { ok: false, error: "Loại thao tác không hợp lệ." };
+    return { ok: false, error: vi.offline.invalidJobKind };
   }
   const { input } = job.payload;
   const res = await closeTrolleyShiftAction(input);
@@ -337,11 +338,11 @@ async function processTrolleyCloseJob(job: OfflineJob): Promise<JobResult> {
 
 async function processRecordJob(job: OfflineJob): Promise<JobResult> {
   if (job.payload.kind !== "record") {
-    return { ok: false, error: "Loại thao tác không hợp lệ." };
+    return { ok: false, error: vi.offline.invalidJobKind };
   }
   const grId = job.grId;
   if (!grId) {
-    return { ok: false, error: "Thiếu mã phiếu nhận." };
+    return { ok: false, error: vi.offline.missingReceivingId };
   }
   const { input } = job.payload;
   // Bản sao để cập nhật tiến trình tải ảnh ngay trong job: gửi lại lần sau
@@ -360,7 +361,7 @@ async function processRecordJob(job: OfflineJob): Promise<JobResult> {
       continue;
     }
     if (!photo.blob) {
-      return { ok: false, error: "Thiếu ảnh chờ tải lên." };
+      return { ok: false, error: vi.offline.missingPendingPhoto };
     }
     const uploaded = await uploadCapturedPhoto({
       propertyId: job.propertyId,

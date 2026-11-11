@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { vi } from "@/i18n/vi";
 
 export const itemSaveSchema = z.object({
   id: z.string().uuid().optional(),
@@ -6,24 +7,21 @@ export const itemSaveSchema = z.object({
   code: z
     .string()
     .trim()
-    .min(1, "Mã vật tư không được để trống")
-    .max(50, "Mã vật tư tối đa 50 ký tự")
-    .regex(
-      /^[A-Za-z0-9_-]+$/,
-      "Mã vật tư chỉ chứa chữ, số, gạch nối hoặc gạch dưới",
-    ),
+    .min(1, vi.master.itemCodeRequired)
+    .max(50, vi.master.itemCodeMax50)
+    .regex(/^[A-Za-z0-9_-]+$/, vi.master.itemCodeFormat),
   name: z
     .string()
     .trim()
-    .min(1, "Tên vật tư không được để trống")
-    .max(200, "Tên vật tư tối đa 200 ký tự"),
+    .min(1, vi.master.itemNameRequired)
+    .max(200, vi.master.itemNameMax200),
   nameEn: z.string().trim().max(200).optional().nullable(),
-  groupId: z.string().uuid("Vui lòng chọn nhóm hàng"),
-  stockUom: z.string().trim().min(1, "Vui lòng chọn đơn vị tính kho"),
+  groupId: z.string().uuid(vi.master.selectItemGroup),
+  stockUom: z.string().trim().min(1, vi.master.selectStockUom),
   recipeUom: z.string().trim().optional().nullable(),
   stockToRecipe: z.coerce
     .number()
-    .positive("Hệ số quy đổi phải lớn hơn 0")
+    .positive(vi.master.conversionFactorPositive)
     .optional()
     .nullable(),
   isKeyItem: z.boolean().default(false),
@@ -34,7 +32,7 @@ export const itemSaveSchema = z.object({
   vatRate: z.coerce.number().min(0).max(100).optional().nullable(),
   allowedChannels: z
     .array(z.enum(["contract", "market"]))
-    .min(1, "Chọn ít nhất 1 kênh mua"),
+    .min(1, vi.master.selectAtLeastOneChannel),
   tareG: z.coerce.number().min(0).optional().nullable(),
   densityGMl: z.coerce.number().positive().optional().nullable(),
   status: z.enum(["active", "inactive"]).default("active"),
@@ -48,17 +46,14 @@ export const itemGroupSaveSchema = z.object({
   codePrefix: z
     .string()
     .trim()
-    .min(1, "Tiền tố mã không được để trống")
-    .max(20, "Tiền tố mã tối đa 20 ký tự")
-    .regex(
-      /^[A-Za-z0-9_-]+$/,
-      "Tiền tố mã chỉ chứa chữ, số, gạch nối hoặc gạch dưới",
-    ),
+    .min(1, vi.master.codePrefixRequired)
+    .max(20, vi.master.codePrefixMax20)
+    .regex(/^[A-Za-z0-9_-]+$/, vi.master.codePrefixFormat),
   name: z
     .string()
     .trim()
-    .min(1, "Tên nhóm hàng không được để trống")
-    .max(100, "Tên nhóm hàng tối đa 100 ký tự"),
+    .min(1, vi.master.itemGroupNameRequired)
+    .max(100, vi.master.itemGroupNameMax100),
   kind: z.enum([
     "food",
     "beverage",
@@ -83,17 +78,14 @@ export const uomSaveSchema = z.object({
   code: z
     .string()
     .trim()
-    .min(1, "Mã ĐVT không được để trống")
-    .max(20, "Mã ĐVT tối đa 20 ký tự")
-    .regex(
-      /^[a-z][a-z0-9_]*$/,
-      "Mã ĐVT chỉ gồm chữ thường không dấu, số hoặc gạch dưới",
-    ),
+    .min(1, vi.master.uomCodeRequired)
+    .max(20, vi.master.uomCodeMax20)
+    .regex(/^[a-z][a-z0-9_]*$/, vi.master.uomCodeFormat),
   nameVi: z
     .string()
     .trim()
-    .min(1, "Tên hiển thị tiếng Việt không được để trống")
-    .max(50, "Tên tiếng Việt tối đa 50 ký tự"),
+    .min(1, vi.master.vietnameseDisplayNameRequired)
+    .max(50, vi.master.vietnameseNameMax50),
 });
 
 export type UomSaveInput = z.infer<typeof uomSaveSchema>;
@@ -102,8 +94,8 @@ export const purchaseUnitSaveSchema = z.object({
   id: z.string().uuid().optional(),
   propertyId: z.string().uuid(),
   itemId: z.string().uuid(),
-  uom: z.string().trim().min(1, "Chọn đơn vị mua"),
-  factorToStock: z.coerce.number().positive("Hệ số quy đổi phải lớn hơn 0"),
+  uom: z.string().trim().min(1, vi.master.selectPurchaseUnit),
+  factorToStock: z.coerce.number().positive(vi.master.conversionFactorPositive),
   isDefault: z.boolean().default(false),
 });
 
@@ -115,17 +107,14 @@ export const warehouseSaveSchema = z.object({
   code: z
     .string()
     .trim()
-    .min(1, "Mã kho không được để trống")
-    .max(50, "Mã kho tối đa 50 ký tự")
-    .regex(
-      /^[A-Za-z0-9_-]+$/,
-      "Mã kho chỉ chứa chữ, số, gạch nối hoặc gạch dưới",
-    ),
+    .min(1, vi.master.warehouseCodeRequired)
+    .max(50, vi.master.warehouseCodeMax50)
+    .regex(/^[A-Za-z0-9_-]+$/, vi.master.warehouseCodeFormat),
   name: z
     .string()
     .trim()
-    .min(1, "Tên kho không được để trống")
-    .max(100, "Tên kho tối đa 100 ký tự"),
+    .min(1, vi.master.warehouseNameRequired)
+    .max(100, vi.master.warehouseNameMax100),
   kind: z.enum([
     "main",
     "outlet",
@@ -148,10 +137,10 @@ export const roomSaveSchema = z.object({
   roomNo: z
     .string()
     .trim()
-    .min(1, "Số phòng không được để trống")
-    .max(20, "Số phòng tối đa 20 ký tự"),
+    .min(1, vi.master.roomNumberRequired)
+    .max(20, vi.master.roomNumberMax20),
   floor: z.string().trim().max(20).optional().nullable(),
-  roomTypeId: z.string().uuid("Vui lòng chọn loại phòng"),
+  roomTypeId: z.string().uuid(vi.master.selectRoomType),
 });
 
 export type RoomSaveInput = z.infer<typeof roomSaveSchema>;
@@ -162,13 +151,13 @@ export const roomTypeSaveSchema = z.object({
   code: z
     .string()
     .trim()
-    .min(1, "Mã loại phòng không được để trống")
-    .max(20, "Mã loại phòng tối đa 20 ký tự"),
+    .min(1, vi.master.roomTypeCodeRequired)
+    .max(20, vi.master.roomTypeCodeMax20),
   name: z
     .string()
     .trim()
-    .min(1, "Tên loại phòng không được để trống")
-    .max(100, "Tên loại phòng tối đa 100 ký tự"),
+    .min(1, vi.master.roomTypeNameRequired)
+    .max(100, vi.master.roomTypeNameMax100),
   maxGuests: z.coerce.number().int().positive().optional().nullable(),
 });
 
@@ -180,14 +169,14 @@ export const outletSaveSchema = z.object({
   code: z
     .string()
     .trim()
-    .min(1, "Mã outlet không được để trống")
-    .max(20, "Mã outlet tối đa 20 ký tự"),
+    .min(1, vi.master.outletCodeRequired)
+    .max(20, vi.master.outletCodeMax20),
   name: z
     .string()
     .trim()
-    .min(1, "Tên outlet không được để trống")
-    .max(100, "Tên outlet tối đa 100 ký tự"),
-  outletTypeId: z.string().uuid("Vui lòng chọn loại outlet"),
+    .min(1, vi.master.outletNameRequired)
+    .max(100, vi.master.outletNameMax100),
+  outletTypeId: z.string().uuid(vi.master.selectOutletType),
   costCenterId: z.string().uuid().optional().nullable(),
 });
 
@@ -199,13 +188,13 @@ export const outletTypeSaveSchema = z.object({
   code: z
     .string()
     .trim()
-    .min(1, "Mã loại outlet không được để trống")
-    .max(20, "Mã loại outlet tối đa 20 ký tự"),
+    .min(1, vi.master.outletTypeCodeRequired)
+    .max(20, vi.master.outletTypeCodeMax20),
   name: z
     .string()
     .trim()
-    .min(1, "Tên loại outlet không được để trống")
-    .max(100, "Tên loại outlet tối đa 100 ký tự"),
+    .min(1, vi.master.outletTypeNameRequired)
+    .max(100, vi.master.outletTypeNameMax100),
 });
 
 export type OutletTypeSaveInput = z.infer<typeof outletTypeSaveSchema>;
@@ -216,13 +205,13 @@ export const expenseCategorySaveSchema = z.object({
   code: z
     .string()
     .trim()
-    .min(1, "Mã khoản mục không được để trống")
-    .max(50, "Mã khoản mục tối đa 50 ký tự"),
+    .min(1, vi.master.expenseCategoryCodeRequired)
+    .max(50, vi.master.expenseCategoryCodeMax50),
   name: z
     .string()
     .trim()
-    .min(1, "Tên khoản mục không được để trống")
-    .max(100, "Tên khoản mục tối đa 100 ký tự"),
+    .min(1, vi.master.expenseCategoryNameRequired)
+    .max(100, vi.master.expenseCategoryNameMax100),
   usaliLine: z.string().trim().max(100).optional().nullable(),
   parentId: z.string().uuid().optional().nullable(),
 });
@@ -241,17 +230,14 @@ export const supplierSaveSchema = z.object({
   code: z
     .string()
     .trim()
-    .min(1, "Mã nhà cung cấp không được để trống")
-    .max(50, "Mã nhà cung cấp tối đa 50 ký tự")
-    .regex(
-      /^[A-Za-z0-9_-]+$/,
-      "Mã nhà cung cấp chỉ chứa chữ, số, gạch nối hoặc gạch dưới",
-    ),
+    .min(1, vi.master.supplierCodeRequired)
+    .max(50, vi.master.supplierCodeMax50)
+    .regex(/^[A-Za-z0-9_-]+$/, vi.master.supplierCodeFormat),
   name: z
     .string()
     .trim()
-    .min(1, "Tên nhà cung cấp không được để trống")
-    .max(200, "Tên nhà cung cấp tối đa 200 ký tự"),
+    .min(1, vi.master.supplierNameRequired)
+    .max(200, vi.master.supplierNameMax200),
   taxCode: z.string().trim().max(30).optional().nullable(),
   kind: z.enum(["company", "household", "individual_no_invoice"]),
   phone: z.string().trim().max(30).optional().nullable(),
@@ -259,7 +245,7 @@ export const supplierSaveSchema = z.object({
   paymentTermsDays: z.coerce
     .number()
     .int()
-    .min(0, "Số ngày thanh toán không được âm")
+    .min(0, vi.master.paymentDaysNonNegative)
     .optional()
     .nullable(),
   foodSafetyCertUntil: z.string().trim().optional().nullable(),
@@ -283,8 +269,8 @@ export const supplierSetStatusSchema = z.object({
   reason: z
     .string()
     .trim()
-    .min(1, "Vui lòng nhập lý do cho thao tác này.")
-    .max(500, "Lý do tối đa 500 ký tự"),
+    .min(1, vi.master.enterReasonForAction)
+    .max(500, vi.master.reasonMax500),
 });
 
 export type SupplierSetStatusInput = z.infer<typeof supplierSetStatusSchema>;
@@ -295,18 +281,18 @@ export const supplierBankRequestSchema = z.object({
   bankName: z
     .string()
     .trim()
-    .min(1, "Tên ngân hàng không được để trống")
-    .max(100, "Tên ngân hàng tối đa 100 ký tự"),
+    .min(1, vi.master.bankNameRequired)
+    .max(100, vi.master.bankNameMax100),
   accountNo: z
     .string()
     .trim()
-    .min(1, "Số tài khoản không được để trống")
-    .max(50, "Số tài khoản tối đa 50 ký tự"),
+    .min(1, vi.master.bankAccountNumberRequired)
+    .max(50, vi.master.bankAccountNumberMax50),
   accountName: z
     .string()
     .trim()
-    .min(1, "Tên chủ tài khoản không được để trống")
-    .max(200, "Tên chủ tài khoản tối đa 200 ký tự"),
+    .min(1, vi.master.bankAccountHolderRequired)
+    .max(200, vi.master.bankAccountHolderMax200),
 });
 
 export type SupplierBankRequestInput = z.infer<
@@ -328,21 +314,21 @@ export const priceAgreementSaveSchema = z
   .object({
     id: z.string().uuid().optional(),
     propertyId: z.string().uuid(),
-    supplierId: z.string().uuid("Vui lòng chọn nhà cung cấp"),
+    supplierId: z.string().uuid(vi.master.selectSupplier),
     validFrom: z
       .string()
       .trim()
-      .regex(/^\d{4}-\d{2}-\d{2}$/, "Ngày bắt đầu không hợp lệ (YYYY-MM-DD)"),
+      .regex(/^\d{4}-\d{2}-\d{2}$/, vi.master.startDateInvalidFormat),
     validTo: z
       .string()
       .trim()
-      .regex(/^\d{4}-\d{2}-\d{2}$/, "Ngày kết thúc không hợp lệ (YYYY-MM-DD)"),
+      .regex(/^\d{4}-\d{2}-\d{2}$/, vi.master.endDateInvalidFormat),
     status: z
       .enum(["draft", "active", "expired", "cancelled"])
       .default("draft"),
   })
   .refine((v) => v.validTo >= v.validFrom, {
-    message: "Ngày kết thúc phải từ ngày bắt đầu trở đi.",
+    message: vi.service.endBeforeStart,
     path: ["validTo"],
   });
 
@@ -352,9 +338,9 @@ export const priceAgreementLineSaveSchema = z.object({
   id: z.string().uuid().optional(),
   propertyId: z.string().uuid(),
   agreementId: z.string().uuid(),
-  itemId: z.string().uuid("Vui lòng chọn vật tư"),
-  uom: z.string().trim().min(1, "Vui lòng chọn đơn vị tính"),
-  unitPrice: z.coerce.number().min(0, "Đơn giá không được âm"),
+  itemId: z.string().uuid(vi.master.selectItem),
+  uom: z.string().trim().min(1, vi.master.selectUom),
+  unitPrice: z.coerce.number().min(0, vi.master.unitPriceNonNegative),
   warnPct: z.coerce.number().min(0).max(100).optional().nullable(),
   lockPct: z.coerce.number().min(0).max(100).optional().nullable(),
 });
@@ -369,20 +355,20 @@ export const ceilingPriceSaveSchema = z
     propertyId: z.string().uuid(),
     // propertyScopeId null = gia tran cap chuoi; co gia tri = gia tran cap khach san.
     propertyScopeId: z.string().uuid().optional().nullable(),
-    itemId: z.string().uuid("Vui lòng chọn vật tư"),
-    uom: z.string().trim().min(1, "Vui lòng chọn đơn vị tính"),
-    price: z.coerce.number().min(0, "Giá trần không được âm"),
+    itemId: z.string().uuid(vi.master.selectItem),
+    uom: z.string().trim().min(1, vi.master.selectUom),
+    price: z.coerce.number().min(0, vi.master.ceilingPriceNonNegative),
     validFrom: z
       .string()
       .trim()
-      .regex(/^\d{4}-\d{2}-\d{2}$/, "Ngày bắt đầu không hợp lệ (YYYY-MM-DD)"),
+      .regex(/^\d{4}-\d{2}-\d{2}$/, vi.master.startDateInvalidFormat),
     validTo: z
       .string()
       .trim()
-      .regex(/^\d{4}-\d{2}-\d{2}$/, "Ngày kết thúc không hợp lệ (YYYY-MM-DD)"),
+      .regex(/^\d{4}-\d{2}-\d{2}$/, vi.master.endDateInvalidFormat),
   })
   .refine((v) => v.validTo >= v.validFrom, {
-    message: "Ngày kết thúc phải từ ngày bắt đầu trở đi.",
+    message: vi.service.endBeforeStart,
     path: ["validTo"],
   });
 
@@ -397,10 +383,10 @@ export const tempItemCreateSchema = z.object({
   name: z
     .string()
     .trim()
-    .min(1, "Tên vật tư không được để trống")
-    .max(200, "Tên vật tư tối đa 200 ký tự"),
-  groupId: z.string().uuid("Vui lòng chọn nhóm hàng"),
-  stockUom: z.string().trim().min(1, "Vui lòng chọn đơn vị tính kho"),
+    .min(1, vi.master.itemNameRequired)
+    .max(200, vi.master.itemNameMax200),
+  groupId: z.string().uuid(vi.master.selectItemGroup),
+  stockUom: z.string().trim().min(1, vi.master.selectStockUom),
 });
 
 export type TempItemCreateInput = z.infer<typeof tempItemCreateSchema>;

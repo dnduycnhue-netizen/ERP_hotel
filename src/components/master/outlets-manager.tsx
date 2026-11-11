@@ -260,7 +260,7 @@ export function OutletsManager({
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="VD: Bếp chính, Quầy bar bể bơi"
+                  placeholder={vi.master.outlets.examplePlaceholder}
                   className="mt-1 h-9 w-full rounded-md border bg-background px-3 text-sm"
                 />
               </div>
@@ -300,7 +300,7 @@ export function OutletsManager({
                   onChange={(e) => setCostCenterId(e.target.value)}
                   className="mt-1 h-9 w-full rounded-md border bg-background px-3 text-sm"
                 >
-                  <option value="">— Chưa gắn trung tâm chi phí —</option>
+                  <option value="">{vi.master.outlets.noCostCenter}</option>
                   {costCenters.map((c) => (
                     <option key={c.id} value={c.id}>
                       {c.code} - {c.name}
@@ -349,7 +349,7 @@ export function OutletsManager({
                   className="text-xs font-medium text-muted-foreground"
                   htmlFor="outTypeCode"
                 >
-                  Mã loại outlet *
+                  {vi.master.outlets.typeCodeLabel}
                 </label>
                 <input
                   id="outTypeCode"
@@ -366,14 +366,14 @@ export function OutletsManager({
                   className="text-xs font-medium text-muted-foreground"
                   htmlFor="outTypeName"
                 >
-                  Tên loại outlet *
+                  {vi.master.outlets.typeNameLabel}
                 </label>
                 <input
                   id="outTypeName"
                   required
                   value={typeName}
                   onChange={(e) => setTypeName(e.target.value)}
-                  placeholder="VD: Bếp, Quầy Bar, Nhà hàng"
+                  placeholder={vi.master.outlets.typeExamplePlaceholder}
                   className="mt-1 h-9 w-full rounded-md border bg-background px-3 text-sm"
                 />
               </div>

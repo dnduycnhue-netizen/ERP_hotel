@@ -106,7 +106,7 @@ export function TempItemCreateDialog({
                 required
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="VD: Hành lá chợ"
+                placeholder={vi.master.tempItem.examplePlaceholder}
                 className="mt-1 h-9 w-full rounded-md border bg-background px-3 text-sm"
               />
             </div>

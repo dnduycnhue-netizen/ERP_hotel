@@ -222,7 +222,7 @@ export function ExpenseCategoriesManager({
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="VD: Chi phí thực phẩm, Chi phí đồ giặt"
+                  placeholder={vi.master.expenseCategories.examplePlaceholder}
                   className="mt-1 h-9 w-full rounded-md border bg-background px-3 text-sm"
                 />
               </div>
@@ -240,7 +240,9 @@ export function ExpenseCategoriesManager({
                   onChange={(e) => setUsaliLine(e.target.value)}
                   className="mt-1 h-9 w-full rounded-md border bg-background px-3 text-sm"
                 >
-                  <option value="">— Chưa phân nhóm USALI —</option>
+                  <option value="">
+                    {vi.master.expenseCategories.noUsaliGroup}
+                  </option>
                   {usaliDepartments.map((dept) => (
                     <option key={dept} value={dept}>
                       {dept}

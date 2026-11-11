@@ -1,4 +1,5 @@
 "use server";
+import { vi } from "@/i18n/vi";
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
@@ -25,7 +26,7 @@ function validationError(
 ): HousekeepingActionResult<never> {
   return {
     ok: false,
-    error: issues[0]?.message ?? "Dữ liệu không hợp lệ.",
+    error: issues[0]?.message ?? vi.common.invalidData,
     code: null,
   };
 }

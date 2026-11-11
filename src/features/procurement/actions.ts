@@ -1,4 +1,5 @@
 "use server";
+import { vi } from "@/i18n/vi";
 
 import { createClient } from "@/lib/supabase/server";
 import { callProcurementRpc, type ProcurementActionResult } from "./rpc";
@@ -63,7 +64,7 @@ export type ApprovalDecideResult = {
 function validationError(
   issues: { message: string }[],
 ): ProcurementActionResult<never> {
-  return { ok: false, error: issues[0]?.message ?? "Dữ liệu không hợp lệ." };
+  return { ok: false, error: issues[0]?.message ?? vi.common.invalidData };
 }
 
 /** Tạo/sửa PR nháp (RPC `pr_save_draft`, T-020). */

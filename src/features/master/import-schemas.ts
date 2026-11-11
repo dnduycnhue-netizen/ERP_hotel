@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { vi } from "@/i18n/vi";
 
 // ---------------------------------------------------------------------------
 // T-014: Import Excel 4 buoc cho vat tu & NCC
@@ -11,7 +12,7 @@ export type ImportKind = z.infer<typeof importKindSchema>;
 export const importRawRowSchema = z
   .record(z.string(), z.unknown())
   .refine((row) => Object.keys(row).length > 0, {
-    message: "Dòng trống không hợp lệ.",
+    message: vi.master.import.emptyRowInvalid,
   });
 export type ImportRawRow = z.infer<typeof importRawRowSchema>;
 
@@ -21,13 +22,13 @@ export const importCreateBatchSchema = z.object({
   fileName: z
     .string()
     .trim()
-    .min(1, "Thiếu tên file")
-    .max(255, "Tên file tối đa 255 ký tự"),
+    .min(1, vi.master.import.missingFileName)
+    .max(255, vi.master.import.fileNameMax255),
   mappingId: z.string().uuid().optional().nullable(),
   rows: z
     .array(importRawRowSchema)
-    .min(1, "File không có dòng dữ liệu nào.")
-    .max(5000, "File tối đa 5000 dòng mỗi lần import."),
+    .min(1, vi.master.import.fileHasNoDataRows)
+    .max(5000, vi.master.import.fileMax5000Rows),
 });
 export type ImportCreateBatchInput = z.infer<typeof importCreateBatchSchema>;
 
@@ -55,14 +56,14 @@ export const importResolutionSchema = z
     if ((v.action === "split" || v.action === "set_code") && !v.new_code) {
       ctx.addIssue({
         code: "custom",
-        message: "Tách/đổi mã cần nhập mã mới.",
+        message: vi.master.import.splitChangeRequiresNewCode,
         path: ["new_code"],
       });
     }
     if (v.action === "merge" && !v.target_id) {
       ctx.addIssue({
         code: "custom",
-        message: "Gộp cần chọn vật tư/NCC đích.",
+        message: vi.master.import.mergeRequiresTarget,
         path: ["target_id"],
       });
     }
@@ -72,21 +73,21 @@ export const importResolutionSchema = z
     ) {
       ctx.addIssue({
         code: "custom",
-        message: "Đặt hệ số cần nhập hệ số.",
+        message: vi.master.import.setFactorRequiresFactor,
         path: ["factor"],
       });
     }
     if (v.action === "set_group" && !v.group_id) {
       ctx.addIssue({
         code: "custom",
-        message: "Đổi nhóm cần chọn nhóm hàng.",
+        message: vi.master.import.changeGroupRequiresGroup,
         path: ["group_id"],
       });
     }
     if (v.action === "set_uom" && !v.stock_uom) {
       ctx.addIssue({
         code: "custom",
-        message: "Đổi đơn vị cần nhập đơn vị.",
+        message: vi.master.import.changeUnitRequiresUnit,
         path: ["stock_uom"],
       });
     }
@@ -110,8 +111,8 @@ export const importSaveMappingSchema = z.object({
   name: z
     .string()
     .trim()
-    .min(1, "Thiếu tên mẫu ánh xạ")
-    .max(100, "Tên mẫu tối đa 100 ký tự"),
+    .min(1, vi.master.import.missingMappingTemplate)
+    .max(100, vi.master.import.templateNameMax100),
   columnMap: z.record(z.string(), z.unknown()),
   groupMap: z.record(z.string(), z.string().uuid()),
 });
@@ -122,9 +123,13 @@ export const importAddUomAliasSchema = z.object({
   alias: z
     .string()
     .trim()
-    .min(1, "Thiếu biến thể đơn vị")
-    .max(30, "Biến thể tối đa 30 ký tự"),
-  uomCode: z.string().trim().min(1, "Thiếu mã đơn vị chuẩn").max(20),
+    .min(1, vi.master.import.missingUnitVariant)
+    .max(30, vi.master.import.variantMax30),
+  uomCode: z
+    .string()
+    .trim()
+    .min(1, vi.master.import.missingStandardUnitCode)
+    .max(20),
 });
 export type ImportAddUomAliasInput = z.infer<typeof importAddUomAliasSchema>;
 

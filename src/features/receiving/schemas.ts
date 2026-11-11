@@ -1,10 +1,11 @@
 import { z } from "zod";
+import { vi } from "@/i18n/vi";
 
-const uuidSchema = z.string().uuid("Mã định danh không hợp lệ.");
+const uuidSchema = z.string().uuid(vi.common.invalidId);
 const dateSchema = z
   .string()
-  .regex(/^\d{4}-\d{2}-\d{2}$/, "Ngày phải có dạng YYYY-MM-DD.");
-const pinSchema = z.string().regex(/^\d{4,6}$/, "Mã PIN phải gồm 4–6 chữ số.");
+  .regex(/^\d{4}-\d{2}-\d{2}$/, vi.common.dateFormatInvalid);
+const pinSchema = z.string().regex(/^\d{4,6}$/, vi.common.pinFormat);
 
 /** Mo phieu nhan nhap cho 1 PO (RPC `receiving_start`, T-023). */
 export const receivingStartSchema = z.object({
@@ -22,7 +23,7 @@ const qcSchema = z.object({
   reason: z
     .string()
     .trim()
-    .max(1000, "Lý do tối đa 1000 ký tự.")
+    .max(1000, vi.common.reasonMax1000)
     .optional()
     .nullable(),
   supplier_signature_path: z.string().trim().max(500).optional().nullable(),
@@ -33,19 +34,14 @@ export const receivingRecordLineSchema = z.object({
   grId: uuidSchema,
   poLineId: uuidSchema,
   itemId: uuidSchema,
-  gross: z.number().positive("Số lượng cân phải lớn hơn 0."),
-  tare: z.number().nonnegative("Bì không được âm.").default(0),
-  uom: z
-    .string()
-    .trim()
-    .min(1, "Đơn vị tính không được để trống.")
-    .optional()
-    .nullable(),
+  gross: z.number().positive(vi.receiving.weighedQuantityPositive),
+  tare: z.number().nonnegative(vi.receiving.tareNonNegative).default(0),
+  uom: z.string().trim().min(1, vi.common.uomRequired).optional().nullable(),
   qc: qcSchema,
   lot: z
     .string()
     .trim()
-    .max(100, "Số lô tối đa 100 ký tự.")
+    .max(100, vi.receiving.lotNumberMax100)
     .optional()
     .nullable(),
   expiry: dateSchema.optional().nullable(),
@@ -56,7 +52,7 @@ export const receivingRecordLineSchema = z.object({
 /** Duyet nhan vuot tran cho 1 dong (RPC `receiving_override_line`, T-023). */
 export const receivingOverrideLineSchema = z.object({
   grLineId: uuidSchema,
-  reason: z.string().trim().min(1, "Lý do vượt PO không được để trống."),
+  reason: z.string().trim().min(1, vi.receiving.overPoReasonRequired),
 });
 
 /** Ghi so phieu nhan: kiem PIN + SoD roi moi move kho (RPC `receiving_post`, T-023). */
@@ -68,11 +64,11 @@ export const receivingPostSchema = z.object({
 /** 1 dong tra hang da nhan ve NCC (RPC `supplier_return_post`, T-023). */
 const supplierReturnLineSchema = z.object({
   grLineId: uuidSchema,
-  qtyStock: z.number().positive("Số lượng trả phải lớn hơn 0."),
+  qtyStock: z.number().positive(vi.receiving.returnQuantityPositive),
   reason: z
     .string()
     .trim()
-    .max(1000, "Lý do tối đa 1000 ký tự.")
+    .max(1000, vi.common.reasonMax1000)
     .optional()
     .nullable(),
   photoIds: z.array(uuidSchema).optional().nullable(),
@@ -84,20 +80,22 @@ export const supplierReturnPostSchema = z.object({
   grId: uuidSchema,
   lines: z
     .array(supplierReturnLineSchema)
-    .min(1, "Cần ít nhất một dòng trả hàng."),
+    .min(1, vi.receiving.needAtLeastOneReturnLine),
 });
 
 /** Dao phieu nhan da post (RPC `receiving_reverse`, T-023). */
 export const receivingReverseSchema = z.object({
   grId: uuidSchema,
-  reason: z.string().trim().min(1, "Lý do đảo phiếu không được để trống."),
+  reason: z.string().trim().min(1, vi.receiving.reverseReasonRequired),
 });
 
 /** Luu mau checklist QC theo nhom hang (RPC `admin_qc_template_save`, T-023). */
 export const qcTemplateSaveSchema = z.object({
   orgId: uuidSchema,
   itemGroupId: uuidSchema,
-  checklist: z.array(z.unknown()).min(1, "Checklist cần ít nhất một mục."),
+  checklist: z
+    .array(z.unknown())
+    .min(1, vi.receiving.checklistNeedsAtLeastOneItem),
 });
 
 /** Xoa mau checklist QC (RPC `admin_qc_template_delete`, T-023). */
@@ -115,7 +113,7 @@ export const receivingListReceiptsSchema = z.object({
   search: z
     .string()
     .trim()
-    .max(100, "Từ khóa tối đa 100 ký tự.")
+    .max(100, vi.common.keywordMax100)
     .optional()
     .nullable(),
   limit: z.number().int().min(1).max(100).default(20),
@@ -129,7 +127,7 @@ export const supplierReturnListSchema = z.object({
   search: z
     .string()
     .trim()
-    .max(100, "Từ khóa tối đa 100 ký tự.")
+    .max(100, vi.common.keywordMax100)
     .optional()
     .nullable(),
   limit: z.number().int().min(1).max(100).default(20),
@@ -146,7 +144,7 @@ export const supplierReturnConfirmSchema = z.object({
 /** Huy phieu tra QC fail (RPC `supplier_return_cancel`, T-026). */
 export const supplierReturnCancelSchema = z.object({
   returnId: uuidSchema,
-  reason: z.string().trim().min(1, "Lý do hủy phiếu trả không được để trống."),
+  reason: z.string().trim().min(1, vi.receiving.cancelReturnReasonRequired),
 });
 
 /** Dong cua phieu nhan da post con tra duoc (RPC `supplier_return_eligible_lines`, T-026). */
@@ -164,7 +162,7 @@ export const photoReviewListSchema = z.object({
   search: z
     .string()
     .trim()
-    .max(100, "Từ khóa tối đa 100 ký tự.")
+    .max(100, vi.common.keywordMax100)
     .optional()
     .nullable(),
   limit: z.number().int().min(1).max(100).default(20),
@@ -179,7 +177,7 @@ export const photoReviewSchema = z
     reason: z
       .string()
       .trim()
-      .max(1000, "Lý do tối đa 1000 ký tự.")
+      .max(1000, vi.common.reasonMax1000)
       .optional()
       .nullable(),
   })
@@ -187,7 +185,7 @@ export const photoReviewSchema = z
     if (value.decision === "rejected" && !value.reason) {
       ctx.addIssue({
         code: "custom",
-        message: "Từ chối ảnh cần ghi rõ lý do.",
+        message: vi.receiving.photoReviewReasonRequired,
         path: ["reason"],
       });
     }

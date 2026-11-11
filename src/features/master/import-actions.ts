@@ -1,4 +1,5 @@
 "use server";
+import { vi } from "@/i18n/vi";
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
@@ -17,7 +18,7 @@ function firstErrorMessage(parsed: {
   success: false;
   error: { issues: { message?: string }[] };
 }): string {
-  return parsed.error.issues[0]?.message ?? "Dữ liệu không hợp lệ.";
+  return parsed.error.issues[0]?.message ?? vi.common.invalidData;
 }
 
 /** Buoc 1-2: tao phien import tu cac dong tho + validate ngay. */
@@ -40,7 +41,7 @@ export async function createImportBatchAction(
   if (!res.ok) return { ok: false, error: res.error };
   const summary = importBatchSummarySchema.safeParse(res.data as unknown);
   if (!summary.success) {
-    return { ok: false, error: "Không đọc được kết quả kiểm tra file." };
+    return { ok: false, error: vi.master.importCheckResultUnreadable };
   }
   revalidatePath(`/[property]/master/import`);
   return { ok: true, data: summary.data };
@@ -63,7 +64,7 @@ export async function resolveImportRowAction(
   if (!res.ok) return { ok: false, error: res.error };
   const summary = importBatchSummarySchema.safeParse(res.data as unknown);
   if (!summary.success) {
-    return { ok: false, error: "Không đọc được kết quả kiểm tra lại." };
+    return { ok: false, error: vi.master.importRecheckResultUnreadable };
   }
   return { ok: true, data: summary.data };
 }

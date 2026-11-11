@@ -177,7 +177,7 @@ export function ItemsList({
     },
     {
       key: "conversion",
-      header: "ĐVT Công thức",
+      header: vi.master.items.recipeUomHeader,
       cell: (row) =>
         row.recipe_uom ? (
           <span className="text-xs">
@@ -193,7 +193,11 @@ export function ItemsList({
       cell: (row) => (
         <span className="text-xs">
           {row.allowed_channels
-            .map((c) => (c === "contract" ? "HĐ" : "Chợ"))
+            .map((c) =>
+              c === "contract"
+                ? vi.master.items.channelContractShort
+                : vi.master.items.channelMarket,
+            )
             .join(", ")}
         </span>
       ),
@@ -229,7 +233,7 @@ export function ItemsList({
             className="text-xs h-7 px-2"
             onClick={() => openPurchaseUnits(row)}
           >
-            ĐVT Mua
+            {vi.master.items.purchaseUomHeader}
           </Button>
           {row.is_temp && row.status === "active" && canMerge ? (
             <Button
@@ -299,7 +303,7 @@ export function ItemsList({
                 : "bg-muted text-muted-foreground hover:bg-muted/80"
             }`}
           >
-            Tất cả ({total})
+            {vi.common.all} ({total})
           </button>
           <button
             type="button"
@@ -327,7 +331,7 @@ export function ItemsList({
                 : "bg-destructive/10 text-destructive hover:bg-destructive/20"
             }`}
           >
-            Mã tạm
+            {vi.master.items.tempBadge}
           </button>
           <button
             type="button"
@@ -341,7 +345,7 @@ export function ItemsList({
                 : "bg-indigo-500/10 text-indigo-700 hover:bg-indigo-500/20"
             }`}
           >
-            Thiếu quy đổi
+            {vi.master.items.filterMissingConversion}
           </button>
         </div>
 

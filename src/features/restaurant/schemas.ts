@@ -9,8 +9,8 @@ export type RecipeKind = z.infer<typeof recipeKindSchema>;
 export const recipeLineSchema = z.object({
   itemId: z.string().uuid().nullable().optional(),
   subRecipeId: z.string().uuid().nullable().optional(),
-  qty: z.number().positive("Số lượng phải lớn hơn 0."),
-  uom: z.string().min(1, "Chưa chọn đơn vị tính."),
+  qty: z.number().positive(vi.common.quantityPositive),
+  uom: z.string().min(1, vi.restaurant.uomNotSelected),
   lossPct: z.number().min(0).max(100).default(0),
   note: z.string().optional(),
 });
@@ -19,8 +19,8 @@ export const recipeSaveSchema = z
   .object({
     propertyId: z.string().uuid(),
     id: z.string().uuid().optional(),
-    code: z.string().trim().min(1, "Chưa nhập mã món."),
-    name: z.string().trim().min(1, "Chưa nhập tên món."),
+    code: z.string().trim().min(1, vi.restaurant.dishCodeNotEntered),
+    name: z.string().trim().min(1, vi.restaurant.dishNameNotEntered),
     kind: recipeKindSchema,
     groupName: z.string().trim().optional(),
     yieldQty: z.number().positive().optional(),
@@ -39,7 +39,7 @@ export const recipeSaveSchema = z
       if (hasItem === hasSub) {
         ctx.addIssue({
           code: "custom",
-          message: "Mỗi dòng phải có đúng 1 NVL hoặc 1 món con.",
+          message: vi.restaurant.lineMustHaveOneIngredientOrSubRecipe,
           path: ["lines", i],
         });
       }
@@ -62,7 +62,9 @@ export type BuffetMeal = z.infer<typeof buffetMealSchema>;
 export const buffetSessionSaveSchema = z.object({
   propertyId: z.string().uuid(),
   id: z.string().uuid().optional(),
-  businessDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Ngày không hợp lệ."),
+  businessDate: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, vi.restaurant.dateInvalid),
   meal: buffetMealSchema,
   guestCount: z.number().int().nonnegative().default(0),
   pricePerGuest: z.number().nonnegative().optional(),
@@ -71,7 +73,7 @@ export const buffetSessionSaveSchema = z.object({
     .array(
       z.object({
         recipeId: z.string().uuid(),
-        plannedQty: z.number().positive("Số phần phải lớn hơn 0."),
+        plannedQty: z.number().positive(vi.restaurant.servingsPositive),
         note: z.string().optional(),
       }),
     )
@@ -83,8 +85,8 @@ export type BuffetSessionSaveInput = z.infer<typeof buffetSessionSaveSchema>;
 export const buffetSessionCloseSchema = z.object({
   propertyId: z.string().uuid(),
   sessionId: z.string().uuid(),
-  guestCount: z.number().int().positive("Số khách phải lớn hơn 0."),
-  pricePerGuest: z.number().nonnegative("Giá / khách không được âm."),
+  guestCount: z.number().int().positive(vi.restaurant.guestCountPositive),
+  pricePerGuest: z.number().nonnegative(vi.restaurant.pricePerGuestNonNegative),
 });
 
 export type BuffetSessionCloseInput = z.infer<typeof buffetSessionCloseSchema>;
@@ -92,7 +94,7 @@ export type BuffetSessionCloseInput = z.infer<typeof buffetSessionCloseSchema>;
 export const buffetSessionCancelSchema = z.object({
   propertyId: z.string().uuid(),
   sessionId: z.string().uuid(),
-  reason: z.string().trim().min(1, "Chưa nhập lý do hủy."),
+  reason: z.string().trim().min(1, vi.restaurant.cancelReasonNotEntered),
 });
 
 export type BuffetSessionCancelInput = z.infer<
@@ -101,10 +103,12 @@ export type BuffetSessionCancelInput = z.infer<
 
 export const dishSaleRecordSchema = z.object({
   propertyId: z.string().uuid(),
-  businessDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Ngày không hợp lệ."),
+  businessDate: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, vi.restaurant.dateInvalid),
   recipeId: z.string().uuid(),
-  qty: z.number().positive("Số lượng phải lớn hơn 0."),
-  unitPrice: z.number().nonnegative("Đơn giá không được âm."),
+  qty: z.number().positive(vi.common.quantityPositive),
+  unitPrice: z.number().nonnegative(vi.common.unitPriceNonNegative),
 });
 
 export type DishSaleRecordInput = z.infer<typeof dishSaleRecordSchema>;
@@ -123,15 +127,20 @@ export const banquetSaveSchema = z
   .object({
     propertyId: z.string().uuid(),
     id: z.string().uuid().optional(),
-    customerName: z.string().trim().min(1, "Chưa nhập tên khách đặt."),
+    customerName: z
+      .string()
+      .trim()
+      .min(1, vi.restaurant.customerNameNotEntered),
     customerPhone: z.string().trim().optional(),
-    eventDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Ngày không hợp lệ."),
-    startTime: z.string().regex(/^\d{2}:\d{2}$/, "Giờ không hợp lệ."),
-    endTime: z.string().regex(/^\d{2}:\d{2}$/, "Giờ không hợp lệ."),
-    hall: z.string().trim().min(1, "Chưa nhập sảnh / khu vực."),
+    eventDate: z
+      .string()
+      .regex(/^\d{4}-\d{2}-\d{2}$/, vi.restaurant.dateInvalid),
+    startTime: z.string().regex(/^\d{2}:\d{2}$/, vi.restaurant.timeInvalid),
+    endTime: z.string().regex(/^\d{2}:\d{2}$/, vi.restaurant.timeInvalid),
+    hall: z.string().trim().min(1, vi.restaurant.hallNotEntered),
     hallId: z.string().uuid().optional(),
     tablesCount: z.number().int().nonnegative().default(0),
-    guestsCount: z.number().int().positive("Số khách phải lớn hơn 0."),
+    guestsCount: z.number().int().positive(vi.restaurant.guestCountPositive),
     depositAmount: z.number().nonnegative().default(0),
     depositStatus: depositStatusSchema.default("unpaid"),
     notes: z.string().optional(),
@@ -139,7 +148,7 @@ export const banquetSaveSchema = z
       .array(
         z.object({
           recipeId: z.string().uuid(),
-          qty: z.number().positive("Số phần phải lớn hơn 0."),
+          qty: z.number().positive(vi.restaurant.servingsPositive),
           unitPrice: z.number().nonnegative().optional(),
           note: z.string().optional(),
         }),
@@ -150,7 +159,7 @@ export const banquetSaveSchema = z
     if (data.endTime <= data.startTime) {
       ctx.addIssue({
         code: "custom",
-        message: "Giờ kết thúc phải sau giờ bắt đầu.",
+        message: vi.restaurant.endTimeAfterStartTime,
         path: ["endTime"],
       });
     }
@@ -169,7 +178,7 @@ export type BanquetSaveInput = z.infer<typeof banquetSaveSchema>;
 export const banquetHallSaveSchema = z.object({
   propertyId: z.string().uuid(),
   id: z.string().uuid().optional(),
-  name: z.string().trim().min(1, "Chưa nhập tên sảnh."),
+  name: z.string().trim().min(1, vi.restaurant.hallNameNotEntered),
   capacity: z.number().int().positive().optional(),
   isActive: z.boolean().default(true),
   notes: z.string().optional(),
@@ -185,7 +194,7 @@ export const banquetIdSchema = z.object({
 export type BanquetIdInput = z.infer<typeof banquetIdSchema>;
 
 export const banquetCancelSchema = banquetIdSchema.extend({
-  reason: z.string().trim().min(1, "Chưa nhập lý do hủy."),
+  reason: z.string().trim().min(1, vi.restaurant.cancelReasonNotEntered),
 });
 
 export type BanquetCancelInput = z.infer<typeof banquetCancelSchema>;

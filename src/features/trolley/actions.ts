@@ -1,4 +1,5 @@
 "use server";
+import { vi } from "@/i18n/vi";
 
 import { createClient } from "@/lib/supabase/server";
 import { callTrolleyRpc, type TrolleyActionResult } from "./rpc";
@@ -39,7 +40,7 @@ function validationError(
 ): TrolleyActionResult<never> {
   return {
     ok: false,
-    error: issues[0]?.message ?? "Dữ liệu không hợp lệ.",
+    error: issues[0]?.message ?? vi.common.invalidData,
     code: null,
   };
 }

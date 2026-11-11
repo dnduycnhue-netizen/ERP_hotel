@@ -1,12 +1,11 @@
 import { z } from "zod";
 import { REPORT_CODES } from "./definitions";
+import { vi } from "@/i18n/vi";
 
 const dateString = z
   .string()
-  .regex(/^\d{4}-\d{2}-\d{2}$/, "Ngày phải có dạng yyyy-mm-dd");
-const monthString = z
-  .string()
-  .regex(/^\d{4}-\d{2}$/, "Tháng phải có dạng yyyy-mm");
+  .regex(/^\d{4}-\d{2}-\d{2}$/, vi.reports.dateFormatLower);
+const monthString = z.string().regex(/^\d{4}-\d{2}$/, vi.reports.monthFormat);
 
 export const reportCodeSchema = z.enum(REPORT_CODES);
 
@@ -23,7 +22,7 @@ export const reportParamsSchema = z
   })
   .refine(
     (v) => !(v.from && v.to && v.from > v.to),
-    "Ngày bắt đầu phải không lớn hơn ngày kết thúc.",
+    vi.reports.startDateNotAfterEndDate,
   );
 
 export type ReportParams = z.infer<typeof reportParamsSchema>;

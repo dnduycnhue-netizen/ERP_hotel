@@ -1,9 +1,10 @@
 import { z } from "zod";
+import { vi } from "@/i18n/vi";
 
-const uuidSchema = z.string().uuid("Mã định danh không hợp lệ.");
+const uuidSchema = z.string().uuid(vi.common.invalidId);
 const dateSchema = z
   .string()
-  .regex(/^\d{4}-\d{2}-\d{2}$/, "Ngày phải có dạng YYYY-MM-DD.");
+  .regex(/^\d{4}-\d{2}-\d{2}$/, vi.common.dateFormatInvalid);
 
 const prLineSchema = z.object({
   id: uuidSchema.optional(),
@@ -11,17 +12,17 @@ const prLineSchema = z.object({
   description: z
     .string()
     .trim()
-    .max(500, "Mô tả tối đa 500 ký tự.")
+    .max(500, vi.procurement.descriptionMax500)
     .optional()
     .nullable(),
-  qty: z.number().positive("Số lượng phải lớn hơn 0."),
-  uom: z.string().trim().min(1, "Đơn vị tính không được để trống."),
+  qty: z.number().positive(vi.common.quantityPositive),
+  uom: z.string().trim().min(1, vi.common.uomRequired),
   expenseCategoryId: uuidSchema.optional().nullable(),
   costCenterId: uuidSchema.optional().nullable(),
   reason: z
     .string()
     .trim()
-    .max(500, "Lý do tối đa 500 ký tự.")
+    .max(500, vi.common.reasonMax500)
     .optional()
     .nullable(),
 });
@@ -35,7 +36,7 @@ export const prSaveDraftSchema = z.object({
   note: z
     .string()
     .trim()
-    .max(1000, "Ghi chú tối đa 1000 ký tự.")
+    .max(1000, vi.common.noteMax1000)
     .optional()
     .nullable(),
   lines: z.array(prLineSchema),
@@ -53,7 +54,7 @@ export const prDecideSchema = z.object({
   comment: z
     .string()
     .trim()
-    .max(1000, "Nhận xét tối đa 1000 ký tự.")
+    .max(1000, vi.procurement.commentMax1000)
     .optional()
     .nullable(),
 });
@@ -61,12 +62,12 @@ export const prDecideSchema = z.object({
 export const prCancelSchema = z.object({
   propertyId: uuidSchema,
   prId: uuidSchema,
-  reason: z.string().trim().min(1, "Lý do hủy không được để trống."),
+  reason: z.string().trim().min(1, vi.common.cancelReasonRequired),
 });
 
 export const poCreateFromPrSchema = z.object({
   propertyId: uuidSchema,
-  prLineIds: z.array(uuidSchema).min(1, "Chọn ít nhất một dòng yêu cầu mua."),
+  prLineIds: z.array(uuidSchema).min(1, vi.procurement.selectAtLeastOnePrLine),
   supplierId: uuidSchema,
   channel: z.enum(["contract", "quote", "market"]),
 });
@@ -77,14 +78,14 @@ const poLineSchema = z.object({
   description: z
     .string()
     .trim()
-    .max(500, "Mô tả tối đa 500 ký tự.")
+    .max(500, vi.procurement.descriptionMax500)
     .optional()
     .nullable(),
-  qty: z.number().positive("Số lượng phải lớn hơn 0."),
-  uom: z.string().trim().min(1, "Đơn vị tính không được để trống."),
+  qty: z.number().positive(vi.common.quantityPositive),
+  uom: z.string().trim().min(1, vi.common.uomRequired),
   unitPrice: z
     .number()
-    .nonnegative("Đơn giá không được âm.")
+    .nonnegative(vi.common.unitPriceNonNegative)
     .optional()
     .nullable(),
   expenseCategoryId: uuidSchema.optional().nullable(),
@@ -98,7 +99,7 @@ export const poSaveDraftSchema = z.object({
   overCeilingReason: z
     .string()
     .trim()
-    .max(1000, "Lý do vượt trần tối đa 1000 ký tự.")
+    .max(1000, vi.procurement.overCeilingReasonMax1000)
     .optional()
     .nullable(),
   lines: z.array(poLineSchema),
@@ -117,7 +118,7 @@ export const approvalDecideSchema = z.object({
   comment: z
     .string()
     .trim()
-    .max(1000, "Nhận xét tối đa 1000 ký tự.")
+    .max(1000, vi.procurement.commentMax1000)
     .optional()
     .nullable(),
 });
@@ -130,18 +131,18 @@ export const poSendSchema = z.object({
 export const poCloseSchema = z.object({
   propertyId: uuidSchema,
   poId: uuidSchema,
-  reason: z.string().trim().min(1, "Lý do đóng không được để trống."),
+  reason: z.string().trim().min(1, vi.procurement.closeReasonRequired),
 });
 
 export const poCancelSchema = z.object({
   propertyId: uuidSchema,
   poId: uuidSchema,
-  reason: z.string().trim().min(1, "Lý do hủy không được để trống."),
+  reason: z.string().trim().min(1, vi.common.cancelReasonRequired),
 });
 
 export const itemSearchSchema = z.object({
   propertyId: uuidSchema,
-  search: z.string().trim().max(100, "Từ khóa tối đa 100 ký tự."),
+  search: z.string().trim().max(100, vi.common.keywordMax100),
 });
 
 /** Dong lenh mua cho (T-022): giong dong PO nhung khong co gia bat buoc. */
@@ -150,14 +151,14 @@ const marketOrderLineSchema = z.object({
   description: z
     .string()
     .trim()
-    .max(500, "Mô tả tối đa 500 ký tự.")
+    .max(500, vi.procurement.descriptionMax500)
     .optional()
     .nullable(),
-  qty: z.number().positive("Số lượng phải lớn hơn 0."),
-  uom: z.string().trim().min(1, "Đơn vị tính không được để trống."),
+  qty: z.number().positive(vi.common.quantityPositive),
+  uom: z.string().trim().min(1, vi.common.uomRequired),
   unitPrice: z
     .number()
-    .nonnegative("Đơn giá không được âm.")
+    .nonnegative(vi.common.unitPriceNonNegative)
     .optional()
     .nullable(),
   expenseCategoryId: uuidSchema.optional().nullable(),
@@ -167,25 +168,27 @@ const marketOrderLineSchema = z.object({
 /** Tao lenh mua cho + tam ung trong 1 giao dich (RPC `market_order_create`, T-022). */
 export const marketOrderCreateSchema = z.object({
   propertyId: uuidSchema,
-  lines: z.array(marketOrderLineSchema).min(1, "Cần ít nhất một dòng hàng."),
-  advanceAmount: z.number().positive("Số tiền tạm ứng phải lớn hơn 0."),
+  lines: z
+    .array(marketOrderLineSchema)
+    .min(1, vi.procurement.form.needAtLeastOneLine),
+  advanceAmount: z.number().positive(vi.procurement.advanceAmountPositive),
   purpose: z
     .string()
     .trim()
-    .min(1, "Mục đích tạm ứng không được để trống.")
-    .max(500, "Mục đích tối đa 500 ký tự."),
+    .min(1, vi.procurement.advancePurposeRequired)
+    .max(500, vi.procurement.purposeMax500),
   expectedDate: dateSchema.optional().nullable(),
 });
 
 /** De nghi tam ung doc lap (RPC `advance_request`, T-022). */
 export const advanceRequestSchema = z.object({
   propertyId: uuidSchema,
-  amount: z.number().positive("Số tiền tạm ứng phải lớn hơn 0."),
+  amount: z.number().positive(vi.procurement.advanceAmountPositive),
   purpose: z
     .string()
     .trim()
-    .min(1, "Mục đích tạm ứng không được để trống.")
-    .max(500, "Mục đích tối đa 500 ký tự."),
+    .min(1, vi.procurement.advancePurposeRequired)
+    .max(500, vi.procurement.purposeMax500),
 });
 
 /** Duyet/tu choi tam ung (RPC `advance_decide`, T-022). Tu choi can ly do
@@ -197,7 +200,7 @@ export const advanceDecideSchema = z.object({
   reason: z
     .string()
     .trim()
-    .max(1000, "Lý do tối đa 1000 ký tự.")
+    .max(1000, vi.common.reasonMax1000)
     .optional()
     .nullable(),
 });
@@ -209,7 +212,7 @@ export const advanceDisburseSchema = z.object({
   note: z
     .string()
     .trim()
-    .max(1000, "Ghi chú tối đa 1000 ký tự.")
+    .max(1000, vi.common.noteMax1000)
     .optional()
     .nullable(),
 });
@@ -225,7 +228,7 @@ export const approvalDelegationSaveSchema = z.object({
   reason: z
     .string()
     .trim()
-    .max(500, "Lý do tối đa 500 ký tự.")
+    .max(500, vi.common.reasonMax500)
     .optional()
     .nullable(),
 });

@@ -1,4 +1,5 @@
 "use server";
+import { vi } from "@/i18n/vi";
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
@@ -43,7 +44,7 @@ export type MasterActionResult<T = unknown> =
   { ok: true; data: T } | { ok: false; error: string };
 
 function mapDbError(error: unknown): string {
-  if (!error) return "Đã xảy ra lỗi không xác định.";
+  if (!error) return vi.common.unknownError;
 
   const errObj =
     typeof error === "object" && error !== null
@@ -53,54 +54,54 @@ function mapDbError(error: unknown): string {
   const msg = typeof errObj.message === "string" ? errObj.message : "";
 
   if (code === "42501" || msg.includes("ERR_FORBIDDEN")) {
-    return "Bạn chưa được cấp quyền thực hiện thao tác này.";
+    return vi.common.notAuthorized;
   }
 
   if (code === "23505") {
     if (msg.includes("name_norm")) {
-      return "Tên vật tư đã tồn tại trong danh mục (kể cả khi khác chữ hoa/thường hoặc khoảng trắng).";
+      return vi.master.itemNameExists;
     }
     if (msg.includes("account_no")) {
-      return "Số tài khoản này đã tồn tại cho nhà cung cấp (đang chờ duyệt hoặc đang dùng).";
+      return vi.master.bankAccountExists;
     }
     if (msg.includes("code")) {
-      return "Mã đã tồn tại trong danh mục.";
+      return vi.master.codeExists;
     }
     if (msg.includes("room_no")) {
-      return "Số phòng đã tồn tại trong khách sạn.";
+      return vi.master.roomNumberExists;
     }
-    return "Dữ liệu bị trùng lặp với bản ghi đã có trong hệ thống.";
+    return vi.master.duplicateRecord;
   }
 
   if (code === "23503") {
-    return "Không thể xóa vì còn dữ liệu liên quan. Hãy xóa các dữ liệu liên quan trước.";
+    return vi.master.deleteBlockedByRelations;
   }
 
   if (msg.includes("ERR_SUPPLIER_HAS_BANK_ACCOUNTS")) {
-    return "Nhà cung cấp đã có tài khoản ngân hàng nên không thể xóa. Hãy tạm ngưng hoặc cấm nhà cung cấp thay vì xóa.";
+    return vi.master.supplierHasBankAccountCannotDelete;
   }
 
   if (msg.includes("ERR_AGREEMENT_OVERLAP")) {
-    return "Đã có hợp đồng khung khác của cùng nhà cung cấp còn hiệu lực trong khoảng thời gian này cho cùng vật tư và đơn vị tính.";
+    return vi.master.overlappingAgreementExists;
   }
 
   if (msg.includes("ERR_SOD_")) {
-    return "Thao tác vi phạm quy tắc tách biệt nhiệm vụ: người thực hiện bước trước không được thực hiện bước này.";
+    return vi.master.sodViolation;
   }
 
   if (msg.includes("ERR_INVALID_STATUS")) {
-    return "Bản ghi đang ở trạng thái không phù hợp với thao tác này.";
+    return vi.master.recordInvalidStatus;
   }
 
   if (msg.includes("ERR_ITEM_HAS_STOCK_MOVES")) {
-    return "Vật tư đã có phát sinh giao dịch kho, không thể xóa (chỉ có thể chuyển sang ngừng dùng).";
+    return vi.master.itemHasTransactionsCannotDelete;
   }
 
   if (msg.includes("ERR_ITEM_UOM_CHANGE_FORBIDDEN")) {
-    return "Không thể đổi đơn vị tính lưu kho của vật tư đã có phát sinh giao dịch kho.";
+    return vi.master.cannotChangeStockUomWithTransactions;
   }
 
-  return msg || "Đã xảy ra lỗi khi lưu dữ liệu. Vui lòng kiểm tra lại.";
+  return msg || vi.master.saveFailed;
 }
 
 // 1. Items CRUD
@@ -111,14 +112,14 @@ export async function saveItemAction(
   if (!parsed.success) {
     return {
       ok: false,
-      error: parsed.error.issues[0]?.message ?? "Dữ liệu không hợp lệ.",
+      error: parsed.error.issues[0]?.message ?? vi.common.invalidData,
     };
   }
 
   const { propertyId, id, ...values } = parsed.data;
   const orgId = await getPropertyOrgId(propertyId);
   if (!orgId) {
-    return { ok: false, error: "Không xác định được tổ chức của khách sạn." };
+    return { ok: false, error: vi.master.propertyOrgUnknown };
   }
 
   const supabase = await createClient();
@@ -209,14 +210,14 @@ export async function saveItemGroupAction(
   if (!parsed.success) {
     return {
       ok: false,
-      error: parsed.error.issues[0]?.message ?? "Dữ liệu không hợp lệ.",
+      error: parsed.error.issues[0]?.message ?? vi.common.invalidData,
     };
   }
 
   const { propertyId, id, ...values } = parsed.data;
   const orgId = await getPropertyOrgId(propertyId);
   if (!orgId) {
-    return { ok: false, error: "Không xác định được tổ chức của khách sạn." };
+    return { ok: false, error: vi.master.propertyOrgUnknown };
   }
 
   const supabase = await createClient();
@@ -277,7 +278,7 @@ export async function saveUomAction(
   if (!parsed.success) {
     return {
       ok: false,
-      error: parsed.error.issues[0]?.message ?? "Dữ liệu không hợp lệ.",
+      error: parsed.error.issues[0]?.message ?? vi.common.invalidData,
     };
   }
 
@@ -300,13 +301,13 @@ export async function savePurchaseUnitAction(
   if (!parsed.success) {
     return {
       ok: false,
-      error: parsed.error.issues[0]?.message ?? "Dữ liệu không hợp lệ.",
+      error: parsed.error.issues[0]?.message ?? vi.common.invalidData,
     };
   }
 
   const { propertyId, id, ...values } = parsed.data;
   const orgId = await getPropertyOrgId(propertyId);
-  if (!orgId) return { ok: false, error: "Không xác định được tổ chức." };
+  if (!orgId) return { ok: false, error: vi.master.orgUnknown };
 
   const supabase = await createClient();
   if (id) {
@@ -379,7 +380,7 @@ export async function saveWarehouseAction(
   if (!parsed.success) {
     return {
       ok: false,
-      error: parsed.error.issues[0]?.message ?? "Dữ liệu không hợp lệ.",
+      error: parsed.error.issues[0]?.message ?? vi.common.invalidData,
     };
   }
 
@@ -439,7 +440,7 @@ export async function saveRoomTypeAction(
   if (!parsed.success) {
     return {
       ok: false,
-      error: parsed.error.issues[0]?.message ?? "Dữ liệu không hợp lệ.",
+      error: parsed.error.issues[0]?.message ?? vi.common.invalidData,
     };
   }
   const { propertyId, id, ...values } = parsed.data;
@@ -481,7 +482,7 @@ export async function saveRoomAction(
   if (!parsed.success) {
     return {
       ok: false,
-      error: parsed.error.issues[0]?.message ?? "Dữ liệu không hợp lệ.",
+      error: parsed.error.issues[0]?.message ?? vi.common.invalidData,
     };
   }
   const { propertyId, id, ...values } = parsed.data;
@@ -535,12 +536,12 @@ export async function saveOutletTypeAction(
   if (!parsed.success) {
     return {
       ok: false,
-      error: parsed.error.issues[0]?.message ?? "Dữ liệu không hợp lệ.",
+      error: parsed.error.issues[0]?.message ?? vi.common.invalidData,
     };
   }
   const { propertyId, id, ...values } = parsed.data;
   const orgId = await getPropertyOrgId(propertyId);
-  if (!orgId) return { ok: false, error: "Không xác định được tổ chức." };
+  if (!orgId) return { ok: false, error: vi.master.orgUnknown };
 
   const supabase = await createClient();
   if (id) {
@@ -577,7 +578,7 @@ export async function saveOutletAction(
   if (!parsed.success) {
     return {
       ok: false,
-      error: parsed.error.issues[0]?.message ?? "Dữ liệu không hợp lệ.",
+      error: parsed.error.issues[0]?.message ?? vi.common.invalidData,
     };
   }
   const { propertyId, id, ...values } = parsed.data;
@@ -633,12 +634,12 @@ export async function saveExpenseCategoryAction(
   if (!parsed.success) {
     return {
       ok: false,
-      error: parsed.error.issues[0]?.message ?? "Dữ liệu không hợp lệ.",
+      error: parsed.error.issues[0]?.message ?? vi.common.invalidData,
     };
   }
   const { propertyId, id, ...values } = parsed.data;
   const orgId = await getPropertyOrgId(propertyId);
-  if (!orgId) return { ok: false, error: "Không xác định được tổ chức." };
+  if (!orgId) return { ok: false, error: vi.master.orgUnknown };
 
   const supabase = await createClient();
   if (id) {
@@ -698,12 +699,12 @@ export async function saveSupplierAction(
   if (!parsed.success) {
     return {
       ok: false,
-      error: parsed.error.issues[0]?.message ?? "Dữ liệu không hợp lệ.",
+      error: parsed.error.issues[0]?.message ?? vi.common.invalidData,
     };
   }
   const { propertyId, id, ...values } = parsed.data;
   const orgId = await getPropertyOrgId(propertyId);
-  if (!orgId) return { ok: false, error: "Không xác định được tổ chức." };
+  if (!orgId) return { ok: false, error: vi.master.orgUnknown };
 
   const supabase = await createClient();
   const payload = {
@@ -779,7 +780,7 @@ export async function approveSupplierAction(
   if (!parsed.success) {
     return {
       ok: false,
-      error: parsed.error.issues[0]?.message ?? "Dữ liệu không hợp lệ.",
+      error: parsed.error.issues[0]?.message ?? vi.common.invalidData,
     };
   }
   const supabase = await createClient();
@@ -805,7 +806,7 @@ export async function setSupplierStatusAction(
   if (!parsed.success) {
     return {
       ok: false,
-      error: parsed.error.issues[0]?.message ?? "Dữ liệu không hợp lệ.",
+      error: parsed.error.issues[0]?.message ?? vi.common.invalidData,
     };
   }
   const supabase = await createClient();
@@ -832,7 +833,7 @@ export async function requestBankAccountAction(
   if (!parsed.success) {
     return {
       ok: false,
-      error: parsed.error.issues[0]?.message ?? "Dữ liệu không hợp lệ.",
+      error: parsed.error.issues[0]?.message ?? vi.common.invalidData,
     };
   }
   const supabase = await createClient();
@@ -862,7 +863,7 @@ export async function approveBankAccountAction(
   if (!parsed.success) {
     return {
       ok: false,
-      error: parsed.error.issues[0]?.message ?? "Dữ liệu không hợp lệ.",
+      error: parsed.error.issues[0]?.message ?? vi.common.invalidData,
     };
   }
   const supabase = await createClient();
@@ -889,12 +890,12 @@ export async function savePriceAgreementAction(
   if (!parsed.success) {
     return {
       ok: false,
-      error: parsed.error.issues[0]?.message ?? "Dữ liệu không hợp lệ.",
+      error: parsed.error.issues[0]?.message ?? vi.common.invalidData,
     };
   }
   const { propertyId, id, ...values } = parsed.data;
   const orgId = await getPropertyOrgId(propertyId);
-  if (!orgId) return { ok: false, error: "Không xác định được tổ chức." };
+  if (!orgId) return { ok: false, error: vi.master.orgUnknown };
 
   const supabase = await createClient();
   const payload = {
@@ -945,12 +946,12 @@ export async function savePriceAgreementLineAction(
   if (!parsed.success) {
     return {
       ok: false,
-      error: parsed.error.issues[0]?.message ?? "Dữ liệu không hợp lệ.",
+      error: parsed.error.issues[0]?.message ?? vi.common.invalidData,
     };
   }
   const { propertyId, id, ...values } = parsed.data;
   const orgId = await getPropertyOrgId(propertyId);
-  if (!orgId) return { ok: false, error: "Không xác định được tổ chức." };
+  if (!orgId) return { ok: false, error: vi.master.orgUnknown };
 
   const supabase = await createClient();
   const payload = {
@@ -1007,17 +1008,17 @@ export async function saveCeilingPriceAction(
   if (!parsed.success) {
     return {
       ok: false,
-      error: parsed.error.issues[0]?.message ?? "Dữ liệu không hợp lệ.",
+      error: parsed.error.issues[0]?.message ?? vi.common.invalidData,
     };
   }
   const { propertyId, id, ...values } = parsed.data;
   const orgId = await getPropertyOrgId(propertyId);
-  if (!orgId) return { ok: false, error: "Không xác định được tổ chức." };
+  if (!orgId) return { ok: false, error: vi.master.orgUnknown };
 
   const supabase = await createClient();
   const { data: userData } = await supabase.auth.getUser();
   const setBy = userData.user?.id;
-  if (!setBy) return { ok: false, error: "Bạn chưa đăng nhập." };
+  if (!setBy) return { ok: false, error: vi.common.notLoggedIn };
 
   const payload = {
     property_id: values.propertyScopeId || null,
@@ -1071,7 +1072,7 @@ export async function createTempItemAction(
   if (!parsed.success) {
     return {
       ok: false,
-      error: parsed.error.issues[0]?.message ?? "Dữ liệu không hợp lệ.",
+      error: parsed.error.issues[0]?.message ?? vi.common.invalidData,
     };
   }
   const supabase = await createClient();
@@ -1099,7 +1100,7 @@ export async function mergeItemAction(
   if (!parsed.success) {
     return {
       ok: false,
-      error: parsed.error.issues[0]?.message ?? "Dữ liệu không hợp lệ.",
+      error: parsed.error.issues[0]?.message ?? vi.common.invalidData,
     };
   }
   const supabase = await createClient();
@@ -1132,7 +1133,7 @@ export async function searchMergeTargetsAction(
   if (!parsed.success) {
     return {
       ok: false,
-      error: parsed.error.issues[0]?.message ?? "Dữ liệu không hợp lệ.",
+      error: parsed.error.issues[0]?.message ?? vi.common.invalidData,
     };
   }
   const targets = await searchMergeTargets(parsed.data);
