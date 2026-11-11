@@ -154,9 +154,13 @@ select is(
   1, 'no_code = 1');
 
 -- 5. Commit khi con loi -> chan
+-- 3-arg throws_ok so message EXACT (pgTAP 1.2.0): app raise kem hau to
+-- ': phien import chua dat kiem tra (con loi hoac da ghi/huy)' nen dung 4-arg.
 select throws_ok(
   $q$select public.import_commit_batch((select id from public.import_batches where file_name = 'nvl-test.xlsx'))$q$,
-  'ERR_INVALID_STATUS', 'commit khi con loi bi chan');
+  'P0001',
+  'ERR_INVALID_STATUS: phiên import chưa đạt kiểm tra (còn lỗi hoặc đã ghi/hủy)',
+  'commit khi con loi bi chan');
 
 -- 6. Resolve tung dong loi (can mapping nhom cua batch: tao mapping truoc
 --    thi moi resolve duoc UNKNOWN_GROUP; o day dung set_group truc tiep)
@@ -233,7 +237,9 @@ select ok(
   'dong NO_CODE sinh ma TP-0001 theo tien to nhom');
 select throws_ok(
   $q$select public.import_commit_batch((select id from public.import_batches where file_name = 'nvl-test.xlsx'))$q$,
-  'ERR_INVALID_STATUS', 'commit lan 2 bi chan');
+  'P0001',
+  'ERR_INVALID_STATUS: phiên import chưa đạt kiểm tra (còn lỗi hoặc đã ghi/hủy)',
+  'commit lan 2 bi chan');
 
 -- 8. Batch NCC: DUP_CODE + NO_CODE, commit tao pending + tai khoan pending
 select public.import_create_batch(
