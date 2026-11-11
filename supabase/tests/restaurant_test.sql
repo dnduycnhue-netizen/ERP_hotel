@@ -74,6 +74,7 @@ insert into public.role_permissions (role_id, permission_code) values
   ('d0600000-0200-4000-8000-000000000601', 'restaurant.dish.manage'),
   ('d0600000-0200-4000-8000-000000000601', 'restaurant.sale.record'),
   ('d0600000-0200-4000-8000-000000000601', 'restaurant.buffet.manage'),
+  ('d0600000-0200-4000-8000-000000000601', 'stock.view_qty'),
   ('d0600000-0200-4000-8000-000000000602', 'restaurant.view'),
   ('d0600000-0200-4000-8000-000000000602', 'restaurant.dish.manage'),
   ('d0600000-0200-4000-8000-000000000602', 'restaurant.sale.record'),
@@ -82,6 +83,7 @@ insert into public.role_permissions (role_id, permission_code) values
   ('d0600000-0200-4000-8000-000000000603', 'restaurant.view'),
   ('d0600000-0200-4000-8000-000000000603', 'restaurant.sale.record'),
   ('d0600000-0200-4000-8000-000000000603', 'restaurant.banquet.manage'),
+  ('d0600000-0200-4000-8000-000000000603', 'stock.view_qty'),
   ('d0600000-0200-4000-8000-000000000604', 'restaurant.view'),
   ('d0600000-0200-4000-8000-000000000605', 'restaurant.view'),
   ('d0600000-0200-4000-8000-000000000605', 'report.view.rpt_fnb_revenue')
@@ -280,7 +282,7 @@ select throws_ok(
     jsonb_build_object('id', (select id::text from public.recipes where code = 'MON01'),
       'code', 'MON01', 'name', 'Cơm gà xối mỡ', 'kind', 'dish',
       'lines', jsonb_build_array(
-        jsonb_build_object('sub_recipe_id', (select id::text from public.recipes where code = 'MON01'), 'qty', 1, 'uom', 'cai')))$q$,
+        jsonb_build_object('sub_recipe_id', (select id::text from public.recipes where code = 'MON01'), 'qty', 1, 'uom', 'cai'))))$q$,
   'P0001', 'ERR_INVALID_VALUE',
   'sub_recipe tu tro chinh minh -> ERR_INVALID_VALUE'
 );
@@ -852,12 +854,19 @@ select is(
   'RLS bat cho banquet_halls'
 );
 
+reset role;
+-- Q168-note: cac RPC nha hang da set app.restaurant_guard_bypass='on'
+-- (SET LOCAL — song het transaction) nen toi test 71 co nay da 'on';
+-- tat tam de INSERT truc tiep bi guard chan nhu y muon, roi bat lai.
+select set_config('app.restaurant_guard_bypass', 'off', true);
 select throws_ok(
   $q$insert into public.banquet_halls (org_id, property_id, name)
     values ('d0600000-0200-4000-8000-000000000001', 'd0600000-0200-4000-8000-000000000201', 'Sảnh X')$q$,
   'P0001', 'ERR_WRITE_GUARD: banquet_halls chi duoc ghi qua RPC',
   'ghi truc tiep banquet_halls bi write-guard chan'
 );
+select set_config('app.restaurant_guard_bypass', 'on', true);
+set local role authenticated;
 
 select _r060_as('d0600000-0200-4000-8000-000000000a05');
 
@@ -1171,6 +1180,8 @@ select is(
   'phieu linh B4: dong NVL tinh theo stock_uom kg'
 );
 
+select _r060_as('d0600000-0200-4000-8000-000000000a01');
+
 select ok(
   (public.recipe_save(
     'd0600000-0200-4000-8000-000000000201',
@@ -1178,6 +1189,8 @@ select ok(
   ) ->> 'ok')::boolean,
   'recipe_save MON04 (khong dong dinh luong) tra ok'
 );
+
+select _r060_as('d0600000-0200-4000-8000-000000000a03');
 
 select ok(
   (public.banquet_save(
