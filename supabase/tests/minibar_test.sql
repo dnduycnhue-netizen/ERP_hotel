@@ -471,7 +471,7 @@ select is(
 select public._t035_as('d0350000-0000-4000-8000-000000000a04');
 select throws_ok(
   $q$select public.minibar_submit_check(
-    (select id from t035_ctx where key = 'chk101'),
+    (select (resp ->> 'id')::uuid from t035_ctx where key = 'chk101'),
     '[{"item_id": "d0350000-0000-4000-8000-000000000501", "missing_qty": 1}]'::jsonb
   )$q$,
   '42501', 'ERR_FORBIDDEN:minibar.check',
@@ -485,7 +485,7 @@ insert into t035_ctx values ('chk103', null, (select public.minibar_request_chec
 select public._t035_as('d0350000-0000-4000-8000-000000000a03');
 select throws_ok(
   $q$select public.minibar_submit_check(
-    (select id from t035_ctx where key = 'chk103'),
+    (select (resp ->> 'id')::uuid from t035_ctx where key = 'chk103'),
     '[{"item_id": "d0350000-0000-4000-8000-000000000503", "missing_qty": 1}]'::jsonb
   )$q$,
   'P0001', 'ERR_PRICE_NOT_SET',
@@ -493,7 +493,7 @@ select throws_ok(
 );
 select throws_ok(
   $q$select public.minibar_submit_check(
-    (select id from t035_ctx where key = 'chk103'),
+    (select (resp ->> 'id')::uuid from t035_ctx where key = 'chk103'),
     '[{"item_id": "d0350000-0000-4000-8000-000000000504", "missing_qty": 1}]'::jsonb
   )$q$,
   'P0001', 'ERR_INVALID_VALUE',
@@ -501,7 +501,7 @@ select throws_ok(
 );
 select throws_ok(
   $q$select public.minibar_submit_check(
-    (select id from t035_ctx where key = 'chk103'),
+    (select (resp ->> 'id')::uuid from t035_ctx where key = 'chk103'),
     '[{"item_id": "d0350000-0000-4000-8000-000000000501", "missing_qty": 0}]'::jsonb
   )$q$,
   'P0001', 'ERR_INVALID_VALUE',
@@ -509,7 +509,7 @@ select throws_ok(
 );
 select throws_ok(
   $q$select public.minibar_submit_check(
-    (select id from t035_ctx where key = 'chk103'),
+    (select (resp ->> 'id')::uuid from t035_ctx where key = 'chk103'),
     '[{"item_id": "d0350000-0000-4000-8000-000000000501", "missing_qty": 1}, {"item_id": "d0350000-0000-4000-8000-000000000501", "missing_qty": 1}]'::jsonb
   )$q$,
   'P0001', 'ERR_INVALID_VALUE',
@@ -518,7 +518,7 @@ select throws_ok(
 
 -- 11-TESTING §4.2: thieu 1 Lavie, 1 Tiger -> tong = gia Lavie + gia Tiger.
 insert into t035_ctx values ('sub101', null, (select public.minibar_submit_check(
-  (select id from t035_ctx where key = 'chk101'),
+  (select (resp ->> 'id')::uuid from t035_ctx where key = 'chk101'),
   '[{"item_id": "d0350000-0000-4000-8000-000000000501", "missing_qty": 1}, {"item_id": "d0350000-0000-4000-8000-000000000502", "missing_qty": 1}]'::jsonb,
   'd0350000-0000-4000-8000-000000000f01'
 )));
@@ -528,18 +528,18 @@ select is(
 );
 select is(
   (select count(*) from public.minibar_check_lines
-   where check_id = (select id from t035_ctx where key = 'chk101')),
+   where check_id = (select (resp ->> 'id')::uuid from t035_ctx where key = 'chk101')),
   2::bigint, 'check 101 has 2 lines'
 );
 select is(
   (select amount from public.minibar_check_lines
-   where check_id = (select id from t035_ctx where key = 'chk101')
+   where check_id = (select (resp ->> 'id')::uuid from t035_ctx where key = 'chk101')
      and item_id = 'd0350000-0000-4000-8000-000000000501'),
   25000::numeric, 'Lavie line amount is 25000'
 );
 select throws_ok(
   $q$select public.minibar_submit_check(
-    (select id from t035_ctx where key = 'chk101'),
+    (select (resp ->> 'id')::uuid from t035_ctx where key = 'chk101'),
     '[{"item_id": "d0350000-0000-4000-8000-000000000501", "missing_qty": 1}]'::jsonb,
     'd0350000-0000-4000-8000-000000000f02'
   )$q$,
@@ -553,13 +553,13 @@ insert into t035_ctx values ('chk102', null, (select public.minibar_request_chec
 )));
 select public._t035_as('d0350000-0000-4000-8000-000000000a03');
 insert into t035_ctx values ('sub102', null, (select public.minibar_submit_check(
-  (select id from t035_ctx where key = 'chk102'),
+  (select (resp ->> 'id')::uuid from t035_ctx where key = 'chk102'),
   '[{"item_id": "d0350000-0000-4000-8000-000000000501", "missing_qty": 1}]'::jsonb,
   'd0350000-0000-4000-8000-000000000f03'
 )));
 select is(
   (select public.minibar_submit_check(
-    (select id from t035_ctx where key = 'chk102'),
+    (select (resp ->> 'id')::uuid from t035_ctx where key = 'chk102'),
     '[{"item_id": "d0350000-0000-4000-8000-000000000501", "missing_qty": 1}]'::jsonb,
     'd0350000-0000-4000-8000-000000000f03'
   ) ->> 'duplicate'),
@@ -567,13 +567,13 @@ select is(
 );
 select is(
   (select count(*) from public.minibar_check_lines
-   where check_id = (select id from t035_ctx where key = 'chk102')),
+   where check_id = (select (resp ->> 'id')::uuid from t035_ctx where key = 'chk102')),
   1::bigint, 'duplicate submit creates no extra line'
 );
 
 -- Nop kiem phong 103 (1 Lavie, co near_expiry).
 insert into t035_ctx values ('sub103', null, (select public.minibar_submit_check(
-  (select id from t035_ctx where key = 'chk103'),
+  (select (resp ->> 'id')::uuid from t035_ctx where key = 'chk103'),
   '[{"item_id": "d0350000-0000-4000-8000-000000000501", "missing_qty": 1, "near_expiry": true}]'::jsonb,
   'd0350000-0000-4000-8000-000000000f04'
 )));
@@ -583,7 +583,7 @@ select is(
 );
 select is(
   (select near_expiry from public.minibar_check_lines
-   where check_id = (select id from t035_ctx where key = 'chk103')),
+   where check_id = (select (resp ->> 'id')::uuid from t035_ctx where key = 'chk103')),
   true, 'check 103 line keeps near_expiry flag'
 );
 
@@ -591,7 +591,7 @@ select is(
 select public._t035_as('d0350000-0000-4000-8000-000000000a03');
 select throws_ok(
   $q$select public.minibar_confirm_charge(
-    (select id from t035_ctx where key = 'chk101'), 'FOL-001'
+    (select (resp ->> 'id')::uuid from t035_ctx where key = 'chk101'), 'FOL-001'
   )$q$,
   '42501', 'ERR_FORBIDDEN:minibar.charge.confirm',
   'housekeeping cannot confirm charge'
@@ -599,7 +599,7 @@ select throws_ok(
 select public._t035_as('d0350000-0000-4000-8000-000000000a04');
 select throws_ok(
   $q$select public.minibar_confirm_charge(
-    (select id from t035_ctx where key = 'chk101'), ''
+    (select (resp ->> 'id')::uuid from t035_ctx where key = 'chk101'), ''
   )$q$,
   'P0001', 'ERR_INVALID_VALUE',
   'confirm_charge rejects empty folio_no'
@@ -607,7 +607,7 @@ select throws_ok(
 
 -- 11-TESTING §4.3: xac nhan thu + folio -> move minibar_sale; kho phong con 1+1.
 insert into t035_ctx values ('chg101', null, (select public.minibar_confirm_charge(
-  (select id from t035_ctx where key = 'chk101'), 'FOL-001'
+  (select (resp ->> 'id')::uuid from t035_ctx where key = 'chk101'), 'FOL-001'
 )));
 select is(
   (select resp ->> 'status' from t035_ctx where key = 'chg101'),
@@ -616,7 +616,7 @@ select is(
 select is(
   (select count(*) from public.stock_moves
    where source_doc_type = 'minibar_check'
-     and source_doc_id = (select id from t035_ctx where key = 'chk101')
+     and source_doc_id = (select (resp ->> 'id')::uuid from t035_ctx where key = 'chk101')
      and move_type = 'minibar_sale'),
   2::bigint, 'confirm posts 2 minibar_sale moves'
 );
@@ -640,7 +640,7 @@ select is(
 );
 select throws_ok(
   $q$select public.minibar_confirm_charge(
-    (select id from t035_ctx where key = 'chk101'), 'FOL-002'
+    (select (resp ->> 'id')::uuid from t035_ctx where key = 'chk101'), 'FOL-002'
   )$q$,
   'P0001', 'ERR_INVALID_STATUS',
   'confirming an already charged check is rejected'
@@ -650,20 +650,20 @@ select throws_ok(
 select public._t035_as('d0350000-0000-4000-8000-000000000a04');
 select throws_ok(
   $q$select public.minibar_request_waive(
-    (select id from t035_ctx where key = 'chk102'), ''
+    (select (resp ->> 'id')::uuid from t035_ctx where key = 'chk102'), ''
   )$q$,
   'P0001', 'ERR_REASON_REQUIRED',
   'request_waive rejects empty reason'
 );
 select is(
   (select public.minibar_request_waive(
-    (select id from t035_ctx where key = 'chk102'), 'Khách VIP'
+    (select (resp ->> 'id')::uuid from t035_ctx where key = 'chk102'), 'Khách VIP'
   ) ->> 'ok'),
   'true', 'frontdesk requests waive for check 102'
 );
 select throws_ok(
   $q$select public.minibar_decide_waive(
-    (select id from t035_ctx where key = 'chk102'), 'approved'
+    (select (resp ->> 'id')::uuid from t035_ctx where key = 'chk102'), 'approved'
   )$q$,
   '42501', 'ERR_FORBIDDEN:minibar.waive.approve',
   'frontdesk cannot approve own waive request'
@@ -672,13 +672,13 @@ select throws_ok(
 select public._t035_as('d0350000-0000-4000-8000-000000000a01');
 select is(
   (select public.minibar_request_waive(
-    (select id from t035_ctx where key = 'chk103'), 'Lỗi phòng'
+    (select (resp ->> 'id')::uuid from t035_ctx where key = 'chk103'), 'Lỗi phòng'
   ) ->> 'ok'),
   'true', 'gm requests waive for check 103'
 );
 select throws_ok(
   $q$select public.minibar_decide_waive(
-    (select id from t035_ctx where key = 'chk103'), 'approved'
+    (select (resp ->> 'id')::uuid from t035_ctx where key = 'chk103'), 'approved'
   )$q$,
   'P0001', 'ERR_SOD_MINIBAR_WAIVE',
   'waive requester cannot approve own request (SoD)'
@@ -687,19 +687,19 @@ select throws_ok(
 select public._t035_as('d0350000-0000-4000-8000-000000000a06');
 select is(
   (select public.minibar_decide_waive(
-    (select id from t035_ctx where key = 'chk103'), 'rejected'
+    (select (resp ->> 'id')::uuid from t035_ctx where key = 'chk103'), 'rejected'
   ) ->> 'status'),
   'pending_charge', 'second gm rejects waive, check stays pending_charge'
 );
 select is(
   (select waive_requested_by from public.minibar_checks
-   where id = (select id from t035_ctx where key = 'chk103')),
+   where id = (select (resp ->> 'id')::uuid from t035_ctx where key = 'chk103')),
   null::uuid, 'rejected waive clears waive_requested_by'
 );
 select public._t035_as('d0350000-0000-4000-8000-000000000a04');
 select is(
   (select public.minibar_confirm_charge(
-    (select id from t035_ctx where key = 'chk103'), 'FOL-003'
+    (select (resp ->> 'id')::uuid from t035_ctx where key = 'chk103'), 'FOL-003'
   ) ->> 'status'),
   'charged', 'check 103 can be charged after waive rejection'
 );
@@ -708,13 +708,13 @@ select is(
 select public._t035_as('d0350000-0000-4000-8000-000000000a01');
 select is(
   (select public.minibar_decide_waive(
-    (select id from t035_ctx where key = 'chk102'), 'approved'
+    (select (resp ->> 'id')::uuid from t035_ctx where key = 'chk102'), 'approved'
   ) ->> 'status'),
   'waived', 'gm approves waive for check 102'
 );
 select throws_ok(
   $q$select public.minibar_decide_waive(
-    (select id from t035_ctx where key = 'chk101'), 'approved'
+    (select (resp ->> 'id')::uuid from t035_ctx where key = 'chk101'), 'approved'
   )$q$,
   'P0001', 'ERR_INVALID_STATUS',
   'decide_waive without pending request is rejected'
@@ -728,7 +728,7 @@ insert into t035_ctx values ('chk104a', null, (select public.minibar_request_che
 select public._t035_as('d0350000-0000-4000-8000-000000000a03');
 select is(
   (select public.minibar_submit_check(
-    (select id from t035_ctx where key = 'chk104a'),
+    (select (resp ->> 'id')::uuid from t035_ctx where key = 'chk104a'),
     '[{"item_id": "d0350000-0000-4000-8000-000000000501", "missing_qty": 1}, {"item_id": "d0350000-0000-4000-8000-000000000502", "missing_qty": 1}]'::jsonb
   ) ->> 'total_amount'),
   '60000', 'check 104a total is 60000'
@@ -736,13 +736,13 @@ select is(
 select public._t035_as('d0350000-0000-4000-8000-000000000a04');
 select is(
   (select public.minibar_mark_late_charge(
-    (select id from t035_ctx where key = 'chk104a'), 'Khách đã đi, thu qua thẻ'
+    (select (resp ->> 'id')::uuid from t035_ctx where key = 'chk104a'), 'Khách đã đi, thu qua thẻ'
   ) ->> 'status'),
   'late_charge', 'check 104a becomes late_charge'
 );
 select is(
   (select public.minibar_confirm_charge(
-    (select id from t035_ctx where key = 'chk104a'), 'FOL-004'
+    (select (resp ->> 'id')::uuid from t035_ctx where key = 'chk104a'), 'FOL-004'
   ) ->> 'status'),
   'charged', 'late_charge check can still be confirmed with folio'
 );
@@ -753,7 +753,7 @@ insert into t035_ctx values ('chk104b', null, (select public.minibar_request_che
 select public._t035_as('d0350000-0000-4000-8000-000000000a03');
 select is(
   (select public.minibar_submit_check(
-    (select id from t035_ctx where key = 'chk104b'),
+    (select (resp ->> 'id')::uuid from t035_ctx where key = 'chk104b'),
     '[{"item_id": "d0350000-0000-4000-8000-000000000501", "missing_qty": 1}, {"item_id": "d0350000-0000-4000-8000-000000000502", "missing_qty": 1}]'::jsonb
   ) ->> 'total_amount'),
   '60000', 'check 104b total is 60000'
@@ -761,7 +761,7 @@ select is(
 select public._t035_as('d0350000-0000-4000-8000-000000000a04');
 select is(
   (select public.minibar_mark_late_charge(
-    (select id from t035_ctx where key = 'chk104b'), 'Chưa thu được'
+    (select (resp ->> 'id')::uuid from t035_ctx where key = 'chk104b'), 'Chưa thu được'
   ) ->> 'status'),
   'late_charge', 'check 104b stays late_charge for reconcile'
 );
@@ -773,7 +773,7 @@ insert into t035_ctx values ('chk105', null, (select public.minibar_request_chec
 select public._t035_as('d0350000-0000-4000-8000-000000000a03');
 select is(
   (select public.minibar_submit_check(
-    (select id from t035_ctx where key = 'chk105'),
+    (select (resp ->> 'id')::uuid from t035_ctx where key = 'chk105'),
     '[{"item_id": "d0350000-0000-4000-8000-000000000502", "missing_qty": 1}]'::jsonb
   ) ->> 'total_amount'),
   '35000', 'check 105 total is 35000'
@@ -781,7 +781,7 @@ select is(
 select public._t035_as('d0350000-0000-4000-8000-000000000a04');
 select throws_ok(
   $q$select public.minibar_write_off(
-    (select id from t035_ctx where key = 'chk105'), 'Không thu được'
+    (select (resp ->> 'id')::uuid from t035_ctx where key = 'chk105'), 'Không thu được'
   )$q$,
   '42501', 'ERR_FORBIDDEN:minibar.waive.approve',
   'frontdesk cannot write off a check'
@@ -789,21 +789,21 @@ select throws_ok(
 select public._t035_as('d0350000-0000-4000-8000-000000000a01');
 select throws_ok(
   $q$select public.minibar_write_off(
-    (select id from t035_ctx where key = 'chk105'), ''
+    (select (resp ->> 'id')::uuid from t035_ctx where key = 'chk105'), ''
   )$q$,
   'P0001', 'ERR_REASON_REQUIRED',
   'write_off rejects empty reason'
 );
 select is(
   (select public.minibar_write_off(
-    (select id from t035_ctx where key = 'chk105'), 'Khách đã về nước, không thu được'
+    (select (resp ->> 'id')::uuid from t035_ctx where key = 'chk105'), 'Khách đã về nước, không thu được'
   ) ->> 'status'),
   'written_off', 'gm writes off check 105'
 );
 select public._t035_as('d0350000-0000-4000-8000-000000000a04');
 select throws_ok(
   $q$select public.minibar_confirm_charge(
-    (select id from t035_ctx where key = 'chk105'), 'FOL-005'
+    (select (resp ->> 'id')::uuid from t035_ctx where key = 'chk105'), 'FOL-005'
   )$q$,
   'P0001', 'ERR_INVALID_STATUS',
   'confirming a written_off check is rejected'
@@ -816,7 +816,7 @@ insert into t035_ctx values ('aud101', null, (select public.minibar_request_chec
 )));
 select public._t035_as('d0350000-0000-4000-8000-000000000a03');
 insert into t035_ctx values ('subaud101', null, (select public.minibar_submit_check(
-  (select id from t035_ctx where key = 'aud101'),
+  (select (resp ->> 'id')::uuid from t035_ctx where key = 'aud101'),
   '[{"item_id": "d0350000-0000-4000-8000-000000000501", "missing_qty": 1}]'::jsonb
 )));
 select is(
@@ -834,7 +834,7 @@ insert into t035_ctx values ('aud102', null, (select public.minibar_request_chec
 )));
 select public._t035_as('d0350000-0000-4000-8000-000000000a03');
 insert into t035_ctx values ('subaud102', null, (select public.minibar_submit_check(
-  (select id from t035_ctx where key = 'aud102'),
+  (select (resp ->> 'id')::uuid from t035_ctx where key = 'aud102'),
   '[{"item_id": "d0350000-0000-4000-8000-000000000502", "missing_qty": 1}]'::jsonb
 )));
 select is(
@@ -863,7 +863,7 @@ insert into t035_ctx values ('aud104', null, (select public.minibar_request_chec
 )));
 select public._t035_as('d0350000-0000-4000-8000-000000000a03');
 insert into t035_ctx values ('subaud104', null, (select public.minibar_submit_check(
-  (select id from t035_ctx where key = 'aud104'),
+  (select (resp ->> 'id')::uuid from t035_ctx where key = 'aud104'),
   '[]'::jsonb
 )));
 select is(
@@ -895,7 +895,7 @@ insert into t035_ctx values ('chk107', null, (select public.minibar_request_chec
 )));
 select public._t035_as('d0350000-0000-4000-8000-000000000a03');
 insert into t035_ctx values ('sub107', null, (select public.minibar_submit_check(
-  (select id from t035_ctx where key = 'chk107'),
+  (select (resp ->> 'id')::uuid from t035_ctx where key = 'chk107'),
   '[{"item_id": "d0350000-0000-4000-8000-000000000501", "missing_qty": 2}]'::jsonb
 )));
 select is(
