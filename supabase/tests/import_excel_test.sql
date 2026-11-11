@@ -75,6 +75,12 @@ select set_config('request.jwt.claim.sub', 'd0140000-1400-4000-8000-000000000a01
 select set_config('request.jwt.claims', '{"sub":"d0140000-1400-4000-8000-000000000a01","role":"authenticated"}', true);
 
 -- 2. import_normalize_uom: bien the -> ma chuan (AC 54->33, thu nho)
+-- §2-§3 goi truc tiep 2 helper noi bo (import_normalize_uom,
+-- import_parse_number): ca 2 bi revoke khoi authenticated theo thiet ke
+-- (chi goi ben trong RPC SECURITY DEFINER), nen chay duoi role postgres
+-- nhu cach test Q209 doc audit_log (tien le: reset role, khong doi app).
+reset role;
+
 select is(public.import_normalize_uom('KG'), 'kg', 'KG -> kg');
 select is(public.import_normalize_uom('Cái'), 'cai', 'Cái (NFD) -> cai');
 select is(public.import_normalize_uom('gr'), 'g', 'gr -> g (alias)');
@@ -89,6 +95,11 @@ select is(public.import_parse_number('"1.000"'::jsonb), 1000::numeric, 'chuoi 1.
 select is(public.import_parse_number('"abc"'::jsonb), null, 'chuoi rac -> NULL');
 
 -- 4. Tao batch vat tu tu 12 dong mo phong sheet NVL (gom 1 dong trong)
+-- Tro lai authenticated u1 cho cac RPC (can item.import / item.manage).
+set local role authenticated;
+select set_config('request.jwt.claim.sub', 'd0140000-1400-4000-8000-000000000a01', true);
+select set_config('request.jwt.claims', '{"sub":"d0140000-1400-4000-8000-000000000a01","role":"authenticated"}', true);
+
 select public.import_create_batch(
   'd0140000-1400-4000-8000-000000000201', 'items', 'nvl-test.xlsx',
   'd0140000-1400-4000-8000-000000000801',
@@ -279,6 +290,11 @@ select set_config('request.jwt.claims', '{"sub":"d0140000-1400-4000-8000-0000000
 select is(
   (select public.import_add_uom_alias('d0140000-1400-4000-8000-000000000201', 'can-nhua', 'can') ->> 'uom_code'),
   'can', 'them alias can-nhua -> can');
+-- 2 assert cuoi goi truc tiep helper noi bo: import_normalize_uom (revoke
+-- khoi authenticated) + next_item_code (SECURITY DEFINER, comment o
+-- migration 180000: "Chi goi ben trong RPC commit") — chay duoi postgres.
+reset role;
+
 select is(public.import_normalize_uom('CAN-NHUA'), 'can', 'alias moi co hieu luc (khong phan biet hoa/thuong)');
 
 select ok(
