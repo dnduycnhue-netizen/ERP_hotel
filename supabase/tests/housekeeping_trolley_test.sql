@@ -962,6 +962,7 @@ select is(
      and lot_id is null),
   20::numeric, 'trolley BANCHAI balance stays 20 (no auto-adjust on surplus)'
 );
+select public._t034_as('d0340000-0000-4000-8000-000000000a02');
 
 -- J. Dong ca khong ton tai (1).
 select throws_ok(
