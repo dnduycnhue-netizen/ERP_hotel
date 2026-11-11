@@ -174,6 +174,9 @@ select throws_ok(
 );
 
 -- 10. Dong audit_log ghi lai viec doi ten.
+-- Doc duoi role postgres (reset role) vi policy audit_log_select chi cho
+-- audit.view_all doc, user test a22 khong co quyen nay (mau c8 §0).
+reset role;
 select ok(
   exists (
     select 1 from public.audit_log
