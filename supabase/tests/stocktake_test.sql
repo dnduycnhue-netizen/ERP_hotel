@@ -597,6 +597,9 @@ select is(
   (select status from public.stock_counts where id = (select id from t032_ctx where key = 'cntA')),
   'submitted', 'count status is submitted after submit2'
 );
+-- Doc truc tiep stock_count_lines chi cho phep nguoi co count.view_variance
+-- (policy stock_count_lines_select) nen cac assert doc dong phai chay bang a03.
+select public._t032_as('d0320000-0000-4000-8000-000000000a03');
 select ok(
   (select (resp -> 'red_line_ids')::text like '%' || (select id::text from public.stock_count_lines
      where count_id = (select id from t032_ctx where key = 'cntA')
@@ -643,33 +646,37 @@ select throws_ok(
 select throws_ok(
   $q$select public.count_lock(
     (select id from t032_ctx where key = 'cntA'),
-    jsonb_build_object((select id::text from public.stock_count_lines
-       where count_id = (select id from t032_ctx where key = 'cntA')
-         and item_id = 'd0320000-0000-4000-8000-000000000501'), 'lost')
+    jsonb_build_object('test-line', 'lost')
   )$q$,
   'P0001', 'ERR_INVALID_VALUE',
   'lock with a non-array reasons argument is rejected'
 );
+-- Mang ly do phai dung truoc bang a03 (co count.view_variance, doc duoc
+-- stock_count_lines): doi so cua count_lock chay trong context cua nguoi goi
+-- (a06, khong co count.view_variance) nen subquery doc line_id tra NULL.
+select public._t032_as('d0320000-0000-4000-8000-000000000a03');
+insert into t032_resp values ('lock_reasons', jsonb_build_array(
+  jsonb_build_object(
+    'line_id', (select id from public.stock_count_lines
+       where count_id = (select id from t032_ctx where key = 'cntA')
+         and item_id = 'd0320000-0000-4000-8000-000000000501'),
+    'reason_code', 'lost',
+    'explanation', 'test'
+  ),
+  jsonb_build_object(
+    'line_id', (select id from public.stock_count_lines
+       where count_id = (select id from t032_ctx where key = 'cntA')
+         and item_id = 'd0320000-0000-4000-8000-000000000504'),
+    'reason_code', 'lost',
+    'explanation', 'test'
+  )
+));
+select public._t032_as('d0320000-0000-4000-8000-000000000a06');
 select ok(
   (select (resp ->> 'ok')::boolean from (
     select public.count_lock(
       (select id from t032_ctx where key = 'cntA'),
-      jsonb_build_array(
-        jsonb_build_object(
-          'line_id', (select id from public.stock_count_lines
-             where count_id = (select id from t032_ctx where key = 'cntA')
-               and item_id = 'd0320000-0000-4000-8000-000000000501'),
-          'reason_code', 'lost',
-          'explanation', 'test'
-        ),
-        jsonb_build_object(
-          'line_id', (select id from public.stock_count_lines
-             where count_id = (select id from t032_ctx where key = 'cntA')
-               and item_id = 'd0320000-0000-4000-8000-000000000504'),
-          'reason_code', 'lost',
-          'explanation', 'test'
-        )
-      )
+      (select resp from t032_resp where key = 'lock_reasons')
     ) as resp
   ) s),
   'count_lock succeeds with a valid reason'
@@ -678,6 +685,7 @@ select is(
   (select status from public.stock_counts where id = (select id from t032_ctx where key = 'cntA')),
   'locked', 'count status is locked'
 );
+select public._t032_as('d0320000-0000-4000-8000-000000000a03');
 select is(
   (select reason_code from public.stock_count_lines
    where count_id = (select id from t032_ctx where key = 'cntA')
