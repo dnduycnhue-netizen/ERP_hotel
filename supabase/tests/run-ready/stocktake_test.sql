@@ -38,6 +38,17 @@ insert into public.expense_categories (id, org_id, code, name) values
   ('d0320000-0000-4000-8000-000000000902', 'd0320000-0000-4000-8000-000000000001', 'FOOD', 'Thực phẩm');
 insert into public.lots (id, org_id, property_id, item_id, lot_no, expiry_date) values
   ('d0320000-0000-4000-8000-000000000903', 'd0320000-0000-4000-8000-000000000001', 'd0320000-0000-4000-8000-000000000201', 'd0320000-0000-4000-8000-000000000502', 'LOT-THIT-001', '2027-01-01');
+insert into auth.users (id, instance_id, aud, role, email, encrypted_password, email_confirmed_at, created_at, updated_at, raw_app_meta_data, raw_user_meta_data)
+values
+  ('d0320000-0000-4000-8000-000000000a01', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'u1-stk032@test.com', '', now(), now(), now(), '{}'::jsonb, '{}'::jsonb),
+  ('d0320000-0000-4000-8000-000000000a02', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'u2-chef032@test.com', '', now(), now(), now(), '{}'::jsonb, '{}'::jsonb),
+  ('d0320000-0000-4000-8000-000000000a03', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'u3-cc032@test.com', '', now(), now(), now(), '{}'::jsonb, '{}'::jsonb),
+  ('d0320000-0000-4000-8000-000000000a04', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'u4-gm032@test.com', '', now(), now(), now(), '{}'::jsonb, '{}'::jsonb),
+  ('d0320000-0000-4000-8000-000000000a05', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'u5-own032@test.com', '', now(), now(), now(), '{}'::jsonb, '{}'::jsonb),
+  ('d0320000-0000-4000-8000-000000000a06', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'u6-acc032@test.com', '', now(), now(), now(), '{}'::jsonb, '{}'::jsonb),
+  ('d0320000-0000-4000-8000-000000000a07', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'u7-chief032@test.com', '', now(), now(), now(), '{}'::jsonb, '{}'::jsonb),
+  ('d0320000-0000-4000-8000-000000000a08', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'u8-rec032@test.com', '', now(), now(), now(), '{}'::jsonb, '{}'::jsonb),
+  ('d0320000-0000-4000-8000-000000000a09', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'u9-cc2032@test.com', '', now(), now(), now(), '{}'::jsonb, '{}'::jsonb);
 insert into public.stock_moves (org_id, legal_entity_id, property_id, warehouse_id, item_id, lot_id, move_type, qty, unit_cost, amount, business_date, posted_by, source_doc_type, source_doc_id) values
   ('d0320000-0000-4000-8000-000000000001', 'd0320000-0000-4000-8000-000000000101', 'd0320000-0000-4000-8000-000000000201', 'd0320000-0000-4000-8000-000000000301', 'd0320000-0000-4000-8000-000000000501', null, 'receipt', 100, 10000, 1000000, '2026-11-09', 'd0320000-0000-4000-8000-000000000a07', 'opening', 'd0320000-0000-4000-8000-000000000f01'),
   ('d0320000-0000-4000-8000-000000000001', 'd0320000-0000-4000-8000-000000000101', 'd0320000-0000-4000-8000-000000000201', 'd0320000-0000-4000-8000-000000000301', 'd0320000-0000-4000-8000-000000000502', 'd0320000-0000-4000-8000-000000000903', 'receipt', 20, 60000, 1200000, '2026-11-09', 'd0320000-0000-4000-8000-000000000a07', 'opening', 'd0320000-0000-4000-8000-000000000f01'),
@@ -57,17 +68,6 @@ insert into public.item_costs (legal_entity_id, org_id, item_id, avg_cost, qty_o
   ('d0320000-0000-4000-8000-000000000101', 'd0320000-0000-4000-8000-000000000001', 'd0320000-0000-4000-8000-000000000502', 60000, 20),
   ('d0320000-0000-4000-8000-000000000101', 'd0320000-0000-4000-8000-000000000001', 'd0320000-0000-4000-8000-000000000503', 5000, 60),
   ('d0320000-0000-4000-8000-000000000101', 'd0320000-0000-4000-8000-000000000001', 'd0320000-0000-4000-8000-000000000504', 20, 7000);
-insert into auth.users (id, instance_id, aud, role, email, encrypted_password, email_confirmed_at, created_at, updated_at, raw_app_meta_data, raw_user_meta_data)
-values
-  ('d0320000-0000-4000-8000-000000000a01', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'u1-stk032@test.com', '', now(), now(), now(), '{}'::jsonb, '{}'::jsonb),
-  ('d0320000-0000-4000-8000-000000000a02', '00000000-0000-4000-8000-000000000000', 'authenticated', 'authenticated', 'u2-chef032@test.com', '', now(), now(), now(), '{}'::jsonb, '{}'::jsonb),
-  ('d0320000-0000-4000-8000-000000000a03', '00000000-0000-4000-8000-000000000000', 'authenticated', 'authenticated', 'u3-cc032@test.com', '', now(), now(), now(), '{}'::jsonb, '{}'::jsonb),
-  ('d0320000-0000-4000-8000-000000000a04', '00000000-0000-4000-8000-000000000000', 'authenticated', 'authenticated', 'u4-gm032@test.com', '', now(), now(), now(), '{}'::jsonb, '{}'::jsonb),
-  ('d0320000-0000-4000-8000-000000000a05', '00000000-0000-4000-8000-000000000000', 'authenticated', 'authenticated', 'u5-own032@test.com', '', now(), now(), now(), '{}'::jsonb, '{}'::jsonb),
-  ('d0320000-0000-4000-8000-000000000a06', '00000000-0000-4000-8000-000000000000', 'authenticated', 'authenticated', 'u6-acc032@test.com', '', now(), now(), now(), '{}'::jsonb, '{}'::jsonb),
-  ('d0320000-0000-4000-8000-000000000a07', '00000000-0000-4000-8000-000000000000', 'authenticated', 'authenticated', 'u7-chief032@test.com', '', now(), now(), now(), '{}'::jsonb, '{}'::jsonb),
-  ('d0320000-0000-4000-8000-000000000a08', '00000000-0000-4000-8000-000000000000', 'authenticated', 'authenticated', 'u8-rec032@test.com', '', now(), now(), now(), '{}'::jsonb, '{}'::jsonb),
-  ('d0320000-0000-4000-8000-000000000a09', '00000000-0000-4000-8000-000000000000', 'authenticated', 'authenticated', 'u9-cc2032@test.com', '', now(), now(), now(), '{}'::jsonb, '{}'::jsonb);
 insert into public.profiles (id, employee_code, full_name) values
   ('d0320000-0000-4000-8000-000000000a01', 'NV03201', 'Thủ kho'),
   ('d0320000-0000-4000-8000-000000000a02', 'NV03202', 'Bếp trưởng'),
