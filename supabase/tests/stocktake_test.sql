@@ -666,6 +666,10 @@ select throws_ok(
   'P0001', 'ERR_REASON_REQUIRED',
   'lock without a reason for the red line is rejected'
 );
+-- count_lock chi nhan p_reasons dang mang JSON [{line_id, reason_code, explanation}]
+-- (migration 280000 + script demo mo ton); RPC khong co whitelist ma ly do nen
+-- khong the test "ma ly do khong ton tai". Test thay the: doi tuong JSON
+-- (khong phai mang) bi tu choi ERR_INVALID_VALUE.
 select throws_ok(
   $q$select public.count_lock(
     (select id from t032_ctx where key = 'cntA'),
@@ -673,16 +677,20 @@ select throws_ok(
        where count_id = (select id from t032_ctx where key = 'cntA')
          and item_id = 'd0320000-0000-4000-8000-000000000501'), 'lost')
   )$q$,
-  'P0001', 'ERR_REASON_CODE_INVALID',
-  'lock with an unknown reason code is rejected'
+  'P0001', 'ERR_INVALID_VALUE',
+  'lock with a non-array reasons argument is rejected'
 );
 select ok(
   (select (resp ->> 'ok')::boolean from (
     select public.count_lock(
       (select id from t032_ctx where key = 'cntA'),
-      jsonb_build_object((select id::text from public.stock_count_lines
-         where count_id = (select id from t032_ctx where key = 'cntA')
-           and item_id = 'd0320000-0000-4000-8000-000000000501'), 'lost')
+      jsonb_build_array(jsonb_build_object(
+        'line_id', (select id from public.stock_count_lines
+           where count_id = (select id from t032_ctx where key = 'cntA')
+             and item_id = 'd0320000-0000-4000-8000-000000000501'),
+        'reason_code', 'lost',
+        'explanation', 'test'
+      ))
     ) as resp
   ) s),
   'count_lock succeeds with a valid reason'
