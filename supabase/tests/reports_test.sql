@@ -375,7 +375,7 @@ select is(public._t044_rows('advances'), 2::bigint, 'advances has 2 rows');
 select is(public._t044_total('advances', 'remaining_amount'), 3000000::numeric, 'advances remaining total 3.000.000');
 select is(public._t044_total('advances', 'overdue_count'), 1::numeric, 'advances overdue count 1');
 select ok(public._t044_num('advances', 'doc_no', 'ADV-044-001', 'overdue_hours') > 0, 'ADV1 overdue_hours > 0');
-select ok(public._t044_num('advances', 'doc_no', 'ADV-044-002', 'overdue_hours') is null, 'ADV2 overdue_hours is null');
+select is(public._t044_num('advances', 'doc_no', 'ADV-044-002', 'overdue_hours'), 0::numeric, 'ADV2 overdue_hours is 0 (not yet due; null only when due_settle_at is null — greatest(0, ...) in _report_advances)');
 
 -- ---------------------------------------------------------------------------
 -- G. RPT_WASTE (owner).
