@@ -149,6 +149,11 @@ $$;
 -- Bang tam giu ket qua RPC (mau T-020/T-023).
 create temp table t043_resp (key text primary key, resp jsonb);
 
+-- Bang tam tao duoi role postgres; cap quyen truoc khi doi role
+-- (mau T-023/T-032/T-043-batches da chay live: khong cap thi INSERT
+-- duoi authenticated loi 42501 permission denied for table t043_resp).
+grant all on t043_resp to authenticated;
+
 -- Tu day tro di chay duoi role authenticated (RLS co hieu luc).
 set local role authenticated;
 
