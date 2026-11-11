@@ -16,6 +16,7 @@ export type SettingEntry = {
     | "waste_approval_threshold_vnd"
     | "count_random_items"
     | "count_variance_threshold_pct"
+    | "count_recount_threshold_pct"
     | "count_without_cc_factor"
     | "invoice_price_tolerance_pct"
     | "rule.R25.enabled"

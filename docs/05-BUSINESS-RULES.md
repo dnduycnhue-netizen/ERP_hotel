@@ -12,6 +12,7 @@ Các khóa cấu hình được quản trị qua `/admin/settings`:
 | `waste_approval_threshold_vnd` | 1.000.000 | Ngưỡng duyệt hủy hàng |
 | `count_random_items` | 3 | Số mã ngẫu nhiên khi kiểm kê ca (giới hạn 2–3) |
 | `count_variance_threshold_pct` | 3 | Ngưỡng lệch kiểm kê ca |
+| `count_recount_threshold_pct` | 5 | Ngưỡng lệch % cho phép khi đếm lại (vượt ngưỡng → đếm lại vòng 1 / đỏ vòng 2) |
 | `count_without_cc_factor` | 0,7 | Hệ số khi khách sạn không có Cost Controller |
 | `invoice_price_tolerance_pct` | 1 | Dung sai đơn giá hóa đơn |
 
