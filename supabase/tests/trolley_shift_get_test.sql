@@ -117,12 +117,21 @@ insert into public.user_property_roles (user_id, role_id, property_id) values
 insert into public.stock_moves (legal_entity_id, property_id, warehouse_id, item_id, lot_id, move_type, qty, unit_cost, amount, business_date, posted_by, source_doc_type, source_doc_id) values
   ('d0460000-0000-4000-8000-000000000101', 'd0460000-0000-4000-8000-000000000201', 'd0460000-0000-4000-8000-000000000303', 'd0460000-0000-4000-8000-000000000501', null, 'receipt', 100, 2000, 200000, '2026-11-09', 'd0460000-0000-4000-8000-000000000a07', 'opening', 'd0460000-0000-4000-8000-000000000f01'),
   ('d0460000-0000-4000-8000-000000000101', 'd0460000-0000-4000-8000-000000000201', 'd0460000-0000-4000-8000-000000000303', 'd0460000-0000-4000-8000-000000000502', null, 'receipt', 100, 3000, 300000, '2026-11-09', 'd0460000-0000-4000-8000-000000000a07', 'opening', 'd0460000-0000-4000-8000-000000000f01'),
-  ('d0460000-0000-4000-8000-000000000101', 'd0460000-0000-4000-8000-000000000201', 'd0460000-0000-4000-8000-000000000303', 'd0460000-0000-4000-8000-000000000503', null, 'receipt', 200, 5000, 1000000, '2026-11-09', 'd0460000-0000-4000-8000-000000000a07', 'opening', 'd0460000-0000-4000-8000-000000000f01');
+  ('d0460000-0000-4000-8000-000000000101', 'd0460000-0000-4000-8000-000000000201', 'd0460000-0000-4000-8000-000000000303', 'd0460000-0000-4000-8000-000000000503', null, 'receipt', 200, 5000, 1000000, '2026-11-09', 'd0460000-0000-4000-8000-000000000a07', 'opening', 'd0460000-0000-4000-8000-000000000f01'),
+  -- Ton dau xe day 1 (muc par): phieu tieu hao khi dong ca ghi -25/-31/-48
+  -- tu kho xe day; _post_move chan ton am (ERR_NEGATIVE_STOCK) nen phai
+  -- co ton truoc (chi 3 cai linh bu la khong du).
+  ('d0460000-0000-4000-8000-000000000101', 'd0460000-0000-4000-8000-000000000201', 'd0460000-0000-4000-8000-000000000304', 'd0460000-0000-4000-8000-000000000501', null, 'receipt', 60, 2000, 120000, '2026-11-09', 'd0460000-0000-4000-8000-000000000a07', 'opening', 'd0460000-0000-4000-8000-000000000f01'),
+  ('d0460000-0000-4000-8000-000000000101', 'd0460000-0000-4000-8000-000000000201', 'd0460000-0000-4000-8000-000000000304', 'd0460000-0000-4000-8000-000000000502', null, 'receipt', 40, 3000, 120000, '2026-11-09', 'd0460000-0000-4000-8000-000000000a07', 'opening', 'd0460000-0000-4000-8000-000000000f01'),
+  ('d0460000-0000-4000-8000-000000000101', 'd0460000-0000-4000-8000-000000000201', 'd0460000-0000-4000-8000-000000000304', 'd0460000-0000-4000-8000-000000000503', null, 'receipt', 60, 5000, 300000, '2026-11-09', 'd0460000-0000-4000-8000-000000000a07', 'opening', 'd0460000-0000-4000-8000-000000000f01');
 
 insert into public.stock_balances (warehouse_id, item_id, lot_id, qty) values
   ('d0460000-0000-4000-8000-000000000303', 'd0460000-0000-4000-8000-000000000501', null, 100),
   ('d0460000-0000-4000-8000-000000000303', 'd0460000-0000-4000-8000-000000000502', null, 100),
-  ('d0460000-0000-4000-8000-000000000303', 'd0460000-0000-4000-8000-000000000503', null, 200);
+  ('d0460000-0000-4000-8000-000000000303', 'd0460000-0000-4000-8000-000000000503', null, 200),
+  ('d0460000-0000-4000-8000-000000000304', 'd0460000-0000-4000-8000-000000000501', null, 60),
+  ('d0460000-0000-4000-8000-000000000304', 'd0460000-0000-4000-8000-000000000502', null, 40),
+  ('d0460000-0000-4000-8000-000000000304', 'd0460000-0000-4000-8000-000000000503', null, 60);
 
 create temp table t046_ctx (key text primary key, id uuid);
 
@@ -176,7 +185,7 @@ select public.trolley_par_set(
 select is(
   (select count(*) from public.trolley_par_levels
    where trolley_warehouse_id = 'd0460000-0000-4000-8000-000000000304'),
-  3, 'par levels seeded for trolley 1'
+  3::bigint, 'par levels seeded for trolley 1'
 );
 
 -- C. Mo ca 1: dem dau BANCHAI 57, GIAY 37, NUOC 57 -> linh bu 3/3/3 (3).
@@ -234,14 +243,14 @@ select is(
   (select (c ->> 'qty')::numeric
    from jsonb_array_elements((select resp -> 'opening_counts' from t046_resp where key = 'g1')) c
    where c ->> 'item_code' = 'ITM_GIAY'),
-  37, 'opening count GIAY is 37 (real 9.5.2019 data)'
+  37::numeric, 'opening count GIAY is 37 (real 9.5.2019 data)'
 );
 select ok(
   (select resp -> 'shift' ->> 'requisition_doc_no' from t046_resp where key = 'g1') is not null,
   'open shift carries top-up requisition doc no'
 );
 select ok(
-  (select resp -> 'closing_counts' from t046_resp where key = 'g1') is null,
+  (select resp ->> 'closing_counts' from t046_resp where key = 'g1') is null,
   'open shift has no closing counts yet'
 );
 select is(
@@ -307,6 +316,8 @@ select is(
   (select resp ->> 'status' from t046_resp where key = 'r1rcv'),
   'received', 'top-up requisition is received'
 );
+-- Doc stock_moves duoi quyen thu kho (u2 khong co stock.view_qty).
+select public._t046_as('d0460000-0000-4000-8000-000000000a07');
 select is(
   (select sum(qty) from public.stock_moves
    where warehouse_id = 'd0460000-0000-4000-8000-000000000304'
@@ -314,10 +325,11 @@ select is(
      and source_doc_type = 'requisition'
      and source_doc_id = (select (resp ->> 'requisition_id')::uuid from t046_resp where key = 's1')
      and item_id = 'd0460000-0000-4000-8000-000000000503'),
-  3, 'trolley received 3 NUOC from top-up'
+  3::numeric, 'trolley received 3 NUOC from top-up'
 );
 
 -- G. Dong ca 1: dem cuoi BANCHAI 35, GIAY 9, NUOC 12 -> tieu hao 25/31/48 (3).
+select public._t046_as('d0460000-0000-4000-8000-000000000a02');
 insert into t046_resp values ('s1c', public.trolley_shift_close(
   p_shift_id := (select (resp ->> 'shift_id')::uuid from t046_resp where key = 's1'),
   p_counts := '[{"item_id": "d0460000-0000-4000-8000-000000000501", "qty": 35}, {"item_id": "d0460000-0000-4000-8000-000000000502", "qty": 9}, {"item_id": "d0460000-0000-4000-8000-000000000503", "qty": 12}]'::jsonb,
@@ -352,7 +364,7 @@ select is(
   (select (c ->> 'qty')::numeric
    from jsonb_array_elements((select resp -> 'closing_counts' from t046_resp where key = 'g2')) c
    where c ->> 'item_code' = 'ITM_GIAY'),
-  9, 'closing count GIAY is 9 (real 9.5.2019 data)'
+  9::numeric, 'closing count GIAY is 9 (real 9.5.2019 data)'
 );
 select is(
   (select jsonb_array_length(resp -> 'consumption') from t046_resp where key = 'g2'),
@@ -362,35 +374,38 @@ select is(
   (select (c ->> 'consumed_qty')::numeric
    from jsonb_array_elements((select resp -> 'consumption' from t046_resp where key = 'g2')) c
    where c ->> 'item_code' = 'ITM_GIAY'),
-  31, 'consumed GIAY is 37 + 3 - 9 = 31'
+  31::numeric, 'consumed GIAY is 37 + 3 - 9 = 31'
 );
 select is(
   (select (c ->> 'consumed_qty')::numeric
    from jsonb_array_elements((select resp -> 'consumption' from t046_resp where key = 'g2')) c
    where c ->> 'item_code' = 'ITM_NUOC'),
-  48, 'consumed NUOC is 57 + 3 - 12 = 48'
+  48::numeric, 'consumed NUOC is 57 + 3 - 12 = 48'
 );
 select is(
   (select (c ->> 'consumed_qty')::numeric
    from jsonb_array_elements((select resp -> 'consumption' from t046_resp where key = 'g2')) c
    where c ->> 'item_code' = 'ITM_BANCHAI'),
-  25, 'consumed BANCHAI is 57 + 3 - 35 = 25'
+  25::numeric, 'consumed BANCHAI is 57 + 3 - 35 = 25'
 );
 select is(
   (select (c ->> 'received_qty')::numeric
    from jsonb_array_elements((select resp -> 'consumption' from t046_resp where key = 'g2')) c
    where c ->> 'item_code' = 'ITM_NUOC'),
-  3, 'received NUOC is 3 (top-up issue_in)'
+  3::numeric, 'received NUOC is 3 (top-up issue_in)'
 );
 select ok(
   (select resp -> 'shift' ->> 'purpose_issue_doc_no' from t046_resp where key = 'g2') is not null,
   'closed shift carries purpose_issue doc no'
 );
+-- Doc purpose_issues duoi quyen thu kho (u2 khong co stock.view_qty).
+select public._t046_as('d0460000-0000-4000-8000-000000000a07');
 select is(
   (select purpose_code from public.purpose_issues
    where id = (select (resp ->> 'purpose_issue_id')::uuid from t046_resp where key = 's1c')),
   'housekeeping', 'consumption purpose_issue code is housekeeping'
 );
+select public._t046_as('d0460000-0000-4000-8000-000000000a02');
 select is(
   (select (r ->> 'room_id')
    from jsonb_array_elements((select resp -> 'shift' -> 'rooms_done' from t046_resp where key = 'g2')) r
@@ -426,13 +441,13 @@ select is(
   (select (c ->> 'consumed_qty')::numeric
    from jsonb_array_elements((select resp -> 'consumption' from t046_resp where key = 'g3')) c
    where c ->> 'item_code' = 'ITM_NUOC'),
-  0, 'surplus close consumes 0 (clamped)'
+  0::numeric, 'surplus close consumes 0 (clamped)'
 );
 select is(
   (select (c ->> 'surplus_qty')::numeric
    from jsonb_array_elements((select resp -> 'consumption' from t046_resp where key = 'g3')) c
    where c ->> 'item_code' = 'ITM_NUOC'),
-  5, 'surplus close reports surplus 5'
+  5::numeric, 'surplus close reports surplus 5'
 );
 
 rollback;
