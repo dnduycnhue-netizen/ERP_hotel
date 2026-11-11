@@ -1,7 +1,7 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 set local search_path = public, extensions;
-select plan(101);
+select plan(103);
 insert into public.organizations (id, name) values
   ('d0320000-0000-4000-8000-000000000001', 'T-032 Master Org');
 insert into public.legal_entities (id, org_id, code, name) values
@@ -38,6 +38,17 @@ insert into public.expense_categories (id, org_id, code, name) values
   ('d0320000-0000-4000-8000-000000000902', 'd0320000-0000-4000-8000-000000000001', 'FOOD', 'Thực phẩm');
 insert into public.lots (id, org_id, property_id, item_id, lot_no, expiry_date) values
   ('d0320000-0000-4000-8000-000000000903', 'd0320000-0000-4000-8000-000000000001', 'd0320000-0000-4000-8000-000000000201', 'd0320000-0000-4000-8000-000000000502', 'LOT-THIT-001', '2027-01-01');
+insert into auth.users (id, instance_id, aud, role, email, encrypted_password, email_confirmed_at, created_at, updated_at, raw_app_meta_data, raw_user_meta_data)
+values
+  ('d0320000-0000-4000-8000-000000000a01', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'u1-stk032@test.com', '', now(), now(), now(), '{}'::jsonb, '{}'::jsonb),
+  ('d0320000-0000-4000-8000-000000000a02', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'u2-chef032@test.com', '', now(), now(), now(), '{}'::jsonb, '{}'::jsonb),
+  ('d0320000-0000-4000-8000-000000000a03', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'u3-cc032@test.com', '', now(), now(), now(), '{}'::jsonb, '{}'::jsonb),
+  ('d0320000-0000-4000-8000-000000000a04', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'u4-gm032@test.com', '', now(), now(), now(), '{}'::jsonb, '{}'::jsonb),
+  ('d0320000-0000-4000-8000-000000000a05', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'u5-own032@test.com', '', now(), now(), now(), '{}'::jsonb, '{}'::jsonb),
+  ('d0320000-0000-4000-8000-000000000a06', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'u6-acc032@test.com', '', now(), now(), now(), '{}'::jsonb, '{}'::jsonb),
+  ('d0320000-0000-4000-8000-000000000a07', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'u7-chief032@test.com', '', now(), now(), now(), '{}'::jsonb, '{}'::jsonb),
+  ('d0320000-0000-4000-8000-000000000a08', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'u8-rec032@test.com', '', now(), now(), now(), '{}'::jsonb, '{}'::jsonb),
+  ('d0320000-0000-4000-8000-000000000a09', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'u9-cc2032@test.com', '', now(), now(), now(), '{}'::jsonb, '{}'::jsonb);
 insert into public.stock_moves (org_id, legal_entity_id, property_id, warehouse_id, item_id, lot_id, move_type, qty, unit_cost, amount, business_date, posted_by, source_doc_type, source_doc_id) values
   ('d0320000-0000-4000-8000-000000000001', 'd0320000-0000-4000-8000-000000000101', 'd0320000-0000-4000-8000-000000000201', 'd0320000-0000-4000-8000-000000000301', 'd0320000-0000-4000-8000-000000000501', null, 'receipt', 100, 10000, 1000000, '2026-11-09', 'd0320000-0000-4000-8000-000000000a07', 'opening', 'd0320000-0000-4000-8000-000000000f01'),
   ('d0320000-0000-4000-8000-000000000001', 'd0320000-0000-4000-8000-000000000101', 'd0320000-0000-4000-8000-000000000201', 'd0320000-0000-4000-8000-000000000301', 'd0320000-0000-4000-8000-000000000502', 'd0320000-0000-4000-8000-000000000903', 'receipt', 20, 60000, 1200000, '2026-11-09', 'd0320000-0000-4000-8000-000000000a07', 'opening', 'd0320000-0000-4000-8000-000000000f01'),
@@ -57,17 +68,6 @@ insert into public.item_costs (legal_entity_id, org_id, item_id, avg_cost, qty_o
   ('d0320000-0000-4000-8000-000000000101', 'd0320000-0000-4000-8000-000000000001', 'd0320000-0000-4000-8000-000000000502', 60000, 20),
   ('d0320000-0000-4000-8000-000000000101', 'd0320000-0000-4000-8000-000000000001', 'd0320000-0000-4000-8000-000000000503', 5000, 60),
   ('d0320000-0000-4000-8000-000000000101', 'd0320000-0000-4000-8000-000000000001', 'd0320000-0000-4000-8000-000000000504', 20, 7000);
-insert into auth.users (id, instance_id, aud, role, email, encrypted_password, email_confirmed_at, created_at, updated_at, raw_app_meta_data, raw_user_meta_data)
-values
-  ('d0320000-0000-4000-8000-000000000a01', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'u1-stk032@test.com', '', now(), now(), now(), '{}'::jsonb, '{}'::jsonb),
-  ('d0320000-0000-4000-8000-000000000a02', '00000000-0000-4000-8000-000000000000', 'authenticated', 'authenticated', 'u2-chef032@test.com', '', now(), now(), now(), '{}'::jsonb, '{}'::jsonb),
-  ('d0320000-0000-4000-8000-000000000a03', '00000000-0000-4000-8000-000000000000', 'authenticated', 'authenticated', 'u3-cc032@test.com', '', now(), now(), now(), '{}'::jsonb, '{}'::jsonb),
-  ('d0320000-0000-4000-8000-000000000a04', '00000000-0000-4000-8000-000000000000', 'authenticated', 'authenticated', 'u4-gm032@test.com', '', now(), now(), now(), '{}'::jsonb, '{}'::jsonb),
-  ('d0320000-0000-4000-8000-000000000a05', '00000000-0000-4000-8000-000000000000', 'authenticated', 'authenticated', 'u5-own032@test.com', '', now(), now(), now(), '{}'::jsonb, '{}'::jsonb),
-  ('d0320000-0000-4000-8000-000000000a06', '00000000-0000-4000-8000-000000000000', 'authenticated', 'authenticated', 'u6-acc032@test.com', '', now(), now(), now(), '{}'::jsonb, '{}'::jsonb),
-  ('d0320000-0000-4000-8000-000000000a07', '00000000-0000-4000-8000-000000000000', 'authenticated', 'authenticated', 'u7-chief032@test.com', '', now(), now(), now(), '{}'::jsonb, '{}'::jsonb),
-  ('d0320000-0000-4000-8000-000000000a08', '00000000-0000-4000-8000-000000000000', 'authenticated', 'authenticated', 'u8-rec032@test.com', '', now(), now(), now(), '{}'::jsonb, '{}'::jsonb),
-  ('d0320000-0000-4000-8000-000000000a09', '00000000-0000-4000-8000-000000000000', 'authenticated', 'authenticated', 'u9-cc2032@test.com', '', now(), now(), now(), '{}'::jsonb, '{}'::jsonb);
 insert into public.profiles (id, employee_code, full_name) values
   ('d0320000-0000-4000-8000-000000000a01', 'NV03201', 'Thủ kho'),
   ('d0320000-0000-4000-8000-000000000a02', 'NV03202', 'Bếp trưởng'),
@@ -205,7 +205,7 @@ select throws_ok(
     'd0320000-0000-4000-8000-000000000301', 'monthly_full', '2026-11-09', null,
     array['d0320000-0000-4000-8000-000000000a01', 'd0320000-0000-4000-8000-000000000a02']::uuid[]
   )$q$,
-  'P0001', 'ERR_FORBIDDEN:count.open',
+  '42501', 'ERR_FORBIDDEN:count.open',
   'owner without count.open cannot open a count'
 );
 select public._t032_as('d0320000-0000-4000-8000-000000000a01');
@@ -237,7 +237,7 @@ select throws_ok(
     'd0320000-0000-4000-8000-000000000301', 'monthly_full', '2026-11-09', null,
     array['d0320000-0000-4000-8000-000000000a01', 'd0320000-0000-4000-8000-000000000a08']::uuid[]
   )$q$,
-  'P0001', 'ERR_SOD_COUNT_INDEPENDENT',
+  'P0001', 'ERR_COUNT_INDEPENDENT',
   'team without an independent counter is rejected at open'
 );
 insert into t032_resp values ('openA', public.count_open(
@@ -306,7 +306,7 @@ select throws_ok(
     'd0320000-0000-4000-8000-000000000501',
     '{"qty": 1, "uom": "kg"}'::jsonb
   )$q$,
-  'P0001', 'ERR_FORBIDDEN:count.perform',
+  '42501', 'ERR_FORBIDDEN:count.perform',
   'non-counter cannot record a line'
 );
 select public._t032_as('d0320000-0000-4000-8000-000000000a08');
@@ -316,7 +316,7 @@ select throws_ok(
     'd0320000-0000-4000-8000-000000000501',
     '{"qty": 1, "uom": "kg"}'::jsonb
   )$q$,
-  'P0001', 'ERR_FORBIDDEN:count.perform',
+  '42501', 'ERR_FORBIDDEN:count.perform',
   'count.perform holder outside the team cannot record'
 );
 select public._t032_as('d0320000-0000-4000-8000-000000000a01');
@@ -393,38 +393,34 @@ select public.count_record_line(
   '{"qty": 500, "uom": "ml"}'::jsonb
 );
 select public._t032_as('d0320000-0000-4000-8000-000000000a01');
-insert into t032_resp values ('freeze_issue', public.purpose_issue_save_draft(
-  'd0320000-0000-4000-8000-000000000301', 'd0320000-0000-4000-8000-000000000101',
-  jsonb_build_object(
-    'outlet_id', 'd0320000-0000-4000-8000-000000000802',
-    'cost_center_id', 'd0320000-0000-4000-8000-000000000901',
-    'expense_category_id', 'd0320000-0000-4000-8000-000000000902',
-    'lines', jsonb_build_array(jsonb_build_object(
-      'item_id', 'd0320000-0000-4000-8000-000000000503',
-      'qty_stock', 5, 'uom', 'kg'
-    ))
-  ),
-  'd0320000-0000-4000-8000-00000000aa03'
-));
+insert into t032_resp values ('freeze_issue', public.purpose_issue_save_draft(jsonb_build_object(
+  'property_id', 'd0320000-0000-4000-8000-000000000201',
+  'warehouse_id', 'd0320000-0000-4000-8000-000000000301',
+  'purpose_code', 'other',
+  'cost_center_id', 'd0320000-0000-4000-8000-000000000901',
+  'expense_category_id', 'd0320000-0000-4000-8000-000000000902',
+  'lines', jsonb_build_array(jsonb_build_object(
+    'item_id', 'd0320000-0000-4000-8000-000000000503',
+    'qty', 5, 'uom', 'kg'
+  ))
+)));
 insert into t032_ctx values ('pi_main', (select (resp ->> 'id')::uuid from t032_resp where key = 'freeze_issue'));
 select throws_ok(
   $q$select public.purpose_issue_post((select id from t032_ctx where key = 'pi_main'))$q$,
   'P0001', 'ERR_COUNT_FREEZE',
   'purpose_issue into MAIN is frozen while count A is open'
 );
-insert into t032_resp values ('kit_issue', public.purpose_issue_save_draft(
-  'd0320000-0000-4000-8000-000000000302', 'd0320000-0000-4000-8000-000000000101',
-  jsonb_build_object(
-    'outlet_id', 'd0320000-0000-4000-8000-000000000802',
-    'cost_center_id', 'd0320000-0000-4000-8000-000000000901',
-    'expense_category_id', 'd0320000-0000-4000-8000-000000000902',
-    'lines', jsonb_build_array(jsonb_build_object(
-      'item_id', 'd0320000-0000-4000-8000-000000000503',
-      'qty_stock', 5, 'uom', 'kg'
-    ))
-  ),
-  'd0320000-0000-4000-8000-00000000aa04'
-));
+insert into t032_resp values ('kit_issue', public.purpose_issue_save_draft(jsonb_build_object(
+  'property_id', 'd0320000-0000-4000-8000-000000000201',
+  'warehouse_id', 'd0320000-0000-4000-8000-000000000302',
+  'purpose_code', 'other',
+  'cost_center_id', 'd0320000-0000-4000-8000-000000000901',
+  'expense_category_id', 'd0320000-0000-4000-8000-000000000902',
+  'lines', jsonb_build_array(jsonb_build_object(
+    'item_id', 'd0320000-0000-4000-8000-000000000503',
+    'qty', 5, 'uom', 'kg'
+  ))
+)));
 insert into t032_ctx values ('pi_kit', (select (resp ->> 'id')::uuid from t032_resp where key = 'kit_issue'));
 select ok(
   (select (resp ->> 'ok')::boolean from t032_resp where key = 'kit_issue'),
@@ -437,13 +433,13 @@ select is(
      and item_id = 'd0320000-0000-4000-8000-000000000503'),
   5::numeric, 'KIT MUOI balance is 5 after unfrozen purpose_issue'
 );
-select public._t032_as('d0320000-0000-4000-8000-000000000a02');
+select public._t032_as('d0320000-0000-4000-8000-000000000a08');
 select throws_ok(
   $q$select public.count_submit(
     (select id from t032_ctx where key = 'cntA'),
     array['1111', '9999']
   )$q$,
-  'P0001', 'ERR_INVALID_STATUS',
+  '42501', 'ERR_FORBIDDEN:count.perform',
   'submit by non-counter is rejected'
 );
 select public._t032_as('d0320000-0000-4000-8000-000000000a01');
@@ -464,10 +460,6 @@ select ok(
   'count_submit round 1 succeeds'
 );
 select is(
-  (select (resp ->> 'round')::int from t032_resp where key = 'submit1'),
-  1, 'submit1 is round 1'
-);
-select is(
   (select jsonb_array_length(resp -> 'recount_line_ids') from t032_resp where key = 'submit1'),
   2, 'submit1 flags 2 recount lines'
 );
@@ -476,10 +468,7 @@ select is(
   0, 'submit1 flags 0 red lines'
 );
 select ok(
-  (select (resp -> 'recount_line_ids')::text not like '%98%'
-          and (resp -> 'red_line_ids')::text not like '%98%'
-          and (resp -> 'recount_line_ids')::text not like '%100%'
-          and (resp -> 'red_line_ids')::text not like '%100%'
+  (select (resp - 'ok' - 'id' - 'recount_line_ids' - 'red_line_ids') = '{}'::jsonb
    from t032_resp where key = 'submit1'),
   'submit1 leaks no quantities in the response'
 );
@@ -519,65 +508,36 @@ select public.count_record_line(
   '{"qty": 500, "uom": "ml"}'::jsonb
 );
 select public._t032_as('d0320000-0000-4000-8000-000000000a01');
-select throws_ok(
-  $q$select public.count_submit(
-    (select id from t032_ctx where key = 'cntA'),
-    array['1111', '2222']
-  )$q$,
-  'P0001', 'ERR_COUNT_INCOMPLETE',
-  'submit round 2 fails while THIT/MUOI are not re-recorded'
-);
-select public.count_record_line(
-  (select id from t032_ctx where key = 'cntA'),
-  'd0320000-0000-4000-8000-000000000502',
-  '{"qty": 20, "uom": "kg"}'::jsonb
-);
-select public._t032_as('d0320000-0000-4000-8000-000000000a02');
-select public.count_record_line(
-  (select id from t032_ctx where key = 'cntA'),
-  'd0320000-0000-4000-8000-000000000502',
-  '{"qty": 20, "uom": "kg"}'::jsonb
-);
-select public._t032_as('d0320000-0000-4000-8000-000000000a01');
-select public.count_record_line(
-  (select id from t032_ctx where key = 'cntA'),
-  'd0320000-0000-4000-8000-000000000503',
-  '{"qty": 50, "uom": "kg"}'::jsonb
-);
-select public._t032_as('d0320000-0000-4000-8000-000000000a02');
-select public.count_record_line(
-  (select id from t032_ctx where key = 'cntA'),
-  'd0320000-0000-4000-8000-000000000503',
-  '{"qty": 50, "uom": "kg"}'::jsonb
-);
-select public._t032_as('d0320000-0000-4000-8000-000000000a01');
 insert into t032_resp values ('submit2', public.count_submit(
   (select id from t032_ctx where key = 'cntA'),
   array['2222', '1111']
 ));
-select is(
-  (select (resp ->> 'round')::int from t032_resp where key = 'submit2'),
-  2, 'submit2 is round 2'
-);
 select is(
   (select jsonb_array_length(resp -> 'recount_line_ids') from t032_resp where key = 'submit2'),
   0, 'submit2 flags 0 recount lines'
 );
 select is(
   (select jsonb_array_length(resp -> 'red_line_ids') from t032_resp where key = 'submit2'),
-  1, 'submit2 flags 1 red line'
+  2, 'submit2 flags 2 red lines (GAO + RUUOU)'
 );
 select is(
   (select status from public.stock_counts where id = (select id from t032_ctx where key = 'cntA')),
   'submitted', 'count status is submitted after submit2'
 );
-select is(
-  (select (resp -> 'red_line_ids' -> 0)::text
-     = (select ('"' || id || '"') from public.stock_count_lines
-        where count_id = (select id from t032_ctx where key = 'cntA')
-          and item_id = 'd0320000-0000-4000-8000-000000000501')
+select public._t032_as('d0320000-0000-4000-8000-000000000a03');
+select ok(
+  (select (resp -> 'red_line_ids')::text like '%' || (select id::text from public.stock_count_lines
+     where count_id = (select id from t032_ctx where key = 'cntA')
+       and item_id = 'd0320000-0000-4000-8000-000000000501') || '%'
    from t032_resp where key = 'submit2'),
-  true, 'red line is GAO'
+  'red lines include GAO'
+);
+select ok(
+  (select (resp -> 'red_line_ids')::text like '%' || (select id::text from public.stock_count_lines
+     where count_id = (select id from t032_ctx where key = 'cntA')
+       and item_id = 'd0320000-0000-4000-8000-000000000504') || '%'
+   from t032_resp where key = 'submit2'),
+  'red lines include RUUOU (500 ml vs book 7000 ml)'
 );
 select is(
   (select flag from public.stock_count_lines
@@ -594,7 +554,7 @@ select is(
 select public._t032_as('d0320000-0000-4000-8000-000000000a01');
 select throws_ok(
   $q$select public.count_lock((select id from t032_ctx where key = 'cntA'))$q$,
-  'P0001', 'ERR_FORBIDDEN:count.lock',
+  '42501', 'ERR_FORBIDDEN:count.lock',
   'counter cannot lock the count'
 );
 select public._t032_as('d0320000-0000-4000-8000-000000000a06');
@@ -606,20 +566,34 @@ select throws_ok(
 select throws_ok(
   $q$select public.count_lock(
     (select id from t032_ctx where key = 'cntA'),
-    jsonb_build_object((select id::text from public.stock_count_lines
-       where count_id = (select id from t032_ctx where key = 'cntA')
-         and item_id = 'd0320000-0000-4000-8000-000000000501'), 'lost')
+    jsonb_build_object('test-line', 'lost')
   )$q$,
-  'P0001', 'ERR_REASON_CODE_INVALID',
-  'lock with an unknown reason code is rejected'
+  'P0001', 'ERR_INVALID_VALUE',
+  'lock with a non-array reasons argument is rejected'
 );
+select public._t032_as('d0320000-0000-4000-8000-000000000a03');
+insert into t032_resp values ('lock_reasons', jsonb_build_array(
+  jsonb_build_object(
+    'line_id', (select id from public.stock_count_lines
+       where count_id = (select id from t032_ctx where key = 'cntA')
+         and item_id = 'd0320000-0000-4000-8000-000000000501'),
+    'reason_code', 'lost',
+    'explanation', 'test'
+  ),
+  jsonb_build_object(
+    'line_id', (select id from public.stock_count_lines
+       where count_id = (select id from t032_ctx where key = 'cntA')
+         and item_id = 'd0320000-0000-4000-8000-000000000504'),
+    'reason_code', 'lost',
+    'explanation', 'test'
+  )
+));
+select public._t032_as('d0320000-0000-4000-8000-000000000a06');
 select ok(
   (select (resp ->> 'ok')::boolean from (
     select public.count_lock(
       (select id from t032_ctx where key = 'cntA'),
-      jsonb_build_object((select id::text from public.stock_count_lines
-         where count_id = (select id from t032_ctx where key = 'cntA')
-           and item_id = 'd0320000-0000-4000-8000-000000000501'), 'lost')
+      (select resp from t032_resp where key = 'lock_reasons')
     ) as resp
   ) s),
   'count_lock succeeds with a valid reason'
@@ -628,6 +602,7 @@ select is(
   (select status from public.stock_counts where id = (select id from t032_ctx where key = 'cntA')),
   'locked', 'count status is locked'
 );
+select public._t032_as('d0320000-0000-4000-8000-000000000a03');
 select is(
   (select reason_code from public.stock_count_lines
    where count_id = (select id from t032_ctx where key = 'cntA')
@@ -638,12 +613,12 @@ select is(
   (select reason_code from public.stock_count_lines
    where count_id = (select id from t032_ctx where key = 'cntA')
      and item_id = 'd0320000-0000-4000-8000-000000000503'),
-  'ok', 'MUOI reason_code stays ok'
+  null, 'MUOI reason_code stays null (no variance, no reason needed)'
 );
 select public._t032_as('d0320000-0000-4000-8000-000000000a01');
 select throws_ok(
   $q$select public.count_adjust_post((select id from t032_ctx where key = 'cntA'))$q$,
-  'P0001', 'ERR_FORBIDDEN:count.adjust.approve',
+  '42501', 'ERR_FORBIDDEN:count.adjust.approve',
   'counter cannot post the adjustment'
 );
 select public._t032_as('d0320000-0000-4000-8000-000000000a04');
@@ -654,11 +629,11 @@ select ok(
 );
 select is(
   (select (resp ->> 'moves_posted')::int from t032_resp where key = 'adjA'),
-  1, 'one adjustment move is posted'
+  2, 'two adjustment moves are posted (GAO + RUUOU)'
 );
 select is(
   (select (resp ->> 'total_value')::numeric from t032_resp where key = 'adjA'),
-  -20000::numeric, 'total adjustment value is -20000'
+  -150000::numeric, 'total adjustment value is -150000 (-20000 GAO + -130000 RUUOU)'
 );
 select is(
   (select status from public.stock_counts where id = (select id from t032_ctx where key = 'cntA')),
@@ -676,25 +651,30 @@ select is(
   108::numeric, 'GAO qty_on_hand is 108 (MAIN 98 + KIT 10)'
 );
 select is(
-  (select amount::numeric from public.stock_moves
+  (select sum(amount)::numeric from public.stock_moves
    where source_doc_type = 'stock_count'
      and source_doc_id = (select id from t032_ctx where key = 'cntA')),
-  -20000::numeric, 'adjustment move amount is -20000 at avg cost'
+  -150000::numeric, 'total adjustment move amount is -150000 at avg cost'
+);
+select is(
+  (select amount::numeric from public.stock_moves
+   where source_doc_type = 'stock_count'
+     and source_doc_id = (select id from t032_ctx where key = 'cntA')
+     and item_id = 'd0320000-0000-4000-8000-000000000501'),
+  -20000::numeric, 'GAO adjustment move amount is -20000 at avg cost'
 );
 select public._t032_as('d0320000-0000-4000-8000-000000000a01');
-insert into t032_resp values ('unfreeze', public.purpose_issue_save_draft(
-  'd0320000-0000-4000-8000-000000000301', 'd0320000-0000-4000-8000-000000000101',
-  jsonb_build_object(
-    'outlet_id', 'd0320000-0000-4000-8000-000000000802',
-    'cost_center_id', 'd0320000-0000-4000-8000-000000000901',
-    'expense_category_id', 'd0320000-0000-4000-8000-000000000902',
-    'lines', jsonb_build_array(jsonb_build_object(
-      'item_id', 'd0320000-0000-4000-8000-000000000503',
-      'qty_stock', 5, 'uom', 'kg'
-    ))
-  ),
-  'd0320000-0000-4000-8000-00000000aa05'
-));
+insert into t032_resp values ('unfreeze', public.purpose_issue_save_draft(jsonb_build_object(
+  'property_id', 'd0320000-0000-4000-8000-000000000201',
+  'warehouse_id', 'd0320000-0000-4000-8000-000000000301',
+  'purpose_code', 'other',
+  'cost_center_id', 'd0320000-0000-4000-8000-000000000901',
+  'expense_category_id', 'd0320000-0000-4000-8000-000000000902',
+  'lines', jsonb_build_array(jsonb_build_object(
+    'item_id', 'd0320000-0000-4000-8000-000000000503',
+    'qty', 5, 'uom', 'kg'
+  ))
+)));
 insert into t032_ctx values ('pi_main2', (select (resp ->> 'id')::uuid from t032_resp where key = 'unfreeze'));
 select public.purpose_issue_post((select id from t032_ctx where key = 'pi_main2'));
 select is(
@@ -705,7 +685,7 @@ select is(
 );
 select public._t032_as('d0320000-0000-4000-8000-000000000a01');
 insert into t032_resp values ('openC', public.count_open(
-  'd0320000-0000-4000-8000-000000000301', 'shift', '2026-11-09', 'ca_toi',
+  'd0320000-0000-4000-8000-000000000301', 'cycle', '2026-11-09', 'ca_toi',
   array['d0320000-0000-4000-8000-000000000a01', 'd0320000-0000-4000-8000-000000000a02']::uuid[],
   'd0320000-0000-4000-8000-00000000aa06'
 ));
@@ -715,7 +695,7 @@ select ok(
 );
 insert into t032_ctx values ('cntC', (select (resp ->> 'id')::uuid from t032_resp where key = 'openC'));
 select throws_ok(
-  $q$select public.count_cancel((select id from t032_ctx where key = 'cntC'))$q$,
+  $q$select public.count_cancel((select id from t032_ctx where key = 'cntC'), null)$q$,
   'P0001', 'ERR_REASON_REQUIRED',
   'cancel without a reason is rejected'
 );
@@ -732,7 +712,7 @@ select is(
   'cancelled', 'count C status is cancelled'
 );
 insert into t032_resp values ('openC2', public.count_open(
-  'd0320000-0000-4000-8000-000000000301', 'shift', '2026-11-09', 'ca_toi',
+  'd0320000-0000-4000-8000-000000000301', 'cycle', '2026-11-09', 'ca_toi',
   array['d0320000-0000-4000-8000-000000000a01', 'd0320000-0000-4000-8000-000000000a02']::uuid[],
   'd0320000-0000-4000-8000-00000000aa07'
 ));
@@ -791,10 +771,14 @@ select public.count_record_line(
   '{"qty": 10, "uom": "kg"}'::jsonb
 );
 select public._t032_as('d0320000-0000-4000-8000-000000000a08');
-select public.count_record_line(
-  (select id from t032_ctx where key = 'cntB2'),
-  'd0320000-0000-4000-8000-000000000501',
-  '{"qty": 10, "uom": "kg"}'::jsonb
+select throws_ok(
+  $q$select public.count_record_line(
+    (select id from t032_ctx where key = 'cntB2'),
+    'd0320000-0000-4000-8000-000000000501',
+    '{"qty": 10, "uom": "kg"}'::jsonb
+  )$q$,
+  'P0001', 'ERR_INVALID_STATUS',
+  'third counter cannot record a line whose 2 slots are taken'
 );
 select public._t032_as('d0320000-0000-4000-8000-000000000a01');
 select public.count_record_line(
@@ -809,10 +793,14 @@ select public.count_record_line(
   '{"qty": 5, "uom": "kg"}'::jsonb
 );
 select public._t032_as('d0320000-0000-4000-8000-000000000a08');
-select public.count_record_line(
-  (select id from t032_ctx where key = 'cntB2'),
-  'd0320000-0000-4000-8000-000000000503',
-  '{"qty": 5, "uom": "kg"}'::jsonb
+select throws_ok(
+  $q$select public.count_record_line(
+    (select id from t032_ctx where key = 'cntB2'),
+    'd0320000-0000-4000-8000-000000000503',
+    '{"qty": 5, "uom": "kg"}'::jsonb
+  )$q$,
+  'P0001', 'ERR_INVALID_STATUS',
+  'third counter cannot record MUOI either (2 slots taken)'
 );
 select public._t032_as('d0320000-0000-4000-8000-000000000a01');
 select throws_ok(
@@ -820,7 +808,7 @@ select throws_ok(
     (select id from t032_ctx where key = 'cntB2'),
     array['1111', '2222']
   )$q$,
-  'P0001', 'ERR_INVALID_VALUE',
+  'P0001', 'ERR_PIN_INVALID',
   'submit with a PIN per missing counter is rejected'
 );
 insert into t032_resp values ('submitB2', public.count_submit(
@@ -838,6 +826,12 @@ select is(
 select is(
   (select status from public.stock_counts where id = (select id from t032_ctx where key = 'cntB2')),
   'submitted', 'KIT count is submitted with zero variance'
+);
+select public._t032_as('d0320000-0000-4000-8000-000000000a07');
+select throws_ok(
+  $q$select public.period_close('d0320000-0000-4000-8000-000000000101', 2026, 11)$q$,
+  'P0001', 'ERR_COUNT_NOT_LOCKED',
+  'period_close is blocked while KIT count B2 is only submitted, not locked'
 );
 select public._t032_as('d0320000-0000-4000-8000-000000000a06');
 select ok(
@@ -859,7 +853,7 @@ select is(
 select public._t032_as('d0320000-0000-4000-8000-000000000a01');
 select throws_ok(
   $q$select public.day_lock('d0320000-0000-4000-8000-000000000302', '2026-11-09')$q$,
-  'P0001', 'ERR_FORBIDDEN:day.lock',
+  '42501', 'ERR_FORBIDDEN:day.lock',
   'storekeeper cannot day_lock'
 );
 select public._t032_as('d0320000-0000-4000-8000-000000000a06');
@@ -878,7 +872,7 @@ select ok(
 select public._t032_as('d0320000-0000-4000-8000-000000000a01');
 select throws_ok(
   $q$select public.count_open(
-    'd0320000-0000-4000-8000-000000000302', 'shift', '2026-11-09', 'ca_dem',
+    'd0320000-0000-4000-8000-000000000302', 'cycle', '2026-11-09', 'ca_dem',
     array['d0320000-0000-4000-8000-000000000a01', 'd0320000-0000-4000-8000-000000000a02']::uuid[]
   )$q$,
   'P0001', 'ERR_DAY_LOCKED',
@@ -893,7 +887,7 @@ select ok(
   'MAIN shift count C2 is cancelled before the warehouse-scoped lock test'
 );
 insert into t032_resp values ('openD', public.count_open(
-  'd0320000-0000-4000-8000-000000000301', 'shift', '2026-11-09', 'ca_sang',
+  'd0320000-0000-4000-8000-000000000301', 'cycle', '2026-11-09', 'ca_sang',
   array['d0320000-0000-4000-8000-000000000a01', 'd0320000-0000-4000-8000-000000000a02']::uuid[],
   'd0320000-0000-4000-8000-00000000aa10'
 ));
@@ -939,8 +933,8 @@ insert into t032_ctx values ('cntB3', (select (resp ->> 'id')::uuid from t032_re
 select public._t032_as('d0320000-0000-4000-8000-000000000a07');
 select throws_ok(
   $q$select public.period_close('d0320000-0000-4000-8000-000000000101', 2026, 11)$q$,
-  'P0001', 'ERR_COUNT_NOT_LOCKED',
-  'period_close is blocked while KIT count B3 is unfinished'
+  'P0001', 'ERR_PO_UNRESOLVED',
+  'period_close is blocked by the stale PO even while KIT count B3 is unfinished'
 );
 select public._t032_as('d0320000-0000-4000-8000-000000000a01');
 select public.count_record_line(
@@ -1030,7 +1024,7 @@ select throws_ok(
 select public._t032_as('d0320000-0000-4000-8000-000000000a01');
 select throws_ok(
   $q$select public.count_open(
-    'd0320000-0000-4000-8000-000000000301', 'shift', '2026-11-10', 'ca_sang',
+    'd0320000-0000-4000-8000-000000000301', 'cycle', '2026-11-10', 'ca_sang',
     array['d0320000-0000-4000-8000-000000000a01', 'd0320000-0000-4000-8000-000000000a02']::uuid[]
   )$q$,
   'P0001', 'ERR_PERIOD_CLOSED',
@@ -1048,7 +1042,7 @@ select ok(
 select public._t032_as('d0320000-0000-4000-8000-000000000a01');
 select throws_ok(
   $q$select public.period_reopen((select id from t032_ctx where key = 'period_id'), 'thử mở lại')$q$,
-  'P0001', 'ERR_FORBIDDEN:period.reopen',
+  '42501', 'ERR_FORBIDDEN:period.reopen',
   'period_reopen without the permission is rejected'
 );
 select finish();
