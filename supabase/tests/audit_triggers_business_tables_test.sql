@@ -63,11 +63,15 @@ insert into public.role_permissions (role_id, permission_code) values
   ('a7d00000-0000-4000-8000-000000000601', 'requisition.create'),
   ('a7d00000-0000-4000-8000-000000000601', 'transfer.send'),
   ('a7d00000-0000-4000-8000-000000000602', 'count.perform'),
-  ('a7d00000-0000-4000-8000-000000000603', 'admin.users.manage');
+  ('a7d00000-0000-4000-8000-000000000603', 'admin.users.manage'),
+  ('a7d00000-0000-4000-8000-000000000603', 'audit.view_all');
 insert into public.user_property_roles (user_id, role_id, property_id) values
   ('a7d00000-0000-4000-8000-000000000a01', 'a7d00000-0000-4000-8000-000000000601', 'a7d00000-0000-4000-8000-000000000201'),
   ('a7d00000-0000-4000-8000-000000000a02', 'a7d00000-0000-4000-8000-000000000602', 'a7d00000-0000-4000-8000-000000000201'),
-  ('a7d00000-0000-4000-8000-000000000a03', 'a7d00000-0000-4000-8000-000000000603', null);
+  ('a7d00000-0000-4000-8000-000000000a03', 'a7d00000-0000-4000-8000-000000000603', null),
+  -- a01 cung can doc audit_log: has_perm(null, 'audit.view_all') chi nhan vai tro
+  -- chain (property_id NULL), nen gan them vai tro chain a7d_admin cho a01.
+  ('a7d00000-0000-4000-8000-000000000a01', 'a7d00000-0000-4000-8000-000000000603', null);
 create temp table a7d_ctx (key text primary key, id uuid);
 create temp table a7d_resp (key text primary key, resp jsonb);
 create temp table a7d_num (key text primary key, n bigint);
