@@ -348,11 +348,11 @@ select lives_ok(
 
 -- Khoa ky hien tai cua phap nhan B (role postgres, insert truc tiep).
 set local role postgres;
-insert into public.accounting_periods (legal_entity_id, year, month, status) values
+insert into public.accounting_periods (legal_entity_id, year, month, status, closed_by, closed_at) values
   ('d0150000-1500-4000-8000-000000000102',
    extract(year from (now() at time zone 'Asia/Ho_Chi_Minh'))::integer,
    extract(month from (now() at time zone 'Asia/Ho_Chi_Minh'))::integer,
-   'closed');
+   'closed', 'd0150000-1500-4000-8000-000000000a02', now());
 set local role authenticated;
 select set_config('request.jwt.claim.sub', 'd0150000-1500-4000-8000-000000000a02', true);
 select set_config('request.jwt.claims', '{"sub":"d0150000-1500-4000-8000-000000000a02","role":"authenticated"}', true);
