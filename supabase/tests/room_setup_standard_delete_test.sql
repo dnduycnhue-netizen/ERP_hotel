@@ -65,6 +65,7 @@ insert into public.user_property_roles (user_id, role_id, property_id) values
   ('d2600000-0000-4000-8000-000000000a02', 'd2600000-0000-4000-8000-000000000602', 'd2600000-0000-4000-8000-000000000201');
 
 create temp table t260_resp (key text primary key, resp jsonb);
+grant all on t260_resp to authenticated;
 
 create or replace function public._t260_as(p_user uuid)
 returns void
