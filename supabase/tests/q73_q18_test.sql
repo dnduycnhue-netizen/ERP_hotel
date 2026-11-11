@@ -49,7 +49,10 @@ insert into public.profiles (id, employee_code, full_name) values
   ('d0730000-0000-4000-8000-000000000a01', 'NV07301', 'Người tạo mua'),
   ('d0730000-0000-4000-8000-000000000a02', 'NV07302', 'Kế toán trưởng'),
   ('d0730000-0000-4000-8000-000000000a03', 'NV07303', 'Chủ đầu tư'),
-  ('d0730000-0000-4000-8000-000000000a04', 'NV07304', 'Chỉ xem PO');
+  ('d0730000-0000-4000-8000-000000000a04', 'NV07304', 'Chỉ xem PO')
+on conflict (id) do update set
+  employee_code = excluded.employee_code,
+  full_name = excluded.full_name;
 
 insert into public.roles (id, org_id, code, name_vi) values
   ('d0730000-0000-4000-8000-000000000601', 'd0730000-0000-4000-8000-000000000001', 'purchaser', 'Mua hàng'),
