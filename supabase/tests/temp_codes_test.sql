@@ -116,11 +116,14 @@ select set_config('request.jwt.claim.sub', 'd0150000-1500-4000-8000-000000000a01
 select set_config('request.jwt.claims', '{"sub":"d0150000-1500-4000-8000-000000000a01","role":"authenticated"}', true);
 
 -- 4. Trung ten (name_norm) -> ERR_INVALID_VALUE.
+-- (4-arg throws_ok: app raise kem hau to ': ten vat tu da ton tai' nen
+-- dang 3-arg so message chinh xac se rot; khoa ca errcode P0001 + message.)
 select throws_ok(
   $q$select public.item_create_temp(
     'd0150000-1500-4000-8000-000000000201', 'Cà chua', 'd0150000-1500-4000-8000-000000000401', 'kg'
   )$q$,
-  'ERR_INVALID_VALUE',
+  'P0001',
+  'ERR_INVALID_VALUE: ten vat tu da ton tai',
   'ten trung voi ma da co bi chan'
 );
 
@@ -136,7 +139,7 @@ select throws_ok(
 -- 6. DVT khong ton tai -> ERR_UOM_UNKNOWN.
 select throws_ok(
   $q$select public.item_create_temp(
-    'd0150000-1500-4000-8000-000000000201', 'Mướp chợ', 'd0150000-1500-4000-8000-000000000401', 'thung'
+    'd0150000-1500-4000-8000-000000000201', 'Mướp chợ', 'd0150000-1500-4000-8000-000000000401', 'xyz-unit'
   )$q$,
   'ERR_UOM_UNKNOWN',
   'DVT la bi chan'
@@ -151,12 +154,16 @@ select is(
   'ma tam thu 2 la TMP-0002'
 );
 
--- 8. Cron: ma tam 25h tao 1 alert TEMP_ITEM_STALE (info), chay lai khong tao them.
+-- 8. Cron: ma tam 25h va 73h deu >24h nen tao 2 alert TEMP_ITEM_STALE
+-- (info); chay lai khong tao them.
 select is(
   (select public.temp_code_maintenance() ->> 'alerts_created'),
-  '1',
-  'cron tao 1 alert cho ma tam 25h'
+  '2',
+  'cron tao 2 alert cho ma tam 25h va 73h'
 );
+-- Doc severity bang u2: u1 khong co alert.receive.temp_item_stale (RLS alerts).
+select set_config('request.jwt.claim.sub', 'd0150000-1500-4000-8000-000000000a02', true);
+select set_config('request.jwt.claims', '{"sub":"d0150000-1500-4000-8000-000000000a02","role":"authenticated"}', true);
 select is(
   (select severity from public.alerts where code = 'TEMP_ITEM_STALE' order by created_at limit 1),
   'info',
@@ -167,6 +174,10 @@ select is(
   '0',
   'chay lai cron khong tao alert trung (dedupe theo alert chua ack)'
 );
+
+-- _post_move bi revoke khoi authenticated (120000:516) -> chay §9-§11
+-- bang role postgres (giong mau §18/§19 trong file nay).
+set local role postgres;
 
 -- 9. Chan 72h: nhan ma tam 73h qua _post_move -> ERR_TEMP_ITEM_EXPIRED.
 select throws_ok(
@@ -219,6 +230,9 @@ select is(
   'merged',
   'ma tam chuyen sang merged'
 );
+-- 4 assert ton/so cai doc bang postgres: u2 khong co stock.view_qty/value
+-- (RLS stock_balances/stock_moves); doc items o tren van chay duoc bang u2.
+set local role postgres;
 select is(
   (select qty::text from public.stock_balances
    where warehouse_id = 'd0150000-1500-4000-8000-000000000301'
@@ -245,6 +259,9 @@ select is(
    where item_id = (select id from public.items where code = 'TMP-0001') and move_type = 'merge_out'),
   'merge_in cung gia von voi merge_out'
 );
+
+-- Tro lai authenticated; §13 tu dat JWT u1.
+set local role authenticated;
 
 -- 13. item_merge: purchaser (khong co item.temp.normalize) bi chan.
 select set_config('request.jwt.claim.sub', 'd0150000-1500-4000-8000-000000000a01', true);
@@ -286,13 +303,15 @@ select throws_ok(
 );
 
 -- 16. Nguon trung dich -> ERR_INVALID_VALUE.
+-- (4-arg throws_ok: app raise kem hau to ': ma nguon va ma dich trung nhau'.)
 select throws_ok(
   $q$select public.item_merge(
     'd0150000-1500-4000-8000-000000000201',
     (select id from public.items where code = 'TMP-0002'),
     (select id from public.items where code = 'TMP-0002')
   )$q$,
-  'ERR_INVALID_VALUE',
+  'P0001',
+  'ERR_INVALID_VALUE: ma nguon va ma dich trung nhau',
   'nguon trung dich bi chan'
 );
 
@@ -308,13 +327,19 @@ select throws_ok(
 );
 
 -- 18. Ky da khoa: ma tam o KS B co ton, khoa ky hien tai cua phap nhan B -> chan gop.
+-- Tao ma tam truoc bang u1 (u2 khong co item.temp.create; ma se la TMP-0003),
+-- roi nhan hang bang postgres (_post_move bi revoke khoi authenticated).
+select set_config('request.jwt.claim.sub', 'd0150000-1500-4000-8000-000000000a01', true);
+select set_config('request.jwt.claims', '{"sub":"d0150000-1500-4000-8000-000000000a01","role":"authenticated"}', true);
+select public.item_create_temp(
+  'd0150000-1500-4000-8000-000000000202', 'Bí xanh chợ B', 'd0150000-1500-4000-8000-000000000401', 'kg'
+);
+set local role postgres;
 select lives_ok(
   $q$select public._post_move(
     'd0150000-1500-4000-8000-000000000102', 'd0150000-1500-4000-8000-000000000202',
     'd0150000-1500-4000-8000-000000000302',
-    (select public.item_create_temp(
-      'd0150000-1500-4000-8000-000000000202', 'Bí xanh chợ B', 'd0150000-1500-4000-8000-000000000401', 'kg'
-    ) ->> 'id')::uuid,
+    (select id from public.items where code = 'TMP-0003'),
     null, 'receipt', 5, 3000,
     (now() at time zone 'Asia/Ho_Chi_Minh')::date, 'test', gen_random_uuid()
   )$q$,
@@ -323,11 +348,11 @@ select lives_ok(
 
 -- Khoa ky hien tai cua phap nhan B (role postgres, insert truc tiep).
 set local role postgres;
-insert into public.accounting_periods (legal_entity_id, year, month, status) values
+insert into public.accounting_periods (legal_entity_id, year, month, status, closed_by, closed_at) values
   ('d0150000-1500-4000-8000-000000000102',
    extract(year from (now() at time zone 'Asia/Ho_Chi_Minh'))::integer,
    extract(month from (now() at time zone 'Asia/Ho_Chi_Minh'))::integer,
-   'closed');
+   'closed', 'd0150000-1500-4000-8000-000000000a02', now());
 set local role authenticated;
 select set_config('request.jwt.claim.sub', 'd0150000-1500-4000-8000-000000000a02', true);
 select set_config('request.jwt.claims', '{"sub":"d0150000-1500-4000-8000-000000000a02","role":"authenticated"}', true);
