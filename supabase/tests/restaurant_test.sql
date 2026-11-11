@@ -1127,7 +1127,7 @@ select is(
 );
 
 select ok(
-  ((public.banquet_confirm(
+  (public.banquet_confirm(
     'd0600000-0200-4000-8000-000000000201',
     (select id from public.banquets where customer_name = 'Chị Đào')
   ) ->> 'requisition_id') is not null,
@@ -1195,7 +1195,7 @@ select ok(
 );
 
 select ok(
-  ((public.banquet_confirm(
+  (public.banquet_confirm(
     'd0600000-0200-4000-8000-000000000201',
     (select id from public.banquets where customer_name = 'Chị Hoa')
   ) ->> 'requisition_id') is null,
@@ -1213,7 +1213,7 @@ select is(
 --     MON03 x 7 phan -> ceil(7/10) = 1 me -> 1000gr gao = 1 kg.
 -- ---------------------------------------------------------------------------
 select ok(
-  ((public.dish_sale_record(
+  (public.dish_sale_record(
     'd0600000-0200-4000-8000-000000000201',
     (now() at time zone 'Asia/Ho_Chi_Minh')::date,
     (select id from public.recipes where code = 'MON03'),

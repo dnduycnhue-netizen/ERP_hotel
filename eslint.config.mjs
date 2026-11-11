@@ -12,6 +12,11 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Playwright artifacts: gitignored but ESLint still scans them;
+    // without these, `pnpm lint` fails locally after any e2e run
+    // (133 errors from playwright-report/ alone, 11/11/2026).
+    "playwright-report/**",
+    "test-results/**",
   ]),
 ]);
 
