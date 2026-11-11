@@ -397,7 +397,7 @@ select is(
     where schemaname = 'public'
       and tablename in ('notification_targets', 'push_subscriptions',
         'notification_deliveries', 'notification_sender_config')
-      and definition ilike '%= any (public.my_property_ids())%'),
+      and (qual ilike '%= any (public.my_property_ids())%' or with_check ilike '%= any (public.my_property_ids())%')),
   0::bigint,
   'khong policy moi nao dung = any (my_property_ids())'
 );
