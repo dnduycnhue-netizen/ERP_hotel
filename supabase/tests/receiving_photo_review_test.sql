@@ -46,7 +46,7 @@ values
   ('dc020000-0000-4000-8000-000000000a02', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'u2-rec0c2@test.com', '', now(), now(), now(), '{}'::jsonb, '{}'::jsonb),
   ('dc020000-0000-4000-8000-000000000a03', '00000000-0000-4000-8000-000000000000', 'authenticated', 'authenticated', 'u3-gm0c2@test.com', '', now(), now(), now(), '{}'::jsonb, '{}'::jsonb);
 
-insert into public.roles (id, org_id, code, name) values
+insert into public.roles (id, org_id, code, name_vi) values
   ('dc020000-0000-4000-8000-000000000601', 'dc020000-0000-4000-8000-000000000001', 'cost_controller', 'Cost Controller'),
   ('dc020000-0000-4000-8000-000000000602', 'dc020000-0000-4000-8000-000000000001', 'receiver', 'Nhận hàng'),
   ('dc020000-0000-4000-8000-000000000603', 'dc020000-0000-4000-8000-000000000001', 'gm', 'Tổng quản lý');
@@ -331,6 +331,10 @@ select throws_ok(
   'P0001', 'ERR_INVALID_STATUS',
   'Review on already approved receipt throws ERR_INVALID_STATUS'
 );
+-- Audit: chi doc duoc voi audit.view_all (has_perm(null, ...) doi hoi
+-- gan quyen cap chuoi, khong phai pham vi property) nen doc bang role
+-- postgres nhu mau T-014, roi tra lai authenticated + u1 cho 2 assert cuoi.
+reset role;
 select ok(
   (select exists (
     select 1 from public.audit_log
@@ -340,6 +344,8 @@ select ok(
   )),
   'Audit log records the photo review UPDATE'
 );
+set local role authenticated;
+select public._t0c2_as('dc020000-0000-4000-8000-000000000a01');
 select is(
   (select (public.receiving_list_photo_reviews(
     'dc020000-0000-4000-8000-000000000201', 'rejected'
