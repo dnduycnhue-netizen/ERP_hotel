@@ -91,6 +91,11 @@ insert into public.role_permissions (role_id, permission_code) values
   ('d0220000-0200-4000-8000-000000000604', 'po.approve'),
   ('d0220000-0200-4000-8000-000000000604', 'po.approve.over_ceiling'),
   ('d0220000-0200-4000-8000-000000000604', 'advance.approve'),
+  -- alerts_select doi has_perm(property, 'alert.receive.advance_overdue');
+  -- gan cho gm theo dung 220000 §8 (gm/chief_accountant/cost_controller).
+  -- Chon gm thay vi cost_controller vi subquery doc advances ben trong
+  -- exists() can quyen advance.* (gm co advance.approve, cc khong co).
+  ('d0220000-0200-4000-8000-000000000604', 'alert.receive.advance_overdue'),
   ('d0220000-0200-4000-8000-000000000605', 'po.approve'),
   ('d0220000-0200-4000-8000-000000000605', 'po.close'),
   ('d0220000-0200-4000-8000-000000000606', 'advance.disburse'),
@@ -588,6 +593,12 @@ select is(
   'overdue',
   'tam ung qua han co status overdue'
 );
+
+-- Doc alert duoi a04 (gm, co alert.receive.advance_overdue + advance.approve):
+-- alerts_select yeu cau dung quyen theo code, a08 (purchaser) khong co
+-- quyen nay nen exists() tra false du alert da tao; subquery doc advances
+-- ben trong cung can quyen advance.* nen phai la gm, khong phai cc.
+select _t022_as('d0220000-0200-4000-8000-000000000a04');
 
 select ok(
   exists (
