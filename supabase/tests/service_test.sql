@@ -69,10 +69,15 @@ insert into public.roles (id, org_id, code, name_vi) values
   ('d0420000-0000-4000-8000-000000000607', 'd0420000-0000-4000-8000-000000000001', 'storekeeper', 'Thủ kho');
 
 -- gm giu ca 2 quyen de test SoD nghiem thu (chi trong fixture nay).
+-- Ke toan a01 doc alerts o §7: policy alerts_select doi
+-- 'alert.receive.' || lower(code) = 'alert.receive.service_contract_renewal'
+-- (seed 380000, gan cho owner/gm/chief_accountant); fixture phai gan
+-- ro cho vai tro doc alerts, neu khong count(*) tra 0.
 insert into public.role_permissions (role_id, permission_code) values
   ('d0420000-0000-4000-8000-000000000601', 'invoice.manage'),
   ('d0420000-0000-4000-8000-000000000601', 'payment.request'),
   ('d0420000-0000-4000-8000-000000000601', 'ap.view'),
+  ('d0420000-0000-4000-8000-000000000601', 'alert.receive.service_contract_renewal'),
   ('d0420000-0000-4000-8000-000000000602', 'invoice.approve'),
   ('d0420000-0000-4000-8000-000000000602', 'payment.approve'),
   ('d0420000-0000-4000-8000-000000000603', 'service.contract.manage'),
