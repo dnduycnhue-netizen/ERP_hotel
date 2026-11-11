@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import {
   DataTable,
@@ -55,6 +57,11 @@ function buildColumns(
  * Màn hình báo cáo dạng bảng chung (T-044): tổng cộng + bảng + ghi chú
  * nguồn số liệu + (nếu có) bảng phụ + nút xuất Excel T-043.
  * Không tính lại tiền/số lượng bằng JS — chỉ hiển thị số Postgres trả về.
+ *
+ * "use client" (Q203): component này định nghĩa cột `cell` (hàm) cho
+ * DataTable nên phải là client component — ở dạng server component,
+ * trang báo cáo chi tiết sập vì React không serialize được hàm truyền
+ * từ server sang client.
  */
 export function ReportView({
   meta,
