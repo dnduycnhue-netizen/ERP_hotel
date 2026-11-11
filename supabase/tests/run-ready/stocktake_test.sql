@@ -468,10 +468,7 @@ select is(
   0, 'submit1 flags 0 red lines'
 );
 select ok(
-  (select (resp -> 'recount_line_ids')::text not like '%98%'
-          and (resp -> 'red_line_ids')::text not like '%98%'
-          and (resp -> 'recount_line_ids')::text not like '%100%'
-          and (resp -> 'red_line_ids')::text not like '%100%'
+  (select (resp - 'ok' - 'id' - 'recount_line_ids' - 'red_line_ids') = '{}'::jsonb
    from t032_resp where key = 'submit1'),
   'submit1 leaks no quantities in the response'
 );
