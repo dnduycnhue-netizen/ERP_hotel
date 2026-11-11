@@ -269,6 +269,10 @@ select public.import_commit_batch((select id from public.import_batches where fi
 select is(
   (select (counts ->> 'created')::integer from public.import_batches where file_name = 'ncc-test.xlsx'),
   3, 'batch NCC created = 3');
+-- Doc truc tiep suppliers/supplier_bank_accounts: RLS doi supplier.view /
+-- supplier.bank.request|approve (u1 khong co) nen doc duoi postgres; app
+-- ghi dung status 'pending' (migration 180000:1308-1324).
+reset role;
 select ok(
   exists (select 1 from public.suppliers where org_id = 'd0140000-1400-4000-8000-000000000001' and code = 'SUP002' and status = 'pending'),
   'NCC moi tao o pending (cho duyet theo T-013)');
@@ -277,6 +281,9 @@ select ok(
     join public.suppliers s on s.id = b.supplier_id
     where s.code = 'SUP001' and b.account_no = '123456789' and b.status = 'pending'),
   'tai khoan NCC kem theo o pending');
+set local role authenticated;
+select set_config('request.jwt.claim.sub', 'd0140000-1400-4000-8000-000000000a01', true);
+select set_config('request.jwt.claims', '{"sub":"d0140000-1400-4000-8000-000000000a01","role":"authenticated"}', true);
 
 -- 9. Phan quyen: viewer khong co item.import
 select set_config('request.jwt.claim.sub', 'd0140000-1400-4000-8000-000000000a02', true);
