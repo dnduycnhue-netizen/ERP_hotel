@@ -20,7 +20,11 @@ insert into public.legal_entities (id, org_id, name, code) values
   ('d0220000-0200-4000-8000-000000000101', 'd0220000-0200-4000-8000-000000000001', 'T022 Entity', 'T022E');
 
 insert into public.properties (id, org_id, legal_entity_id, code, name, sod_profile) values
-  ('d0220000-0200-4000-8000-000000000201', 'd0220000-0200-4000-8000-000000000001', 'd0220000-0200-4000-8000-000000000101', 'P0221', 'T-022 Property', 'with_cc');
+  ('d0220000-0200-4000-8000-000000000201', 'd0220000-0200-4000-8000-000000000001', 'd0220000-0200-4000-8000-000000000101', 'P0221', 'T-022 Property', 'with_cc'),
+  -- KS thu 2 (cung org) chi de test advance_get sai KS: has_perm tra false
+  -- voi KS khong ton tai nen phai dung KS that de toi duoc guard
+  -- ERR_INVALID_STATUS ben trong ham.
+  ('d0220000-0200-4000-8000-000000000202', 'd0220000-0200-4000-8000-000000000001', 'd0220000-0200-4000-8000-000000000101', 'P0222', 'T-022 Property 2', 'with_cc');
 
 insert into public.uoms (code, name_vi) values ('kg', 'Ký'), ('cai', 'Cái')
 on conflict do nothing;
@@ -112,6 +116,9 @@ insert into public.user_property_roles (user_id, role_id, property_id) values
   ('d0220000-0200-4000-8000-000000000a04', 'd0220000-0200-4000-8000-000000000601', 'd0220000-0200-4000-8000-000000000201'),
   ('d0220000-0200-4000-8000-000000000a05', 'd0220000-0200-4000-8000-000000000605', 'd0220000-0200-4000-8000-000000000201'),
   ('d0220000-0200-4000-8000-000000000a06', 'd0220000-0200-4000-8000-000000000606', 'd0220000-0200-4000-8000-000000000201'),
+  -- a06 (ke toan) co vai tro o ca P0222 de advance_get(P0222, ...) vuot
+  -- qua cong kiem quyen roi moi roi vao guard sai KS.
+  ('d0220000-0200-4000-8000-000000000a06', 'd0220000-0200-4000-8000-000000000606', 'd0220000-0200-4000-8000-000000000202'),
   ('d0220000-0200-4000-8000-000000000a07', 'd0220000-0200-4000-8000-000000000607', 'd0220000-0200-4000-8000-000000000201'),
   ('d0220000-0200-4000-8000-000000000a08', 'd0220000-0200-4000-8000-000000000601', 'd0220000-0200-4000-8000-000000000201');
 
@@ -656,10 +663,10 @@ select ok(
 
 select throws_ok(
   $q$select public.advance_get(
-    'd0220000-0200-4000-8000-000000000999',
+    'd0220000-0200-4000-8000-000000000202',
     (select id from public.advances where purpose = 'Mua gạo + muối chợ sớm'))$q$,
   'P0001', 'ERR_INVALID_STATUS',
-  'advance_get sai KS -> ERR_INVALID_STATUS'
+  'advance_get sai KS (P0222, a06 co quyen o do) -> ERR_INVALID_STATUS'
 );
 
 -- RLS: nguoi khong co quyen advance.* khong doc duoc dong advances.
