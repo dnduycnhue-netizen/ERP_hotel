@@ -143,9 +143,13 @@ insert into public.role_permissions (role_id, permission_code) values
   ('d0350000-0000-4000-8000-000000000602', 'hk.standard.manage'),
   ('d0350000-0000-4000-8000-000000000603', 'minibar.check'),
   ('d0350000-0000-4000-8000-000000000603', 'minibar.refill'),
+  ('d0350000-0000-4000-8000-000000000603', 'stock.view_qty'),
+  ('d0350000-0000-4000-8000-000000000603', 'stock.view_value'),
   ('d0350000-0000-4000-8000-000000000604', 'minibar.request_check'),
   ('d0350000-0000-4000-8000-000000000604', 'minibar.charge.confirm'),
   ('d0350000-0000-4000-8000-000000000604', 'minibar.waive.request'),
+  ('d0350000-0000-4000-8000-000000000604', 'stock.view_qty'),
+  ('d0350000-0000-4000-8000-000000000604', 'stock.view_value'),
   ('d0350000-0000-4000-8000-000000000607', 'stock.view_qty'),
   ('d0350000-0000-4000-8000-000000000608', 'minibar.reconcile'),
   ('d0350000-0000-4000-8000-000000000608', 'report.view.rpt_minibar'),
@@ -548,6 +552,8 @@ select throws_ok(
 );
 
 -- Idempotency: nop lai cung client_uuid -> tra ket qua cu, khong ghi them dong.
+-- request_check can minibar.request_check (le tan); a03 hien tai khong co quyen nay.
+select public._t035_as('d0350000-0000-4000-8000-000000000a04');
 insert into t035_ctx values ('chk102', null, (select public.minibar_request_check(
   'd0350000-0000-4000-8000-000000000c02', 'daily'
 )));
@@ -730,8 +736,8 @@ select is(
   (select public.minibar_submit_check(
     (select (resp ->> 'id')::uuid from t035_ctx where key = 'chk104a'),
     '[{"item_id": "d0350000-0000-4000-8000-000000000501", "missing_qty": 1}, {"item_id": "d0350000-0000-4000-8000-000000000502", "missing_qty": 1}]'::jsonb
-  ) ->> 'total_amount'),
-  '60000', 'check 104a total is 60000'
+  ) ->> 'total_amount')::numeric,
+  60000::numeric, 'check 104a total is 60000'
 );
 select public._t035_as('d0350000-0000-4000-8000-000000000a04');
 select is(
@@ -755,8 +761,8 @@ select is(
   (select public.minibar_submit_check(
     (select (resp ->> 'id')::uuid from t035_ctx where key = 'chk104b'),
     '[{"item_id": "d0350000-0000-4000-8000-000000000501", "missing_qty": 1}, {"item_id": "d0350000-0000-4000-8000-000000000502", "missing_qty": 1}]'::jsonb
-  ) ->> 'total_amount'),
-  '60000', 'check 104b total is 60000'
+  ) ->> 'total_amount')::numeric,
+  60000::numeric, 'check 104b total is 60000'
 );
 select public._t035_as('d0350000-0000-4000-8000-000000000a04');
 select is(
@@ -775,8 +781,8 @@ select is(
   (select public.minibar_submit_check(
     (select (resp ->> 'id')::uuid from t035_ctx where key = 'chk105'),
     '[{"item_id": "d0350000-0000-4000-8000-000000000502", "missing_qty": 1}]'::jsonb
-  ) ->> 'total_amount'),
-  '35000', 'check 105 total is 35000'
+  ) ->> 'total_amount')::numeric,
+  35000::numeric, 'check 105 total is 35000'
 );
 select public._t035_as('d0350000-0000-4000-8000-000000000a04');
 select throws_ok(
@@ -829,8 +835,10 @@ select is(
 );
 
 select public._t035_as('d0350000-0000-4000-8000-000000000a04');
+-- Phong 105 chua co phieu checkout nao (phong 102 co chk105 da kiem nen
+-- tinh la phieu tuong ung theo quyet dinh 7 cua migration 320000).
 insert into t035_ctx values ('aud102', null, (select public.minibar_request_check(
-  'd0350000-0000-4000-8000-000000000c02', 'audit'
+  'd0350000-0000-4000-8000-000000000c06', 'audit'
 )));
 select public._t035_as('d0350000-0000-4000-8000-000000000a03');
 insert into t035_ctx values ('subaud102', null, (select public.minibar_submit_check(
@@ -960,7 +968,7 @@ select is(
   (select public.minibar_recall_list(
     'd0350000-0000-4000-8000-000000000201', 30
   ) -> 'items' -> 0 ->> 'item_code'),
-  'TIGER', 'recall list item is Tiger (expires in 10 days)'
+  'ITM_TIGER', 'recall list item is Tiger (expires in 10 days)'
 );
 select is(
   jsonb_array_length(
