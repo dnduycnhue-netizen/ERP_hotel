@@ -637,7 +637,7 @@ select throws_ok(
   $q$select public.purpose_issue_save_draft(
     '{"id": "d0300000-0000-4000-8000-000000000e01", "property_id": "d0300000-0000-4000-8000-000000000201", "warehouse_id": "d0300000-0000-4000-8000-000000000301", "purpose_code": "staff_meal", "lines": []}'::jsonb
   )$q$,
-  'P0001', 'ERR_NOT_FOUND',
+  'P0001', 'ERR_INVALID_VALUE',
   'purpose_issue_save_draft rejects unknown id'
 );
 insert into t030_resp values ('pi1c', public.purpose_issue_save_draft(
@@ -673,8 +673,8 @@ select is(
 select public._t030_as('d0300000-0000-4000-8000-000000000a02');
 select throws_ok(
   $q$select public.purpose_issue_reverse(
-    (select id from t030_ctx where key = 'pi1'),
     'd0300000-0000-4000-8000-000000000201',
+    (select id from t030_ctx where key = 'pi1'),
     'Xuat nham'
   )$q$,
   '42501', 'ERR_FORBIDDEN:purpose_issue.reverse',
@@ -682,8 +682,8 @@ select throws_ok(
 );
 select public._t030_as('d0300000-0000-4000-8000-000000000a04');
 insert into t030_resp values ('pi1rev', public.purpose_issue_reverse(
-  (select id from t030_ctx where key = 'pi1'),
   'd0300000-0000-4000-8000-000000000201',
+  (select id from t030_ctx where key = 'pi1'),
   'Xuat nham, can dao phieu'
 ));
 select ok(
@@ -712,8 +712,8 @@ select is(
 select public._t030_as('d0300000-0000-4000-8000-000000000a04');
 select throws_ok(
   $q$select public.purpose_issue_reverse(
-    (select id from t030_ctx where key = 'pi1'),
     'd0300000-0000-4000-8000-000000000201',
+    (select id from t030_ctx where key = 'pi1'),
     'Dao lan 2'
   )$q$,
   'P0001', 'ERR_INVALID_STATUS',
@@ -755,7 +755,7 @@ select ok(
 
 select public._t030_as('d0300000-0000-4000-8000-000000000a02');
 insert into t030_resp values ('w1', public.waste_save_draft(
-  '{"property_id": "d0300000-0000-4000-8000-000000000201", "warehouse_id": "d0300000-0000-4000-8000-000000000301", "reason_code": "expired", "lines": [{"item_id": "d0300000-0000-4000-8000-000000000503", "qty": 3, "uom": "kg"}]}'::jsonb
+  '{"property_id": "d0300000-0000-4000-8000-000000000201", "warehouse_id": "d0300000-0000-4000-8000-000000000301", "reason_code": "expired", "lines": [{"item_id": "d0300000-0000-4000-8000-000000000503", "qty_stock": 3}]}'::jsonb
 ));
 select ok(
   (select (resp ->> 'ok')::boolean from t030_resp where key = 'w1'),
@@ -777,7 +777,7 @@ insert into t030_resp values ('w1b', public.waste_save_draft(
     'warehouse_id', 'd0300000-0000-4000-8000-000000000301',
     'reason_code', 'expired',
     'photo_ids', jsonb_build_array('d0300000-0000-4000-8000-000000000904'),
-    'lines', jsonb_build_array(jsonb_build_object('item_id', 'd0300000-0000-4000-8000-000000000503', 'qty', 3, 'uom', 'kg'))
+    'lines', jsonb_build_array(jsonb_build_object('item_id', 'd0300000-0000-4000-8000-000000000503', 'qty_stock', 3))
   ))
 ));
 select ok(
@@ -835,7 +835,7 @@ select is(
 
 select public._t030_as('d0300000-0000-4000-8000-000000000a02');
 insert into t030_resp values ('w2', public.waste_save_draft(
-  '{"property_id": "d0300000-0000-4000-8000-000000000201", "warehouse_id": "d0300000-0000-4000-8000-000000000301", "reason_code": "spoiled_storage", "photo_ids": ["d0300000-0000-4000-8000-000000000904"], "lines": [{"item_id": "d0300000-0000-4000-8000-000000000501", "qty": 150, "uom": "kg"}]}'::jsonb
+  '{"property_id": "d0300000-0000-4000-8000-000000000201", "warehouse_id": "d0300000-0000-4000-8000-000000000301", "reason_code": "spoiled_storage", "photo_ids": ["d0300000-0000-4000-8000-000000000904"], "lines": [{"item_id": "d0300000-0000-4000-8000-000000000501", "qty_stock": 150}]}'::jsonb
 ));
 insert into t030_ctx values ('w2', (select (resp ->> 'id')::uuid from t030_resp where key = 'w2'));
 insert into t030_resp values ('w2sub', public.waste_submit(
@@ -886,7 +886,7 @@ select is(
 
 select public._t030_as('d0300000-0000-4000-8000-000000000a02');
 insert into t030_resp values ('w3', public.waste_save_draft(
-  '{"property_id": "d0300000-0000-4000-8000-000000000201", "warehouse_id": "d0300000-0000-4000-8000-000000000301", "reason_code": "broken", "photo_ids": ["d0300000-0000-4000-8000-000000000904"], "lines": [{"item_id": "d0300000-0000-4000-8000-000000000503", "qty": 1, "uom": "kg"}]}'::jsonb
+  '{"property_id": "d0300000-0000-4000-8000-000000000201", "warehouse_id": "d0300000-0000-4000-8000-000000000301", "reason_code": "broken", "photo_ids": ["d0300000-0000-4000-8000-000000000904"], "lines": [{"item_id": "d0300000-0000-4000-8000-000000000503", "qty_stock": 1}]}'::jsonb
 ));
 insert into t030_resp values ('w3can', public.waste_cancel(
   'd0300000-0000-4000-8000-000000000201',
@@ -898,7 +898,7 @@ select is(
   'cancelled', 'waste_cancel cancels draft W3'
 );
 insert into t030_resp values ('w4', public.waste_save_draft(
-  '{"property_id": "d0300000-0000-4000-8000-000000000201", "warehouse_id": "d0300000-0000-4000-8000-000000000301", "reason_code": "guest_return", "photo_ids": ["d0300000-0000-4000-8000-000000000904"], "lines": [{"item_id": "d0300000-0000-4000-8000-000000000503", "qty": 1, "uom": "kg"}]}'::jsonb
+  '{"property_id": "d0300000-0000-4000-8000-000000000201", "warehouse_id": "d0300000-0000-4000-8000-000000000301", "reason_code": "guest_return", "photo_ids": ["d0300000-0000-4000-8000-000000000904"], "lines": [{"item_id": "d0300000-0000-4000-8000-000000000503", "qty_stock": 1}]}'::jsonb
 ));
 insert into t030_ctx values ('w4', (select (resp ->> 'id')::uuid from t030_resp where key = 'w4'));
 select public.waste_submit(
@@ -974,10 +974,10 @@ select public.requisition_submit(
 
 reset role;
 update public.items
-set status = 'merged', merged_into_item_id = 'd0300000-0000-4000-8000-000000000501'
+set status = 'merged', merged_into_id = 'd0300000-0000-4000-8000-000000000501'
 where id = 'd0300000-0000-4000-8000-000000000504';
 update public.items
-set status = 'merged', merged_into_item_id = 'd0300000-0000-4000-8000-000000000501'
+set status = 'merged', merged_into_id = 'd0300000-0000-4000-8000-000000000501'
 where id = 'd0300000-0000-4000-8000-000000000505';
 set local role authenticated;
 
