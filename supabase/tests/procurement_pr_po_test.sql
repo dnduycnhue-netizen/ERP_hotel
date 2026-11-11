@@ -114,6 +114,7 @@ insert into public.role_permissions (role_id, permission_code) values
   ('d0200000-0200-4000-8000-000000000601', 'po.view_price'),
   ('d0200000-0200-4000-8000-000000000601', 'po.close'),
   ('d0200000-0200-4000-8000-000000000601', 'item.temp.create'),
+  ('d0200000-0200-4000-8000-000000000601', 'item.view'),
   ('d0200000-0200-4000-8000-000000000602', 'pr.create'),
   ('d0200000-0200-4000-8000-000000000602', 'pr.approve'),
   ('d0200000-0200-4000-8000-000000000603', 'po.approve'),
@@ -1031,6 +1032,9 @@ select lives_ok(
   )$q$,
   'Cost controller merges temp item into real item'
 );
+-- Doc dong PR duoi quyen u1 (co pr.create): u3 cost_controller khong co
+-- quyen doc PR (RLS purchase_request_lines) nen doc duoi u3 tra NULL.
+select public._t020_as('d0200000-0200-4000-8000-000000000a01');
 select is(
   (select item_id from public.purchase_request_lines where pr_id = (select id from t020_ctx where key = 'pr_tmp')),
   'd0200000-0200-4000-8000-000000000501'::uuid,
