@@ -59,16 +59,6 @@ insert into public.room_types (id, property_id, code, name, max_guests) values
 insert into public.rooms (id, property_id, room_type_id, room_no, floor) values
   ('d0460000-0000-4000-8000-000000000c01', 'd0460000-0000-4000-8000-000000000201', 'd0460000-0000-4000-8000-000000000b01', '101', '1');
 
-insert into public.approval_rules (
-  org_id, property_id, doc_type, min_amount, max_amount,
-  item_group_id, condition, step,
-  approver_role_id, approver_user_id, required_perm
-) values
-  ('d0460000-0000-4000-8000-000000000001', null, 'requisition', 0, null,
-   null, '{}'::jsonb, 1,
-   'd0460000-0000-4000-8000-000000000601', null, 'requisition.approve')
-on conflict do nothing;
-
 insert into public.item_costs (legal_entity_id, item_id, avg_cost, qty_on_hand) values
   ('d0460000-0000-4000-8000-000000000101', 'd0460000-0000-4000-8000-000000000501', 2000, 105),
   ('d0460000-0000-4000-8000-000000000101', 'd0460000-0000-4000-8000-000000000502', 3000, 100),
@@ -113,6 +103,18 @@ insert into public.user_property_roles (user_id, role_id, property_id) values
   ('d0460000-0000-4000-8000-000000000a02', 'd0460000-0000-4000-8000-000000000602', 'd0460000-0000-4000-8000-000000000201'),
   ('d0460000-0000-4000-8000-000000000a07', 'd0460000-0000-4000-8000-000000000607', 'd0460000-0000-4000-8000-000000000201'),
   ('d0460000-0000-4000-8000-000000000a10', 'd0460000-0000-4000-8000-000000000609', 'd0460000-0000-4000-8000-000000000201');
+
+-- approval_rules phai dung SAU roles (FK approver_role_id -> roles):
+-- ban goc dat truoc roles nen chay that rot 23503 (run 1).
+insert into public.approval_rules (
+  org_id, property_id, doc_type, min_amount, max_amount,
+  item_group_id, condition, step,
+  approver_role_id, approver_user_id, required_perm
+) values
+  ('d0460000-0000-4000-8000-000000000001', null, 'requisition', 0, null,
+   null, '{}'::jsonb, 1,
+   'd0460000-0000-4000-8000-000000000601', null, 'requisition.approve')
+on conflict do nothing;
 
 insert into public.stock_moves (legal_entity_id, property_id, warehouse_id, item_id, lot_id, move_type, qty, unit_cost, amount, business_date, posted_by, source_doc_type, source_doc_id) values
   ('d0460000-0000-4000-8000-000000000101', 'd0460000-0000-4000-8000-000000000201', 'd0460000-0000-4000-8000-000000000303', 'd0460000-0000-4000-8000-000000000501', null, 'receipt', 100, 2000, 200000, '2026-11-09', 'd0460000-0000-4000-8000-000000000a07', 'opening', 'd0460000-0000-4000-8000-000000000f01'),
