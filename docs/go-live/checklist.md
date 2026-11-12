@@ -94,7 +94,7 @@ commit `ec4c7be` (sửa Q235), trước toàn bộ thay đổi code của Q241�
 
 **Trạng thái 12/11 tối: ĐÃ deploy** bản `main` commit `e1db99b0c` lên production
 (`erphotel-7e8a3q31w-dnduys-projects.vercel.app`, Ready, gắn `erphotel.vercel.app`), theo lệnh của Duy.
-Remote GitHub chưa được push (còn chậm 23 commit so với `main` cục bộ).
+Đã push `main` lên GitHub (`ec4c7be7e..53213cb3b`, 23 commit) theo lệnh Duy; bản deploy `e1db99b0c` cũ hơn đầu `main` đúng các commit chỉ sửa tài liệu.
 
 Kiểm tra sau deploy (smoke): `/login` trả 200; đăng nhập `uat.gm@erp.internal` thấy đúng 1 khách sạn
 (TEST47); `uat.storekeeper` gọi `receiving_list_tasks` trên TEST47 được, trên SONHOIAN bị `ERR_FORBIDDEN`;
