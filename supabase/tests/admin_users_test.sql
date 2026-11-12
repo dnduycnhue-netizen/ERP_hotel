@@ -331,11 +331,30 @@ select ok(
   ) = 'true',
   'an admin can set a PIN for another user'
 );
-select ok(
-  extensions.crypt(
-    '123456',
-    (select p.pin_hash from public.profiles p where p.id = '00000000-0000-4000-8000-000000000a13')
-  ) = (select p.pin_hash from public.profiles p where p.id = '00000000-0000-4000-8000-000000000a13'),
+-- Doc truc tiep profiles.pin_hash duoi role authenticated rot 42501 (co y:
+-- org_access.sql:814 chi grant select cac cot tru pin_hash; org_access_test
+-- :461 khang dinh authenticated khong doc duoc pin_hash). Lay hash khi con
+-- la postgres, ghi ket qua vao bang probe, roi khoi phuc JWT a11.
+reset role;
+insert into pg_tap_admin_users_probe values ('pin_a13_ok',
+  case when extensions.crypt('123456',
+    (select pin_hash from public.profiles where id = '00000000-0000-4000-8000-000000000a13'))
+    = (select pin_hash from public.profiles where id = '00000000-0000-4000-8000-000000000a13')
+    then 'OK' else 'FAIL' end);
+set local role authenticated;
+select set_config(
+  'request.jwt.claim.sub',
+  '00000000-0000-4000-8000-000000000a11',
+  true
+);
+select set_config(
+  'request.jwt.claims',
+  '{"sub":"00000000-0000-4000-8000-000000000a11","role":"authenticated"}',
+  true
+);
+select is(
+  (select result from pg_tap_admin_users_probe where key = 'pin_a13_ok'),
+  'OK',
   'the stored PIN hash verifies with crypt'
 );
 
