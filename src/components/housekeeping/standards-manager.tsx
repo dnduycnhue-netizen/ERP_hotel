@@ -234,7 +234,7 @@ export function StandardsManager({
             id="filterRoomType"
             value={filterRoomType}
             onChange={(e) => setFilterRoomType(e.target.value)}
-            className="mt-1 h-9 rounded-md border bg-background px-3 text-sm"
+            className="mt-1 h-9 rounded-md border bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
           >
             <option value="">{vi.housekeeping.allRoomTypes}</option>
             {roomTypes.map((rt) => (
@@ -255,7 +255,7 @@ export function StandardsManager({
             id="filterCleanType"
             value={filterCleanType}
             onChange={(e) => setFilterCleanType(e.target.value)}
-            className="mt-1 h-9 rounded-md border bg-background px-3 text-sm"
+            className="mt-1 h-9 rounded-md border bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
           >
             <option value="">{vi.housekeeping.allCleanTypes}</option>
             {CLEAN_TYPES.map((ct) => (
