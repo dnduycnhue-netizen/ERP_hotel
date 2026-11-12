@@ -89,17 +89,26 @@ export default async function UserDetailPage({
             <table className="w-full text-sm">
               <thead className="bg-muted/40 text-left">
                 <tr>
-                  <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">{vi.admin.roleName}</th>
-                  <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">{vi.admin.property}</th>
+                  <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                    {vi.admin.roleName}
+                  </th>
+                  <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                    {vi.admin.property}
+                  </th>
                   <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
                     {vi.admin.validFrom}
                   </th>
-                  <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">{vi.admin.validTo}</th>
+                  <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                    {vi.admin.validTo}
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {assignments.map((assignment) => (
-                  <tr key={assignment.id} className="border-t hover:bg-muted/40">
+                  <tr
+                    key={assignment.id}
+                    className="border-t hover:bg-muted/40"
+                  >
                     <td className="px-3 py-3 align-middle">
                       <span className="font-medium">
                         {assignment.role_name}
@@ -111,8 +120,12 @@ export default async function UserDetailPage({
                     <td className="px-3 py-3 align-middle">
                       {assignment.property_name ?? vi.admin.chainWide}
                     </td>
-                    <td className="px-3 py-3 align-middle">{assignment.valid_from}</td>
-                    <td className="px-3 py-3 align-middle">{assignment.valid_to ?? "—"}</td>
+                    <td className="px-3 py-3 align-middle">
+                      {assignment.valid_from}
+                    </td>
+                    <td className="px-3 py-3 align-middle">
+                      {assignment.valid_to ?? "—"}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -135,10 +148,18 @@ export default async function UserDetailPage({
                   <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
                     {vi.admin.permission}
                   </th>
-                  <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">{vi.admin.property}</th>
-                  <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">{vi.admin.effect}</th>
-                  <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">{vi.admin.validTo}</th>
-                  <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">{vi.admin.reason}</th>
+                  <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                    {vi.admin.property}
+                  </th>
+                  <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                    {vi.admin.effect}
+                  </th>
+                  <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                    {vi.admin.validTo}
+                  </th>
+                  <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                    {vi.admin.reason}
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -160,8 +181,12 @@ export default async function UserDetailPage({
                         ? vi.admin.effectAllow
                         : vi.admin.effectDeny}
                     </td>
-                    <td className="px-3 py-3 align-middle">{override.valid_to ?? "—"}</td>
-                    <td className="px-3 py-3 align-middle">{override.reason}</td>
+                    <td className="px-3 py-3 align-middle">
+                      {override.valid_to ?? "—"}
+                    </td>
+                    <td className="px-3 py-3 align-middle">
+                      {override.reason}
+                    </td>
                   </tr>
                 ))}
               </tbody>

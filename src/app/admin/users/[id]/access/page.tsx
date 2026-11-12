@@ -115,18 +115,29 @@ export default async function UserAccessPage({
             <table className="w-full text-sm">
               <thead className="bg-muted/40 text-left">
                 <tr>
-                  <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">{vi.admin.roleName}</th>
-                  <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">{vi.admin.property}</th>
+                  <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                    {vi.admin.roleName}
+                  </th>
+                  <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                    {vi.admin.property}
+                  </th>
                   <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
                     {vi.admin.validFrom}
                   </th>
-                  <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">{vi.admin.validTo}</th>
-                  <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">{vi.common.actions}</th>
+                  <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                    {vi.admin.validTo}
+                  </th>
+                  <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                    {vi.common.actions}
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {assignments.map((assignment) => (
-                  <tr key={assignment.id} className="border-t hover:bg-muted/40">
+                  <tr
+                    key={assignment.id}
+                    className="border-t hover:bg-muted/40"
+                  >
                     <td className="px-3 py-3 align-middle">
                       <span className="font-medium">
                         {assignment.role_name}
@@ -138,8 +149,12 @@ export default async function UserAccessPage({
                     <td className="px-3 py-3 align-middle">
                       {assignment.property_name ?? vi.admin.chainWide}
                     </td>
-                    <td className="px-3 py-3 align-middle">{assignment.valid_from}</td>
-                    <td className="px-3 py-3 align-middle">{assignment.valid_to ?? "—"}</td>
+                    <td className="px-3 py-3 align-middle">
+                      {assignment.valid_from}
+                    </td>
+                    <td className="px-3 py-3 align-middle">
+                      {assignment.valid_to ?? "—"}
+                    </td>
                     <td className="px-3 py-3 align-middle">
                       <RevokeAssignmentButton
                         assignmentId={assignment.id}
@@ -176,10 +191,18 @@ export default async function UserAccessPage({
                   <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
                     {vi.admin.permission}
                   </th>
-                  <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">{vi.admin.property}</th>
-                  <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">{vi.admin.effect}</th>
-                  <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">{vi.admin.validTo}</th>
-                  <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">{vi.admin.reason}</th>
+                  <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                    {vi.admin.property}
+                  </th>
+                  <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                    {vi.admin.effect}
+                  </th>
+                  <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                    {vi.admin.validTo}
+                  </th>
+                  <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                    {vi.admin.reason}
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -201,8 +224,12 @@ export default async function UserAccessPage({
                         ? vi.admin.effectAllow
                         : vi.admin.effectDeny}
                     </td>
-                    <td className="px-3 py-3 align-middle">{override.valid_to ?? "—"}</td>
-                    <td className="px-3 py-3 align-middle">{override.reason}</td>
+                    <td className="px-3 py-3 align-middle">
+                      {override.valid_to ?? "—"}
+                    </td>
+                    <td className="px-3 py-3 align-middle">
+                      {override.reason}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -258,24 +285,35 @@ export default async function UserAccessPage({
                   <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
                     {vi.admin.permission}
                   </th>
-                  <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">{vi.admin.module}</th>
-                  <th className="px-3 py-2.5 text-center text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">{vi.admin.granted}</th>
+                  <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                    {vi.admin.module}
+                  </th>
+                  <th className="px-3 py-2.5 text-center text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                    {vi.admin.granted}
+                  </th>
                   <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
                     {vi.admin.effectiveSource}
                   </th>
-                  <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">{vi.admin.validTo}</th>
+                  <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                    {vi.admin.validTo}
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {effective.map((permission) => (
-                  <tr key={permission.code} className="border-t hover:bg-muted/40">
+                  <tr
+                    key={permission.code}
+                    className="border-t hover:bg-muted/40"
+                  >
                     <td className="px-3 py-3 align-middle">
                       <span className="font-medium">{permission.name_vi}</span>
                       <span className="block font-mono text-xs text-muted-foreground">
                         {permission.code}
                       </span>
                     </td>
-                    <td className="px-3 py-3 align-middle">{permission.module}</td>
+                    <td className="px-3 py-3 align-middle">
+                      {permission.module}
+                    </td>
                     <td className="px-3 py-3 text-center align-middle">
                       {permission.granted ? (
                         <Check
@@ -289,8 +327,12 @@ export default async function UserAccessPage({
                         />
                       )}
                     </td>
-                    <td className="px-3 py-3 align-middle">{permission.source ?? "—"}</td>
-                    <td className="px-3 py-3 align-middle">{permission.valid_to ?? "—"}</td>
+                    <td className="px-3 py-3 align-middle">
+                      {permission.source ?? "—"}
+                    </td>
+                    <td className="px-3 py-3 align-middle">
+                      {permission.valid_to ?? "—"}
+                    </td>
                   </tr>
                 ))}
               </tbody>
