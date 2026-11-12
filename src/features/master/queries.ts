@@ -292,7 +292,7 @@ export async function listWarehouses(
   const { data } = await supabase
     .from("warehouses")
     .select(
-      "id, property_id, code, name, kind, outlet_id, outlet:outlets(name)",
+      "id, property_id, code, name, kind, outlet_id, outlet:outlets!warehouses_outlet_id_fkey(name)",
     )
     .eq("property_id", propertyId)
     .order("code", { ascending: true });
