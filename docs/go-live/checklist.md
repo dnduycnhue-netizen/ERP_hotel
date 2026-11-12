@@ -68,7 +68,7 @@ yếu phải được tắt trước khi dùng thật.
 |---|---|---|
 | E1 | Vỏ giao diện ClickUp, 34 bảng (UI-1/UI-2) | Xong |
 | E2 | Chuỗi tiếng Việt hard-code | **Xong (Q243)**: chỉ có 50 chuỗi ở 10 file (không phải 222 như ghi nhầm trước đó), đã chuyển vào `vi.ts` + luật ESLint chặn tái phát |
-| E3 | Tốc độ tải (Q124–126) | **Chưa đo lại** sau các đợt merge |
+| E3 | Tốc độ tải (Q124–126) | **Đo một phần 13/11:** `/login` TTFB ~0,16–0,17 s (5 lần, qua edge hkg1), `vercel.json` đã đặt `bom1`. **Chưa đo trang sau đăng nhập** (cần phiên đăng nhập thật; đo trên máy Duy bằng DevTools → Network) |
 | E4 | Đợt UI polish theo `ui-polish-plan.md` | Chưa làm (không chặn go-live) |
 
 ## F. Các wave
