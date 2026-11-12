@@ -30,12 +30,12 @@ insert into public.item_groups (id, org_id, code_prefix, name, kind) values
   ('d0300000-0000-4000-8000-000000000402', 'd0300000-0000-4000-8000-000000000001', 'THIT', 'Thịt', 'food'),
   ('d0300000-0000-4000-8000-000000000403', 'd0300000-0000-4000-8000-000000000001', 'MUOI', 'Muối', 'other');
 
-insert into public.items (id, org_id, code, name, group_id, stock_uom, is_key_item, track_lot, shelf_life_days, allowed_channels, is_temp) values
-  ('d0300000-0000-4000-8000-000000000501', 'd0300000-0000-4000-8000-000000000001', 'ITM_GAO', 'Gạo ST25', 'd0300000-0000-4000-8000-000000000401', 'kg', true, false, null, array['contract', 'market'], false),
-  ('d0300000-0000-4000-8000-000000000502', 'd0300000-0000-4000-8000-000000000001', 'ITM_THIT', 'Thịt ba chỉ', 'd0300000-0000-4000-8000-000000000402', 'kg', true, true, 30, array['contract'], false),
-  ('d0300000-0000-4000-8000-000000000503', 'd0300000-0000-4000-8000-000000000001', 'ITM_MUOI', 'Muối hạt', 'd0300000-0000-4000-8000-000000000403', 'kg', false, false, null, array['contract', 'market'], false),
-  ('d0300000-0000-4000-8000-000000000504', 'd0300000-0000-4000-8000-000000000001', 'TMP-030-1', 'Mã tạm 1', 'd0300000-0000-4000-8000-000000000403', 'kg', false, false, null, array['contract', 'market'], true),
-  ('d0300000-0000-4000-8000-000000000505', 'd0300000-0000-4000-8000-000000000001', 'TMP-030-2', 'Mã tạm 2', 'd0300000-0000-4000-8000-000000000403', 'kg', false, false, null, array['contract', 'market'], true);
+insert into public.items (id, org_id, code, name, group_id, stock_uom, is_key_item, track_lot, shelf_life_days, allowed_channels, is_temp, temp_created_at) values
+  ('d0300000-0000-4000-8000-000000000501', 'd0300000-0000-4000-8000-000000000001', 'ITM_GAO', 'Gạo ST25', 'd0300000-0000-4000-8000-000000000401', 'kg', true, false, null, array['contract', 'market'], false, null),
+  ('d0300000-0000-4000-8000-000000000502', 'd0300000-0000-4000-8000-000000000001', 'ITM_THIT', 'Thịt ba chỉ', 'd0300000-0000-4000-8000-000000000402', 'kg', true, true, 30, array['contract'], false, null),
+  ('d0300000-0000-4000-8000-000000000503', 'd0300000-0000-4000-8000-000000000001', 'ITM_MUOI', 'Muối hạt', 'd0300000-0000-4000-8000-000000000403', 'kg', false, false, null, array['contract', 'market'], false, null),
+  ('d0300000-0000-4000-8000-000000000504', 'd0300000-0000-4000-8000-000000000001', 'TMP-030-1', 'Mã tạm 1', 'd0300000-0000-4000-8000-000000000403', 'kg', false, false, null, array['contract', 'market'], true, now()),
+  ('d0300000-0000-4000-8000-000000000505', 'd0300000-0000-4000-8000-000000000001', 'TMP-030-2', 'Mã tạm 2', 'd0300000-0000-4000-8000-000000000403', 'kg', false, false, null, array['contract', 'market'], true, now());
 
 insert into public.item_purchase_units (org_id, item_id, uom, factor_to_stock, is_default) values
   ('d0300000-0000-4000-8000-000000000001', 'd0300000-0000-4000-8000-000000000501', 'cai', 10, false);
@@ -100,6 +100,7 @@ insert into public.role_permissions (role_id, permission_code) values
   ('d0300000-0000-4000-8000-000000000603', 'waste.approve'),
   ('d0300000-0000-4000-8000-000000000603', 'stock.view_qty'),
   ('d0300000-0000-4000-8000-000000000603', 'stock.view_value'),
+  ('d0300000-0000-4000-8000-000000000603', 'alert.receive.waste_large'),
   ('d0300000-0000-4000-8000-000000000604', 'waste.approve.large'),
   ('d0300000-0000-4000-8000-000000000604', 'purpose_issue.post'),
   ('d0300000-0000-4000-8000-000000000604', 'purpose_issue.reverse'),
@@ -115,6 +116,7 @@ insert into public.role_permissions (role_id, permission_code) values
 
 insert into public.user_property_roles (user_id, role_id, property_id) values
   ('d0300000-0000-4000-8000-000000000a02', 'd0300000-0000-4000-8000-000000000602', 'd0300000-0000-4000-8000-000000000201'),
+  ('d0300000-0000-4000-8000-000000000a02', 'd0300000-0000-4000-8000-000000000603', 'd0300000-0000-4000-8000-000000000201'),
   ('d0300000-0000-4000-8000-000000000a03', 'd0300000-0000-4000-8000-000000000603', 'd0300000-0000-4000-8000-000000000201'),
   ('d0300000-0000-4000-8000-000000000a04', 'd0300000-0000-4000-8000-000000000604', 'd0300000-0000-4000-8000-000000000201'),
   ('d0300000-0000-4000-8000-000000000a05', 'd0300000-0000-4000-8000-000000000605', null),
@@ -138,20 +140,20 @@ on conflict do nothing;
 insert into public.attachments (id, org_id, legal_entity_id, property_id, bucket, path, sha256, doc_type, doc_id, uploaded_by) values
   ('d0300000-0000-4000-8000-000000000904', 'd0300000-0000-4000-8000-000000000001', 'd0300000-0000-4000-8000-000000000101', 'd0300000-0000-4000-8000-000000000201', 'evidence', 'd0300000-0000-4000-8000-000000000101/waste/photo1.jpg', encode(sha256('waste-photo1'::bytea), 'hex'), 'waste', 'd0300000-0000-4000-8000-000000000905', 'd0300000-0000-4000-8000-000000000a02');
 
-insert into public.stock_moves (legal_entity_id, property_id, warehouse_id, item_id, lot_id, move_type, qty, unit_cost, amount, business_date, posted_by, source_doc_type, source_doc_id) values
-  ('d0300000-0000-4000-8000-000000000101', 'd0300000-0000-4000-8000-000000000201', 'd0300000-0000-4000-8000-000000000301', 'd0300000-0000-4000-8000-000000000501', null, 'receipt', 200, 10000, 2000000, '2026-11-09', 'd0300000-0000-4000-8000-000000000a07', 'opening', 'd0300000-0000-4000-8000-000000000f01'),
-  ('d0300000-0000-4000-8000-000000000101', 'd0300000-0000-4000-8000-000000000201', 'd0300000-0000-4000-8000-000000000301', 'd0300000-0000-4000-8000-000000000503', null, 'receipt', 50, 5000, 250000, '2026-11-09', 'd0300000-0000-4000-8000-000000000a07', 'opening', 'd0300000-0000-4000-8000-000000000f01'),
-  ('d0300000-0000-4000-8000-000000000101', 'd0300000-0000-4000-8000-000000000201', 'd0300000-0000-4000-8000-000000000301', 'd0300000-0000-4000-8000-000000000502', 'd0300000-0000-4000-8000-000000000903', 'receipt', 20, 60000, 1200000, '2026-11-09', 'd0300000-0000-4000-8000-000000000a07', 'opening', 'd0300000-0000-4000-8000-000000000f01');
+insert into public.stock_moves (org_id, legal_entity_id, property_id, warehouse_id, item_id, lot_id, move_type, qty, unit_cost, amount, business_date, posted_by, source_doc_type, source_doc_id) values
+  ('d0300000-0000-4000-8000-000000000001', 'd0300000-0000-4000-8000-000000000101', 'd0300000-0000-4000-8000-000000000201', 'd0300000-0000-4000-8000-000000000301', 'd0300000-0000-4000-8000-000000000501', null, 'receipt', 200, 10000, 2000000, '2026-11-09', 'd0300000-0000-4000-8000-000000000a07', 'opening', 'd0300000-0000-4000-8000-000000000f01'),
+  ('d0300000-0000-4000-8000-000000000001', 'd0300000-0000-4000-8000-000000000101', 'd0300000-0000-4000-8000-000000000201', 'd0300000-0000-4000-8000-000000000301', 'd0300000-0000-4000-8000-000000000503', null, 'receipt', 50, 5000, 250000, '2026-11-09', 'd0300000-0000-4000-8000-000000000a07', 'opening', 'd0300000-0000-4000-8000-000000000f01'),
+  ('d0300000-0000-4000-8000-000000000001', 'd0300000-0000-4000-8000-000000000101', 'd0300000-0000-4000-8000-000000000201', 'd0300000-0000-4000-8000-000000000301', 'd0300000-0000-4000-8000-000000000502', 'd0300000-0000-4000-8000-000000000903', 'receipt', 20, 60000, 1200000, '2026-11-09', 'd0300000-0000-4000-8000-000000000a07', 'opening', 'd0300000-0000-4000-8000-000000000f01');
 
-insert into public.stock_balances (warehouse_id, item_id, lot_id, qty) values
-  ('d0300000-0000-4000-8000-000000000301', 'd0300000-0000-4000-8000-000000000501', null, 200),
-  ('d0300000-0000-4000-8000-000000000301', 'd0300000-0000-4000-8000-000000000503', null, 50),
-  ('d0300000-0000-4000-8000-000000000301', 'd0300000-0000-4000-8000-000000000502', 'd0300000-0000-4000-8000-000000000903', 20);
+insert into public.stock_balances (org_id, legal_entity_id, property_id, warehouse_id, item_id, lot_id, qty) values
+  ('d0300000-0000-4000-8000-000000000001', 'd0300000-0000-4000-8000-000000000101', 'd0300000-0000-4000-8000-000000000201', 'd0300000-0000-4000-8000-000000000301', 'd0300000-0000-4000-8000-000000000501', null, 200),
+  ('d0300000-0000-4000-8000-000000000001', 'd0300000-0000-4000-8000-000000000101', 'd0300000-0000-4000-8000-000000000201', 'd0300000-0000-4000-8000-000000000301', 'd0300000-0000-4000-8000-000000000503', null, 50),
+  ('d0300000-0000-4000-8000-000000000001', 'd0300000-0000-4000-8000-000000000101', 'd0300000-0000-4000-8000-000000000201', 'd0300000-0000-4000-8000-000000000301', 'd0300000-0000-4000-8000-000000000502', 'd0300000-0000-4000-8000-000000000903', 20);
 
-insert into public.item_costs (legal_entity_id, item_id, avg_cost, qty_on_hand) values
-  ('d0300000-0000-4000-8000-000000000101', 'd0300000-0000-4000-8000-000000000501', 10000, 200),
-  ('d0300000-0000-4000-8000-000000000101', 'd0300000-0000-4000-8000-000000000503', 5000, 50),
-  ('d0300000-0000-4000-8000-000000000101', 'd0300000-0000-4000-8000-000000000502', 60000, 20);
+insert into public.item_costs (legal_entity_id, org_id, item_id, avg_cost, qty_on_hand) values
+  ('d0300000-0000-4000-8000-000000000101', 'd0300000-0000-4000-8000-000000000001', 'd0300000-0000-4000-8000-000000000501', 10000, 200),
+  ('d0300000-0000-4000-8000-000000000101', 'd0300000-0000-4000-8000-000000000001', 'd0300000-0000-4000-8000-000000000503', 5000, 50),
+  ('d0300000-0000-4000-8000-000000000101', 'd0300000-0000-4000-8000-000000000001', 'd0300000-0000-4000-8000-000000000502', 60000, 20);
 
 create temp table t030_ctx (key text primary key, id uuid);
 
@@ -322,14 +324,14 @@ select is(
    where warehouse_id = 'd0300000-0000-4000-8000-000000000301'
      and item_id = 'd0300000-0000-4000-8000-000000000501'
      and lot_id is null),
-  194, 'issue: main GAO balance 200 -> 194'
+  194::numeric, 'issue: main GAO balance 200 -> 194'
 );
 select is(
   (select qty from public.stock_balances
    where warehouse_id = 'd0300000-0000-4000-8000-000000000302'
      and item_id = 'd0300000-0000-4000-8000-000000000501'
      and lot_id is null),
-  6, 'issue: transit GAO balance 6'
+  6::numeric, 'issue: transit GAO balance 6'
 );
 select throws_ok(
   $q$select public.requisition_issue(
@@ -368,14 +370,14 @@ select is(
    where warehouse_id = 'd0300000-0000-4000-8000-000000000302'
      and item_id = 'd0300000-0000-4000-8000-000000000501'
      and lot_id is null),
-  1, 'confirm: transit GAO balance 1 after short receipt'
+  1::numeric, 'confirm: transit GAO balance 1 after short receipt'
 );
 select is(
   (select qty from public.stock_balances
    where warehouse_id = 'd0300000-0000-4000-8000-000000000303'
      and item_id = 'd0300000-0000-4000-8000-000000000501'
      and lot_id is null),
-  5, 'confirm: kitchen GAO balance 5'
+  5::numeric, 'confirm: kitchen GAO balance 5'
 );
 select public._t030_as('d0300000-0000-4000-8000-000000000a02');
 insert into t030_resp values ('r1rcv2', public.requisition_confirm_receipt(
@@ -487,19 +489,19 @@ select is(
    where warehouse_id = 'd0300000-0000-4000-8000-000000000301'
      and item_id = 'd0300000-0000-4000-8000-000000000503'
      and lot_id is null),
-  40, 'transfer send: main MUOI balance 50 -> 40'
+  40::numeric, 'transfer send: main MUOI balance 50 -> 40'
 );
 select is(
   (select qty from public.stock_balances
    where warehouse_id = 'd0300000-0000-4000-8000-000000000302'
      and item_id = 'd0300000-0000-4000-8000-000000000503'
      and lot_id is null),
-  10, 'transfer send: transit MUOI balance 10'
+  10::numeric, 'transfer send: transit MUOI balance 10'
 );
 select is(
   (select coalesce(sum(qty), 0) from public.stock_balances
    where item_id = 'd0300000-0000-4000-8000-000000000503'),
-  50, 'transfer send: entity total MUOI unchanged at 50'
+  50::numeric, 'transfer send: entity total MUOI unchanged at 50'
 );
 insert into t030_resp values ('t1rcv', public.transfer_receive(
   (select id from t030_ctx where key = 't1'),
@@ -518,7 +520,7 @@ select is(
    where warehouse_id = 'd0300000-0000-4000-8000-000000000304'
      and item_id = 'd0300000-0000-4000-8000-000000000503'
      and lot_id is null),
-  10, 'transfer receive: floor MUOI balance 10'
+  10::numeric, 'transfer receive: floor MUOI balance 10'
 );
 
 insert into t030_resp values ('t2', public.transfer_save_draft(
@@ -637,7 +639,7 @@ select throws_ok(
   $q$select public.purpose_issue_save_draft(
     '{"id": "d0300000-0000-4000-8000-000000000e01", "property_id": "d0300000-0000-4000-8000-000000000201", "warehouse_id": "d0300000-0000-4000-8000-000000000301", "purpose_code": "staff_meal", "lines": []}'::jsonb
   )$q$,
-  'P0001', 'ERR_NOT_FOUND',
+  'P0001', 'ERR_INVALID_VALUE',
   'purpose_issue_save_draft rejects unknown id'
 );
 insert into t030_resp values ('pi1c', public.purpose_issue_save_draft(
@@ -668,13 +670,13 @@ select is(
    where warehouse_id = 'd0300000-0000-4000-8000-000000000301'
      and item_id = 'd0300000-0000-4000-8000-000000000501'
      and lot_id is null),
-  186, 'purpose issue: main GAO balance 188 -> 186'
+  186::numeric, 'purpose issue: main GAO balance 188 -> 186'
 );
 select public._t030_as('d0300000-0000-4000-8000-000000000a02');
 select throws_ok(
   $q$select public.purpose_issue_reverse(
-    (select id from t030_ctx where key = 'pi1'),
     'd0300000-0000-4000-8000-000000000201',
+    (select id from t030_ctx where key = 'pi1'),
     'Xuat nham'
   )$q$,
   '42501', 'ERR_FORBIDDEN:purpose_issue.reverse',
@@ -682,8 +684,8 @@ select throws_ok(
 );
 select public._t030_as('d0300000-0000-4000-8000-000000000a04');
 insert into t030_resp values ('pi1rev', public.purpose_issue_reverse(
-  (select id from t030_ctx where key = 'pi1'),
   'd0300000-0000-4000-8000-000000000201',
+  (select id from t030_ctx where key = 'pi1'),
   'Xuat nham, can dao phieu'
 ));
 select ok(
@@ -700,20 +702,20 @@ select is(
    where warehouse_id = 'd0300000-0000-4000-8000-000000000301'
      and item_id = 'd0300000-0000-4000-8000-000000000501'
      and lot_id is null),
-  188, 'purpose issue reverse: main GAO balance back to 188'
+  188::numeric, 'purpose issue reverse: main GAO balance back to 188'
 );
 select is(
   (select count(*) from public.stock_moves
    where source_doc_type = 'purpose_issue'
      and source_doc_id = (select id from t030_ctx where key = 'pi1')
      and move_type = 'reversal'),
-  1, 'purpose issue reverse writes one reversal move'
+  1::bigint, 'purpose issue reverse writes one reversal move'
 );
 select public._t030_as('d0300000-0000-4000-8000-000000000a04');
 select throws_ok(
   $q$select public.purpose_issue_reverse(
-    (select id from t030_ctx where key = 'pi1'),
     'd0300000-0000-4000-8000-000000000201',
+    (select id from t030_ctx where key = 'pi1'),
     'Dao lan 2'
   )$q$,
   'P0001', 'ERR_INVALID_STATUS',
@@ -743,9 +745,9 @@ select is(
   (select (public.purpose_issue_get(
     (select id from t030_ctx where key = 'pi1')
   ) -> 'lines' -> 0 ->> 'unit_cost')::numeric),
-  10000, 'purpose_issue_get shows unit_cost 10000 to cost_controller'
+  10000::numeric, 'purpose_issue_get shows unit_cost 10000 to cost_controller'
 );
-select public._t030_as('d0300000-0000-4000-8000-000000000a02');
+select public._t030_as('d0300000-0000-4000-8000-000000000a11');
 select ok(
   (select (public.purpose_issue_get(
     (select id from t030_ctx where key = 'pi1')
@@ -755,7 +757,7 @@ select ok(
 
 select public._t030_as('d0300000-0000-4000-8000-000000000a02');
 insert into t030_resp values ('w1', public.waste_save_draft(
-  '{"property_id": "d0300000-0000-4000-8000-000000000201", "warehouse_id": "d0300000-0000-4000-8000-000000000301", "reason_code": "expired", "lines": [{"item_id": "d0300000-0000-4000-8000-000000000503", "qty": 3, "uom": "kg"}]}'::jsonb
+  '{"property_id": "d0300000-0000-4000-8000-000000000201", "warehouse_id": "d0300000-0000-4000-8000-000000000301", "reason_code": "expired", "lines": [{"item_id": "d0300000-0000-4000-8000-000000000503", "qty_stock": 3}]}'::jsonb
 ));
 select ok(
   (select (resp ->> 'ok')::boolean from t030_resp where key = 'w1'),
@@ -777,7 +779,7 @@ insert into t030_resp values ('w1b', public.waste_save_draft(
     'warehouse_id', 'd0300000-0000-4000-8000-000000000301',
     'reason_code', 'expired',
     'photo_ids', jsonb_build_array('d0300000-0000-4000-8000-000000000904'),
-    'lines', jsonb_build_array(jsonb_build_object('item_id', 'd0300000-0000-4000-8000-000000000503', 'qty', 3, 'uom', 'kg'))
+    'lines', jsonb_build_array(jsonb_build_object('item_id', 'd0300000-0000-4000-8000-000000000503', 'qty_stock', 3))
   ))
 ));
 select ok(
@@ -790,7 +792,7 @@ insert into t030_resp values ('w1sub', public.waste_submit(
 ));
 select is(
   (select (resp ->> 'total_value')::numeric from t030_resp where key = 'w1sub'),
-  15000, 'waste_submit values W1 at 3kg x 5000 = 15000'
+  15000::numeric, 'waste_submit values W1 at 3kg x 5000 = 15000'
 );
 select is(
   (select (resp ->> 'steps')::integer from t030_resp where key = 'w1sub'),
@@ -823,19 +825,19 @@ select is(
    where warehouse_id = 'd0300000-0000-4000-8000-000000000301'
      and item_id = 'd0300000-0000-4000-8000-000000000503'
      and lot_id is null),
-  37, 'waste: main MUOI balance 40 -> 37'
+  37::numeric, 'waste: main MUOI balance 40 -> 37'
 );
 select public._t030_as('d0300000-0000-4000-8000-000000000a03');
 select is(
   (select (public.waste_get(
     (select id from t030_ctx where key = 'w1')
   ) -> 'lines' -> 0 ->> 'unit_cost')::numeric),
-  5000, 'waste_get shows line unit_cost 5000 to cost_controller'
+  5000::numeric, 'waste_get shows line unit_cost 5000 to cost_controller'
 );
 
 select public._t030_as('d0300000-0000-4000-8000-000000000a02');
 insert into t030_resp values ('w2', public.waste_save_draft(
-  '{"property_id": "d0300000-0000-4000-8000-000000000201", "warehouse_id": "d0300000-0000-4000-8000-000000000301", "reason_code": "spoiled_storage", "photo_ids": ["d0300000-0000-4000-8000-000000000904"], "lines": [{"item_id": "d0300000-0000-4000-8000-000000000501", "qty": 150, "uom": "kg"}]}'::jsonb
+  '{"property_id": "d0300000-0000-4000-8000-000000000201", "warehouse_id": "d0300000-0000-4000-8000-000000000301", "reason_code": "spoiled_storage", "photo_ids": ["d0300000-0000-4000-8000-000000000904"], "lines": [{"item_id": "d0300000-0000-4000-8000-000000000501", "qty_stock": 150}]}'::jsonb
 ));
 insert into t030_ctx values ('w2', (select (resp ->> 'id')::uuid from t030_resp where key = 'w2'));
 insert into t030_resp values ('w2sub', public.waste_submit(
@@ -851,7 +853,7 @@ select is(
   (select count(*) from public.alerts
    where property_id = 'd0300000-0000-4000-8000-000000000201'
      and code = 'WASTE_LARGE'),
-  1, 'waste_submit over threshold creates WASTE_LARGE alert'
+  1::bigint, 'waste_submit over threshold creates WASTE_LARGE alert'
 );
 select public._t030_as('d0300000-0000-4000-8000-000000000a03');
 insert into t030_resp values ('w2dec1', public.waste_decide(
@@ -881,12 +883,12 @@ select is(
    where warehouse_id = 'd0300000-0000-4000-8000-000000000301'
      and item_id = 'd0300000-0000-4000-8000-000000000501'
      and lot_id is null),
-  38, 'waste: main GAO balance 188 -> 38 after W2'
+  38::numeric, 'waste: main GAO balance 188 -> 38 after W2'
 );
 
 select public._t030_as('d0300000-0000-4000-8000-000000000a02');
 insert into t030_resp values ('w3', public.waste_save_draft(
-  '{"property_id": "d0300000-0000-4000-8000-000000000201", "warehouse_id": "d0300000-0000-4000-8000-000000000301", "reason_code": "broken", "photo_ids": ["d0300000-0000-4000-8000-000000000904"], "lines": [{"item_id": "d0300000-0000-4000-8000-000000000503", "qty": 1, "uom": "kg"}]}'::jsonb
+  '{"property_id": "d0300000-0000-4000-8000-000000000201", "warehouse_id": "d0300000-0000-4000-8000-000000000301", "reason_code": "broken", "photo_ids": ["d0300000-0000-4000-8000-000000000904"], "lines": [{"item_id": "d0300000-0000-4000-8000-000000000503", "qty_stock": 1}]}'::jsonb
 ));
 insert into t030_resp values ('w3can', public.waste_cancel(
   'd0300000-0000-4000-8000-000000000201',
@@ -898,7 +900,7 @@ select is(
   'cancelled', 'waste_cancel cancels draft W3'
 );
 insert into t030_resp values ('w4', public.waste_save_draft(
-  '{"property_id": "d0300000-0000-4000-8000-000000000201", "warehouse_id": "d0300000-0000-4000-8000-000000000301", "reason_code": "guest_return", "photo_ids": ["d0300000-0000-4000-8000-000000000904"], "lines": [{"item_id": "d0300000-0000-4000-8000-000000000503", "qty": 1, "uom": "kg"}]}'::jsonb
+  '{"property_id": "d0300000-0000-4000-8000-000000000201", "warehouse_id": "d0300000-0000-4000-8000-000000000301", "reason_code": "guest_return", "photo_ids": ["d0300000-0000-4000-8000-000000000904"], "lines": [{"item_id": "d0300000-0000-4000-8000-000000000503", "qty_stock": 1}]}'::jsonb
 ));
 insert into t030_ctx values ('w4', (select (resp ->> 'id')::uuid from t030_resp where key = 'w4'));
 select public.waste_submit(
@@ -925,9 +927,9 @@ select is(
   (select (public.waste_get(
     (select id from t030_ctx where key = 'w1')
   ) ->> 'total_value')::numeric),
-  15000, 'waste_get shows total_value 15000 to cost_controller'
+  15000::numeric, 'waste_get shows total_value 15000 to cost_controller'
 );
-select public._t030_as('d0300000-0000-4000-8000-000000000a02');
+select public._t030_as('d0300000-0000-4000-8000-000000000a11');
 select ok(
   (select (public.waste_get(
     (select id from t030_ctx where key = 'w1')
@@ -974,10 +976,10 @@ select public.requisition_submit(
 
 reset role;
 update public.items
-set status = 'merged', merged_into_item_id = 'd0300000-0000-4000-8000-000000000501'
+set status = 'merged', merged_into_id = 'd0300000-0000-4000-8000-000000000501'
 where id = 'd0300000-0000-4000-8000-000000000504';
 update public.items
-set status = 'merged', merged_into_item_id = 'd0300000-0000-4000-8000-000000000501'
+set status = 'merged', merged_into_id = 'd0300000-0000-4000-8000-000000000501'
 where id = 'd0300000-0000-4000-8000-000000000505';
 set local role authenticated;
 
@@ -1001,13 +1003,13 @@ select is(
    where warehouse_id = 'd0300000-0000-4000-8000-000000000301'
      and item_id = 'd0300000-0000-4000-8000-000000000501'
      and lot_id is null),
-  38, 'final: main GAO balance 38'
+  38::numeric, 'final: main GAO balance 38'
 );
 select is(
   (select qty_on_hand from public.item_costs
    where legal_entity_id = 'd0300000-0000-4000-8000-000000000101'
      and item_id = 'd0300000-0000-4000-8000-000000000501'),
-  50, 'final: entity GAO qty_on_hand 50 (200 - 2 purpose issue + 2 reversal - 150 waste)'
+  50::numeric, 'final: entity GAO qty_on_hand 50 (200 - 2 purpose issue + 2 reversal - 150 waste)'
 );
 
 select * from finish();
