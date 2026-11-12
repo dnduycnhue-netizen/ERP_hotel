@@ -13,6 +13,26 @@ set local search_path = public, extensions;
 
 select plan(35);
 
+-- Baseline truoc fixture: so quan tri chuoi da co tren DB. Production co
+-- tai khoan Duy/owner giu sys_admin cap chuoi nen baseline co the > 0;
+-- test 1/10/14/26/27 phai cong baseline thay vi hard-code 2 (app dung theo
+-- spec: guard ERR_LAST_ADMIN chi chan khi tong <= 2). Tien le admin_relax
+-- (commit 2b992d2): test 10/12 baseline-aware.
+create temp table pg_tap_admin_users_baseline as
+select public.admin_count() as chain_admins;
+
+-- Bang tam giu ket qua cac probe thu-cham-guard (revoke/khoa/deny) chay
+-- duoi role authenticated: DO block bat exception, ghi 'OK' hoac message
+-- loi vao day de assert sau. Dung DO block thay vi ham pg_temp nhu
+-- admin_relax (co che DO + bang tam da chung minh o T-023/T-026, tranh
+-- rui ro goi ham pg_temp duoi SET ROLE chua kiem chung).
+create temp table pg_tap_admin_users_probe (key text primary key, result text);
+
+-- Hai bang tam tao duoi role postgres, doc/ghi o test 1/10/14/26/27 duoi
+-- role authenticated -> cap quyen truoc khi doi role (khong thi 42501,
+-- bay da can T-043/C1/T-040/admin_relax).
+grant all on pg_tap_admin_users_baseline, pg_tap_admin_users_probe to authenticated;
+
 insert into public.organizations (id, name)
 values ('00000000-0000-4000-8000-000000000001', 'pgTAP organization')
 on conflict (id) do nothing;
@@ -105,8 +125,8 @@ set local role authenticated;
 -- 1. Đếm quản trị chuỗi.
 select is(
   (select public.admin_count()),
-  2,
-  'admin_count counts the two chain admins'
+  (select chain_admins from pg_tap_admin_users_baseline) + 2,
+  'admin_count counts baseline plus the two fixture chain admins'
 );
 
 -- 2. Kiểm tra quyền theo người dùng cụ thể.
@@ -232,19 +252,43 @@ select throws_ok(
   'revoking your own role raises ERR_SELF_GRANT'
 );
 
--- 10. Thu hồi lần gán quản trị cuối cùng bị chặn.
-select throws_ok(
-  $$select public.admin_user_revoke_role(
-    (
-      select upr.id from public.user_property_roles upr
-      where upr.user_id = '00000000-0000-4000-8000-000000000a12'
-        and upr.role_id = '00000000-0000-4000-8000-000000000517'
-    ),
-    'pgTAP: last admin revoke must fail'
-  )$$,
-  'P0001',
-  'ERR_LAST_ADMIN',
-  'revoking the second admin assignment raises ERR_LAST_ADMIN'
+-- 10. Thu hồi lần gán quản trị cuối cùng bị chặn — nhưng guard chỉ nổ
+-- khi tổng quản trị chuỗi <= 2 (admin_require_not_last_admin). Production
+-- đã có quản trị chuỗi ngoài fixture nên kỳ vọng phụ thuộc baseline:
+-- baseline 0 -> ERR_LAST_ADMIN; baseline > 0 -> thu hồi thành công, gán
+-- lại ngay để các test sau vẫn thấy đủ quản trị fixture.
+do $$
+declare
+  v_assignment uuid;
+  v_result text;
+begin
+  select upr.id into v_assignment
+  from public.user_property_roles upr
+  where upr.user_id = '00000000-0000-4000-8000-000000000a12'
+    and upr.role_id = '00000000-0000-4000-8000-000000000517';
+  begin
+    perform public.admin_user_revoke_role(v_assignment, 'pgTAP: last admin revoke must fail');
+    v_result := 'OK';
+  exception
+    when others then
+      v_result := sqlerrm;
+  end;
+  if v_result = 'OK' then
+    perform public.admin_user_assign_role(
+      '00000000-0000-4000-8000-000000000a12',
+      '00000000-0000-4000-8000-000000000517',
+      null
+    );
+  end if;
+  insert into pg_tap_admin_users_probe values ('revoke_a12', v_result);
+end $$;
+select is(
+  (select result from pg_tap_admin_users_probe where key = 'revoke_a12'),
+  case
+    when (select chain_admins from pg_tap_admin_users_baseline) = 0 then 'ERR_LAST_ADMIN'
+    else 'OK'
+  end,
+  'revoking the second admin assignment raises ERR_LAST_ADMIN only when it would leave fewer than two chain admins'
 );
 
 -- 11. Người không có quyền quản trị không gọi được RPC.
@@ -305,14 +349,35 @@ select throws_ok(
   'a PIN shorter than 4 digits raises ERR_INVALID_PIN'
 );
 
--- 14. Khóa quản trị cuối cùng bị chặn.
-select throws_ok(
-  $$select public.admin_user_set_active(
-    '00000000-0000-4000-8000-000000000a12', false
-  )$$,
-  'P0001',
-  'ERR_LAST_ADMIN',
-  'locking the second admin raises ERR_LAST_ADMIN'
+-- 14. Khóa quản trị cuối cùng bị chặn — guard như test 10: chỉ nổ khi
+-- tổng <= 2; baseline > 0 -> khóa thành công, mở lại ngay.
+do $$
+declare
+  v_result text;
+begin
+  begin
+    perform public.admin_user_set_active(
+      '00000000-0000-4000-8000-000000000a12', false, 'pgTAP: last admin lock must fail'
+    );
+    v_result := 'OK';
+  exception
+    when others then
+      v_result := sqlerrm;
+  end;
+  if v_result = 'OK' then
+    perform public.admin_user_set_active(
+      '00000000-0000-4000-8000-000000000a12', true, 'pgTAP: restore after last-admin probe'
+    );
+  end if;
+  insert into pg_tap_admin_users_probe values ('lock_a12', v_result);
+end $$;
+select is(
+  (select result from pg_tap_admin_users_probe where key = 'lock_a12'),
+  case
+    when (select chain_admins from pg_tap_admin_users_baseline) = 0 then 'ERR_LAST_ADMIN'
+    else 'OK'
+  end,
+  'locking the second admin raises ERR_LAST_ADMIN only when it would leave fewer than two chain admins'
 );
 
 -- 15. Tự khóa chính mình bị chặn.
@@ -468,26 +533,53 @@ select throws_ok(
   'deactivating sys_admin raises ERR_SYSTEM_ROLE'
 );
 
--- 26. Chặn quyền quản trị cấp chuỗi của quản trị cuối bị chặn.
-select throws_ok(
-  $$select public.admin_permission_override_set(
-    '00000000-0000-4000-8000-000000000a12',
-    null,
-    'admin.users.manage',
-    'deny',
-    null,
-    'pgTAP: deny last admin must fail'
-  )$$,
-  'P0001',
-  'ERR_LAST_ADMIN',
-  'denying a chain admin permission of the second admin raises ERR_LAST_ADMIN'
+-- 26. Chặn quyền quản trị cấp chuỗi của quản trị cuối bị chặn — guard như
+-- test 10: chỉ nổ khi tổng <= 2; baseline > 0 -> deny thành công, đặt lại
+-- 'allow' ngay để a12 giữ quyền cho test 27.
+do $$
+declare
+  v_result text;
+begin
+  begin
+    perform public.admin_permission_override_set(
+      '00000000-0000-4000-8000-000000000a12',
+      null,
+      'admin.users.manage',
+      'deny',
+      null,
+      'pgTAP: deny last admin must fail'
+    );
+    v_result := 'OK';
+  exception
+    when others then
+      v_result := sqlerrm;
+  end;
+  if v_result = 'OK' then
+    perform public.admin_permission_override_set(
+      '00000000-0000-4000-8000-000000000a12',
+      null,
+      'admin.users.manage',
+      'allow',
+      null,
+      'pgTAP: restore after last-admin probe'
+    );
+  end if;
+  insert into pg_tap_admin_users_probe values ('deny_a12', v_result);
+end $$;
+select is(
+  (select result from pg_tap_admin_users_probe where key = 'deny_a12'),
+  case
+    when (select chain_admins from pg_tap_admin_users_baseline) = 0 then 'ERR_LAST_ADMIN'
+    else 'OK'
+  end,
+  'denying a chain admin permission of the second admin raises ERR_LAST_ADMIN only when it would leave fewer than two chain admins'
 );
 
 -- 27. Số quản trị không đổi sau các thao tác bị chặn.
 select is(
   (select public.admin_count()),
-  2,
-  'admin_count is still 2 after the blocked operations'
+  (select chain_admins from pg_tap_admin_users_baseline) + 2,
+  'admin_count is still baseline + 2 after the blocked operations'
 );
 
 select ok(num_failed() = 0, 'all preceding pgTAP assertions passed');
