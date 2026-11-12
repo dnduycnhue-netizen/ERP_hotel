@@ -77,7 +77,7 @@ export default async function SalesPage({
             type="date"
             name="from"
             defaultValue={from}
-            className="h-9 rounded-lg border border-border bg-background px-2.5"
+            className="h-9 rounded-md border bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
           />
         </label>
         <label className="space-y-1 text-sm">
@@ -86,12 +86,12 @@ export default async function SalesPage({
             type="date"
             name="to"
             defaultValue={to}
-            className="h-9 rounded-lg border border-border bg-background px-2.5"
+            className="h-9 rounded-md border bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
           />
         </label>
         <button
           type="submit"
-          className="inline-flex h-9 items-center justify-center rounded-lg border border-border bg-background px-3 text-sm font-medium hover:bg-muted"
+          className="inline-flex h-9 items-center justify-center rounded-md border bg-background px-3 text-sm font-medium outline-none transition-colors hover:bg-accent focus-visible:ring-2 focus-visible:ring-brand/40"
         >
           {vi.reports.applyFilter}
         </button>
