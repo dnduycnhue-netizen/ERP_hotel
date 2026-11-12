@@ -114,6 +114,7 @@ insert into public.role_permissions (role_id, permission_code) values
   ('d0200000-0200-4000-8000-000000000601', 'po.view_price'),
   ('d0200000-0200-4000-8000-000000000601', 'po.close'),
   ('d0200000-0200-4000-8000-000000000601', 'item.temp.create'),
+  ('d0200000-0200-4000-8000-000000000601', 'item.view'),
   ('d0200000-0200-4000-8000-000000000602', 'pr.create'),
   ('d0200000-0200-4000-8000-000000000602', 'pr.approve'),
   ('d0200000-0200-4000-8000-000000000603', 'po.approve'),
@@ -362,9 +363,14 @@ select lives_ok(
   'Purchaser can create PO from approved PR'
 );
 insert into t020_ctx(key, id)
-select 'po_30m', id from public.purchase_orders
-where status = 'draft' and created_by = 'd0200000-0200-4000-8000-000000000a07'
-order by created_at desc limit 1;
+select 'po_30m', po.id from public.purchase_orders po
+where po.status = 'draft' and po.created_by = 'd0200000-0200-4000-8000-000000000a07'
+  and exists (
+    select 1 from public.purchase_order_lines pol
+    join public.purchase_request_lines prl on prl.id = pol.pr_line_id
+    where pol.po_id = po.id
+      and prl.pr_id = (select id from t020_ctx where key = 'pr_main')
+  );
 select is(
   (select price_source from public.purchase_order_lines where po_id = (select id from t020_ctx where key = 'po_30m')),
   'agreement', 'PO line price source is agreement'
@@ -530,9 +536,14 @@ select lives_ok(
   'Setup: u1 creates PO2 from PR2'
 );
 insert into t020_ctx(key, id)
-select 'po_2', id from public.purchase_orders
-where status = 'draft' and created_by = 'd0200000-0200-4000-8000-000000000a01'
-order by created_at desc limit 1;
+select 'po_2', po.id from public.purchase_orders po
+where po.status = 'draft' and po.created_by = 'd0200000-0200-4000-8000-000000000a01'
+  and exists (
+    select 1 from public.purchase_order_lines pol
+    join public.purchase_request_lines prl on prl.id = pol.pr_line_id
+    where pol.po_id = po.id
+      and prl.pr_id = (select id from t020_ctx where key = 'pr_2')
+  );
 select throws_ok(
   $q$select public.po_save_draft(
     'd0200000-0200-4000-8000-000000000201',
@@ -583,9 +594,14 @@ select lives_ok(
   'Setup: u1 creates manual PO from PR manual'
 );
 insert into t020_ctx(key, id)
-select 'po_manual', id from public.purchase_orders
-where status = 'draft' and created_by = 'd0200000-0200-4000-8000-000000000a01'
-order by created_at desc limit 1;
+select 'po_manual', po.id from public.purchase_orders po
+where po.status = 'draft' and po.created_by = 'd0200000-0200-4000-8000-000000000a01'
+  and exists (
+    select 1 from public.purchase_order_lines pol
+    join public.purchase_request_lines prl on prl.id = pol.pr_line_id
+    where pol.po_id = po.id
+      and prl.pr_id = (select id from t020_ctx where key = 'pr_manual')
+  );
 select is(
   (select price_source from public.purchase_order_lines where po_id = (select id from t020_ctx where key = 'po_manual')),
   'manual', 'Line without agreement/ceiling has price_source manual'
@@ -669,9 +685,14 @@ select lives_ok(
   'Setup: u1 creates over-ceiling PO from PR over-ceiling'
 );
 insert into t020_ctx(key, id)
-select 'po_over', id from public.purchase_orders
-where status = 'draft' and created_by = 'd0200000-0200-4000-8000-000000000a01'
-order by created_at desc limit 1;
+select 'po_over', po.id from public.purchase_orders po
+where po.status = 'draft' and po.created_by = 'd0200000-0200-4000-8000-000000000a01'
+  and exists (
+    select 1 from public.purchase_order_lines pol
+    join public.purchase_request_lines prl on prl.id = pol.pr_line_id
+    where pol.po_id = po.id
+      and prl.pr_id = (select id from t020_ctx where key = 'pr_over')
+  );
 select is(
   (select over_ceiling from public.purchase_order_lines where po_id = (select id from t020_ctx where key = 'po_over')),
   true, 'Agreement price above ceiling flags over_ceiling'
@@ -862,9 +883,14 @@ select lives_ok(
   'Setup: u1 creates PO delegation (10M)'
 );
 insert into t020_ctx(key, id)
-select 'po_deleg', id from public.purchase_orders
-where status = 'draft' and created_by = 'd0200000-0200-4000-8000-000000000a01'
-order by created_at desc limit 1;
+select 'po_deleg', po.id from public.purchase_orders po
+where po.status = 'draft' and po.created_by = 'd0200000-0200-4000-8000-000000000a01'
+  and exists (
+    select 1 from public.purchase_order_lines pol
+    join public.purchase_request_lines prl on prl.id = pol.pr_line_id
+    where pol.po_id = po.id
+      and prl.pr_id = (select id from t020_ctx where key = 'pr_deleg')
+  );
 select lives_ok(
   $q$select public.po_submit('d0200000-0200-4000-8000-000000000201', (select id from t020_ctx where key = 'po_deleg'))$q$,
   'Setup: u1 submits PO delegation'
@@ -915,9 +941,14 @@ select lives_ok(
   'Setup: u1 creates PO without_cc (10M)'
 );
 insert into t020_ctx(key, id)
-select 'po_nocc', id from public.purchase_orders
-where status = 'draft' and created_by = 'd0200000-0200-4000-8000-000000000a01' and property_id = 'd0200000-0200-4000-8000-000000000202'
-order by created_at desc limit 1;
+select 'po_nocc', po.id from public.purchase_orders po
+where po.status = 'draft' and po.created_by = 'd0200000-0200-4000-8000-000000000a01' and po.property_id = 'd0200000-0200-4000-8000-000000000202'
+  and exists (
+    select 1 from public.purchase_order_lines pol
+    join public.purchase_request_lines prl on prl.id = pol.pr_line_id
+    where pol.po_id = po.id
+      and prl.pr_id = (select id from t020_ctx where key = 'pr_nocc')
+  );
 select lives_ok(
   $q$select public.po_submit('d0200000-0200-4000-8000-000000000202', (select id from t020_ctx where key = 'po_nocc'))$q$,
   'Setup: u1 submits PO without_cc'
@@ -968,9 +999,14 @@ select lives_ok(
   'Setup: u1 creates PO cancel flow from PR cancel flow'
 );
 insert into t020_ctx(key, id)
-select 'po_cancel', id from public.purchase_orders
-where status = 'draft' and created_by = 'd0200000-0200-4000-8000-000000000a01'
-order by created_at desc limit 1;
+select 'po_cancel', po.id from public.purchase_orders po
+where po.status = 'draft' and po.created_by = 'd0200000-0200-4000-8000-000000000a01'
+  and exists (
+    select 1 from public.purchase_order_lines pol
+    join public.purchase_request_lines prl on prl.id = pol.pr_line_id
+    where pol.po_id = po.id
+      and prl.pr_id = (select id from t020_ctx where key = 'pr_cancel')
+  );
 select is(
   (select status from public.purchase_requests where id = (select id from t020_ctx where key = 'pr_cancel')),
   'converted', 'PR is converted before cancel'
@@ -1031,6 +1067,9 @@ select lives_ok(
   )$q$,
   'Cost controller merges temp item into real item'
 );
+-- Doc dong PR duoi quyen u1 (co pr.create): u3 cost_controller khong co
+-- quyen doc PR (RLS purchase_request_lines) nen doc duoi u3 tra NULL.
+select public._t020_as('d0200000-0200-4000-8000-000000000a01');
 select is(
   (select item_id from public.purchase_request_lines where pr_id = (select id from t020_ctx where key = 'pr_tmp')),
   'd0200000-0200-4000-8000-000000000501'::uuid,
