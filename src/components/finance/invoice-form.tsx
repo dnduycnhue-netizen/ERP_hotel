@@ -199,7 +199,7 @@ export function InvoiceForm({
             value={symbol}
             onChange={(e) => setSymbol(e.target.value)}
             className="mt-1 w-full rounded-md border bg-background px-3 py-2 text-sm"
-            placeholder="VD: C25TAA"
+            placeholder={`${vi.common.examplePrefix} C25TAA`}
           />
         </label>
         <label className="block text-sm">
@@ -208,7 +208,7 @@ export function InvoiceForm({
             value={no}
             onChange={(e) => setNo(e.target.value)}
             className="mt-1 w-full rounded-md border bg-background px-3 py-2 text-sm"
-            placeholder="VD: 0000123"
+            placeholder={`${vi.common.examplePrefix} 0000123`}
           />
         </label>
         <label className="block text-sm">

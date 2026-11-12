@@ -1,5 +1,7 @@
 import { read, utils, writeFile, type WorkBook } from "xlsx";
 
+import { vi } from "@/i18n/vi";
+
 /**
  * Doc/ghi file .xlsx phia client (T-014). Chi parse thanh JSON tho;
  * moi logic nghiep vu (chuan hoa, validate, ghi) nam trong SQL.
@@ -111,21 +113,22 @@ export function downloadResultReport(
   rows: ImportResultRow[],
 ): void {
   const wb = utils.book_new();
+  const t = vi.master.import.report;
   const summarySheet = utils.json_to_sheet([
-    { "Chỉ tiêu": "Tạo mới", "Số lượng": summary.created },
-    { "Chỉ tiêu": "Bỏ qua", "Số lượng": summary.skipped },
-    { "Chỉ tiêu": "Gộp", "Số lượng": summary.merged },
+    { [t.metric]: t.created, [t.count]: summary.created },
+    { [t.metric]: t.skipped, [t.count]: summary.skipped },
+    { [t.metric]: t.merged, [t.count]: summary.merged },
   ]);
-  utils.book_append_sheet(wb, summarySheet, "Tóm tắt");
+  utils.book_append_sheet(wb, summarySheet, t.summarySheet);
   const detailSheet = utils.json_to_sheet(
     rows.map((r) => ({
-      Dòng: r.rowNo,
-      Mã: r.code,
-      Tên: r.name,
-      "Trạng thái": r.status,
-      "Vấn đề": r.issues,
+      [t.row]: r.rowNo,
+      [t.code]: r.code,
+      [t.name]: r.name,
+      [t.status]: r.status,
+      [t.issues]: r.issues,
     })),
   );
-  utils.book_append_sheet(wb, detailSheet, "Chi tiết");
+  utils.book_append_sheet(wb, detailSheet, t.detailSheet);
   writeFile(wb, fileName);
 }

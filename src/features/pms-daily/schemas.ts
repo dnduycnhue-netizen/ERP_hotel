@@ -9,8 +9,8 @@ const dateSchema = z
 const statSchema = (label: string) =>
   z
     .number()
-    .int(`${label} phải là số nguyên.`)
-    .nonnegative(`${label} không được âm.`);
+    .int(vi.pmsDaily.validation.integer.replace("{label}", label))
+    .nonnegative(vi.pmsDaily.validation.nonNegative.replace("{label}", label));
 
 /** Lễ tân nhập số liệu vận hành ngày (RPC `pms_daily_upsert`). */
 export const pmsDailyUpsertSchema = z

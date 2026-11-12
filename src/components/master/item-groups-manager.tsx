@@ -206,7 +206,7 @@ export function ItemGroupsManager({
                   required
                   value={codePrefix}
                   onChange={(e) => setCodePrefix(e.target.value)}
-                  placeholder="VD: TP, DU, AMN"
+                  placeholder={`${vi.common.examplePrefix} TP, DU, AMN`}
                   className="mt-1 h-9 w-full rounded-md border bg-background px-3 text-sm"
                 />
               </div>

@@ -173,7 +173,7 @@ export function ContractDetail({
                         ? ` · ★ ${s.acceptance.rating}/5`
                         : ""}
                       {s.acceptance.photo_ids.length > 0
-                        ? ` · ${s.acceptance.photo_ids.length} ảnh`
+                        ? ` · ${vi.service.photoCount.replace("{count}", String(s.acceptance.photo_ids.length))}`
                         : ""}
                     </p>
                     {s.acceptance.note ? (

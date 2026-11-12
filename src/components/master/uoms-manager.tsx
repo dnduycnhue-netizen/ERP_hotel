@@ -145,7 +145,7 @@ export function UomsManager({
                   disabled={Boolean(editingUom)}
                   value={code}
                   onChange={(e) => setCode(e.target.value)}
-                  placeholder="VD: thung, hop, lon"
+                  placeholder={`${vi.common.examplePrefix} thung, hop, lon`}
                   className="mt-1 h-9 w-full rounded-md border bg-background px-3 text-sm font-mono disabled:opacity-60"
                 />
               </div>

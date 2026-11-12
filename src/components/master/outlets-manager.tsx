@@ -243,7 +243,7 @@ export function OutletsManager({
                   required
                   value={code}
                   onChange={(e) => setCode(e.target.value)}
-                  placeholder="VD: KITCHEN, BAR, SPA"
+                  placeholder={`${vi.common.examplePrefix} KITCHEN, BAR, SPA`}
                   className="mt-1 h-9 w-full rounded-md border bg-background px-3 text-sm font-mono"
                 />
               </div>
@@ -356,7 +356,7 @@ export function OutletsManager({
                   required
                   value={typeCode}
                   onChange={(e) => setTypeCode(e.target.value)}
-                  placeholder="VD: KITCHEN, BAR, REST"
+                  placeholder={`${vi.common.examplePrefix} KITCHEN, BAR, REST`}
                   className="mt-1 h-9 w-full rounded-md border bg-background px-3 text-sm font-mono"
                 />
               </div>
