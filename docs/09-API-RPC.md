@@ -71,7 +71,7 @@ Các RPC danh mục dưới đây thuộc các task sau, chưa được triển 
 | `purpose_issue_save_draft(p_doc jsonb)` | Tạo/sửa nháp xuất mục đích: `purpose_code` trong 7 giá trị; `cost_center_id`/`expense_category_id` bắt buộc ở lúc post, không bắt buộc ở nháp; quyền `purpose_issue.post` |
 | `purpose_issue_cancel(p_property_id, p_id, p_reason)` | Chỉ `draft` → `cancelled`; lý do bắt buộc; quyền `purpose_issue.post` |
 | `purpose_issue_reverse(p_id, p_property_id, p_reason)` | `posted` → `reversed`; ghi move `reversal` (`reverses_move_id`); đảo 2 lần → `ERR_INVALID_STATUS`; quyền mới `purpose_issue.reverse` (gm, owner) |
-| `purpose_issue_list(p_property_id, p_status, p_search, p_limit, p_offset)` / `purpose_issue_get(p_id)` | Danh sách/chi tiết xuất mục đích; `unit_cost`/`line_amount` chỉ khi có `stock.view_value`; quyền `purpose_issue.post` hoặc `purpose_issue.reverse` |
+| `purpose_issue_list(p_property_id, p_status, p_search, p_limit, p_offset)` / `purpose_issue_get(p_id)` | Danh sách/chi tiết xuất mục đích; `unit_cost`/`line_amount` chỉ khi có `stock.view_value`; quyền `purpose_issue.post` hoặc `purpose_issue.reverse` hoặc `stock.view_value` |
 | `waste_save_draft(p_doc jsonb)` | Tạo/sửa nháp hủy hàng: `photo_ids` phải là attachment đã đăng ký; quyền `waste.propose` |
 | `waste_cancel(p_property_id, p_id, p_reason)` | `draft`/`submitted` → `cancelled`; lý do bắt buộc; quyền `waste.propose` |
 | `waste_list(p_property_id, p_status, p_search, p_limit, p_offset)` / `waste_get(p_id)` | Danh sách/chi tiết hủy hàng; `total_value`/`unit_cost` chỉ khi có `stock.view_value`; quyền `waste.propose` hoặc `waste.approve` hoặc `waste.approve.large` |
