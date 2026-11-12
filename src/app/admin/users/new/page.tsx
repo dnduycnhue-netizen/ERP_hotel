@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { CreateUserForm } from "@/components/admin/create-user-form";
+import { PageHeader } from "@/components/shell/page-header";
 import { hasChainPerm, listRoles } from "@/features/admin";
 import { vi } from "@/i18n/vi";
 import { listAccessibleProperties } from "@/lib/supabase/access";
@@ -19,14 +20,10 @@ export default async function CreateUserPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">
-          {vi.admin.createUserTitle}
-        </h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          {vi.admin.createUserDescription}
-        </p>
-      </div>
+      <PageHeader
+        title={vi.admin.createUserTitle}
+        description={vi.admin.createUserDescription}
+      />
       <div className="max-w-2xl rounded-lg border bg-card p-6">
         <CreateUserForm
           roles={roles.filter((role) => role.active)}
