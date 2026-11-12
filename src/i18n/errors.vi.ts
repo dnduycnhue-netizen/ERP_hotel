@@ -138,6 +138,10 @@ export const rpcErrorMessages: Record<string, string> = {
     "Gửi thông báo quá thời gian chờ. Hệ thống sẽ thử lại.",
   ERR_COUNT_INDEPENDENT:
     "Đợt kiểm kê cần ít nhất một người đếm độc lập, không phải người nhập hoặc xuất kho tại kho này.",
+  ERR_SOD_INVOICE_GR:
+    "Người nhập hóa đơn không được là người nhận hàng của chính các dòng hóa đơn này. Nhờ người khác nhập hoặc khớp hóa đơn.",
+  ERR_SOD_PAYMENT_APPROVER:
+    "Bạn không được duyệt thanh toán này: bạn đã nhập hóa đơn trong đề nghị, hoặc đã yêu cầu đổi tài khoản ngân hàng của nhà cung cấp trong 30 ngày gần đây. Nhờ người khác duyệt.",
 } as const;
 
 export const rpcErrorFallback =
@@ -164,7 +168,7 @@ export function getRpcErrorMessage(code: string | null | undefined): string {
       ? `Khoảng ngày yêu cầu chứa dữ liệu chưa khóa sổ (${dates}). Hãy khóa sổ kỳ kế toán hoặc ngày nghiệp vụ rồi xuất lại, hoặc thu hẹp khoảng ngày.`
       : rpcErrorMessages.ERR_EXPORT_NOT_LOCKED;
   }
-  if (base.startsWith("ERR_SOD_")) {
+  if (base.startsWith("ERR_SOD_") && !(base in rpcErrorMessages)) {
     return "Thao tác vi phạm quy tắc tách biệt nhiệm vụ: người thực hiện bước trước không được thực hiện bước này.";
   }
   return rpcErrorMessages[base] ?? rpcErrorFallback;
