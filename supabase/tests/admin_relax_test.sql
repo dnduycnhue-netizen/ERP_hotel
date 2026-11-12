@@ -14,6 +14,44 @@ set local search_path = public, extensions;
 
 select plan(13);
 
+-- Baseline trước fixture: số quản trị chuỗi đã có trên DB. Production có
+-- tài khoản Duy/owner giữ sys_admin cấp chuỗi nên baseline có thể > 0;
+-- test 10/12 phải cộng baseline thay vì hard-code 2/3 (app đúng theo
+-- spec: guard ERR_LAST_ADMIN chỉ chặn khi tổng <= 2).
+create temp table pg_tap_admin_relax_baseline as
+select public.admin_count() as chain_admins;
+
+-- Bang tam tao duoi role postgres, doc o dong 262/283 duoi role
+-- authenticated -> cap quyen truoc khi doi role (khong thi 42501).
+grant all on pg_tap_admin_relax_baseline to authenticated;
+
+-- Helper: thử thu hồi 1 lần gán, trả 'OK' hoặc message lỗi (ERR_*).
+-- Thu hồi thành công thì gán lại ngay vai trò chuỗi đó để khôi phục
+-- trạng thái cho các test sau (chỉ xảy ra khi baseline > 0).
+create or replace function pg_temp.pgtap_try_revoke(p_assignment_id uuid, p_reason text)
+returns text
+language plpgsql
+as $$
+declare
+  v_user_id uuid;
+  v_role_id uuid;
+begin
+  select upr.user_id, upr.role_id into v_user_id, v_role_id
+  from public.user_property_roles upr
+  where upr.id = p_assignment_id;
+
+  begin
+    perform public.admin_user_revoke_role(p_assignment_id, p_reason);
+  exception
+    when others then
+      return sqlerrm;
+  end;
+
+  perform public.admin_user_assign_role(v_user_id, v_role_id, null);
+  return 'OK';
+end;
+$$;
+
 insert into public.organizations (id, name)
 values ('00000000-0000-4000-8000-000000000001', 'pgTAP organization')
 on conflict (id) do nothing;
@@ -208,19 +246,27 @@ select throws_ok(
   'deactivating sys_admin still raises ERR_SYSTEM_ROLE'
 );
 
--- 10. Thu hồi lần gán quản trị cuối cùng VẪN bị chặn.
-select throws_ok(
-  $$select public.admin_user_revoke_role(
-    (
-      select upr.id from public.user_property_roles upr
-      where upr.user_id = '00000000-0000-4000-8000-000000000a12'
-        and upr.role_id = '00000000-0000-4000-8000-000000000517'
-    ),
-    'pgTAP: last admin revoke must fail'
-  )$$,
-  'P0001',
-  'ERR_LAST_ADMIN',
-  'revoking the second admin assignment still raises ERR_LAST_ADMIN'
+-- 10. Thu hồi lần gán quản trị cuối cùng VẪN bị chặn — nhưng guard chỉ nổ
+-- khi tổng quản trị chuỗi <= 2 (admin_require_not_last_admin). Production
+-- đã có quản trị chuỗi ngoài fixture nên kỳ vọng phụ thuộc baseline:
+-- baseline 0 -> ERR_LAST_ADMIN; baseline > 0 -> thu hồi thành công ('OK',
+-- helper gán lại ngay để các test sau vẫn thấy đủ quản trị fixture).
+select is(
+  (
+    select pg_temp.pgtap_try_revoke(
+      (
+        select upr.id from public.user_property_roles upr
+        where upr.user_id = '00000000-0000-4000-8000-000000000a12'
+          and upr.role_id = '00000000-0000-4000-8000-000000000517'
+      ),
+      'pgTAP: last admin revoke must fail'
+    )
+  ),
+  case
+    when (select chain_admins from pg_tap_admin_relax_baseline) = 0 then 'ERR_LAST_ADMIN'
+    else 'OK'
+  end,
+  'revoking the second admin assignment raises ERR_LAST_ADMIN only when it would leave fewer than two chain admins'
 );
 
 -- 11. Gán vai trò sys_admin cho người khác được phép.
@@ -235,11 +281,11 @@ select ok(
   'an admin can assign the sys_admin role to another user'
 );
 
--- 12. Số quản trị chuỗi tăng lên 3 sau lần gán trên.
+-- 12. Số quản trị chuỗi tăng lên baseline + 3 sau lần gán trên.
 select is(
   (select public.admin_count()),
-  3,
-  'admin_count is 3 after granting sys_admin to the target user'
+  (select chain_admins from pg_tap_admin_relax_baseline) + 3,
+  'admin_count is baseline + 3 after granting sys_admin to the target user'
 );
 
 select ok(num_failed() = 0, 'all preceding pgTAP assertions passed');
