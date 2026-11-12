@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DataTable,
@@ -489,16 +490,24 @@ export function SuppliersManager({
       />
 
       <div className="flex gap-2 flex-wrap">
-        <input
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder={vi.master.suppliers.searchPlaceholder}
-          className="h-9 flex-1 min-w-52 rounded-md border bg-background px-3 text-sm"
-        />
+        <div className="relative min-w-52 flex-1">
+          <Search
+            className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
+            aria-hidden
+          />
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder={vi.master.suppliers.searchPlaceholder}
+            aria-label={vi.master.suppliers.searchPlaceholder}
+            className="h-9 w-full rounded-md border bg-background pr-3 pl-9 text-sm outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
+          />
+        </div>
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="h-9 rounded-md border bg-background px-3 text-sm"
+          aria-label={vi.master.suppliers.filterAllStatuses}
+          className="h-9 rounded-md border bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
         >
           <option value="">{vi.master.suppliers.filterAllStatuses}</option>
           <option value="pending">{vi.master.suppliers.statusPending}</option>

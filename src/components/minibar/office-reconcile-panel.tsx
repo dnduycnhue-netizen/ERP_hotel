@@ -65,7 +65,7 @@ export function OfficeReconcilePanel({ propertyId }: { propertyId: string }) {
             type="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
-            className="mt-1 rounded-md border bg-background px-3 py-2 text-sm"
+            className="mt-1 h-9 rounded-md border bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
           />
         </label>
         <Button
@@ -87,19 +87,19 @@ export function OfficeReconcilePanel({ propertyId }: { propertyId: string }) {
             <tbody>
               {rows.map((row) => (
                 <tr key={row.label} className="border-t hover:bg-muted/40">
-                  <td className="py-3 pr-3 text-muted-foreground align-middle">
+                  <td className="py-3 px-3 text-muted-foreground align-middle">
                     {row.label}
                   </td>
-                  <td className="py-3 pr-3 text-right font-medium align-middle">
+                  <td className="py-3 px-3 text-right font-medium align-middle">
                     <MoneyText amount={row.value} />
                   </td>
                 </tr>
               ))}
               <tr>
-                <td className="py-3 pr-3 font-semibold align-middle">
+                <td className="py-3 px-3 font-semibold align-middle">
                   {vi.minibar.diff}
                 </td>
-                <td className="py-3 pr-3 text-right font-semibold align-middle">
+                <td className="py-3 px-3 text-right font-semibold align-middle">
                   <MoneyText amount={Number(result.diff)} />
                 </td>
               </tr>

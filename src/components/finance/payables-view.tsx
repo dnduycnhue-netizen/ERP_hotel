@@ -64,7 +64,7 @@ export function PayablesView({
           <select
             value={supplierId}
             onChange={(e) => setSupplierId(e.target.value)}
-            className="mt-1 w-full rounded-md border bg-background px-3 py-2 text-sm"
+            className="mt-1 h-9 w-full rounded-md border bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
           >
             <option value="">{vi.common.all}</option>
             {suppliers.map((s) => (

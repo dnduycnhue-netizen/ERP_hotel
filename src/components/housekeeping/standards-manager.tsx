@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Check, Plus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DataTable,
@@ -168,7 +169,12 @@ export function StandardsManager({
       key: "per_guest",
       header: vi.housekeeping.perGuest,
       align: "center",
-      cell: (row) => (row.per_guest ? "✓" : "—"),
+      cell: (row) =>
+        row.per_guest ? (
+          <Check className="mx-auto size-4" aria-label={vi.common.yes} />
+        ) : (
+          "—"
+        ),
     },
     {
       key: "actions",
@@ -216,7 +222,8 @@ export function StandardsManager({
               onClick={startCreate}
               disabled={roomTypes.length === 0 || items.length === 0}
             >
-              + {vi.housekeeping.addStandard}
+              <Plus className="size-4" aria-hidden />
+              {vi.housekeeping.addStandard}
             </Button>
           ) : null
         }
@@ -234,7 +241,7 @@ export function StandardsManager({
             id="filterRoomType"
             value={filterRoomType}
             onChange={(e) => setFilterRoomType(e.target.value)}
-            className="mt-1 h-9 rounded-md border bg-background px-3 text-sm"
+            className="mt-1 h-9 rounded-md border bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
           >
             <option value="">{vi.housekeeping.allRoomTypes}</option>
             {roomTypes.map((rt) => (
@@ -255,7 +262,7 @@ export function StandardsManager({
             id="filterCleanType"
             value={filterCleanType}
             onChange={(e) => setFilterCleanType(e.target.value)}
-            className="mt-1 h-9 rounded-md border bg-background px-3 text-sm"
+            className="mt-1 h-9 rounded-md border bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
           >
             <option value="">{vi.housekeeping.allCleanTypes}</option>
             {CLEAN_TYPES.map((ct) => (
@@ -286,8 +293,9 @@ export function StandardsManager({
                 variant="ghost"
                 size="sm"
                 onClick={() => setFormOpen(false)}
+                aria-label={vi.common.close}
               >
-                ✕
+                <X className="size-4" aria-hidden />
               </Button>
             </div>
 
@@ -311,7 +319,7 @@ export function StandardsManager({
                   disabled={editing !== null}
                   value={roomTypeId}
                   onChange={(e) => setRoomTypeId(e.target.value)}
-                  className="mt-1 h-9 w-full rounded-md border bg-background px-3 text-sm disabled:opacity-60"
+                  className="mt-1 h-9 w-full rounded-md border bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-brand/40 disabled:opacity-60"
                 >
                   {roomTypes.map((rt) => (
                     <option key={rt.id} value={rt.id}>
@@ -336,7 +344,7 @@ export function StandardsManager({
                   onChange={(e) =>
                     setCleanType(e.target.value as RoomCleanType)
                   }
-                  className="mt-1 h-9 w-full rounded-md border bg-background px-3 text-sm disabled:opacity-60"
+                  className="mt-1 h-9 w-full rounded-md border bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-brand/40 disabled:opacity-60"
                 >
                   {CLEAN_TYPES.map((ct) => (
                     <option key={ct} value={ct}>
@@ -359,7 +367,7 @@ export function StandardsManager({
                   disabled={editing !== null}
                   value={itemId}
                   onChange={(e) => setItemId(e.target.value)}
-                  className="mt-1 h-9 w-full rounded-md border bg-background px-3 text-sm disabled:opacity-60"
+                  className="mt-1 h-9 w-full rounded-md border bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-brand/40 disabled:opacity-60"
                 >
                   {items.map((item) => (
                     <option key={item.id} value={item.id}>
@@ -384,7 +392,7 @@ export function StandardsManager({
                   step="0.0001"
                   value={qty}
                   onChange={(e) => setQty(e.target.value)}
-                  className="mt-1 h-9 w-full rounded-md border bg-background px-3 text-sm"
+                  className="mt-1 h-9 w-full rounded-md border bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
                 />
               </div>
 

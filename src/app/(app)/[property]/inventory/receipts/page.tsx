@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Search } from "lucide-react";
 import { EmptyState } from "@/components/common/empty-state";
 import { ErrorState } from "@/components/common/error-state";
 import { listReceiptsAction } from "@/features/receiving/actions";
@@ -77,14 +78,20 @@ export default async function InventoryReceiptsPage({
       <PageHeader title={vi.receiving.listTitle} />
 
       <form method="get" className="flex flex-wrap gap-2">
-        <input
-          type="search"
-          name="search"
-          defaultValue={search}
-          placeholder={vi.receiving.receiptsSearchPlaceholder}
-          aria-label={vi.receiving.receiptsSearchPlaceholder}
-          className="h-9 w-full max-w-sm flex-1 rounded-md border bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
-        />
+        <div className="relative w-full max-w-sm flex-1">
+          <Search
+            className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
+            aria-hidden
+          />
+          <input
+            type="search"
+            name="search"
+            defaultValue={search}
+            placeholder={vi.receiving.receiptsSearchPlaceholder}
+            aria-label={vi.receiving.receiptsSearchPlaceholder}
+            className="h-9 w-full rounded-md border bg-background pr-3 pl-9 text-sm outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
+          />
+        </div>
         {status !== "" ? (
           <input type="hidden" name="status" value={status} />
         ) : null}

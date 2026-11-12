@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DataTable,
@@ -375,6 +376,10 @@ export function ItemsList({
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
         <div className="relative flex-1">
+          <Search
+            className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
+            aria-hidden
+          />
           <input
             type="text"
             value={search}
@@ -383,7 +388,8 @@ export function ItemsList({
               if (e.key === "Enter") applyFilters({ s: search, p: 1 });
             }}
             placeholder={vi.master.items.searchPlaceholder}
-            className="h-9 w-full rounded-md border bg-background px-3 text-sm placeholder:text-muted-foreground"
+            aria-label={vi.master.items.searchPlaceholder}
+            className="h-9 w-full rounded-md border bg-background pr-3 pl-9 text-sm outline-none placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-brand/40"
           />
         </div>
         <div className="w-full sm:w-64">
@@ -393,7 +399,8 @@ export function ItemsList({
               setSelectedGroup(e.target.value);
               applyFilters({ g: e.target.value, p: 1 });
             }}
-            className="h-9 w-full rounded-md border bg-background px-3 text-sm"
+            aria-label={vi.master.items.filterAllGroups}
+            className="h-9 w-full rounded-md border bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
           >
             <option value="">{vi.master.items.filterAllGroups}</option>
             {groups.map((g) => (
@@ -405,8 +412,7 @@ export function ItemsList({
         </div>
         <Button
           variant="outline"
-          size="sm"
-          className="h-9"
+          size="lg"
           onClick={() => applyFilters({ s: search, g: selectedGroup, p: 1 })}
         >
           {vi.common.search}

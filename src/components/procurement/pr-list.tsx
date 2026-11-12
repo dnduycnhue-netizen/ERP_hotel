@@ -218,7 +218,7 @@ export function PrList({
             </option>
           ))}
         </select>
-        <Button variant="outline" onClick={() => applyFilters({})}>
+        <Button variant="outline" size="lg" onClick={() => applyFilters({})}>
           {vi.common.search}
         </Button>
         <ViewToggle value={view} onChange={setView} />

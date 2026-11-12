@@ -32,6 +32,7 @@ export const vi = {
     save: "Lưu",
     remove: "Xóa",
     close: "Đóng",
+    yes: "Có",
     copy: "Sao chép",
     copied: "Đã sao chép",
     back: "Quay lại",

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Search } from "lucide-react";
 import { ErrorState } from "@/components/common/error-state";
 import { ToggleDishButton } from "@/components/restaurant/restaurant-actions";
 import { formatMoney } from "@/components/common/money-text";
@@ -56,7 +57,7 @@ export default async function DishesPage({
           <select
             name="kind"
             defaultValue={kind}
-            className="h-9 rounded-lg border border-border bg-background px-2"
+            className="h-9 rounded-md border bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
           >
             <option value="">{vi.restaurant.allKinds}</option>
             <option value="dish">{vi.restaurant.kindDish}</option>
@@ -68,15 +69,24 @@ export default async function DishesPage({
         </label>
         <label className="space-y-1 text-sm">
           <span className="block font-medium">{vi.restaurant.searchDish}</span>
-          <input
-            name="search"
-            defaultValue={search}
-            className="h-9 w-56 rounded-lg border border-border bg-background px-2.5"
-          />
+          <span className="relative block w-56">
+            <Search
+              className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
+              aria-hidden
+            />
+            <input
+              type="search"
+              name="search"
+              defaultValue={search}
+              placeholder={vi.restaurant.searchDish}
+              aria-label={vi.restaurant.searchDish}
+              className="h-9 w-full rounded-md border bg-background pr-3 pl-9 text-sm outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
+            />
+          </span>
         </label>
         <button
           type="submit"
-          className="inline-flex h-9 items-center justify-center rounded-lg border border-border bg-background px-3 text-sm font-medium hover:bg-muted"
+          className="inline-flex h-9 items-center justify-center rounded-md border bg-background px-3 text-sm font-medium outline-none transition-colors hover:bg-accent focus-visible:ring-2 focus-visible:ring-brand/40"
         >
           {vi.common.search}
         </button>

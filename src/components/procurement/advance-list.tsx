@@ -172,7 +172,8 @@ export function AdvanceList({
         <select
           value={currentStatus}
           onChange={(e) => applyFilters({ status: e.target.value })}
-          className="h-9 rounded-md border bg-background px-3 text-sm"
+          aria-label={vi.procurement.list.filterAllStatuses}
+          className="h-9 rounded-md border bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
         >
           <option value="">{vi.procurement.list.filterAllStatuses}</option>
           {ADVANCE_STATUSES.map((s) => (
@@ -181,12 +182,7 @@ export function AdvanceList({
             </option>
           ))}
         </select>
-        <Button
-          variant="outline"
-          size="sm"
-          className="h-9"
-          onClick={() => applyFilters({})}
-        >
+        <Button variant="outline" size="lg" onClick={() => applyFilters({})}>
           {vi.common.search}
         </Button>
       </div>

@@ -69,7 +69,7 @@ export function ReportFilters({
               type="date"
               value={from}
               onChange={(e) => setFrom(e.target.value)}
-              className="h-9 w-full rounded-md border bg-background px-3"
+              className="h-9 w-full rounded-md border bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
             />
           </label>
           <label className="space-y-1 text-sm">
@@ -78,7 +78,7 @@ export function ReportFilters({
               type="date"
               value={to}
               onChange={(e) => setTo(e.target.value)}
-              className="h-9 w-full rounded-md border bg-background px-3"
+              className="h-9 w-full rounded-md border bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
             />
           </label>
         </>
@@ -90,7 +90,7 @@ export function ReportFilters({
             type="date"
             value={asOf}
             onChange={(e) => setAsOf(e.target.value)}
-            className="h-9 w-full rounded-md border bg-background px-3"
+            className="h-9 w-full rounded-md border bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
           />
         </label>
       )}
@@ -101,7 +101,7 @@ export function ReportFilters({
             type="month"
             value={month}
             onChange={(e) => setMonth(e.target.value)}
-            className="h-9 w-full rounded-md border bg-background px-3"
+            className="h-9 w-full rounded-md border bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
           />
         </label>
       )}
@@ -112,7 +112,7 @@ export function ReportFilters({
             type="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
-            className="h-9 w-full rounded-md border bg-background px-3"
+            className="h-9 w-full rounded-md border bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
           />
         </label>
       )}
@@ -122,7 +122,7 @@ export function ReportFilters({
           <select
             value={warehouseId}
             onChange={(e) => setWarehouseId(e.target.value)}
-            className="h-9 w-full rounded-md border bg-background px-3"
+            className="h-9 w-full rounded-md border bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
           >
             <option value="all">{vi.reports.allWarehouses}</option>
             {warehouses.map((w) => (
@@ -139,7 +139,7 @@ export function ReportFilters({
           <select
             value={supplierId}
             onChange={(e) => setSupplierId(e.target.value)}
-            className="h-9 w-full rounded-md border bg-background px-3"
+            className="h-9 w-full rounded-md border bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
           >
             <option value="all">{vi.reports.allSuppliers}</option>
             {suppliers.map((s) => (
@@ -150,7 +150,9 @@ export function ReportFilters({
           </select>
         </label>
       )}
-      <Button type="submit">{vi.reports.applyFilter}</Button>
+      <Button type="submit" variant="outline" size="lg">
+        {vi.reports.applyFilter}
+      </Button>
     </form>
   );
 }

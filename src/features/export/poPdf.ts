@@ -65,6 +65,9 @@ export function isPoPdfData(value: unknown): value is PoPdfData {
 const MARGIN = 48;
 const PAGE_WIDTH = 595.28; // A4
 const CONTENT_WIDTH = PAGE_WIDTH - MARGIN * 2;
+/** Tim nhan ClickUp (#7B68EE) + nen xam nhat cho dong tieu de bang. */
+const BRAND = "#7B68EE";
+const HEADER_BG = "#F5F5F5";
 const FONT_DIR = path.join(process.cwd(), "src/features/export/fonts");
 
 let cachedFonts: { regular: Buffer; bold: Buffer } | null = null;
@@ -227,21 +230,32 @@ export function buildPoPdf(data: PoPdfData): Promise<Buffer> {
     doc.moveDown(0.4);
   }
 
-  // --- Tieu de + phap nhan ---
+  // --- Tieu de + phap nhan (mau nhan #7B68EE, ten phap nhan dam) ---
   doc
     .font("NotoSans-Bold")
     .fontSize(18)
+    .fillColor(BRAND)
     .text(T.title, MARGIN, doc.y, { align: "center", width: CONTENT_WIDTH });
   doc.moveDown(0.3);
   doc
-    .font("NotoSans")
+    .font("NotoSans-Bold")
     .fontSize(10)
+    .fillColor("#000000")
     .text(
       `${T.entity}: ${data.po.entity_name ?? ""} (${data.po.entity_code ?? ""})`,
       MARGIN,
       doc.y,
       { align: "center", width: CONTENT_WIDTH },
     );
+  doc.moveDown(0.4);
+  doc
+    .moveTo(MARGIN, doc.y)
+    .lineTo(MARGIN + CONTENT_WIDTH, doc.y)
+    .strokeColor(BRAND)
+    .lineWidth(2)
+    .stroke()
+    .strokeColor("#000000")
+    .lineWidth(1);
   doc.moveDown(0.8);
 
   // --- Thong tin chung (2 cot nhan — gia tri) ---
@@ -279,6 +293,8 @@ export function buildPoPdf(data: PoPdfData): Promise<Buffer> {
   // --- Bang dong hang ---
   sectionTitle(T.linesTitle);
   const headerY = doc.y;
+  doc.rect(MARGIN, headerY - 2, CONTENT_WIDTH, 16).fill(HEADER_BG);
+  doc.fillColor("#000000");
   doc.font("NotoSans-Bold").fontSize(10);
   let x = MARGIN;
   for (const col of LINE_COLUMNS) {
