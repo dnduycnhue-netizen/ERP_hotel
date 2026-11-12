@@ -88,8 +88,7 @@ export function AppSidebar({
             href: item.href,
             icon: item.icon,
             active:
-              pathname === item.href ||
-              pathname.startsWith(`${item.href}/`),
+              pathname === item.href || pathname.startsWith(`${item.href}/`),
           })),
         },
       ]
