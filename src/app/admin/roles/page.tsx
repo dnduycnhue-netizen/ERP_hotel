@@ -1,4 +1,5 @@
 import { RoleList } from "@/components/admin/role-list";
+import { PageHeader } from "@/components/shell/page-header";
 import { connection } from "next/server";
 import {
   getAdminOrgId,
@@ -32,14 +33,10 @@ export default async function RolesPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">
-          {vi.admin.rolesTitle}
-        </h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          {vi.admin.rolesDescription}
-        </p>
-      </div>
+      <PageHeader
+        title={vi.admin.rolesTitle}
+        description={vi.admin.rolesDescription}
+      />
       <RoleList
         roles={roles}
         rolePermissions={rolePermissions}
