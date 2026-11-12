@@ -99,3 +99,5 @@ commit `ec4c7be` (sửa Q235), trước toàn bộ thay đổi code của Q241�
 Kiểm tra sau deploy (smoke): `/login` trả 200; đăng nhập `uat.gm@erp.internal` thấy đúng 1 khách sạn
 (TEST47); `uat.storekeeper` gọi `receiving_list_tasks` trên TEST47 được, trên SONHOIAN bị `ERR_FORBIDDEN`;
 `anon` gọi RPC bị 401.
+
+**13/11 (Q249–Q250):** đã áp migration 565000 (màn `/admin/health`) và 566000 (tổng ước tính PO chợ) lên production, deploy lại `main` (merge `4efa1e6c3`), `/login` 200. Q152 minibar offline đã code, chưa kiểm tay trên điện thoại. Q172 chưa code (chờ phương án điều chỉnh giá vốn).
