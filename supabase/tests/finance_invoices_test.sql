@@ -101,6 +101,14 @@ insert into public.user_property_roles (user_id, role_id, property_id) values
   ('d0400000-0000-4000-8000-000000000a06', 'd0400000-0000-4000-8000-000000000601', 'd0400000-0000-4000-8000-000000000201'),
   ('d0400000-0000-4000-8000-000000000a07', 'd0400000-0000-4000-8000-000000000607', 'd0400000-0000-4000-8000-000000000201');
 
+-- Q242: SOD_PAYMENT_APPROVER nay duoc thuc thi. Trong fixture nay a02 (ke toan
+-- truong) vua nhap hoa don inv6 vua duyet de nghi thanh toan chua inv6 (buoc 1
+-- cua pr2) — dung la cai quy tac cam. Khach san nho thuc te van lam vay, nen
+-- cap ngoai le sod_exceptions con han cho a02 (co alert SOD_EXCEPTION_USED).
+-- Hanh vi chan khi KHONG co ngoai le duoc kiem o sod_invoice_gr_payment_approver_test.
+insert into public.sod_exceptions (property_id, user_id, rule_code, reason, valid_to, approved_by) values
+  ('d0400000-0000-4000-8000-000000000201', 'd0400000-0000-4000-8000-000000000a02', 'SOD_PAYMENT_APPROVER', 'Fixture T-040: KTT nhap hoa don va duyet thanh toan (khach san nho)', '2030-12-31', 'd0400000-0000-4000-8000-000000000a03');
+
 -- Tam ung fixture (chen truc tiep, bypass advance guard).
 select set_config('app.advance_guard_bypass', 'on', true);
 insert into public.advances (id, org_id, legal_entity_id, property_id, employee_id, doc_no, amount, purpose, status) values

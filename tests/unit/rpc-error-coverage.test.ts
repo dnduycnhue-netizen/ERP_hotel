@@ -36,3 +36,14 @@ describe("mã lỗi RPC trong migration", () => {
     expect(missing).toEqual([]);
   });
 });
+
+describe("mã lỗi SoD có câu riêng", () => {
+  it("ERR_SOD_INVOICE_GR và ERR_SOD_PAYMENT_APPROVER nói rõ lý do", () => {
+    expect(getRpcErrorMessage("ERR_SOD_INVOICE_GR")).toContain("người nhận hàng");
+    expect(getRpcErrorMessage("ERR_SOD_PAYMENT_APPROVER")).toContain("duyệt thanh toán");
+  });
+
+  it("mã SoD chưa có câu riêng vẫn dùng câu SoD chung", () => {
+    expect(getRpcErrorMessage("ERR_SOD_KHONG_TON_TAI")).toContain("tách biệt nhiệm vụ");
+  });
+});
