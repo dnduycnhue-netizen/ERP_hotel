@@ -276,7 +276,7 @@ select public.receiving_record_line(
   p_gr_id := (select id from t026_ctx where key = 'gr3'),
   p_po_line_id := 'd0260000-0000-4000-8000-000000000c04',
   p_item_id := 'd0260000-0000-4000-8000-000000000501',
-  p_gross := 5, p_tare := 0, p_uom := 'kg',
+  p_gross := 8, p_tare := 0, p_uom := 'kg',
   p_qc := '{"status": "pass"}'::jsonb,
   p_photo_ids := array[(select id from t026_ctx where key = 'att3')]
 );
