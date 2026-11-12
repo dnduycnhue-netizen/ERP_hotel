@@ -49,10 +49,13 @@ mục.
    trạng thái NCC, duyệt yêu cầu đổi tài khoản ngân hàng, tạo mã tạm,
    gộp mã vật tư đã gọi `callMasterRpc` trong cùng file — ngoại lệ này
    chỉ bao CRUD thuần túy, không bao quyết định hay chuyển trạng thái.
-5. **Hạn chế đã biết:** các lần ghi này không tự ghi dòng `audit_log`
-   (không có lệnh ghi audit trong `actions.ts`). Chấp nhận vì đây là dữ
-   liệu danh mục, không phải chứng từ; nếu sau này cần vết audit cho danh
-   mục thì thêm trigger hoặc RPC riêng, không đổi cơ chế ghi.
+5. **Audit (đã sửa 12/11/2026):** các lần ghi này VẪN sinh dòng `audit_log`.
+   Bản đầu ghi ngược lại vì chỉ xét `actions.ts` (không có lệnh ghi audit
+   tay). Thực tế cả 14 bảng danh mục đều có trigger `trg_<bảng>_audit`
+   (hàm `audit_trigger()` là `security definer`, actor = `auth.uid()`), nên
+   mọi INSERT/UPDATE/DELETE trực tiếp đều được log. Đã kiểm chứng trên
+   production (trigger tồn tại; audit cho `purchase_orders` cũng có). Hạn
+   chế còn lại: thao tác ĐỌC và các lần bị chặn không được log.
 
 ## Hệ quả
 
