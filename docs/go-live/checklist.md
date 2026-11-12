@@ -1,6 +1,6 @@
 # Checklist go-live ERP_hotel — 1 bảng duy nhất
 
-> **Trạng thái:** cập nhật 12/11/2026 (tối) bởi Claude Code, thay bản 10/11. Mọi dòng
+> **Trạng thái:** cập nhật 13/11/2026 (đọc lại số liệu production lúc cập nhật); bản trước 12/11/2026 (tối) bởi Claude Code, thay bản 10/11. Mọi dòng
 > "đã kiểm chứng" nghĩa là đã đọc lại từ production (project ERP_hotel
 > `ufxcjfntesafmqzsjsyr`) hoặc chạy thật trong phiên này; mục nào chưa kiểm chứng
 > được ghi rõ **chưa kiểm chứng**. Không bịa trạng thái.
@@ -8,17 +8,18 @@
 
 ## Tóm tắt một dòng
 
-Mã nguồn và cơ sở dữ liệu **sẵn sàng cho UAT** (test có kiểm soát). **Chưa sẵn sàng vận hành thật**:
-thiếu dữ liệu thật (phòng, nhà cung cấp, tồn đầu kỳ, tài khoản nhân viên) và các tài khoản test mật khẩu
-yếu phải được tắt trước khi dùng thật.
+Mã nguồn và cơ sở dữ liệu **sẵn sàng cho UAT** (test có kiểm soát) và đã deploy production (13/11).
+**CHƯA đủ điều kiện vận hành thật** — số liệu production đọc 13/11: **0 phòng**, **1 nhà cung cấp**,
+**7 dòng giá minibar hết hạn**, **21 tài khoản test/UAT** còn hoạt động (mật khẩu yếu), 0 tài khoản nhân viên thật,
+tồn đầu kỳ chưa kiểm đếm. Cron 0 lỗi/7 ngày. Xem **Cổng go-live** ở mục G.
 
 ## A. Cổng kỹ thuật
 
 | # | Cổng | Trạng thái | Chủ | Ghi chú |
 |---|---|---|---|---|
 | A1 | pgTAP | **XANH: 53/54 suite, 2.210/2.220 ca** (12/11) | Claude | Còn lại `bootstrap_initial_org_test` chỉ đạt trên DB trống (cần staging/Docker). Chạy lại: `python3 scripts/pgtap-rehearse.py` (docs/11-TESTING.md §12) |
-| A2 | Lint + typecheck + Vitest | **XANH**: eslint sạch, `tsc` sạch, 19 file / 156 test | Claude | ESLint có thêm luật chặn chuỗi tiếng Việt hard-code (Q243) |
-| A3 | `database.types.ts` | **XONG 12/11**: sinh lại từ ERP_hotel (9.468 dòng; bản cũ 2.554 dòng, dừng ở T-012) | Claude | Checklist cũ ghi "chỉ Duy làm được" — sai, CLI đã link |
+| A2 | Lint + typecheck + Vitest | **XANH 13/11**: eslint sạch, `tsc` sạch, 20 file / 160 test | Claude | ESLint có thêm luật chặn chuỗi tiếng Việt hard-code (Q243) |
+| A3 | `database.types.ts` | **XONG, cập nhật 13/11** sau migration 565000–567000: sinh lại từ ERP_hotel (~9.500 dòng; bản cũ 2.554 dòng, dừng ở T-012) | Claude | Checklist cũ ghi "chỉ Duy làm được" — sai, CLI đã link |
 | A4 | Playwright tầng ghi | **Chưa chạy** | Duy | Chỉ chạy được trên máy Duy. `.env.local` đã sửa về ERP_hotel (12/11); còn thiếu `SUPABASE_SECRET_KEY` (dán từ Dashboard → API Keys → Secret) |
 | A5 | Kiểm tay trên điện thoại thật (Q110, 7 mục) | **Chưa kiểm chứng (0/7)** | Duy | Đếm mù end-to-end, đối chiếu Excel với `v_count_result`, test offline kiểm kê/nhận hàng |
 | A6 | Bản deploy khớp mã nguồn | **XONG 12/11**: production = commit `e1db99b0c` (mục H) | Claude | |
@@ -75,7 +76,28 @@ yếu phải được tắt trước khi dùng thật.
 
 Mobile UI, Completion-2, Verify-prep: **đã merge vào `main`** (bản deploy ngày 12/11 chứa chúng).
 
+## F2. Đã làm thêm 13/11 (đã áp production + deploy)
+
+| Mã | Việc | Trạng thái |
+|---|---|---|
+| Q249 | Màn `/admin/health` (sức khỏe hệ thống), quyền `admin.health.view` (migration 565000) | Xong, chưa kiểm tay giao diện |
+| Q173 | Tổng ước tính cho PO chợ, bậc duyệt theo số lớn hơn (566000) | Xong |
+| Q152/Q199 | Hàng đợi offline cho kiểm minibar | Xong code, **chưa kiểm tay trên điện thoại** |
+| Q34 | Nạp file POS của ca + `count_open` shift_key cần file POS (567000), màn `/inventory/pos-import` | Xong, **định dạng CSV là giả định** (file mẫu giả lập), cần file POS thật |
+| Q161, Q165 | Chốt giữ tính live; xác nhận đã sửa | Xong |
+| Q172 | Giá 0 của PO chợ: nhập giá lúc đối chiếu hóa đơn | **Chưa code** — cần kế toán duyệt cách điều chỉnh giá vốn |
+| Staging | Project Supabase riêng | **Chưa tạo** (chờ Duy đồng ý chi phí) |
+
 ## G. Thứ tự làm từ bây giờ
+
+**Cổng go-live (tất cả phải đạt trước khi vận hành thật):**
+- [ ] C2 có phòng thật; C3 có nhà cung cấp/giá thật; C4 giá minibar hiện hành
+- [ ] C8 có tài khoản nhân viên thật (mật khẩu mạnh, PIN)
+- [ ] C1 kiểm đếm tồn đầu kỳ thật + khóa kỳ
+- [ ] B6 tắt/xóa 21 tài khoản test/UAT, hạ quyền `0001` (B7)
+- [ ] A5 kiểm tay trên điện thoại (7 mục)
+- [ ] Cập nhật tên pháp nhân thật (C6)
+
 
 1. ~~Deploy bản mới nhất~~ **xong** → UAT bằng tài khoản `uat.*` ở TEST47. *(Duy)*
 2. Duy kiểm tay A5 (điện thoại thật) + chạy A4 (Playwright) sau khi dán `SUPABASE_SECRET_KEY`. *(Duy)*
