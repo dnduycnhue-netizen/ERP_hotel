@@ -4050,6 +4050,7 @@ export type Database = {
           created_at: string
           created_by: string | null
           doc_no: string
+          estimated_total: number | null
           expected_date: string | null
           export_status: string
           id: string
@@ -4072,6 +4073,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           doc_no: string
+          estimated_total?: number | null
           expected_date?: string | null
           export_status?: string
           id?: string
@@ -4094,6 +4096,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           doc_no?: string
+          estimated_total?: number | null
           expected_date?: string | null
           export_status?: string
           id?: string
@@ -8277,6 +8280,7 @@ export type Database = {
         Returns: Json
       }
       admin_sod_pairs: { Args: never; Returns: string[][] }
+      admin_system_health: { Args: never; Returns: Json }
       admin_user_assign_role: {
         Args: {
           p_outlet_ids?: string[]
@@ -8877,6 +8881,10 @@ export type Database = {
       }
       po_send: {
         Args: { p_po_id: string; p_property_id: string }
+        Returns: Json
+      }
+      po_set_estimated_total: {
+        Args: { p_amount: number; p_po_id: string; p_property_id: string }
         Returns: Json
       }
       po_submit: {
