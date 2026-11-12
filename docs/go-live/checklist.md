@@ -21,7 +21,7 @@ yếu phải được tắt trước khi dùng thật.
 | A3 | `database.types.ts` | **XONG 12/11**: sinh lại từ ERP_hotel (9.468 dòng; bản cũ 2.554 dòng, dừng ở T-012) | Claude | Checklist cũ ghi "chỉ Duy làm được" — sai, CLI đã link |
 | A4 | Playwright tầng ghi | **Chưa chạy** | Duy | Chỉ chạy được trên máy Duy. `.env.local` đã sửa về ERP_hotel (12/11); còn thiếu `SUPABASE_SECRET_KEY` (dán từ Dashboard → API Keys → Secret) |
 | A5 | Kiểm tay trên điện thoại thật (Q110, 7 mục) | **Chưa kiểm chứng (0/7)** | Duy | Đếm mù end-to-end, đối chiếu Excel với `v_count_result`, test offline kiểm kê/nhận hàng |
-| A6 | Bản deploy khớp mã nguồn | Xem mục H (deploy ngày 12/11) | Claude | |
+| A6 | Bản deploy khớp mã nguồn | **XONG 12/11**: production = commit `e1db99b0c` (mục H) | Claude | |
 
 ## B. Bảo mật và kiểm soát (mục mới — đã kiểm chứng trên production)
 
@@ -77,7 +77,7 @@ Mobile UI, Completion-2, Verify-prep: **đã merge vào `main`** (bản deploy n
 
 ## G. Thứ tự làm từ bây giờ
 
-1. **Deploy bản mới nhất** (mục H) → UAT bằng tài khoản `uat.*` ở TEST47. *(Claude)*
+1. ~~Deploy bản mới nhất~~ **xong** → UAT bằng tài khoản `uat.*` ở TEST47. *(Duy)*
 2. Duy kiểm tay A5 (điện thoại thật) + chạy A4 (Playwright) sau khi dán `SUPABASE_SECRET_KEY`. *(Duy)*
 3. Cung cấp dữ liệu thật C2–C6, C8. *(Duy)*
 4. Kiểm đếm cutover (C1) theo runbook → khóa kỳ → import công thức/dữ liệu còn thiếu. *(Duy + Claude)*
@@ -92,11 +92,9 @@ Việc deploy đi qua Vercel CLI (không có tích hợp git tự động), proj
 địa chỉ production `https://erphotel.vercel.app`. Trước ngày 12/11 21:xx bản đang chạy là
 commit `ec4c7be` (sửa Q235), trước toàn bộ thay đổi code của Q241–Q246.
 
-**Trạng thái 12/11 tối: CHƯA deploy bản mới nhất** (`main` = `c030691d6`) — lệnh `vercel --prod` do
-Claude Code chạy bị hệ thống chặn, cần Duy tự chạy hoặc cấp quyền. Bản đang chạy vẫn dùng được với
-cơ sở dữ liệu mới (đã kiểm chứng đăng nhập 6 tài khoản + RPC nhận hàng qua API); chênh lệch chỉ ở
-phía giao diện: câu báo lỗi tiếng Việt riêng cho `ERR_SOD_INVOICE_GR`/`ERR_SOD_PAYMENT_APPROVER`
-(bản cũ hiện câu SoD chung), 31 mã lỗi RPC mới dịch, và chuỗi chuyển vào `vi.ts`.
+**Trạng thái 12/11 tối: ĐÃ deploy** bản `main` commit `e1db99b0c` lên production
+(`erphotel-7e8a3q31w-dnduys-projects.vercel.app`, Ready, gắn `erphotel.vercel.app`), theo lệnh của Duy.
+Remote GitHub chưa được push (còn chậm 23 commit so với `main` cục bộ).
 
 Kiểm tra sau deploy (smoke): `/login` trả 200; đăng nhập `uat.gm@erp.internal` thấy đúng 1 khách sạn
 (TEST47); `uat.storekeeper` gọi `receiving_list_tasks` trên TEST47 được, trên SONHOIAN bị `ERR_FORBIDDEN`;
