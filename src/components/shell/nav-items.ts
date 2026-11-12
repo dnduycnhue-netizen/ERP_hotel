@@ -2,14 +2,19 @@ import {
   BarChart3,
   BedDouble,
   Bell,
+  BellRing,
   Boxes,
+  Building2,
   CalendarDays,
+  ClipboardCheck,
   ClipboardList,
   Hotel,
+  KeyRound,
   LayoutDashboard,
   Package,
   PackageCheck,
   Settings,
+  Users,
   Wallet,
   UtensilsCrossed,
   type LucideIcon,
@@ -265,6 +270,60 @@ export type JumpDestination = {
   /** Chỉ hiện khi người dùng thấy được mục cha. */
   visible: (permissions: ReadonlySet<string>) => boolean;
 };
+
+/**
+ * Cờ hiển thị từng mục điều hướng khu quản trị (Q122): AppShell ở
+ * mode="admin" nhận đúng object này từ server layout (quyền đã kiểm ở
+ * layout, shell chỉ hiển thị theo cờ — không kiểm quyền ở đây).
+ */
+export type AdminNavVisibility = {
+  roles: boolean;
+  users: boolean;
+  organizations: boolean;
+  settings: boolean;
+  approvalRules: boolean;
+  alertRules: boolean;
+};
+
+export type AdminNavItem = {
+  key: keyof AdminNavVisibility;
+  label: string;
+  href: string;
+  icon: LucideIcon;
+};
+
+/**
+ * Điều hướng khu quản trị: 1 nhóm duy nhất "Hệ thống" với 6 mục.
+ * Nhãn lấy từ `vi.admin.*` (AGENTS.md quy tắc 11).
+ */
+export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
+  { key: "roles", label: vi.admin.roles, href: "/admin/roles", icon: KeyRound },
+  { key: "users", label: vi.admin.users, href: "/admin/users", icon: Users },
+  {
+    key: "organizations",
+    label: vi.admin.organizations,
+    href: "/admin/organizations",
+    icon: Building2,
+  },
+  {
+    key: "settings",
+    label: vi.admin.settings,
+    href: "/admin/settings",
+    icon: Settings,
+  },
+  {
+    key: "approvalRules",
+    label: vi.admin.approvalRules,
+    href: "/admin/approval-rules",
+    icon: ClipboardCheck,
+  },
+  {
+    key: "alertRules",
+    label: vi.admin.alertRules,
+    href: "/admin/alert-rules",
+    icon: BellRing,
+  },
+];
 
 /**
  * Index tìm kiếm nhảy nhanh ở topbar (ADR-006): chỉ là các đích điều

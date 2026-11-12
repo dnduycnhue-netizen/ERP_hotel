@@ -2,17 +2,39 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ChevronsLeft, ChevronsRight, X } from "lucide-react";
+import { ChevronsLeft, ChevronsRight, X, type LucideIcon } from "lucide-react";
 import { vi } from "@/i18n/vi";
 import { usePermissions } from "@/lib/permissions/permissions-provider";
 import { cn } from "@/lib/utils";
-import { NAV_GROUPS, NAV_ITEMS } from "./nav-items";
+import {
+  ADMIN_NAV_ITEMS,
+  NAV_GROUPS,
+  NAV_ITEMS,
+  type AdminNavVisibility,
+} from "./nav-items";
+
+type SidebarNavItem = {
+  key: string;
+  label: string;
+  href: string;
+  icon: LucideIcon;
+  active: boolean;
+};
+
+type SidebarNavGroup = {
+  id: string;
+  label: string;
+  items: SidebarNavItem[];
+};
 
 /**
  * Sidebar điều hướng trái kiểu ClickUp (ADR-006).
  * Render dưới dạng `<header>` (chứa logo + điều hướng chính) để giữ
  * test smoke T-047 S2 xanh (header chứa ≥ 8 link, trong đó có link
  * Nhận hàng và link về trang tổng quan).
+ *
+ * Mode "admin" (Q122): logo về "/", nhãn vi.admin.title, nav chỉ 1 nhóm
+ * "Hệ thống" với 6 mục, mỗi mục chỉ hiện khi cờ adminNav tương ứng true.
  */
 export function AppSidebar({
   propertyId,
@@ -21,25 +43,71 @@ export function AppSidebar({
   onToggleCollapsed,
   mobileOpen,
   onCloseMobile,
+  mode = "property",
+  adminNav,
 }: {
-  propertyId: string;
-  propertyName: string;
+  propertyId?: string;
+  propertyName?: string;
   collapsed: boolean;
   onToggleCollapsed: () => void;
   mobileOpen: boolean;
   onCloseMobile: () => void;
+  mode?: "property" | "admin";
+  adminNav?: AdminNavVisibility;
 }) {
   const pathname = usePathname();
   const { permissions } = usePermissions();
 
+  const isAdmin = mode === "admin";
+
   const isActive = (item: (typeof NAV_ITEMS)[number]): boolean => {
-    const href = item.href(propertyId);
+    const href = item.href(propertyId ?? "");
     if (item.key === "dashboard") {
       return pathname === href;
     }
-    const prefix = item.matchPrefix(propertyId);
+    const prefix = item.matchPrefix(propertyId ?? "");
     return pathname === href || pathname.startsWith(`${prefix}/`);
   };
+
+  /**
+   * Nhóm điều hướng đã tính sẵn — cùng hình dạng cho cả 2 mode nên JSX
+   * render phía dưới dùng chung 1 lần, hành vi collapse/drawer giữ
+   * nguyên. Mode "property": Y HỆT như cũ (NAV_GROUPS + NAV_ITEMS lọc
+   * theo quyền); mode "admin": 1 nhóm "Hệ thống", lọc theo cờ adminNav.
+   */
+  const groups: SidebarNavGroup[] = isAdmin
+    ? [
+        {
+          id: "system",
+          label: vi.shell.groups.system,
+          items: ADMIN_NAV_ITEMS.filter(
+            (item) => adminNav?.[item.key] ?? false,
+          ).map((item) => ({
+            key: item.key,
+            label: item.label,
+            href: item.href,
+            icon: item.icon,
+            active:
+              pathname === item.href || pathname.startsWith(`${item.href}/`),
+          })),
+        },
+      ]
+    : NAV_GROUPS.map((group) => ({
+        id: group.id,
+        label: group.label,
+        items: NAV_ITEMS.filter(
+          (item) => item.group === group.id && item.visible(permissions),
+        ).map((item) => ({
+          key: item.key,
+          label: item.label,
+          href: item.href(propertyId ?? ""),
+          icon: item.icon,
+          active: isActive(item),
+        })),
+      }));
+
+  const logoHref = isAdmin ? "/" : `/${propertyId ?? ""}`;
+  const logoLabel = isAdmin ? vi.admin.title : (propertyName ?? "");
 
   const content = (
     <>
@@ -50,10 +118,10 @@ export function AppSidebar({
         )}
       >
         <Link
-          href={`/${propertyId}`}
+          href={logoHref}
           onClick={onCloseMobile}
           className="flex min-w-0 items-center gap-2.5 rounded-md px-1 py-1 outline-none focus-visible:ring-2 focus-visible:ring-brand"
-          aria-label={propertyName}
+          aria-label={logoLabel}
         >
           <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-brand text-base font-bold text-white">
             M
@@ -61,7 +129,7 @@ export function AppSidebar({
           {!collapsed ? (
             <span className="min-w-0">
               <span className="block truncate text-sm font-semibold text-foreground">
-                {propertyName}
+                {logoLabel}
               </span>
               <span className="block text-xs text-muted-foreground">
                 Mini-ERP
@@ -85,10 +153,8 @@ export function AppSidebar({
         aria-label={vi.shell.menu}
         className="min-h-0 flex-1 overflow-y-auto px-2 py-3"
       >
-        {NAV_GROUPS.map((group) => {
-          const items = NAV_ITEMS.filter(
-            (item) => item.group === group.id && item.visible(permissions),
-          );
+        {groups.map((group) => {
+          const items = group.items;
           if (items.length === 0) return null;
           return (
             <div key={group.id} className="mt-4 first:mt-0">
@@ -99,12 +165,12 @@ export function AppSidebar({
               ) : null}
               <ul className="space-y-0.5">
                 {items.map((item) => {
-                  const active = isActive(item);
+                  const active = item.active;
                   const Icon = item.icon;
                   return (
                     <li key={item.key}>
                       <Link
-                        href={item.href(propertyId)}
+                        href={item.href}
                         onClick={onCloseMobile}
                         aria-current={active ? "page" : undefined}
                         title={collapsed ? item.label : undefined}
