@@ -205,7 +205,7 @@ export function ExpenseCategoriesManager({
                   required
                   value={code}
                   onChange={(e) => setCode(e.target.value)}
-                  placeholder="VD: EXP_FOOD, EXP_LINEN, EXP_ENERGY"
+                  placeholder={`${vi.common.examplePrefix} EXP_FOOD, EXP_LINEN, EXP_ENERGY`}
                   className="mt-1 h-9 w-full rounded-md border bg-background px-3 text-sm font-mono"
                 />
               </div>

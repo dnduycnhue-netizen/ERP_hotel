@@ -128,7 +128,7 @@ export function RoomsManager({
     {
       key: "floor",
       header: vi.master.rooms.floor,
-      cell: (row) => (row.floor ? `Tầng ${row.floor}` : "—"),
+      cell: (row) => (row.floor ? vi.master.rooms.floorLabel.replace("{floor}", String(row.floor)) : "—"),
     },
     {
       key: "room_type",
@@ -230,7 +230,7 @@ export function RoomsManager({
                   required
                   value={roomNo}
                   onChange={(e) => setRoomNo(e.target.value)}
-                  placeholder="VD: 101, 201, 305"
+                  placeholder={`${vi.common.examplePrefix} 101, 201, 305`}
                   className="mt-1 h-9 w-full rounded-md border bg-background px-3 text-sm"
                 />
               </div>
@@ -246,7 +246,7 @@ export function RoomsManager({
                   id="floor"
                   value={floor}
                   onChange={(e) => setFloor(e.target.value)}
-                  placeholder="VD: 1, 2, 3"
+                  placeholder={`${vi.common.examplePrefix} 1, 2, 3`}
                   className="mt-1 h-9 w-full rounded-md border bg-background px-3 text-sm"
                 />
               </div>
@@ -318,7 +318,7 @@ export function RoomsManager({
                   required
                   value={typeCode}
                   onChange={(e) => setTypeCode(e.target.value)}
-                  placeholder="VD: STD, DLX, SUI"
+                  placeholder={`${vi.common.examplePrefix} STD, DLX, SUI`}
                   className="mt-1 h-9 w-full rounded-md border bg-background px-3 text-sm font-mono"
                 />
               </div>
@@ -335,7 +335,7 @@ export function RoomsManager({
                   required
                   value={typeName}
                   onChange={(e) => setTypeName(e.target.value)}
-                  placeholder="VD: Standard, Deluxe, Suite"
+                  placeholder={`${vi.common.examplePrefix} Standard, Deluxe, Suite`}
                   className="mt-1 h-9 w-full rounded-md border bg-background px-3 text-sm"
                 />
               </div>

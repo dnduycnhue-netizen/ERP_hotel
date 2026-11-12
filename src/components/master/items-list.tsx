@@ -147,7 +147,7 @@ export function ItemsList({
             <span className="font-medium text-foreground">{row.name}</span>
             {row.is_key_item ? (
               <span className="rounded bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-amber-600">
-                Key Item
+                {vi.master.items.keyItemBadge}
               </span>
             ) : null}
             {row.is_temp ? (
@@ -318,7 +318,7 @@ export function ItemsList({
                 : "bg-amber-500/10 text-amber-700 hover:bg-amber-500/20"
             }`}
           >
-            ★ Key Items
+            {vi.master.items.keyItemFilterButton}
           </button>
           <button
             type="button"

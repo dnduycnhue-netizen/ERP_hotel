@@ -278,7 +278,7 @@ export function RoleList({
                           size="sm"
                           onClick={() => {
                             setCopyTarget(role);
-                            setCopyName(`${role.name_vi} — bản sao`);
+                            setCopyName(vi.admin.roleCopyName.replace("{name}", role.name_vi));
                             setCopyError(null);
                           }}
                         >

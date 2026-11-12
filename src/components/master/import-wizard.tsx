@@ -499,7 +499,7 @@ export function ImportWizard({
           kind,
           name:
             mappingName.trim() ||
-            `${kind === "items" ? "Vật tư" : "NCC"} ${fileName}`,
+            `${kind === "items" ? vi.master.import.kindItems : vi.master.import.kindSuppliersShort} ${fileName}`,
           columnMap: colMap,
           groupMap: finalGroupMap,
         });
@@ -624,7 +624,9 @@ export function ImportWizard({
         return;
       }
       setNotice(
-        `Đã thêm biến thể ${res.data.alias} → ${res.data.uom_code}. Đang kiểm tra lại…`,
+        vi.master.import.aliasAdded
+          .replace("{alias}", res.data.alias)
+          .replace("{uom}", res.data.uom_code),
       );
       const re = await resolveImportRowAction({
         batchId: batch?.batch.id ?? "",

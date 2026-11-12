@@ -111,7 +111,7 @@ export function NumPad({
             disabled={disabled}
             onClick={() => pressDigit(digit)}
             className={keyClass}
-            aria-label={`Số ${digit}`}
+            aria-label={vi.components.numPad.digit.replace("{digit}", String(digit))}
           >
             {digit}
           </Button>

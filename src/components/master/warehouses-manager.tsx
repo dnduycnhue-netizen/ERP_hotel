@@ -215,7 +215,7 @@ export function WarehousesManager({
                   required
                   value={code}
                   onChange={(e) => setCode(e.target.value)}
-                  placeholder="VD: KHO_TONG, KHO_BEP"
+                  placeholder={`${vi.common.examplePrefix} KHO_TONG, KHO_BEP`}
                   className="mt-1 h-9 w-full rounded-md border bg-background px-3 text-sm"
                 />
               </div>

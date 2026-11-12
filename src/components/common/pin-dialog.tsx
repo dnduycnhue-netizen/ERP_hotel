@@ -143,7 +143,9 @@ export function PinDialog({
                 onPaste={handlePaste}
                 inputMode="numeric"
                 autoComplete="one-time-code"
-                aria-label={`Chữ số ${index + 1} trên ${length}`}
+                aria-label={vi.components.pinDialog.digitLabel
+                  .replace("{index}", String(index + 1))
+                  .replace("{length}", String(length))}
                 maxLength={1}
                 disabled={submitting}
                 className={cn(
