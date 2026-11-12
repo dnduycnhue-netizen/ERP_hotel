@@ -63,7 +63,7 @@ export function AccountingExportForm({
           <select
             value={kind}
             onChange={(e) => setKind(e.target.value as ExportKind)}
-            className="mt-1 w-full rounded-md border bg-background px-3 py-2 text-sm"
+            className="mt-1 h-9 w-full rounded-md border bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
           >
             {EXPORT_KINDS.map((k) => {
               const def = getExportDefinition(k);
@@ -81,7 +81,7 @@ export function AccountingExportForm({
             type="date"
             value={from}
             onChange={(e) => setFrom(e.target.value)}
-            className="mt-1 w-full rounded-md border bg-background px-3 py-2 text-sm"
+            className="mt-1 h-9 w-full rounded-md border bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
           />
         </label>
         <label className="block text-sm">
@@ -90,14 +90,14 @@ export function AccountingExportForm({
             type="date"
             value={to}
             onChange={(e) => setTo(e.target.value)}
-            className="mt-1 w-full rounded-md border bg-background px-3 py-2 text-sm"
+            className="mt-1 h-9 w-full rounded-md border bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
           />
         </label>
         <Button onClick={onDownload} disabled={busy}>
           {busy ? vi.export.hub.downloading : vi.export.hub.downloadButton}
         </Button>
       </div>
-      {error && <p className="text-sm text-red-800">{error}</p>}
+      {error && <p className="text-sm text-destructive">{error}</p>}
     </div>
   );
 }
@@ -241,8 +241,8 @@ export function BankTransferExportPanel({
             {requests.map((r) => {
               const exportedAt = previouslyExported[r.id];
               return (
-                <tr key={r.id} className="border-t">
-                  <td className="px-3 py-2.5">
+                <tr key={r.id} className="border-t hover:bg-muted/40">
+                  <td className="px-3 py-3 align-middle">
                     <input
                       type="checkbox"
                       checked={selected.has(r.id)}
@@ -250,17 +250,17 @@ export function BankTransferExportPanel({
                       aria-label={r.doc_no}
                     />
                   </td>
-                  <td className="px-3 py-2.5 font-medium">{r.doc_no}</td>
-                  <td className="px-3 py-2.5">
+                  <td className="px-3 py-3 font-medium align-middle">{r.doc_no}</td>
+                  <td className="px-3 py-3 align-middle">
                     {r.supplier_name ?? r.supplier_code ?? "—"}
                   </td>
-                  <td className="px-3 py-2.5 whitespace-nowrap">
+                  <td className="px-3 py-3 whitespace-nowrap align-middle">
                     {formatDateVn(r.due_date) ?? "—"}
                   </td>
-                  <td className="px-3 py-2.5 text-right whitespace-nowrap">
+                  <td className="px-3 py-3 text-right whitespace-nowrap align-middle">
                     <MoneyText amount={r.total} />
                   </td>
-                  <td className="px-3 py-2.5 whitespace-nowrap">
+                  <td className="px-3 py-3 whitespace-nowrap align-middle">
                     {exportedAt ? (
                       <span className="text-amber-800">
                         {formatDateTimeVn(exportedAt)}
@@ -289,7 +289,7 @@ export function BankTransferExportPanel({
           · {vi.export.hub.totalAmount}: <MoneyText amount={selectedTotal} />
         </p>
       </div>
-      {error && <p className="text-sm text-red-800">{error}</p>}
+      {error && <p className="text-sm text-destructive">{error}</p>}
     </div>
   );
 }
