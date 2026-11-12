@@ -9,15 +9,13 @@ import type { CountItemDetail, CountSheetRow } from "@/features/count/queries";
 import { vi } from "@/i18n/vi";
 import { enqueueOfflineJob } from "@/lib/offline/db";
 import { cn } from "@/lib/utils";
-import { formatQty, interpolate } from "./count-utils";
-
-function parseDecimal(value: string): number | null {
-  if (value === "" || value === "-" || value === "." || value === "-.") {
-    return null;
-  }
-  const n = Number(value);
-  return Number.isFinite(n) ? n : null;
-}
+import {
+  calcBottleTotal,
+  calcUomTotal,
+  formatQty,
+  interpolate,
+  parseDecimal,
+} from "./count-utils";
 
 type DetailEntry = { qty: number; uom: string };
 
@@ -124,48 +122,34 @@ export function MobileCountLineForm({
   } | null>(null);
   const [queued, setQueued] = useState(false);
 
-  const uomTotal = useMemo(() => {
-    let total = 0;
-    let anyValid = false;
-    for (const row of rows) {
-      const qty = parseDecimal(row.qty);
-      if (qty === null) {
-        continue;
-      }
-      const factor = factorFor(item, row.uom);
-      if (factor === null) {
-        return null;
-      }
-      total += qty * factor;
-      anyValid = true;
-    }
-    return anyValid ? total : null;
-  }, [rows, item]);
+  const uomTotal = useMemo(
+    () =>
+      calcUomTotal(
+        rows.map((row) => ({
+          qty: parseDecimal(row.qty),
+          factor: factorFor(item, row.uom),
+        })),
+      ),
+    [rows, item],
+  );
 
-  const bottleCalc = useMemo(() => {
-    const bottles = parseDecimal(fullBottles) ?? 0;
-    const grams = parseDecimal(openGrams);
-    const tare = item.tare_g ?? 0;
-    const density = item.density_g_ml ?? 0;
-    const openMl =
-      grams !== null && density > 0 ? (grams - tare) / density : null;
-    const bottlePart =
-      defaultUnit && bottles > 0 ? bottles * defaultUnit.factor_to_stock : 0;
-    const openPart =
-      openMl !== null && openMl > 0
-        ? mlFactor === null
-          ? null
-          : openMl * mlFactor
-        : 0;
-    if (openPart === null) {
-      return { openMl, total: null as number | null };
-    }
-    const total = bottlePart + openPart;
-    return { openMl, total: total > 0 ? total : null };
-  }, [fullBottles, openGrams, item, defaultUnit, mlFactor]);
+  const bottleCalc = useMemo(
+    () =>
+      calcBottleTotal({
+        fullBottles: parseDecimal(fullBottles),
+        openGrams: parseDecimal(openGrams),
+        tareG: item.tare_g ?? 0,
+        densityGml: item.density_g_ml ?? 0,
+        defaultFactor: defaultUnit?.factor_to_stock ?? null,
+        mlFactor,
+      }),
+    [fullBottles, openGrams, item, defaultUnit, mlFactor],
+  );
 
   const total = mode === "uom" ? uomTotal : bottleCalc.total;
-  const valid = total !== null && total > 0;
+  // R30: tổng 0 là giá trị hợp lệ (đếm hết hàng); chỉ null (chưa nhập gì
+  // hoặc nhập sai) mới không cho lưu.
+  const valid = total !== null;
 
   function updateActiveField(value: string): void {
     if (activeField === "bottle:full") {
@@ -206,10 +190,15 @@ export function MobileCountLineForm({
         ? rows.length > 1
           ? rows
               .map((row) => ({
-                qty: parseDecimal(row.qty) ?? 0,
+                // R30: dòng chưa nhập (qty null) thì bỏ; dòng nhập 0 thì GIỮ
+                // (hết hàng là giá trị hợp lệ, không được lọc như trước).
+                qty: parseDecimal(row.qty),
                 uom: row.uom,
               }))
-              .filter((entry) => entry.qty > 0)
+              .filter(
+                (entry): entry is { qty: number; uom: string } =>
+                  entry.qty !== null,
+              )
           : { qty: total, uom: rows[0]?.uom ?? item.stock_uom }
         : { qty: total, uom: item.stock_uom };
     const input = {
@@ -438,6 +427,12 @@ export function MobileCountLineForm({
         {interpolate(vi.count.totalInStockUom, { uom: item.stock_uom })}:{" "}
         {total === null ? "—" : formatQty(total)}
       </p>
+
+      {total === 0 ? (
+        <p className="text-sm text-muted-foreground">
+          {vi.count.zeroCountHint}
+        </p>
+      ) : null}
 
       {error ? (
         <p role="alert" className="text-sm text-destructive">

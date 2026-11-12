@@ -21,9 +21,9 @@ export const countReasonCodeSchema = z.enum([
 ]);
 export type CountReasonCode = z.infer<typeof countReasonCodeSchema>;
 
-/** 1 dong chi tiet dem: { qty, uom } hoac mang cac phan tu nhu vay (RPC `count_record_line`, T-032). */
+/** 1 dong chi tiet dem: { qty, uom } hoac mang cac phan tu nhu vay (RPC `count_record_line`, T-032). R30: qty 0 hop le (het hang), chi tu choi so am. */
 export const countDetailItemSchema = z.object({
-  qty: z.number().positive(vi.common.quantityPositive),
+  qty: z.number().nonnegative(vi.common.quantityNonNegative),
   uom: z.string().trim().min(1, vi.common.uomRequired),
 });
 

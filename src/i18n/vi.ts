@@ -1966,6 +1966,7 @@ export const vi = {
     openBottleGrams: "Cân chai đang mở (gram)",
     openBottleMl: "Chai mở quy ra (ml)",
     totalInStockUom: "Tổng quy ra {uom}",
+    zeroCountHint: "Số 0 nghĩa là hết hàng — dòng này vẫn được ghi nhận.",
     bottleUnitHint:
       "Chai nguyên tem tính theo đơn vị mua mặc định; chai mở cân theo (gram − bì) ÷ tỉ trọng.",
     addRow: "Thêm dòng",

@@ -1,5 +1,10 @@
 import { test, expect } from "@playwright/test";
-import { mobileUrl, requireMobileLive } from "../helpers";
+import {
+  TEST_PROPERTY_ID,
+  loginAs,
+  mobileUrl,
+  requireMobileLive,
+} from "../helpers";
 import {
   expectMinTouchTargets,
   expectNoHorizontalOverflow,
@@ -71,4 +76,124 @@ test("M-C3 — dòng đợt (nếu có) đủ lớn để chạm", async ({ page
   }
   const box = await rows.first().boundingBox();
   expect(box?.height).toBeGreaterThanOrEqual(44);
+});
+
+/**
+ * M-C4 (R30) — đếm một mã về 0, nộp, dòng hiện variance = 0 − tồn sổ.
+ * Luồng đầy đủ cần chuẩn bị trước trên TEST47 (xem tests/e2e/README.md):
+ * - 2 tài khoản người đếm (count.perform tại kho, SoD độc lập) + PIN
+ *   từng người: TEST_COUNTER1_EMAIL/PASSWORD/PIN,
+ *   TEST_COUNTER2_EMAIL/PASSWORD/PIN.
+ * - 1 tài khoản xem chênh lệch (count.view_variance, không phải người
+ *   đếm): TEST_VARIANCE_VIEWER_EMAIL/PASSWORD.
+ * - 1 đợt kiểm kê monthly_full đang đếm (trạng thái counting/recount)
+ *   có dòng của mã TEST_COUNT_ITEM_CODE (mặc định NVL0388) với tồn sổ
+ *   đã biết TEST_COUNT_BOOK_QTY (vd sau khi nhận hàng brief 01).
+ * Thiếu bất kỳ điều kiện nào thì test tự skip với lý do rõ ràng.
+ */
+test("M-C4 — đếm một mã về 0, nộp, dòng hiện variance = 0 − tồn sổ", async ({
+  page,
+}) => {
+  const counter1 = {
+    email: process.env.TEST_COUNTER1_EMAIL ?? "",
+    password: process.env.TEST_COUNTER1_PASSWORD ?? "",
+    pin: process.env.TEST_COUNTER1_PIN ?? "",
+  };
+  const counter2 = {
+    email: process.env.TEST_COUNTER2_EMAIL ?? "",
+    password: process.env.TEST_COUNTER2_PASSWORD ?? "",
+    pin: process.env.TEST_COUNTER2_PIN ?? "",
+  };
+  const viewer = {
+    email: process.env.TEST_VARIANCE_VIEWER_EMAIL ?? "",
+    password: process.env.TEST_VARIANCE_VIEWER_PASSWORD ?? "",
+  };
+  const itemCode = process.env.TEST_COUNT_ITEM_CODE ?? "NVL0388";
+  const bookQty = Number(process.env.TEST_COUNT_BOOK_QTY ?? "");
+  if (
+    !counter1.email ||
+    !counter1.password ||
+    !counter1.pin ||
+    !counter2.email ||
+    !counter2.password ||
+    !counter2.pin ||
+    !viewer.email ||
+    !viewer.password ||
+    !Number.isFinite(bookQty)
+  ) {
+    test.skip(
+      true,
+      "Cần TEST_COUNTER1/2_EMAIL/PASSWORD/PIN + TEST_VARIANCE_VIEWER_EMAIL/PASSWORD + TEST_COUNT_BOOK_QTY (tồn sổ đã biết của mã đếm) — xem tests/e2e/README.md.",
+    );
+  }
+  const expectedVariance = 0 - bookQty;
+
+  async function recordZero(
+    account: { email: string; password: string },
+    countId: string,
+  ): Promise<void> {
+    await loginAs(page, account);
+    await page.goto(mobileUrl(`/count/${countId}`));
+    await page
+      .getByPlaceholder("Tìm theo mã hoặc tên hàng…")
+      .fill(itemCode);
+    const lineButton = page.getByRole("button", {
+      name: new RegExp(itemCode.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")),
+    });
+    await lineButton.first().click();
+    // Nhập 0 bằng NumPad: nút "0" phải cho lưu (R30), tổng hiện 0 và
+    // hiện gợi ý "hết hàng".
+    await page.getByRole("button", { name: "Số 0", exact: true }).click();
+    await expect(
+      page.getByText("Số 0 nghĩa là hết hàng — dòng này vẫn được ghi nhận."),
+    ).toBeVisible();
+    await page
+      .getByRole("button", { name: "Lưu số đếm", exact: true })
+      .click();
+    await expect(page.getByText("Đã ghi số đếm.")).toBeVisible();
+  }
+
+  // Vòng 1: người đếm 1 ghi 0.
+  await loginAs(page, counter1);
+  await page.goto(mobileUrl("/count"));
+  const roundLink = page.locator("main ul li a, main ul li button").first();
+  if ((await roundLink.count()) === 0) {
+    test.skip(
+      true,
+      "Chưa có đợt kiểm kê nào trên TEST47 — mở đợt trước (cần count.open).",
+    );
+  }
+  const href = await roundLink.first().getAttribute("href");
+  const countId = href?.split("/").filter(Boolean).pop();
+  if (!countId) {
+    test.skip(true, "Không đọc được id đợt kiểm kê từ danh sách.");
+    return;
+  }
+  await recordZero(counter1, countId);
+  // Vòng 1: người đếm 2 ghi 0 (cùng mã, độc lập).
+  await recordZero(counter2, countId);
+
+  // Nộp đợt bằng cả 2 PIN (R25 đang bật: cần đủ PIN mọi người đếm).
+  await loginAs(page, counter1);
+  await page.goto(mobileUrl(`/count/${countId}`));
+  await page
+    .getByRole("button", { name: "Nộp đợt", exact: true })
+    .click();
+  await page.getByLabel("Mã PIN người đếm 1").fill(counter1.pin);
+  await page.getByLabel("Mã PIN người đếm 2").fill(counter2.pin);
+  await page
+    .getByRole("button", { name: "Nộp đợt", exact: true })
+    .last()
+    .click();
+  await expect(page.getByText("Đã nộp đợt kiểm kê.")).toBeVisible();
+
+  // Người xem chênh lệch kiểm tra dòng: variance = 0 − tồn sổ.
+  await loginAs(page, viewer);
+  await page.goto(`/${TEST_PROPERTY_ID}/inventory/counts/${countId}`);
+  const row = page.locator("tr", { hasText: itemCode }).first();
+  await expect(row).toBeVisible();
+  const varianceText = new Intl.NumberFormat("vi-VN", {
+    maximumFractionDigits: 4,
+  }).format(expectedVariance);
+  await expect(row).toContainText(varianceText);
 });
