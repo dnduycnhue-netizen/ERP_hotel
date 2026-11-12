@@ -2,6 +2,7 @@ import { ApprovalDelegationsEditor } from "@/components/admin/approval-delegatio
 import { ApprovalRulesEditor } from "@/components/admin/approval-rules-editor";
 import { ConfigScopeSelector } from "@/components/admin/config-scope-selector";
 import { ErrorState } from "@/components/common/error-state";
+import { PageHeader } from "@/components/shell/page-header";
 import {
   listApprovalApprovers,
   listApprovalDelegations,
@@ -39,14 +40,10 @@ export default async function ApprovalRulesPage({
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">
-          {vi.admin.configApprovalTitle}
-        </h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          {vi.admin.configApprovalDescription}
-        </p>
-      </div>
+      <PageHeader
+        title={vi.admin.configApprovalTitle}
+        description={vi.admin.configApprovalDescription}
+      />
       <ConfigScopeSelector
         path="/admin/approval-rules"
         properties={scope.properties}
@@ -59,7 +56,7 @@ export default async function ApprovalRulesPage({
         approvers={approvers}
       />
       <div className="space-y-2">
-        <h2 className="text-xl font-bold tracking-tight">
+        <h2 className="text-base font-semibold">
           {vi.admin.configDelegationTitle}
         </h2>
         <p className="text-sm text-muted-foreground">

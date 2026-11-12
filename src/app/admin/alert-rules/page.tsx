@@ -1,6 +1,7 @@
 import { AlertRulesEditor } from "@/components/admin/alert-rules-editor";
 import { ConfigScopeSelector } from "@/components/admin/config-scope-selector";
 import { ErrorState } from "@/components/common/error-state";
+import { PageHeader } from "@/components/shell/page-header";
 import { listAlertRules, resolveAdminConfigScope } from "@/features/admin";
 import { vi } from "@/i18n/vi";
 import { createClient } from "@/lib/supabase/server";
@@ -29,11 +30,7 @@ export default async function AlertRulesPage({
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">
-          {vi.admin.configAlertTitle}
-        </h1>
-      </div>
+      <PageHeader title={vi.admin.configAlertTitle} />
       <ConfigScopeSelector
         path="/admin/alert-rules"
         properties={scope.properties}

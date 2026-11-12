@@ -1,6 +1,7 @@
 import { ConfigScopeSelector } from "@/components/admin/config-scope-selector";
 import { SettingsEditor } from "@/components/admin/settings-editor";
 import { ErrorState } from "@/components/common/error-state";
+import { PageHeader } from "@/components/shell/page-header";
 import { listSettingEntries, resolveAdminConfigScope } from "@/features/admin";
 import { vi } from "@/i18n/vi";
 import { createClient } from "@/lib/supabase/server";
@@ -33,14 +34,10 @@ export default async function SettingsPage({
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">
-          {vi.admin.configSettingsTitle}
-        </h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          {vi.admin.configSettingsDescription}
-        </p>
-      </div>
+      <PageHeader
+        title={vi.admin.configSettingsTitle}
+        description={vi.admin.configSettingsDescription}
+      />
       <ConfigScopeSelector
         path="/admin/settings"
         properties={scope.properties}
