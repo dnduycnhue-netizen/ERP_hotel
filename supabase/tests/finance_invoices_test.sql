@@ -377,7 +377,11 @@ insert into t040_resp values ('ret1', public.supplier_return_post(
 ));
 insert into t040_ctx values ('ret1', (select (resp ->> 'id')::uuid from t040_resp where key = 'ret1'));
 select is((select resp ->> 'ok' from t040_resp where key = 'ret1'), 'true', 'return1 posted');
+-- Doc ap_ledger duoi quyen a01 (co ap.view): a07 (thu kho) bi policy
+-- ap_ledger_select chan nen doc thay null — xem diag+dump 12/11.
+select public._t040_as('d0400000-0000-4000-8000-000000000a01');
 select is((select amount from public.ap_ledger where doc_type = 'supplier_return' and doc_id = (select id from t040_ctx where key = 'ret1')), -40000::numeric, 'ap_ledger (-) 40000 for return1 (4kg x 10000 invoiced)');
+select public._t040_as('d0400000-0000-4000-8000-000000000a07');
 -- Tra hang chua co hoa don duyet (GR2, invoice4 moi 'matched') -> khong ghi so.
 insert into t040_resp values ('ret2', public.supplier_return_post(
   'd0400000-0000-4000-8000-000000000e02',
@@ -385,7 +389,11 @@ insert into t040_resp values ('ret2', public.supplier_return_post(
 ));
 insert into t040_ctx values ('ret2', (select (resp ->> 'id')::uuid from t040_resp where key = 'ret2'));
 select is((select resp ->> 'ok' from t040_resp where key = 'ret2'), 'true', 'return2 posted');
+-- Doc duoi quyen a01 (co ap.view) de assert co nghia that: duoi a07 thi
+-- count luon = 0 do RLS chan, du co dong ledger cung khong thay.
+select public._t040_as('d0400000-0000-4000-8000-000000000a01');
 select is((select count(*) from public.ap_ledger where doc_type = 'supplier_return' and doc_id = (select id from t040_ctx where key = 'ret2')), 0::bigint, 'no ap_ledger entry for return2 (no approved invoice)');
+select public._t040_as('d0400000-0000-4000-8000-000000000a07');
 -- Tra not 6kg GAO con lai cua GR1 -> tru not phan hoa don con lai 60000.
 insert into t040_resp values ('ret3', public.supplier_return_post(
   'd0400000-0000-4000-8000-000000000e01',
@@ -393,6 +401,7 @@ insert into t040_resp values ('ret3', public.supplier_return_post(
 ));
 insert into t040_ctx values ('ret3', (select (resp ->> 'id')::uuid from t040_resp where key = 'ret3'));
 select is((select resp ->> 'ok' from t040_resp where key = 'ret3'), 'true', 'return3 posted');
+select public._t040_as('d0400000-0000-4000-8000-000000000a01');
 select is((select amount from public.ap_ledger where doc_type = 'supplier_return' and doc_id = (select id from t040_ctx where key = 'ret3')), -60000::numeric, 'ap_ledger (-) 60000 for return3 (remaining invoiced 6kg)');
 
 -- 13. Quyet toan tam ung.
