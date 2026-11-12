@@ -92,6 +92,52 @@ export const rpcErrorMessages: Record<string, string> = {
     "Tồn kho minibar tổng không đủ để bổ sung. Hãy kiểm tra tồn kho tổng trước.",
   ERR_SUPPLIER_HAS_BANK_ACCOUNTS:
     "Nhà cung cấp đã có tài khoản ngân hàng nên không thể xóa. Hãy tạm ngưng hoặc cấm nhà cung cấp thay vì xóa.",
+  // Mã bổ sung (rà soát 12/11/2026): mã RPC có trong migration nhưng chưa có câu tiếng Việt.
+  ERR_UNAUTHENTICATED: "Phiên đăng nhập đã hết hạn. Hãy đăng nhập lại.",
+  ERR_WRITE_GUARD:
+    "Dữ liệu này chỉ được ghi qua chức năng của hệ thống, không sửa trực tiếp được.",
+  ERR_INVALID_INPUT: "Dữ liệu gửi lên không hợp lệ. Hãy kiểm tra lại.",
+  ERR_INVALID_DOCUMENT_NUMBER_INPUT:
+    "Không sinh được số chứng từ vì thông tin loại chứng từ hoặc ngày không hợp lệ.",
+  ERR_INVALID_MOVE_INPUT: "Dòng nhập xuất kho không hợp lệ. Hãy kiểm tra lại.",
+  ERR_INVALID_MOVE_TYPE: "Loại nhập xuất kho không hợp lệ.",
+  ERR_ZERO_QUANTITY_MOVE: "Số lượng nhập xuất kho phải khác 0.",
+  ERR_UNIT_COST_REQUIRED: "Thiếu đơn giá vốn cho dòng nhập kho.",
+  ERR_RETURN_COST_REQUIRED: "Thiếu giá vốn gốc để ghi nhận trả hàng.",
+  ERR_SOURCE_DOC_REQUIRED: "Thiếu chứng từ gốc cho bút toán này.",
+  ERR_ORIGINAL_MOVE_NOT_FOUND: "Không tìm thấy bút toán gốc cần đảo.",
+  ERR_REVERSAL_TARGET_REQUIRED: "Cần chỉ rõ bút toán gốc để đảo.",
+  ERR_REVERSAL_QTY_MISMATCH:
+    "Số lượng đảo không khớp với số lượng của bút toán gốc.",
+  ERR_LOT_MISMATCH: "Số lô không khớp với bút toán gốc.",
+  ERR_ITEM_ORG_MISMATCH: "Vật tư không thuộc tổ chức của chứng từ.",
+  ERR_PROPERTY_ENTITY_MISMATCH:
+    "Khách sạn và pháp nhân không khớp nhau. Hãy kiểm tra lại.",
+  ERR_WAREHOUSE_PROPERTY_MISMATCH: "Kho không thuộc khách sạn đã chọn.",
+  ERR_BANK_ACCOUNT_MISSING: "Nhà cung cấp chưa có tài khoản ngân hàng hợp lệ.",
+  ERR_ROLE_NOT_FOUND: "Không tìm thấy vai trò.",
+  ERR_ROLE_ASSIGNED:
+    "Vai trò đang được gán cho người dùng nên không thể thực hiện thao tác này.",
+  ERR_ROLE_PROPERTY_ORG_MISMATCH:
+    "Khách sạn không thuộc cùng tổ chức với vai trò.",
+  ERR_ROLE_SCOPE_ORG_MISMATCH:
+    "Phạm vi của vai trò không thuộc tổ chức đã chọn.",
+  ERR_ROLE_SCOPE_PROPERTY_MISMATCH:
+    "Phạm vi của vai trò không khớp với khách sạn đã chọn.",
+  ERR_BOOTSTRAP_ALREADY_INITIALIZED: "Hệ thống đã được khởi tạo trước đó.",
+  ERR_BOOTSTRAP_INVALID_INPUT: "Thông tin khởi tạo hệ thống không hợp lệ.",
+  ERR_BOOTSTRAP_PERMISSIONS_MISSING:
+    "Thiếu danh mục quyền để khởi tạo hệ thống.",
+  ERR_BOOTSTRAP_USERS_INVALID:
+    "Danh sách người dùng khởi tạo không hợp lệ.",
+  ERR_NOTIFICATION_SENDER_UNAVAILABLE:
+    "Chưa cấu hình dịch vụ gửi thông báo. Hãy liên hệ quản trị viên.",
+  ERR_NOTIFICATION_SEND_FAILED:
+    "Gửi thông báo không thành công. Hệ thống sẽ thử lại.",
+  ERR_NOTIFICATION_TIMEOUT:
+    "Gửi thông báo quá thời gian chờ. Hệ thống sẽ thử lại.",
+  ERR_COUNT_INDEPENDENT:
+    "Đợt kiểm kê cần ít nhất một người đếm độc lập, không phải người nhập hoặc xuất kho tại kho này.",
 } as const;
 
 export const rpcErrorFallback =
