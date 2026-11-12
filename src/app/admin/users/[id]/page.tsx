@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { EmptyState } from "@/components/common/empty-state";
+import { PageHeader } from "@/components/shell/page-header";
 import {
   getUserProfile,
   listUserAssignments,
@@ -40,9 +41,19 @@ export default async function UserDetailPage({
         >
           ← {vi.admin.users}
         </Link>
-        <h1 className="mt-2 text-2xl font-bold tracking-tight">
-          {profile.full_name}
-        </h1>
+        <div className="mt-2">
+          <PageHeader
+            title={profile.full_name}
+            actions={
+              <Link
+                href={`/admin/users/${userId}/access`}
+                className="inline-flex h-9 items-center rounded-md border bg-background px-3 text-sm font-medium outline-none transition-colors hover:bg-accent focus-visible:ring-2 focus-visible:ring-brand/40"
+              >
+                {vi.admin.manageAccess}
+              </Link>
+            }
+          />
+        </div>
         <dl className="mt-3 grid max-w-2xl grid-cols-2 gap-x-6 gap-y-2 rounded-lg border bg-card p-4 text-sm sm:grid-cols-3">
           <div>
             <dt className="text-muted-foreground">{vi.admin.employeeCode}</dt>
@@ -67,37 +78,29 @@ export default async function UserDetailPage({
             </dd>
           </div>
         </dl>
-        <div className="mt-4">
-          <Link
-            href={`/admin/users/${userId}/access`}
-            className="inline-flex h-9 items-center rounded-md border bg-background px-3 text-sm font-medium outline-none transition-colors hover:bg-accent focus-visible:ring-2 focus-visible:ring-brand/40"
-          >
-            {vi.admin.manageAccess}
-          </Link>
-        </div>
       </div>
 
       <section className="space-y-3">
-        <h2 className="text-lg font-semibold">{vi.admin.assignedRoles}</h2>
+        <h2 className="text-base font-semibold">{vi.admin.assignedRoles}</h2>
         {assignments.length === 0 ? (
           <EmptyState title={vi.admin.assignedRolesEmpty} />
         ) : (
           <div className="overflow-x-auto rounded-lg border bg-card">
             <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b text-left text-muted-foreground">
-                  <th className="px-4 py-3 font-medium">{vi.admin.roleName}</th>
-                  <th className="px-4 py-3 font-medium">{vi.admin.property}</th>
-                  <th className="px-4 py-3 font-medium">
+              <thead className="bg-muted/40 text-left">
+                <tr>
+                  <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">{vi.admin.roleName}</th>
+                  <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">{vi.admin.property}</th>
+                  <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
                     {vi.admin.validFrom}
                   </th>
-                  <th className="px-4 py-3 font-medium">{vi.admin.validTo}</th>
+                  <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">{vi.admin.validTo}</th>
                 </tr>
               </thead>
               <tbody>
                 {assignments.map((assignment) => (
-                  <tr key={assignment.id} className="border-b last:border-0">
-                    <td className="px-4 py-3">
+                  <tr key={assignment.id} className="border-t hover:bg-muted/40">
+                    <td className="px-3 py-3 align-middle">
                       <span className="font-medium">
                         {assignment.role_name}
                       </span>
@@ -105,11 +108,11 @@ export default async function UserDetailPage({
                         {assignment.role_code}
                       </span>
                     </td>
-                    <td className="px-4 py-3">
+                    <td className="px-3 py-3 align-middle">
                       {assignment.property_name ?? vi.admin.chainWide}
                     </td>
-                    <td className="px-4 py-3">{assignment.valid_from}</td>
-                    <td className="px-4 py-3">{assignment.valid_to ?? "—"}</td>
+                    <td className="px-3 py-3 align-middle">{assignment.valid_from}</td>
+                    <td className="px-3 py-3 align-middle">{assignment.valid_to ?? "—"}</td>
                   </tr>
                 ))}
               </tbody>
@@ -119,7 +122,7 @@ export default async function UserDetailPage({
       </section>
 
       <section className="space-y-3">
-        <h2 className="text-lg font-semibold">
+        <h2 className="text-base font-semibold">
           {vi.admin.individualPermissions}
         </h2>
         {overrides.length === 0 ? (
@@ -127,21 +130,21 @@ export default async function UserDetailPage({
         ) : (
           <div className="overflow-x-auto rounded-lg border bg-card">
             <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b text-left text-muted-foreground">
-                  <th className="px-4 py-3 font-medium">
+              <thead className="bg-muted/40 text-left">
+                <tr>
+                  <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
                     {vi.admin.permission}
                   </th>
-                  <th className="px-4 py-3 font-medium">{vi.admin.property}</th>
-                  <th className="px-4 py-3 font-medium">{vi.admin.effect}</th>
-                  <th className="px-4 py-3 font-medium">{vi.admin.validTo}</th>
-                  <th className="px-4 py-3 font-medium">{vi.admin.reason}</th>
+                  <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">{vi.admin.property}</th>
+                  <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">{vi.admin.effect}</th>
+                  <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">{vi.admin.validTo}</th>
+                  <th className="px-3 py-2.5 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">{vi.admin.reason}</th>
                 </tr>
               </thead>
               <tbody>
                 {overrides.map((override) => (
-                  <tr key={override.id} className="border-b last:border-0">
-                    <td className="px-4 py-3">
+                  <tr key={override.id} className="border-t hover:bg-muted/40">
+                    <td className="px-3 py-3 align-middle">
                       <span className="font-medium">
                         {override.permission_name}
                       </span>
@@ -149,16 +152,16 @@ export default async function UserDetailPage({
                         {override.permission_code}
                       </span>
                     </td>
-                    <td className="px-4 py-3">
+                    <td className="px-3 py-3 align-middle">
                       {override.property_name ?? vi.admin.chainWide}
                     </td>
-                    <td className="px-4 py-3">
+                    <td className="px-3 py-3 align-middle">
                       {override.effect === "allow"
                         ? vi.admin.effectAllow
                         : vi.admin.effectDeny}
                     </td>
-                    <td className="px-4 py-3">{override.valid_to ?? "—"}</td>
-                    <td className="px-4 py-3">{override.reason}</td>
+                    <td className="px-3 py-3 align-middle">{override.valid_to ?? "—"}</td>
+                    <td className="px-3 py-3 align-middle">{override.reason}</td>
                   </tr>
                 ))}
               </tbody>
