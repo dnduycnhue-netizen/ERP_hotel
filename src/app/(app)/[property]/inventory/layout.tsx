@@ -35,6 +35,7 @@ export default async function InventoryLayout({
     perms.has("waste.propose") ||
     perms.has("waste.approve") ||
     perms.has("waste.approve.large") ||
+    perms.has("pos.import") ||
     perms.has("count.open") ||
     perms.has("count.perform") ||
     perms.has("count.view_variance") ||

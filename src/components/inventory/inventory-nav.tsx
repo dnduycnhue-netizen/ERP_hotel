@@ -34,6 +34,7 @@ export function InventoryNav({ propertyId }: { propertyId: string }) {
   const canDayUnlock = useCan("day.unlock");
   const canPeriodClose = useCan("period.close");
   const canPeriodReopen = useCan("period.reopen");
+  const canPosImport = useCan("pos.import");
   const canReceivingView = useCan("receiving.view");
   const canReceivingReviewPhotos = useCan("receiving.review_photos");
 
@@ -91,6 +92,12 @@ export function InventoryNav({ propertyId }: { propertyId: string }) {
     links.push({
       href: `/${propertyId}/inventory/locks`,
       label: vi.inventory.nav.locks,
+    });
+  }
+  if (canPosImport) {
+    links.push({
+      href: `/${propertyId}/inventory/pos-import`,
+      label: vi.inventory.nav.posImport,
     });
   }
   if (canStock) {

@@ -3715,6 +3715,164 @@ export type Database = {
           },
         ]
       }
+      pos_import_lines: {
+        Row: {
+          amount: number
+          bill_no: string
+          business_date: string
+          created_at: string
+          id: string
+          import_id: string
+          item_code: string
+          item_name: string | null
+          org_id: string
+          outlet: string | null
+          payment: string | null
+          property_id: string
+          qty: number
+          recipe_id: string | null
+          shift: string
+          sold_time: string | null
+          unit_price: number
+        }
+        Insert: {
+          amount: number
+          bill_no: string
+          business_date: string
+          created_at?: string
+          id?: string
+          import_id: string
+          item_code: string
+          item_name?: string | null
+          org_id: string
+          outlet?: string | null
+          payment?: string | null
+          property_id: string
+          qty: number
+          recipe_id?: string | null
+          shift: string
+          sold_time?: string | null
+          unit_price: number
+        }
+        Update: {
+          amount?: number
+          bill_no?: string
+          business_date?: string
+          created_at?: string
+          id?: string
+          import_id?: string
+          item_code?: string
+          item_name?: string | null
+          org_id?: string
+          outlet?: string | null
+          payment?: string | null
+          property_id?: string
+          qty?: number
+          recipe_id?: string | null
+          shift?: string
+          sold_time?: string | null
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pos_import_lines_import_id_fkey"
+            columns: ["import_id"]
+            isOneToOne: false
+            referencedRelation: "pos_imports"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pos_import_lines_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pos_import_lines_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pos_imports: {
+        Row: {
+          business_date: string
+          created_at: string
+          created_by: string | null
+          file_name: string
+          file_sha256: string
+          id: string
+          legal_entity_id: string
+          org_id: string
+          property_id: string
+          row_count: number
+          shift: string
+          status: string
+          total_amount: number
+          unmapped_count: number
+          updated_at: string
+        }
+        Insert: {
+          business_date: string
+          created_at?: string
+          created_by?: string | null
+          file_name: string
+          file_sha256: string
+          id?: string
+          legal_entity_id: string
+          org_id: string
+          property_id: string
+          row_count: number
+          shift: string
+          status?: string
+          total_amount: number
+          unmapped_count?: number
+          updated_at?: string
+        }
+        Update: {
+          business_date?: string
+          created_at?: string
+          created_by?: string | null
+          file_name?: string
+          file_sha256?: string
+          id?: string
+          legal_entity_id?: string
+          org_id?: string
+          property_id?: string
+          row_count?: number
+          shift?: string
+          status?: string
+          total_amount?: number
+          unmapped_count?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pos_imports_legal_entity_id_fkey"
+            columns: ["legal_entity_id"]
+            isOneToOne: false
+            referencedRelation: "legal_entities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pos_imports_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pos_imports_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       price_agreement_lines: {
         Row: {
           agreement_id: string
@@ -8889,6 +9047,15 @@ export type Database = {
       }
       po_submit: {
         Args: { p_po_id: string; p_property_id: string }
+        Returns: Json
+      }
+      pos_import_commit: {
+        Args: {
+          p_file_name: string
+          p_file_sha256: string
+          p_lines: Json
+          p_property_id: string
+        }
         Returns: Json
       }
       pr_cancel: {

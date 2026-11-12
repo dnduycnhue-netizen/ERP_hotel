@@ -114,7 +114,7 @@ Các RPC danh mục dưới đây thuộc các task sau, chưa được triển 
 | `payment_request_create`, `payment_request_decide`, `payment_mark_paid(p_id, p_bank_ref)` | `ap_ledger` (−) khi paid; timeline duyệt đọc qua `approval_timeline(..., 'payment_request', ...)` (Q73) |
 | `service_contract_save`, `service_schedule_generate(p_month)`, `service_accept(p_schedule_id, p_rating, p_photos, p_po_id, p_note)` | `p_note` tuy chon, luu vao `service_acceptances.note` (Q81) |
 | `pms_daily_upsert(p_property_id, p_date, p_stats jsonb)` | Lễ tân nhập hằng ngày |
-| `pos_import_commit(p_import_id)` (P2) | |
+| `pos_import_commit(p_property_id, p_file_name, p_file_sha256, p_lines)` | Q34: nạp file POS (quyền `pos.import`); tách theo (ngày, ca) thành các `pos_imports`; nạp lại cùng file → `ERR_ALREADY_IMPORTED`; mã món không có trong `recipes.code` lưu `recipe_id` NULL và trả về `unmapped_codes`. Định dạng cột là giả định (xem OPEN-QUESTIONS Q34) |
 
 ## 8. Nhà hàng (M06)
 
