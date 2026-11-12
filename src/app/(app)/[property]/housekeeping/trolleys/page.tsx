@@ -76,7 +76,7 @@ export default async function TrolleysPage({
             id="status"
             name="status"
             defaultValue={statusFilter ?? ""}
-            className="mt-1 h-9 rounded-md border bg-background px-3 text-sm"
+            className="mt-1 h-9 rounded-md border bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
           >
             <option value="">{vi.common.all}</option>
             <option value="open">{vi.components.docStatus.open}</option>
@@ -98,7 +98,7 @@ export default async function TrolleysPage({
             name="date"
             type="date"
             defaultValue={dateFilter ?? ""}
-            className="mt-1 h-9 rounded-md border bg-background px-3 text-sm"
+            className="mt-1 h-9 rounded-md border bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
           />
         </div>
         <Button type="submit" size="sm" variant="outline">
