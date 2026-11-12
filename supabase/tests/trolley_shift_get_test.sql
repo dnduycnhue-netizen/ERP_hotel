@@ -59,10 +59,12 @@ insert into public.room_types (id, property_id, code, name, max_guests) values
 insert into public.rooms (id, property_id, room_type_id, room_no, floor) values
   ('d0460000-0000-4000-8000-000000000c01', 'd0460000-0000-4000-8000-000000000201', 'd0460000-0000-4000-8000-000000000b01', '101', '1');
 
-insert into public.item_costs (legal_entity_id, item_id, avg_cost, qty_on_hand) values
-  ('d0460000-0000-4000-8000-000000000101', 'd0460000-0000-4000-8000-000000000501', 2000, 105),
-  ('d0460000-0000-4000-8000-000000000101', 'd0460000-0000-4000-8000-000000000502', 3000, 100),
-  ('d0460000-0000-4000-8000-000000000101', 'd0460000-0000-4000-8000-000000000503', 5000, 210);
+-- item_costs.org_id NOT NULL (110000:91) + FK (legal_entity_id, org_id):
+-- ban goc thieu org_id nen run 2 rot 23502; tien le T-030/T-034 da ghi org_id.
+insert into public.item_costs (legal_entity_id, org_id, item_id, avg_cost, qty_on_hand) values
+  ('d0460000-0000-4000-8000-000000000101', 'd0460000-0000-4000-8000-000000000001', 'd0460000-0000-4000-8000-000000000501', 2000, 105),
+  ('d0460000-0000-4000-8000-000000000101', 'd0460000-0000-4000-8000-000000000001', 'd0460000-0000-4000-8000-000000000502', 3000, 100),
+  ('d0460000-0000-4000-8000-000000000101', 'd0460000-0000-4000-8000-000000000001', 'd0460000-0000-4000-8000-000000000503', 5000, 210);
 
 insert into auth.users (id, instance_id, aud, role, email, encrypted_password, email_confirmed_at, created_at, updated_at, raw_app_meta_data, raw_user_meta_data)
 values
