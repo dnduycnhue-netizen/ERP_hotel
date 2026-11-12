@@ -34,7 +34,7 @@ export default async function ReportDetailPage({
   if (!perms[meta.code]) {
     return (
       <div className="space-y-4">
-        <h2 className="text-xl font-semibold">{meta.title}</h2>
+        <h2 className="text-base font-semibold">{meta.title}</h2>
         <ErrorState title={vi.reports.noPermission} />
       </div>
     );
@@ -47,7 +47,7 @@ export default async function ReportDetailPage({
     const code = error instanceof Error ? error.message : null;
     return (
       <div className="space-y-4">
-        <h2 className="text-xl font-semibold">{meta.title}</h2>
+        <h2 className="text-base font-semibold">{meta.title}</h2>
         <ErrorState title={getRpcErrorMessage(code)} />
       </div>
     );
@@ -86,7 +86,7 @@ export default async function ReportDetailPage({
   return (
     <div className="space-y-4">
       <div>
-        <h2 className="text-xl font-semibold">{meta.title}</h2>
+        <h2 className="text-base font-semibold">{meta.title}</h2>
         <p className="text-sm text-muted-foreground">{meta.description}</p>
       </div>
       <ReportFilters

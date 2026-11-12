@@ -98,7 +98,7 @@ export default async function TrolleyShiftDetailPage({
 
       {shift.rooms_done.length > 0 ? (
         <section className="space-y-3">
-          <h2 className="text-lg font-semibold">{vi.housekeeping.roomsDone}</h2>
+          <h2 className="text-base font-semibold">{vi.housekeeping.roomsDone}</h2>
           <ul className="flex flex-col gap-2">
             {shift.rooms_done.map((room, index) => (
               <li
@@ -118,7 +118,7 @@ export default async function TrolleyShiftDetailPage({
       ) : null}
 
       <section className="space-y-3">
-        <h2 className="text-lg font-semibold">
+        <h2 className="text-base font-semibold">
           {vi.housekeeping.openingCounts}
         </h2>
         <ShiftCountTable
@@ -130,7 +130,7 @@ export default async function TrolleyShiftDetailPage({
       </section>
 
       <section className="space-y-3">
-        <h2 className="text-lg font-semibold">
+        <h2 className="text-base font-semibold">
           {vi.housekeeping.closingCounts}
         </h2>
         {detail.closing_counts === null ? (
@@ -146,7 +146,7 @@ export default async function TrolleyShiftDetailPage({
       </section>
 
       <section className="space-y-3">
-        <h2 className="text-lg font-semibold">
+        <h2 className="text-base font-semibold">
           {vi.housekeeping.consumptionTitle}
         </h2>
         {detail.consumption.length === 0 ? (
