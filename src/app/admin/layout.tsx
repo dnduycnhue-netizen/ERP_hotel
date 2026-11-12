@@ -3,9 +3,11 @@ import Link from "next/link";
 import { connection } from "next/server";
 import { redirect } from "next/navigation";
 import { ErrorState } from "@/components/common/error-state";
+import { AppShell } from "@/components/shell/app-shell";
 import { hasChainPerm } from "@/features/admin";
 import { hasAdminConfigPermission } from "@/features/admin";
 import { vi } from "@/i18n/vi";
+import { PermissionsProvider } from "@/lib/permissions/permissions-provider";
 import { listAccessibleProperties } from "@/lib/supabase/access";
 import { createClient, getAuthenticatedUser } from "@/lib/supabase/server";
 
@@ -84,78 +86,39 @@ export default async function AdminLayout({
     );
   }
 
+  // Quyền cấp chuỗi + tên hiển thị cho vỏ ClickUp: my_permissions(null)
+  // trả quyền cấp chuỗi; full_name đọc 1 câu profiles theo user.id —
+  // không gọi getUser() lần 2 (user đã có từ getAuthenticatedUser).
+  const [{ data: chainPermissions }, { data: profile }] = await Promise.all([
+    supabase.rpc("my_permissions", { p_property: null }),
+    supabase
+      .from("profiles")
+      .select("full_name")
+      .eq("id", user.id)
+      .maybeSingle(),
+  ]);
+
   return (
-    <div className="min-h-screen bg-muted/30">
-      <header className="border-b bg-background">
-        <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-4 px-4 py-4 sm:px-6">
-          <Link className="font-semibold tracking-tight" href="/admin/roles">
-            {vi.admin.title}
-          </Link>
-          <nav className="flex gap-4 text-sm">
-            {canRoles ? (
-              <Link
-                href="/admin/roles"
-                className="text-primary hover:underline"
-              >
-                {vi.admin.roles}
-              </Link>
-            ) : null}
-            {canUsers ? (
-              <Link
-                href="/admin/users"
-                className="text-primary hover:underline"
-              >
-                {vi.admin.users}
-              </Link>
-            ) : null}
-            {canOrg ? (
-              <Link
-                href="/admin/organizations"
-                className="text-primary hover:underline"
-              >
-                {vi.admin.organizations}
-              </Link>
-            ) : null}
-            {canSettings ? (
-              <Link
-                href="/admin/settings"
-                className="text-primary hover:underline"
-              >
-                {vi.admin.settings}
-              </Link>
-            ) : null}
-            {canApprovalRules ? (
-              <Link
-                href="/admin/approval-rules"
-                className="text-primary hover:underline"
-              >
-                {vi.admin.approvalRules}
-              </Link>
-            ) : null}
-            {canAlertRules ? (
-              <Link
-                href="/admin/alert-rules"
-                className="text-primary hover:underline"
-              >
-                {vi.admin.alertRules}
-              </Link>
-            ) : null}
-            <Link
-              href="/settings/password"
-              className="text-primary hover:underline"
-            >
-              {vi.password.changePasswordTitle}
-            </Link>
-          </nav>
-          <Link
-            href="/"
-            className="ml-auto text-sm text-muted-foreground hover:underline"
-          >
-            {vi.admin.backToDashboard}
-          </Link>
-        </div>
-      </header>
-      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6">{children}</main>
-    </div>
+    <PermissionsProvider
+      propertyId={null}
+      initialPermissions={chainPermissions ?? []}
+    >
+      <AppShell
+        mode="admin"
+        adminNav={{
+          roles: canRoles,
+          users: canUsers,
+          organizations: canOrg,
+          settings: canSettings,
+          approvalRules: canApprovalRules,
+          alertRules: canAlertRules,
+        }}
+        userEmail={user.email}
+        userName={profile?.full_name ?? null}
+        showJumpSearch={false}
+      >
+        {children}
+      </AppShell>
+    </PermissionsProvider>
   );
 }
