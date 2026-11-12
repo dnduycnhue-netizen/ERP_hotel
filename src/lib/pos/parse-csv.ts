@@ -43,7 +43,7 @@ export type PosCsvParseResult =
   | { ok: false; error: "empty" | "missing_columns" | "bad_row"; detail: string };
 
 /** Tách CSV có hỗ trợ dấu ngoặc kép, xuống dòng CRLF/LF. */
-function splitCsv(text: string): string[][] {
+export function splitCsv(text: string): string[][] {
   const rows: string[][] = [];
   let row: string[] = [];
   let cell = "";
