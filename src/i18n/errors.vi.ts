@@ -81,6 +81,7 @@ export const rpcErrorMessages: Record<string, string> = {
     "Mã tạm đã quá 72 giờ nên không dùng được nữa. Hãy chuẩn hóa mã trước khi dùng.",
   ERR_POS_IMPORT_REQUIRED:
     "Chưa tải file POS của ca này nên chưa đối soát được.",
+  ERR_ALREADY_IMPORTED: "File POS này đã được nạp trước đó.",
   ERR_SERVICE_NOT_ACCEPTED:
     "Kỳ dịch vụ chưa được nghiệm thu nên chưa thanh toán được.",
   ERR_UOM_UNKNOWN:
