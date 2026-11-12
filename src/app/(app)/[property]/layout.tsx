@@ -66,6 +66,11 @@ export default async function PropertyLayout({
     p.startsWith("alert.receive."),
   );
 
+  // Ghi rõ kiểu ở biên: parser select của supabase-js suy ra
+  // `data?.full_name` là `any` ở câu select này (cùng mẫu với select
+  // "active" ở layout cha), nên ép về đúng kiểu hợp đồng của AppShell.
+  const userName: string | null = profileResponse.data?.full_name ?? null;
+
   return (
     <PermissionsProvider
       key={propertyId}
@@ -79,7 +84,7 @@ export default async function PropertyLayout({
         canViewAlerts={canViewAlerts}
         unreadAlerts={unreadAlerts}
         userEmail={userEmail}
-        userName={profileResponse.data?.full_name ?? null}
+        userName={userName}
       >
         {children}
       </AppShell>
