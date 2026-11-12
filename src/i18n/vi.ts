@@ -3433,6 +3433,8 @@ export const vi = {
     queuedRecordHint:
       "Dòng này sẽ tự gửi lên máy chủ khi có mạng. Không cần ghi lại.",
     queuedPost: "Đã xếp hàng ghi sổ — sẽ tự gửi khi có mạng.",
+    queuedMinibar:
+      "Mất mạng — đã lưu phiếu kiểm minibar trên máy, sẽ tự gửi khi có mạng.",
     queuedOverride: "Đã xếp hàng duyệt vượt — sẽ tự gửi khi có mạng.",
     photoPending: "Ảnh chờ tải lên",
     startNeedsOnline:

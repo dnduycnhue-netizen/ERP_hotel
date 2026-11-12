@@ -158,7 +158,7 @@ describe("fixture mobile — property TEST47 + vật tư seed (T-047)", () => {
 });
 
 describe("fixture mobile — trạng thái hàng đợi offline (Q152)", () => {
-  it("U24 — Dexie queue có đủ 6 kind, CHƯA có kind minibar (Q152 đang mở)", () => {
+  it("U24 — Dexie queue có đủ 7 kind, gồm minibar_submit (Q152 đã chốt thêm queue)", () => {
     // Khoa trang thai hien tai: minibar chi nop online (mobile-check-form
     // goi thang submitCheckAction) vi queue chua co kind minibar.
     // Khi Q152 chot them kind `minibar_submit`, sua test nay + them kind
@@ -170,9 +170,9 @@ describe("fixture mobile — trạng thái hàng đợi offline (Q152)", () => {
       "count_record",
       "trolley_open",
       "trolley_close",
+      "minibar_submit",
     ]) {
       expect(offlineDbSrc).toContain(`"${kind}"`);
     }
-    expect(offlineDbSrc).not.toContain("minibar_submit");
   });
 });

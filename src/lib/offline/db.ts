@@ -1,5 +1,6 @@
 import Dexie, { type Table } from "dexie";
 import type { CountRecordLineInput } from "@/features/count/schemas";
+import type { MinibarSubmitCheckInput } from "@/features/minibar/schemas";
 import type {
   ReceivingOverrideLineInput,
   ReceivingPostInput,
@@ -31,7 +32,8 @@ export type OfflineJobKind =
   | "post"
   | "count_record"
   | "trolley_open"
-  | "trolley_close";
+  | "trolley_close"
+  | "minibar_submit";
 export type OfflineJobStatus = "pending" | "syncing" | "failed";
 
 export type OfflineJobPayload =
@@ -44,7 +46,8 @@ export type OfflineJobPayload =
   | { kind: "post"; input: ReceivingPostInput }
   | { kind: "count_record"; input: CountRecordLineInput }
   | { kind: "trolley_open"; input: TrolleyShiftOpenInput }
-  | { kind: "trolley_close"; input: TrolleyShiftCloseInput };
+  | { kind: "trolley_close"; input: TrolleyShiftCloseInput }
+  | { kind: "minibar_submit"; input: MinibarSubmitCheckInput };
 
 /**
  * Nháp số đếm xe đẩy đang nhập dở (mở ca / đóng ca). Số đếm lưu dạng

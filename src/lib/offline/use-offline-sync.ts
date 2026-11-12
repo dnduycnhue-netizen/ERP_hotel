@@ -39,6 +39,8 @@ export function useOfflineSync(listener?: SyncListener): OfflineSyncState {
         listenerRef.current?.onTrolleyOpenSynced?.(info),
       onTrolleyCloseSynced: (info) =>
         listenerRef.current?.onTrolleyCloseSynced?.(info),
+      onMinibarSubmitSynced: (info) =>
+        listenerRef.current?.onMinibarSubmitSynced?.(info),
     });
   }, []);
 
