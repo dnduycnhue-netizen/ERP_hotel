@@ -98,7 +98,9 @@ export default async function TrolleyShiftDetailPage({
 
       {shift.rooms_done.length > 0 ? (
         <section className="space-y-3">
-          <h2 className="text-base font-semibold">{vi.housekeeping.roomsDone}</h2>
+          <h2 className="text-base font-semibold">
+            {vi.housekeeping.roomsDone}
+          </h2>
           <ul className="flex flex-col gap-2">
             {shift.rooms_done.map((room, index) => (
               <li

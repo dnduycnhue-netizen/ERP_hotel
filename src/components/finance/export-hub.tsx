@@ -250,7 +250,9 @@ export function BankTransferExportPanel({
                       aria-label={r.doc_no}
                     />
                   </td>
-                  <td className="px-3 py-3 font-medium align-middle">{r.doc_no}</td>
+                  <td className="px-3 py-3 font-medium align-middle">
+                    {r.doc_no}
+                  </td>
                   <td className="px-3 py-3 align-middle">
                     {r.supplier_name ?? r.supplier_code ?? "—"}
                   </td>
