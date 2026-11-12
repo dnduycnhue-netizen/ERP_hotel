@@ -21,6 +21,10 @@ select plan(13);
 create temp table pg_tap_admin_relax_baseline as
 select public.admin_count() as chain_admins;
 
+-- Bang tam tao duoi role postgres, doc o dong 262/283 duoi role
+-- authenticated -> cap quyen truoc khi doi role (khong thi 42501).
+grant all on pg_tap_admin_relax_baseline to authenticated;
+
 -- Helper: thử thu hồi 1 lần gán, trả 'OK' hoặc message lỗi (ERR_*).
 -- Thu hồi thành công thì gán lại ngay vai trò chuỗi đó để khôi phục
 -- trạng thái cho các test sau (chỉ xảy ra khi baseline > 0).
