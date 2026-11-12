@@ -17,6 +17,7 @@ import {
   poCreateFromPrSchema,
   poSaveDraftSchema,
   poSendSchema,
+  poSetEstimatedTotalSchema,
   poSubmitSchema,
   prCancelSchema,
   prDecideSchema,
@@ -35,6 +36,7 @@ import {
   type PoCreateFromPrInput,
   type PoSaveDraftInput,
   type PoSendInput,
+  type PoSetEstimatedTotalInput,
   type PoSubmitInput,
   type PrCancelInput,
   type PrDecideInput,
@@ -205,6 +207,26 @@ export async function submitPoAction(
     p_property_id: parsed.data.propertyId,
     p_po_id: parsed.data.poId,
   });
+}
+
+/** Nhập tổng ước tính cho PO chợ có dòng chưa giá (RPC `po_set_estimated_total`, Q173). */
+export async function setPoEstimatedTotalAction(
+  input: PoSetEstimatedTotalInput,
+): Promise<ProcurementActionResult<{ ok: true; estimated_total: number }>> {
+  const parsed = poSetEstimatedTotalSchema.safeParse(input);
+  if (!parsed.success) {
+    return validationError(parsed.error.issues);
+  }
+  const supabase = await createClient();
+  return callProcurementRpc<{ ok: true; estimated_total: number }>(
+    supabase,
+    "po_set_estimated_total",
+    {
+      p_property_id: parsed.data.propertyId,
+      p_po_id: parsed.data.poId,
+      p_amount: parsed.data.amount,
+    },
+  );
 }
 
 /** Duyệt/từ chối bước duyệt hiện tại của PR hoặc PO (RPC `approval_decide`, T-020). */

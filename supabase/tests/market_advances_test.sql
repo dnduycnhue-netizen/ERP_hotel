@@ -453,6 +453,12 @@ select throws_ok(
 -- Duyet PO market: submit (1 buoc outlet_head) -> outlet_head duyet -> approved.
 select _t022_as('d0220000-0200-4000-8000-000000000a01');
 
+-- Q173: PO cho co dong chua gia phai co tong uoc tinh truoc khi submit.
+select public.po_set_estimated_total(
+  'd0220000-0200-4000-8000-000000000201',
+  (select id from public.purchase_orders where channel = 'market'),
+  3000000);
+
 select ok(
   (public.po_submit(
     'd0220000-0200-4000-8000-000000000201',

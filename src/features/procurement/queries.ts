@@ -45,6 +45,7 @@ export type PoRow = {
   order_date: string;
   expected_date: string | null;
   total_amount: number;
+  estimated_total?: number | null;
   status: string;
   over_ceiling_reason: string | null;
   created_by: string;

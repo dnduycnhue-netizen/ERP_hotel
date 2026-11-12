@@ -1371,6 +1371,12 @@ export const vi = {
       statusCancelled: "Đã hủy",
     },
     po: {
+      estimatedTotal: "Tổng ước tính",
+      estimatedTotalHint:
+        "Đơn mua chợ còn dòng chưa có giá: nhập tổng tiền ước tính để tính đúng bậc duyệt (lấy số lớn hơn giữa ước tính và tổng dòng đã có giá).",
+      estimatedTotalSave: "Lưu ước tính",
+      estimatedTotalSaved: "Đã lưu tổng ước tính.",
+      estimatedTotalInvalid: "Nhập số tiền lớn hơn 0.",
       title: "Đơn mua",
       listTitle: "Danh sách đơn mua",
       createTitle: "Tạo đơn mua",
