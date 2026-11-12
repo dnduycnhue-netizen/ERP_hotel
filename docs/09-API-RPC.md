@@ -26,6 +26,7 @@ Các RPC danh mục dưới đây thuộc các task sau, chưa được triển 
 | `pr_submit(p_pr_id)` / `pr_decide(p_pr_id, p_decision, p_comment)` | |
 | `po_create_from_pr(p_pr_line_ids uuid[], p_supplier_id, p_channel)` | Tự lấy giá theo thứ tự hợp đồng → báo giá → giá trần |
 | `po_save_draft(p_po jsonb)` | Không cho sửa `unit_price` nếu `price_source <> 'manual'` |
+| `po_set_estimated_total(p_property_id, p_po_id, p_amount)` | Q173: nhập tổng tiền ước tính cho PO chợ nháp (quyền `po.create`); `po_submit` bắt buộc khi PO chợ còn dòng giá 0 (`ERR_ESTIMATE_REQUIRED`) và tính bậc duyệt theo số lớn hơn giữa ước tính và `total_amount` |
 | `po_submit(p_po_id)` | Sinh các bước `approvals` theo `approval_rules`; chặn `ERR_PRICE_NOT_SET` khi PO **thường** (contract/quote) có dòng `manual` giá ≤ 0 — **PO chợ (`channel = 'market'`) được miễn** kiểm tra giá (T-022A, tự phê duyệt 10/11) |
 | `approval_decide(p_doc_type, p_doc_id, p_decision, p_comment)` | Kiểm `SOD_PO_CREATOR_APPROVER` |
 | `pr_list(p_property_id, p_status, p_search, p_limit, p_offset)` / `po_list(...)` | Trả `created_by_name` (join `profiles`, Q18); `total` + `rows` |

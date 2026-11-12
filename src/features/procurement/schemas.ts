@@ -110,6 +110,12 @@ export const poSubmitSchema = z.object({
   poId: uuidSchema,
 });
 
+export const poSetEstimatedTotalSchema = z.object({
+  propertyId: uuidSchema,
+  poId: uuidSchema,
+  amount: z.number().positive(),
+});
+
 export const approvalDecideSchema = z.object({
   propertyId: uuidSchema,
   docType: z.enum(["pr", "po"]),
@@ -245,6 +251,9 @@ export type PrCancelInput = z.infer<typeof prCancelSchema>;
 export type PoCreateFromPrInput = z.infer<typeof poCreateFromPrSchema>;
 export type PoSaveDraftInput = z.infer<typeof poSaveDraftSchema>;
 export type PoSubmitInput = z.infer<typeof poSubmitSchema>;
+export type PoSetEstimatedTotalInput = z.infer<
+  typeof poSetEstimatedTotalSchema
+>;
 export type ApprovalDecideInput = z.infer<typeof approvalDecideSchema>;
 export type PoSendInput = z.infer<typeof poSendSchema>;
 export type PoCloseInput = z.infer<typeof poCloseSchema>;

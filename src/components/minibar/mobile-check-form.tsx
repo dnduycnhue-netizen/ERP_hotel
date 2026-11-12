@@ -11,6 +11,8 @@ import type {
   MinibarPriceRow,
 } from "@/features/minibar/queries";
 import { vi } from "@/i18n/vi";
+import { enqueueOfflineJob } from "@/lib/offline/db";
+import { useOfflineSync } from "@/lib/offline/use-offline-sync";
 import { cn } from "@/lib/utils";
 
 /** Giá đang hiệu lực hôm nay của 1 món (valid_from mới nhất, còn hạn). */
@@ -61,6 +63,13 @@ export function MobileCheckForm({
   prices: MinibarPriceRow[];
 }) {
   const router = useRouter();
+  const { online } = useOfflineSync({
+    onMinibarSubmitSynced: ({ checkId }) => {
+      if (checkId === check.id) {
+        router.refresh();
+      }
+    },
+  });
   const [qtyByItem, setQtyByItem] = useState<Record<string, string>>({});
   const [nearExpiryByItem, setNearExpiryByItem] = useState<
     Record<string, boolean>
@@ -116,7 +125,7 @@ export function MobileCheckForm({
     setPending(true);
     setMessage(null);
     setError(null);
-    const res = await submitCheckAction({
+    const input = {
       propertyId,
       checkId: check.id,
       lines: missingLines.map((l) => ({
@@ -125,7 +134,27 @@ export function MobileCheckForm({
         nearExpiry: nearExpiryByItem[l.item.id] ?? false,
       })),
       clientUuid,
-    });
+    };
+    if (!online) {
+      // Q152: mất mạng thì xếp hàng; cùng clientUuid nên gửi lại không ghi trùng.
+      try {
+        await enqueueOfflineJob({
+          propertyId,
+          grId: null,
+          countId: null,
+          kind: "minibar_submit",
+          clientUuid,
+          payload: { kind: "minibar_submit", input },
+          createdAt: Date.now(),
+        });
+        setMessage(vi.offline.queuedMinibar);
+      } catch {
+        setError(vi.offline.queueUnavailable);
+      }
+      setPending(false);
+      return;
+    }
+    const res = await submitCheckAction(input);
     setPending(false);
     if (!res.ok) {
       setError(res.error);

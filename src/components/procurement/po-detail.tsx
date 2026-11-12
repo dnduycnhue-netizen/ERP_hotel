@@ -14,6 +14,7 @@ import {
   closePoAction,
   decideApprovalAction,
   sendPoAction,
+  setPoEstimatedTotalAction,
   submitPoAction,
 } from "@/features/procurement/actions";
 import type {
@@ -63,6 +64,9 @@ export function PoDetail({
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [estimate, setEstimate] = useState(
+    po.estimated_total ? String(po.estimated_total) : "",
+  );
 
   // Hủy / đóng PO (lý do bắt buộc)
   const [reasonDialog, setReasonDialog] = useState<"cancel" | "close" | null>(
@@ -86,6 +90,28 @@ export function PoDetail({
     setBusy(false);
     if (res.ok) {
       setNotice(vi.procurement.form.submitSuccess);
+      router.refresh();
+    } else {
+      setError(res.error);
+    }
+  }
+
+  async function handleSaveEstimate() {
+    const amount = Number(estimate);
+    if (!Number.isFinite(amount) || amount <= 0) {
+      setError(vi.procurement.po.estimatedTotalInvalid);
+      return;
+    }
+    setBusy(true);
+    setError(null);
+    const res = await setPoEstimatedTotalAction({
+      propertyId,
+      poId: po.id,
+      amount,
+    });
+    setBusy(false);
+    if (res.ok) {
+      setNotice(vi.procurement.po.estimatedTotalSaved);
       router.refresh();
     } else {
       setError(res.error);
@@ -189,6 +215,15 @@ export function PoDetail({
             {vi.procurement.po.totalAmount}:{" "}
             <MoneyText amount={po.total_amount} className="font-semibold" />
           </p>
+          {po.estimated_total ? (
+            <p className="mt-1 text-sm">
+              {vi.procurement.po.estimatedTotal}:{" "}
+              <MoneyText
+                amount={po.estimated_total}
+                className="font-semibold"
+              />
+            </p>
+          ) : null}
         </div>
 
         <div className="flex gap-2 flex-wrap">
@@ -251,6 +286,33 @@ export function PoDetail({
           ) : null}
         </div>
       </div>
+
+      {po.status === "draft" && po.channel === "market" && canPoCreate ? (
+        <div className="space-y-2 rounded-md border p-3 text-sm">
+          <p className="text-muted-foreground">
+            {vi.procurement.po.estimatedTotalHint}
+          </p>
+          <div className="flex items-center gap-2">
+            <input
+              type="number"
+              inputMode="decimal"
+              min="0"
+              value={estimate}
+              onChange={(e) => setEstimate(e.target.value)}
+              aria-label={vi.procurement.po.estimatedTotal}
+              className="h-9 w-48 rounded-md border bg-background px-3"
+            />
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={handleSaveEstimate}
+              disabled={busy}
+            >
+              {vi.procurement.po.estimatedTotalSave}
+            </Button>
+          </div>
+        </div>
+      ) : null}
 
       {overCeilingLines.length > 0 ? (
         <div className="rounded-md border border-amber-500/30 bg-amber-500/10 p-3 text-sm">

@@ -8,6 +8,7 @@ import {
   CalendarDays,
   ClipboardCheck,
   ClipboardList,
+  HeartPulse,
   Hotel,
   KeyRound,
   LayoutDashboard,
@@ -283,6 +284,7 @@ export type AdminNavVisibility = {
   settings: boolean;
   approvalRules: boolean;
   alertRules: boolean;
+  health: boolean;
 };
 
 export type AdminNavItem = {
@@ -322,6 +324,12 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
     label: vi.admin.alertRules,
     href: "/admin/alert-rules",
     icon: BellRing,
+  },
+  {
+    key: "health",
+    label: vi.admin.health.title,
+    href: "/admin/health",
+    icon: HeartPulse,
   },
 ];
 
@@ -435,6 +443,7 @@ export function buildJumpDestinations(propertyId: string): JumpDestination[] {
     item("admin", vi.admin.approvalRules, "/admin/approval-rules"),
     item("admin", vi.admin.alertRules, "/admin/alert-rules"),
     item("admin", vi.admin.settings, "/admin/settings"),
+    item("admin", vi.admin.health.title, "/admin/health"),
     {
       label: vi.password.changePasswordTitle,
       groupLabel: vi.auth.account,

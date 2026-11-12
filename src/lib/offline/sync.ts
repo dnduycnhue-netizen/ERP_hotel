@@ -1,6 +1,7 @@
 "use client";
 
 import { uploadCapturedPhoto } from "@/features/attachments/upload-client";
+import { submitCheckAction } from "@/features/minibar/actions";
 import { recordCountLineAction } from "@/features/count/actions";
 import {
   getReceivingReceiptStatusAction,
@@ -53,6 +54,7 @@ export type SyncListener = {
   onCountRecordSynced?: (info: { countId: string; itemId: string }) => void;
   onTrolleyOpenSynced?: (info: { shiftId: string }) => void;
   onTrolleyCloseSynced?: (info: { shiftId: string }) => void;
+  onMinibarSubmitSynced?: (info: { checkId: string }) => void;
 };
 
 let state: OfflineSyncState = initialSyncState;
@@ -181,7 +183,9 @@ async function processJob(job: OfflineJob): Promise<JobResult> {
   // Job nhận hàng bắt buộc có grId; job kiểm kê bắt buộc có countId.
   // Job xe đẩy không dùng grId/countId (mở ca chưa có shiftId).
   const trolleyKind =
-    job.payload.kind === "trolley_open" || job.payload.kind === "trolley_close";
+    job.payload.kind === "trolley_open" ||
+    job.payload.kind === "trolley_close" ||
+    job.payload.kind === "minibar_submit";
   if (!trolleyKind && job.payload.kind !== "count_record" && !job.grId) {
     return { ok: false, error: vi.offline.missingReceivingId };
   }
@@ -197,6 +201,8 @@ async function processJob(job: OfflineJob): Promise<JobResult> {
       return processTrolleyOpenJob(job);
     case "trolley_close":
       return processTrolleyCloseJob(job);
+    case "minibar_submit":
+      return processMinibarSubmitJob(job);
     case "override": {
       const grId = job.grId;
       if (!grId) {
@@ -334,6 +340,29 @@ async function processTrolleyCloseJob(job: OfflineJob): Promise<JobResult> {
     }
   }
   return { ok: false, error: res.error };
+}
+
+/**
+ * Nộp kiểm minibar xếp hàng (Q152): gửi lại cùng clientUuid, RPC
+ * `minibar_submit_check` trả về kết quả cũ (`duplicate`) thay vì ghi
+ * trùng — an toàn khi mất phản hồi rồi bơm lại.
+ */
+async function processMinibarSubmitJob(job: OfflineJob): Promise<JobResult> {
+  if (job.payload.kind !== "minibar_submit") {
+    return { ok: false, error: vi.offline.invalidJobKind };
+  }
+  const { input } = job.payload;
+  const res = await submitCheckAction({
+    ...input,
+    clientUuid: input.clientUuid ?? job.clientUuid ?? undefined,
+  });
+  if (!res.ok) {
+    return { ok: false, error: res.error };
+  }
+  for (const listener of syncListeners) {
+    listener.onMinibarSubmitSynced?.({ checkId: input.checkId });
+  }
+  return { ok: true };
 }
 
 async function processRecordJob(job: OfflineJob): Promise<JobResult> {
