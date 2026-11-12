@@ -101,13 +101,13 @@ export default async function TrolleysPage({
             className="mt-1 h-9 rounded-md border bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
           />
         </div>
-        <Button type="submit" size="sm" variant="outline">
+        <Button type="submit" size="lg" variant="outline">
           {vi.housekeeping.filterButton}
         </Button>
         {statusFilter || dateFilter ? (
           <Link
             href={`/${propertyId}/housekeeping/trolleys`}
-            className="inline-flex h-9 items-center rounded-md border px-3 text-sm hover:bg-muted"
+            className="inline-flex h-9 items-center rounded-md border bg-background px-3 text-sm font-medium outline-none transition-colors hover:bg-accent focus-visible:ring-2 focus-visible:ring-brand/40"
           >
             {vi.housekeeping.clearFilter}
           </Link>
