@@ -249,7 +249,7 @@ select lives_ok(
   'Purchaser can create PR draft via RPC'
 );
 select ok(
-  (select doc_no like 'PR-T020-%' from public.purchase_requests where kind = 'stock' and status = 'draft' order by created_at desc limit 1),
+  (select doc_no like 'PR-T020-%' from public.purchase_requests where kind = 'stock' and status = 'draft' and created_by = 'd0200000-0200-4000-8000-000000000a07' order by created_at desc limit 1),
   'PR doc_no follows next_doc_no format'
 );
 select is(
