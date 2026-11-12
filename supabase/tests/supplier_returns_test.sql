@@ -276,7 +276,7 @@ select public.receiving_record_line(
   p_gr_id := (select id from t026_ctx where key = 'gr3'),
   p_po_line_id := 'd0260000-0000-4000-8000-000000000c04',
   p_item_id := 'd0260000-0000-4000-8000-000000000501',
-  p_gross := 5, p_tare := 0, p_uom := 'kg',
+  p_gross := 8, p_tare := 0, p_uom := 'kg',
   p_qc := '{"status": "pass"}'::jsonb,
   p_photo_ids := array[(select id from t026_ctx where key = 'att3')]
 );
@@ -301,6 +301,10 @@ select ok(
 );
 
 -- Luu id 3 phieu tra QC fail: sr1 = GAO gr2, sr2 = MUOI gr2, sr3 = MUOI gr3.
+-- Nguoi nhan a06 KHONG doc duoc supplier_returns qua RLS (chi co
+-- receiving.view / review_photos / supplier_return.post moi xem duoc) nen
+-- doi sang thu kho a07 (co supplier_return.post) truoc khi doc.
+select public._t026_as('d0260000-0000-4000-8000-000000000a07');
 insert into t026_ctx values ('sr1', (select sr.id from public.supplier_returns sr
   join public.supplier_return_lines srl on srl.return_id = sr.id
   where sr.gr_id = (select id from t026_ctx where key = 'gr2')
@@ -451,7 +455,7 @@ select throws_ok(
   $q$select public.supplier_return_eligible_lines(
     (select id from t026_ctx where key = 'gr1')
   )$q$,
-  'P0001', 'ERR_FORBIDDEN:supplier_return.post',
+  '42501', 'ERR_FORBIDDEN:supplier_return.post',
   'receiver cannot list eligible lines (no supplier_return.post)'
 );
 
@@ -484,14 +488,19 @@ select ok(
 );
 select is(
   (select count(*) from public.stock_moves
-   where doc_type = 'supplier_return' and qty = -2 and unit_cost = 10000),
+   where move_type = 'return_out' and source_doc_type = 'supplier_return' and qty = -2 and unit_cost = 10000),
   1::bigint, 'AC T-026: return_out move at original cost 10000'
 );
+-- Thu kho a07 KHONG doc duoc purchase_order_lines qua RLS (can po.view /
+-- po.create / po.approve / po.close) nen doi sang thu mua a01 (co po.view)
+-- chi cho assert nay, roi doi lai a07.
+select public._t026_as('d0260000-0000-4000-8000-000000000a01');
 select is(
   (select received_qty_stock from public.purchase_order_lines
    where id = 'd0260000-0000-4000-8000-000000000c01'),
   8::numeric, 'GAO received_qty_stock drops to 8 after return'
 );
+select public._t026_as('d0260000-0000-4000-8000-000000000a07');
 select is(
   (select ((select v from jsonb_array_elements(
     public.supplier_return_eligible_lines(
@@ -610,16 +619,18 @@ select throws_ok(
     'd0260000-0000-4000-8000-000000000101/receiving/signature-sr3.jpg',
     null
   )$q$,
-  'P0001', 'ERR_FORBIDDEN:supplier_return.post',
+  '42501', 'ERR_FORBIDDEN:supplier_return.post',
   'receiver cannot confirm a return'
 );
 select throws_ok(
   $q$select public.supplier_return_cancel(
     (select id from t026_ctx where key = 'sr3'), 'Không được phép'
   )$q$,
-  'P0001', 'ERR_FORBIDDEN:supplier_return.post',
+  '42501', 'ERR_FORBIDDEN:supplier_return.post',
   'receiver cannot cancel a return'
 );
+-- list/get raise P0001 ERR_FORBIDDEN:receiving.view TRUC TIEP (khong qua
+-- require_perm) nen 2 assert duoi giu 'P0001' — khac 3 assert 42501 tren.
 select throws_ok(
   $q$select public.supplier_return_list(
     'd0260000-0000-4000-8000-000000000201'
