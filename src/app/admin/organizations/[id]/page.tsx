@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { LegalEntityNameForm } from "@/components/admin/legal-entity-name-form";
 import { QuickAssignWizard } from "@/components/admin/quick-assign-wizard";
+import { PageHeader } from "@/components/shell/page-header";
 import {
   filterQuickAssignRoles,
   getOrgDetail,
@@ -58,12 +59,7 @@ export default async function OrganizationDetailPage({
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">{org.name}</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          {vi.admin.orgCreated}
-        </p>
-      </div>
+      <PageHeader title={org.name} description={vi.admin.orgCreated} />
 
       <div className="grid gap-4 md:grid-cols-3">
         <section className="rounded-lg border bg-card p-4">
@@ -137,7 +133,7 @@ export default async function OrganizationDetailPage({
 
       <section className="space-y-3">
         <div>
-          <h2 className="text-lg font-semibold">
+          <h2 className="text-base font-semibold">
             {vi.admin.orgNextStepsTitle}
           </h2>
           <p className="mt-1 text-sm text-muted-foreground">

@@ -68,8 +68,10 @@ export default async function FinanceExportPage({
 
   return (
     <div className="space-y-6">
-      <PageHeader title={vi.export.hub.title} />
-      <p className="text-sm text-muted-foreground">{vi.export.hub.hint}</p>
+      <PageHeader
+        title={vi.export.hub.title}
+        description={vi.export.hub.hint}
+      />
 
       {perms.canExportAccounting && (
         <section

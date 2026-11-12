@@ -72,7 +72,7 @@ export default async function HousekeepingMinibarPage({
       <PageHeader title={vi.minibar.housekeepingTitle} />
 
       <section className="space-y-3">
-        <h2 className="text-lg font-semibold">{vi.minibar.stockTitle}</h2>
+        <h2 className="text-base font-semibold">{vi.minibar.stockTitle}</h2>
         {!stocksRes.data.canViewQty ? (
           <p className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
             {vi.minibar.stockHiddenNote}
@@ -143,22 +143,22 @@ export default async function HousekeepingMinibarPage({
           <table className="mt-3 w-full text-sm">
             <thead className="bg-muted/40 text-left">
               <tr>
-                <th className="py-2.5 pr-3 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                <th className="py-2.5 px-3 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
                   {vi.minibar.roomNo}
                 </th>
-                <th className="py-2.5 pr-3 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                <th className="py-2.5 px-3 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
                   {vi.minibar.itemCode}
                 </th>
-                <th className="py-2.5 pr-3 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                <th className="py-2.5 px-3 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
                   {vi.minibar.lotNo}
                 </th>
-                <th className="py-2.5 pr-3 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                <th className="py-2.5 px-3 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
                   {vi.minibar.expiryDate}
                 </th>
-                <th className="py-2.5 pr-3 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase text-right">
+                <th className="py-2.5 px-3 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase text-right">
                   {vi.minibar.daysLeft}
                 </th>
-                <th className="py-2.5 pr-3 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase text-right">
+                <th className="py-2.5 px-3 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase text-right">
                   {vi.minibar.qty}
                 </th>
               </tr>
@@ -169,14 +169,14 @@ export default async function HousekeepingMinibarPage({
                   key={`${row.room_no}-${row.lot_id}`}
                   className="border-t hover:bg-muted/40"
                 >
-                  <td className="py-3 pr-3 align-middle">{row.room_no}</td>
-                  <td className="py-3 pr-3 align-middle">{row.item_code}</td>
-                  <td className="py-3 pr-3 align-middle">{row.lot_no}</td>
-                  <td className="py-3 pr-3 align-middle">{row.expiry_date}</td>
-                  <td className="py-3 pr-3 text-right tabular-nums align-middle">
+                  <td className="py-3 px-3 align-middle">{row.room_no}</td>
+                  <td className="py-3 px-3 align-middle">{row.item_code}</td>
+                  <td className="py-3 px-3 align-middle">{row.lot_no}</td>
+                  <td className="py-3 px-3 align-middle">{row.expiry_date}</td>
+                  <td className="py-3 px-3 text-right tabular-nums align-middle">
                     {row.days_left}
                   </td>
-                  <td className="py-3 pr-3 text-right tabular-nums align-middle">
+                  <td className="py-3 px-3 text-right tabular-nums align-middle">
                     {formatNumber(row.qty)}
                   </td>
                 </tr>
@@ -239,13 +239,13 @@ export default async function HousekeepingMinibarPage({
                 <table className="mt-4 w-full text-sm">
                   <thead className="bg-muted/40 text-left">
                     <tr>
-                      <th className="py-2.5 pr-3 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+                      <th className="py-2.5 px-3 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
                         {vi.minibar.itemName}
                       </th>
-                      <th className="py-2.5 pr-3 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase text-right">
+                      <th className="py-2.5 px-3 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase text-right">
                         {vi.minibar.qty}
                       </th>
-                      <th className="py-2.5 pr-3 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase text-right">
+                      <th className="py-2.5 px-3 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase text-right">
                         {vi.minibar.amount}
                       </th>
                     </tr>
@@ -256,14 +256,14 @@ export default async function HousekeepingMinibarPage({
                         key={item.item_id}
                         className="border-t hover:bg-muted/40"
                       >
-                        <td className="py-3 pr-3 align-middle">
+                        <td className="py-3 px-3 align-middle">
                           {item.item_name ?? vi.minibar.itemNameHidden}
                           {item.item_code ? ` (${item.item_code})` : ""}
                         </td>
-                        <td className="py-3 pr-3 text-right tabular-nums align-middle">
+                        <td className="py-3 px-3 text-right tabular-nums align-middle">
                           {formatNumber(item.qty)}
                         </td>
-                        <td className="py-3 pr-3 text-right align-middle">
+                        <td className="py-3 px-3 text-right align-middle">
                           <MoneyText amount={item.amount} />
                         </td>
                       </tr>

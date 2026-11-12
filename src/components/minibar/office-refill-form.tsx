@@ -83,7 +83,7 @@ export function OfficeRefillForm({
           <select
             value={floor}
             onChange={(e) => setFloor(e.target.value)}
-            className="mt-1 w-full rounded-md border bg-background px-3 py-2 text-sm"
+            className="mt-1 h-9 w-full rounded-md border bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
           >
             <option value="">{vi.common.all}</option>
             {floors.map((f) => (
@@ -100,7 +100,7 @@ export function OfficeRefillForm({
           <select
             value={itemId}
             onChange={(e) => setItemId(e.target.value)}
-            className="mt-1 w-full rounded-md border bg-background px-3 py-2 text-sm"
+            className="mt-1 h-9 w-full rounded-md border bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
           >
             <option value="">{vi.minibar.selectItem}</option>
             {items.map((item) => (
@@ -119,7 +119,7 @@ export function OfficeRefillForm({
             step="0.01"
             value={qty}
             onChange={(e) => setQty(e.target.value)}
-            className="mt-1 w-full rounded-md border bg-background px-3 py-2 text-sm"
+            className="mt-1 h-9 w-full rounded-md border bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
           />
         </label>
       </div>

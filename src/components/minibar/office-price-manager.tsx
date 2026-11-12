@@ -85,7 +85,7 @@ export function OfficePriceManager({
           <select
             value={itemId}
             onChange={(e) => setItemId(e.target.value)}
-            className="mt-1 w-full rounded-md border bg-background px-3 py-2 text-sm"
+            className="mt-1 h-9 w-full rounded-md border bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
           >
             <option value="">{vi.minibar.selectItem}</option>
             {items.map((item) => (
@@ -104,7 +104,7 @@ export function OfficePriceManager({
             step="1000"
             value={price}
             onChange={(e) => setPrice(e.target.value)}
-            className="mt-1 w-full rounded-md border bg-background px-3 py-2 text-sm"
+            className="mt-1 h-9 w-full rounded-md border bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
           />
         </label>
         <label className="block text-sm">
@@ -113,7 +113,7 @@ export function OfficePriceManager({
             type="date"
             value={validFrom}
             onChange={(e) => setValidFrom(e.target.value)}
-            className="mt-1 w-full rounded-md border bg-background px-3 py-2 text-sm"
+            className="mt-1 h-9 w-full rounded-md border bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
           />
         </label>
         <label className="block text-sm">
@@ -122,7 +122,7 @@ export function OfficePriceManager({
             type="date"
             value={validTo}
             onChange={(e) => setValidTo(e.target.value)}
-            className="mt-1 w-full rounded-md border bg-background px-3 py-2 text-sm"
+            className="mt-1 h-9 w-full rounded-md border bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
           />
         </label>
       </div>
@@ -143,16 +143,16 @@ export function OfficePriceManager({
         <table className="mt-4 w-full text-sm">
           <thead className="bg-muted/40 text-left">
             <tr>
-              <th className="py-2.5 pr-3 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+              <th className="py-2.5 px-3 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
                 {vi.minibar.itemName}
               </th>
-              <th className="py-2.5 pr-3 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase text-right">
+              <th className="py-2.5 px-3 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase text-right">
                 {vi.minibar.price}
               </th>
-              <th className="py-2.5 pr-3 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+              <th className="py-2.5 px-3 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
                 {vi.minibar.validFrom}
               </th>
-              <th className="py-2.5 pr-3 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
+              <th className="py-2.5 px-3 text-[11px] font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase">
                 {vi.minibar.validTo}
               </th>
             </tr>
@@ -160,7 +160,7 @@ export function OfficePriceManager({
           <tbody>
             {prices.map((row) => (
               <tr key={row.id} className="border-t hover:bg-muted/40">
-                <td className="py-3 pr-3 align-middle">
+                <td className="py-3 px-3 align-middle">
                   {row.item_name ?? vi.minibar.itemNameHidden}
                   {row.item_code ? (
                     <span className="block text-xs text-muted-foreground">
@@ -168,11 +168,11 @@ export function OfficePriceManager({
                     </span>
                   ) : null}
                 </td>
-                <td className="py-3 pr-3 text-right align-middle">
+                <td className="py-3 px-3 text-right align-middle">
                   <MoneyText amount={row.price} />
                 </td>
-                <td className="py-3 pr-3 align-middle">{row.valid_from}</td>
-                <td className="py-3 pr-3 align-middle">
+                <td className="py-3 px-3 align-middle">{row.valid_from}</td>
+                <td className="py-3 px-3 align-middle">
                   {row.valid_to ?? vi.common.noData}
                 </td>
               </tr>
