@@ -66,3 +66,22 @@ export async function getAuthenticatedUserId(
   }
   return data.claims.sub;
 }
+
+/**
+ * Chỉ lấy email của người dùng đã đăng nhập (từ JWT claims), hoặc
+ * `null` khi không có.
+ *
+ * Cùng mẫu với `getAuthenticatedUserId()`: `getClaims()` xác thực JWT
+ * tại chỗ, KHÔNG gọi sang máy chủ Auth (0 round-trip) — dùng để hiện
+ * email trong menu người dùng ở topbar (Q123) mà không tốn thêm một
+ * lần `getUser()` mỗi request.
+ */
+export async function getAuthenticatedUserEmail(
+  supabase: SupabaseClient<Database>,
+): Promise<string | null> {
+  const { data, error } = await supabase.auth.getClaims();
+  if (error || !data?.claims?.email) {
+    return null;
+  }
+  return data.claims.email;
+}

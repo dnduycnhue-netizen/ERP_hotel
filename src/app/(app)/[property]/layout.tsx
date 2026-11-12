@@ -4,7 +4,11 @@ import { AppShell } from "@/components/shell/app-shell";
 import { countUnreadAlerts } from "@/features/alerts/queries";
 import { PermissionsProvider } from "@/lib/permissions/permissions-provider";
 import { listAccessibleProperties } from "@/lib/supabase/access";
-import { createClient } from "@/lib/supabase/server";
+import {
+  createClient,
+  getAuthenticatedUserEmail,
+  getAuthenticatedUserId,
+} from "@/lib/supabase/server";
 
 export default async function PropertyLayout({
   children,
@@ -19,17 +23,36 @@ export default async function PropertyLayout({
   // Layout cha (app) đã chặn người chưa đăng nhập (getUser + redirect
   // /login) nên ở đây không gọi getUser() lần nữa; hai lần gọi nối tiếp
   // chỉ thêm một vòng round-trip tới Supabase Auth cho mỗi request.
-  // listAccessibleProperties, RPC my_permissions và số cảnh báo chưa xử
-  // lý không phụ thuộc nhau nên chạy song song. Đếm cảnh báo chạy qua
-  // RLS của bảng alerts (chỉ dòng có quyền alert.receive.<code> tương
-  // ứng) nên người không có quyền nào vẫn ra 0 — không cần chặn riêng.
-  const [properties, { data: myPermissions }, unreadAlerts] = await Promise.all(
-    [
-      listAccessibleProperties(supabase),
-      supabase.rpc("my_permissions", { p_property: propertyId }),
-      countUnreadAlerts(propertyId),
-    ],
-  );
+  // Email/tên cho menu người dùng ở topbar (Q123): email lấy từ JWT
+  // claims tại chỗ (0 round-trip), tên lấy bằng 1 câu select profiles
+  // theo userId — userId cũng lấy từ claims tại chỗ nên có trước khi
+  // chạy các promise dưới; lỗi select (vd RLS) chỉ làm tên hiện trống,
+  // không chặn layout vì đây chỉ là thông tin hiển thị.
+  // listAccessibleProperties, RPC my_permissions, số cảnh báo chưa xử
+  // lý, email và hồ sơ không phụ thuộc nhau nên chạy song song. Đếm cảnh
+  // báo chạy qua RLS của bảng alerts (chỉ dòng có quyền alert.receive.*
+  // tương ứng) nên người không có quyền nào vẫn ra 0 — không cần chặn riêng.
+  const userId = await getAuthenticatedUserId(supabase);
+  const profileQuery = userId
+    ? supabase
+        .from("profiles")
+        .select("full_name")
+        .eq("id", userId)
+        .maybeSingle()
+    : Promise.resolve({ data: null as { full_name: string } | null });
+  const [
+    properties,
+    { data: myPermissions },
+    unreadAlerts,
+    userEmail,
+    profileResponse,
+  ] = await Promise.all([
+    listAccessibleProperties(supabase),
+    supabase.rpc("my_permissions", { p_property: propertyId }),
+    countUnreadAlerts(propertyId),
+    getAuthenticatedUserEmail(supabase),
+    profileQuery,
+  ]);
 
   const currentProperty = properties.find(({ id }) => id === propertyId);
 
@@ -55,6 +78,8 @@ export default async function PropertyLayout({
         properties={properties}
         canViewAlerts={canViewAlerts}
         unreadAlerts={unreadAlerts}
+        userEmail={userEmail}
+        userName={profileResponse.data?.full_name ?? null}
       >
         {children}
       </AppShell>
