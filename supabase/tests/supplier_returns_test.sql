@@ -488,7 +488,7 @@ select ok(
 );
 select is(
   (select count(*) from public.stock_moves
-   where doc_type = 'supplier_return' and qty = -2 and unit_cost = 10000),
+   where move_type = 'return_out' and source_doc_type = 'supplier_return' and qty = -2 and unit_cost = 10000),
   1::bigint, 'AC T-026: return_out move at original cost 10000'
 );
 -- Thu kho a07 KHONG doc duoc purchase_order_lines qua RLS (can po.view /
