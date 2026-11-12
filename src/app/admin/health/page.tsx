@@ -1,8 +1,10 @@
 import { connection } from "next/server";
+import { HealthRefreshButton } from "@/components/admin/health-refresh-button";
 import { ErrorState } from "@/components/common/error-state";
 import { PageHeader } from "@/components/shell/page-header";
 import { callAdminRpc } from "@/features/admin/rpc";
 import { vi } from "@/i18n/vi";
+import { summarizeHealth, type HealthIssue } from "@/lib/admin/health-status";
 import { createClient } from "@/lib/supabase/server";
 
 type SystemHealth = {
@@ -67,8 +69,8 @@ function Stat({
       <p
         className={
           warn
-            ? "mt-1 text-2xl font-semibold text-destructive"
-            : "mt-1 text-2xl font-semibold"
+            ? "mt-1 text-xl font-semibold text-destructive sm:text-2xl"
+            : "mt-1 text-xl font-semibold sm:text-2xl"
         }
       >
         {value}
@@ -76,6 +78,12 @@ function Stat({
     </div>
   );
 }
+
+const ISSUE_LABEL: Record<HealthIssue, (t: typeof vi.admin.health) => string> = {
+  cron: (t) => t.cronFailed7d,
+  notifications: (t) => t.notifStuck,
+  alerts: (t) => t.alertsRed,
+};
 
 export default async function SystemHealthPage() {
   await connection();
@@ -97,9 +105,47 @@ export default async function SystemHealthPage() {
   }
 
   const h = result.data;
+  const cronFailedTotal = h.cron.reduce((sum, job) => sum + job.failed_7d, 0);
+  const summary = summarizeHealth({
+    cronFailed7dTotal: cronFailedTotal,
+    notificationsStuck: h.notifications.stuck,
+    alertsRed: h.alerts.red,
+  });
+  const issueValues: Record<HealthIssue, number> = {
+    cron: cronFailedTotal,
+    notifications: h.notifications.stuck,
+    alerts: h.alerts.red,
+  };
   return (
     <div className="space-y-8">
-      <PageHeader title={t.title} />
+      <PageHeader
+        title={t.title}
+        actions={<HealthRefreshButton label={t.refresh} />}
+      />
+      <div
+        role="status"
+        className={
+          summary.ok
+            ? "rounded-lg border border-emerald-200 bg-emerald-50 p-4 dark:border-emerald-900 dark:bg-emerald-950"
+            : "rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-900 dark:bg-amber-950"
+        }
+      >
+        <p className="text-base font-semibold">
+          {summary.ok ? t.statusOk : t.statusWarn}
+        </p>
+        <p className="mt-1 text-sm text-muted-foreground">
+          {summary.ok ? t.statusOkDetail : t.statusWarnDetail}
+        </p>
+        {summary.issues.length > 0 ? (
+          <ul className="mt-2 list-disc space-y-1 pl-5 text-sm">
+            {summary.issues.map((issue) => (
+              <li key={issue}>
+                {ISSUE_LABEL[issue](t)}: {number.format(issueValues[issue])}
+              </li>
+            ))}
+          </ul>
+        ) : null}
+      </div>
       <p className="text-sm text-muted-foreground">
         {t.description} {t.generatedAt}: {dateTime.format(new Date(h.generated_at))}
       </p>
@@ -110,7 +156,7 @@ export default async function SystemHealthPage() {
           <p className="text-sm text-muted-foreground">{t.cronEmpty}</p>
         ) : (
           <div className="overflow-x-auto rounded-lg border">
-            <table className="w-full text-sm">
+            <table className="w-full min-w-[560px] text-sm">
               <thead className="bg-muted/50 text-left">
                 <tr>
                   <th className="p-2">{t.cronJob}</th>
@@ -206,6 +252,7 @@ export default async function SystemHealthPage() {
             value={number.format(h.database.stock_moves_rows_estimate)}
           />
         </div>
+        <p className="text-sm text-muted-foreground">{t.dbLimitNote}</p>
       </section>
     </div>
   );
