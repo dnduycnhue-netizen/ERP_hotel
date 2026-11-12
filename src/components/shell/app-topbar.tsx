@@ -7,28 +7,45 @@ import { vi } from "@/i18n/vi";
 import { switchProperty } from "@/app/(app)/actions";
 import { signOut } from "@/app/(auth)/login/actions";
 import type { AccessibleProperty } from "@/lib/supabase/access";
+import { cn } from "@/lib/utils";
 import { JumpSearch } from "./jump-search";
 
 /**
  * Thanh trên cùng của vỏ app (ADR-006): hamburger (mobile), tìm kiếm
  * nhảy nhanh, bộ chọn khách sạn gọn, menu người dùng (đăng xuất).
  * Không phải `<header>` — sidebar đã giữ vai trò landmark header.
+ *
+ * Mode admin (Q122/Q123): khi propertyId null hoặc showJumpSearch=false
+ * thì ẩn JumpSearch, bộ chọn khách sạn và chuông. Khi có userEmail hoặc
+ * userName thì hiện khối định danh ở đầu dropdown user menu (Q123);
+ * dữ liệu do server layout truyền xuống qua props, component không gọi
+ * thêm getUser/getClaims.
  */
 export function AppTopbar({
   propertyId,
-  properties,
-  canViewAlerts,
-  unreadAlerts,
+  properties = [],
+  canViewAlerts = false,
+  unreadAlerts = 0,
   onOpenMobile,
+  userEmail,
+  userName,
+  showJumpSearch = true,
 }: {
-  propertyId: string;
-  properties: AccessibleProperty[];
-  canViewAlerts: boolean;
-  unreadAlerts: number;
+  propertyId?: string | null;
+  properties?: AccessibleProperty[];
+  canViewAlerts?: boolean;
+  unreadAlerts?: number;
   onOpenMobile: () => void;
+  userEmail?: string | null;
+  userName?: string | null;
+  showJumpSearch?: boolean;
 }) {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const switchFormRef = useRef<HTMLFormElement>(null);
+
+  // Nút avatar giữ nguyên aria-label vi.auth.signOut (đừng đổi — e2e
+  // selector dựa vào nó).
+  const hasIdentity = Boolean(userEmail ?? userName);
 
   return (
     <div className="sticky top-0 z-40 flex h-14 shrink-0 items-center gap-3 border-b bg-background/95 px-4 backdrop-blur sm:px-6">
@@ -41,10 +58,12 @@ export function AppTopbar({
         <Menu className="size-5" aria-hidden />
       </button>
 
-      <JumpSearch propertyId={propertyId} />
+      {propertyId != null && showJumpSearch ? (
+        <JumpSearch propertyId={propertyId} />
+      ) : null}
 
       <div className="ml-auto flex items-center gap-2">
-        {properties.length > 1 ? (
+        {propertyId != null && showJumpSearch && properties.length > 1 ? (
           <form
             ref={switchFormRef}
             action={switchProperty}
@@ -70,7 +89,7 @@ export function AppTopbar({
           </form>
         ) : null}
 
-        {canViewAlerts ? (
+        {propertyId != null && showJumpSearch && canViewAlerts ? (
           <Link
             href={`/${propertyId}/alerts`}
             aria-label={
@@ -108,7 +127,29 @@ export function AppTopbar({
                 onClick={() => setUserMenuOpen(false)}
                 className="fixed inset-0 z-40 cursor-default"
               />
-              <div className="absolute right-0 z-50 mt-2 w-44 overflow-hidden rounded-lg border bg-popover py-1 shadow-lg">
+              <div
+                className={cn(
+                  "absolute right-0 z-50 mt-2 overflow-hidden rounded-lg border bg-popover py-1 shadow-lg",
+                  hasIdentity ? "w-56" : "w-44",
+                )}
+              >
+                {hasIdentity ? (
+                  <>
+                    <div className="min-w-0 px-3 py-2">
+                      {userName ? (
+                        <p className="truncate text-sm font-medium text-foreground">
+                          {userName}
+                        </p>
+                      ) : null}
+                      {userEmail ? (
+                        <p className="truncate text-xs text-muted-foreground">
+                          {userEmail}
+                        </p>
+                      ) : null}
+                    </div>
+                    <div aria-hidden className="my-1 border-t" />
+                  </>
+                ) : null}
                 <Link
                   href="/settings/password"
                   onClick={() => setUserMenuOpen(false)}
