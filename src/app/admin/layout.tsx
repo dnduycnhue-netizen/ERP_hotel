@@ -115,7 +115,6 @@ export default async function AdminLayout({
         }}
         userEmail={user.email}
         userName={profile?.full_name ?? null}
-        showJumpSearch={false}
       >
         {children}
       </AppShell>
