@@ -15,11 +15,12 @@ insert into public.organizations (id, name) values
   ('d0340000-0000-4000-8000-000000000001', 'T-034 Org');
 
 insert into public.legal_entities (id, org_id, code, name) values
-  ('d0340000-0000-4000-8000-000000000101', 'd0340000-0000-4000-8000-000000000001', 'T034', 'Entity T-034');
+  ('d0340000-0000-4000-8000-000000000101', 'd0340000-0000-4000-8000-000000000001', 'T034', 'Entity T-034'),
+  ('d0340000-0000-4000-8000-000000000102', 'd0340000-0000-4000-8000-000000000001', 'T034B', 'Entity T-034 B');
 
 insert into public.properties (id, org_id, legal_entity_id, code, name, sod_profile) values
   ('d0340000-0000-4000-8000-000000000201', 'd0340000-0000-4000-8000-000000000001', 'd0340000-0000-4000-8000-000000000101', 'P0341', 'Property T-034', 'with_cc'),
-  ('d0340000-0000-4000-8000-000000000202', 'd0340000-0000-4000-8000-000000000001', 'd0340000-0000-4000-8000-000000000101', 'P0342', 'Property T-034 B', 'with_cc');
+  ('d0340000-0000-4000-8000-000000000202', 'd0340000-0000-4000-8000-000000000001', 'd0340000-0000-4000-8000-000000000102', 'P0342', 'Property T-034 B', 'with_cc');
 
 insert into public.uoms (code, name_vi) values
   ('cai', 'Cái'),
@@ -102,39 +103,45 @@ insert into public.role_permissions (role_id, permission_code) values
   ('d0340000-0000-4000-8000-000000000601', 'hk.trolley.operate'),
   ('d0340000-0000-4000-8000-000000000601', 'requisition.approve'),
   ('d0340000-0000-4000-8000-000000000601', 'requisition.receive'),
+  ('d0340000-0000-4000-8000-000000000601', 'count.view_variance'),
   ('d0340000-0000-4000-8000-000000000602', 'hk.trolley.operate'),
   ('d0340000-0000-4000-8000-000000000602', 'requisition.receive'),
   ('d0340000-0000-4000-8000-000000000607', 'requisition.issue'),
   ('d0340000-0000-4000-8000-000000000607', 'stock.view_qty'),
+  ('d0340000-0000-4000-8000-000000000607', 'item.view'),
   ('d0340000-0000-4000-8000-000000000609', 'receiving.view');
 
 insert into public.user_property_roles (user_id, role_id, property_id) values
   ('d0340000-0000-4000-8000-000000000a01', 'd0340000-0000-4000-8000-000000000601', 'd0340000-0000-4000-8000-000000000201'),
   ('d0340000-0000-4000-8000-000000000a02', 'd0340000-0000-4000-8000-000000000602', 'd0340000-0000-4000-8000-000000000201'),
+  -- u2 them vai giam sat de §G SoD chay toi _sod_check: _decide_approval
+  -- require_perm(requisition.approve) + _approval_can_decide (role 601)
+  -- truoc khi kiem SoD, nen nguoi tao (u2) phai dong thoi la approver.
+  ('d0340000-0000-4000-8000-000000000a02', 'd0340000-0000-4000-8000-000000000601', 'd0340000-0000-4000-8000-000000000201'),
   ('d0340000-0000-4000-8000-000000000a07', 'd0340000-0000-4000-8000-000000000607', 'd0340000-0000-4000-8000-000000000201'),
   ('d0340000-0000-4000-8000-000000000a10', 'd0340000-0000-4000-8000-000000000609', 'd0340000-0000-4000-8000-000000000201');
 
-insert into public.stock_moves (legal_entity_id, property_id, warehouse_id, item_id, lot_id, move_type, qty, unit_cost, amount, business_date, posted_by, source_doc_type, source_doc_id) values
-  ('d0340000-0000-4000-8000-000000000101', 'd0340000-0000-4000-8000-000000000201', 'd0340000-0000-4000-8000-000000000303', 'd0340000-0000-4000-8000-000000000501', null, 'receipt', 100, 2000, 200000, '2026-11-09', 'd0340000-0000-4000-8000-000000000a07', 'opening', 'd0340000-0000-4000-8000-000000000f01'),
-  ('d0340000-0000-4000-8000-000000000101', 'd0340000-0000-4000-8000-000000000201', 'd0340000-0000-4000-8000-000000000303', 'd0340000-0000-4000-8000-000000000502', null, 'receipt', 100, 3000, 300000, '2026-11-09', 'd0340000-0000-4000-8000-000000000a07', 'opening', 'd0340000-0000-4000-8000-000000000f01'),
-  ('d0340000-0000-4000-8000-000000000101', 'd0340000-0000-4000-8000-000000000201', 'd0340000-0000-4000-8000-000000000303', 'd0340000-0000-4000-8000-000000000503', null, 'receipt', 200, 5000, 1000000, '2026-11-09', 'd0340000-0000-4000-8000-000000000a07', 'opening', 'd0340000-0000-4000-8000-000000000f01'),
-  ('d0340000-0000-4000-8000-000000000101', 'd0340000-0000-4000-8000-000000000201', 'd0340000-0000-4000-8000-000000000303', 'd0340000-0000-4000-8000-000000000504', null, 'receipt', 100, 8000, 800000, '2026-11-09', 'd0340000-0000-4000-8000-000000000a07', 'opening', 'd0340000-0000-4000-8000-000000000f01'),
-  ('d0340000-0000-4000-8000-000000000101', 'd0340000-0000-4000-8000-000000000201', 'd0340000-0000-4000-8000-000000000304', 'd0340000-0000-4000-8000-000000000501', null, 'receipt', 5, 2000, 10000, '2026-11-09', 'd0340000-0000-4000-8000-000000000a07', 'opening', 'd0340000-0000-4000-8000-000000000f01'),
-  ('d0340000-0000-4000-8000-000000000101', 'd0340000-0000-4000-8000-000000000201', 'd0340000-0000-4000-8000-000000000304', 'd0340000-0000-4000-8000-000000000503', null, 'receipt', 10, 5000, 50000, '2026-11-09', 'd0340000-0000-4000-8000-000000000a07', 'opening', 'd0340000-0000-4000-8000-000000000f01');
+insert into public.stock_moves (org_id, legal_entity_id, property_id, warehouse_id, item_id, lot_id, move_type, qty, unit_cost, amount, business_date, posted_by, source_doc_type, source_doc_id) values
+  ('d0340000-0000-4000-8000-000000000001', 'd0340000-0000-4000-8000-000000000101', 'd0340000-0000-4000-8000-000000000201', 'd0340000-0000-4000-8000-000000000303', 'd0340000-0000-4000-8000-000000000501', null, 'receipt', 100, 2000, 200000, '2026-11-09', 'd0340000-0000-4000-8000-000000000a07', 'opening', 'd0340000-0000-4000-8000-000000000f01'),
+  ('d0340000-0000-4000-8000-000000000001', 'd0340000-0000-4000-8000-000000000101', 'd0340000-0000-4000-8000-000000000201', 'd0340000-0000-4000-8000-000000000303', 'd0340000-0000-4000-8000-000000000502', null, 'receipt', 100, 3000, 300000, '2026-11-09', 'd0340000-0000-4000-8000-000000000a07', 'opening', 'd0340000-0000-4000-8000-000000000f01'),
+  ('d0340000-0000-4000-8000-000000000001', 'd0340000-0000-4000-8000-000000000101', 'd0340000-0000-4000-8000-000000000201', 'd0340000-0000-4000-8000-000000000303', 'd0340000-0000-4000-8000-000000000503', null, 'receipt', 200, 5000, 1000000, '2026-11-09', 'd0340000-0000-4000-8000-000000000a07', 'opening', 'd0340000-0000-4000-8000-000000000f01'),
+  ('d0340000-0000-4000-8000-000000000001', 'd0340000-0000-4000-8000-000000000101', 'd0340000-0000-4000-8000-000000000201', 'd0340000-0000-4000-8000-000000000303', 'd0340000-0000-4000-8000-000000000504', null, 'receipt', 100, 8000, 800000, '2026-11-09', 'd0340000-0000-4000-8000-000000000a07', 'opening', 'd0340000-0000-4000-8000-000000000f01'),
+  ('d0340000-0000-4000-8000-000000000001', 'd0340000-0000-4000-8000-000000000101', 'd0340000-0000-4000-8000-000000000201', 'd0340000-0000-4000-8000-000000000304', 'd0340000-0000-4000-8000-000000000501', null, 'receipt', 5, 2000, 10000, '2026-11-09', 'd0340000-0000-4000-8000-000000000a07', 'opening', 'd0340000-0000-4000-8000-000000000f01'),
+  ('d0340000-0000-4000-8000-000000000001', 'd0340000-0000-4000-8000-000000000101', 'd0340000-0000-4000-8000-000000000201', 'd0340000-0000-4000-8000-000000000304', 'd0340000-0000-4000-8000-000000000503', null, 'receipt', 10, 5000, 50000, '2026-11-09', 'd0340000-0000-4000-8000-000000000a07', 'opening', 'd0340000-0000-4000-8000-000000000f01');
 
-insert into public.stock_balances (warehouse_id, item_id, lot_id, qty) values
-  ('d0340000-0000-4000-8000-000000000303', 'd0340000-0000-4000-8000-000000000501', null, 100),
-  ('d0340000-0000-4000-8000-000000000303', 'd0340000-0000-4000-8000-000000000502', null, 100),
-  ('d0340000-0000-4000-8000-000000000303', 'd0340000-0000-4000-8000-000000000503', null, 200),
-  ('d0340000-0000-4000-8000-000000000303', 'd0340000-0000-4000-8000-000000000504', null, 100),
-  ('d0340000-0000-4000-8000-000000000304', 'd0340000-0000-4000-8000-000000000501', null, 5),
-  ('d0340000-0000-4000-8000-000000000304', 'd0340000-0000-4000-8000-000000000503', null, 10);
+insert into public.stock_balances (org_id, legal_entity_id, property_id, warehouse_id, item_id, lot_id, qty) values
+  ('d0340000-0000-4000-8000-000000000001', 'd0340000-0000-4000-8000-000000000101', 'd0340000-0000-4000-8000-000000000201', 'd0340000-0000-4000-8000-000000000303', 'd0340000-0000-4000-8000-000000000501', null, 100),
+  ('d0340000-0000-4000-8000-000000000001', 'd0340000-0000-4000-8000-000000000101', 'd0340000-0000-4000-8000-000000000201', 'd0340000-0000-4000-8000-000000000303', 'd0340000-0000-4000-8000-000000000502', null, 100),
+  ('d0340000-0000-4000-8000-000000000001', 'd0340000-0000-4000-8000-000000000101', 'd0340000-0000-4000-8000-000000000201', 'd0340000-0000-4000-8000-000000000303', 'd0340000-0000-4000-8000-000000000503', null, 200),
+  ('d0340000-0000-4000-8000-000000000001', 'd0340000-0000-4000-8000-000000000101', 'd0340000-0000-4000-8000-000000000201', 'd0340000-0000-4000-8000-000000000303', 'd0340000-0000-4000-8000-000000000504', null, 100),
+  ('d0340000-0000-4000-8000-000000000001', 'd0340000-0000-4000-8000-000000000101', 'd0340000-0000-4000-8000-000000000201', 'd0340000-0000-4000-8000-000000000304', 'd0340000-0000-4000-8000-000000000501', null, 5),
+  ('d0340000-0000-4000-8000-000000000001', 'd0340000-0000-4000-8000-000000000101', 'd0340000-0000-4000-8000-000000000201', 'd0340000-0000-4000-8000-000000000304', 'd0340000-0000-4000-8000-000000000503', null, 10);
 
-insert into public.item_costs (legal_entity_id, item_id, avg_cost, qty_on_hand) values
-  ('d0340000-0000-4000-8000-000000000101', 'd0340000-0000-4000-8000-000000000501', 2000, 105),
-  ('d0340000-0000-4000-8000-000000000101', 'd0340000-0000-4000-8000-000000000502', 3000, 100),
-  ('d0340000-0000-4000-8000-000000000101', 'd0340000-0000-4000-8000-000000000503', 5000, 210),
-  ('d0340000-0000-4000-8000-000000000101', 'd0340000-0000-4000-8000-000000000504', 8000, 100);
+insert into public.item_costs (org_id, legal_entity_id, item_id, avg_cost, qty_on_hand) values
+  ('d0340000-0000-4000-8000-000000000001', 'd0340000-0000-4000-8000-000000000101', 'd0340000-0000-4000-8000-000000000501', 2000, 105),
+  ('d0340000-0000-4000-8000-000000000001', 'd0340000-0000-4000-8000-000000000101', 'd0340000-0000-4000-8000-000000000502', 3000, 100),
+  ('d0340000-0000-4000-8000-000000000001', 'd0340000-0000-4000-8000-000000000101', 'd0340000-0000-4000-8000-000000000503', 5000, 210),
+  ('d0340000-0000-4000-8000-000000000001', 'd0340000-0000-4000-8000-000000000101', 'd0340000-0000-4000-8000-000000000504', 8000, 100);
 
 create temp table t034_ctx (key text primary key, id uuid);
 
@@ -250,7 +257,7 @@ select is(
      and clean_type = 'checkout'
      and item_id = 'd0340000-0000-4000-8000-000000000501'
      and per_guest = false),
-  1, 'standard row stored with qty 1'
+  1::numeric, 'standard row stored with qty 1'
 );
 insert into t034_resp values ('std1b', public.room_setup_standard_set(
   p_property_id := 'd0340000-0000-4000-8000-000000000201',
@@ -266,14 +273,14 @@ select is(
      and clean_type = 'checkout'
      and item_id = 'd0340000-0000-4000-8000-000000000501'
      and per_guest = false),
-  2, 'standard upsert updates qty to 2'
+  2::numeric, 'standard upsert updates qty to 2'
 );
 select is(
   (select count(*) from public.room_setup_standards
    where room_type_id = 'd0340000-0000-4000-8000-000000000b01'
      and clean_type = 'checkout'
      and item_id = 'd0340000-0000-4000-8000-000000000501'),
-  1, 'standard upsert does not duplicate the row'
+  1::bigint, 'standard upsert does not duplicate the row'
 );
 insert into t034_resp values ('std2', public.room_setup_standard_set(
   p_property_id := 'd0340000-0000-4000-8000-000000000201',
@@ -295,7 +302,7 @@ select is(
   (select count(*) from public.room_setup_standards
    where room_type_id = 'd0340000-0000-4000-8000-000000000b01'
      and item_id = 'd0340000-0000-4000-8000-000000000503'),
-  2, 'same item can have per-room and per-guest standards'
+  2::bigint, 'same item can have per-room and per-guest standards'
 );
 select public._t034_as('d0340000-0000-4000-8000-000000000a10');
 select throws_ok(
@@ -371,13 +378,13 @@ insert into t034_resp values ('par4', public.trolley_par_set(
 select is(
   (select count(*) from public.trolley_par_levels
    where trolley_warehouse_id = 'd0340000-0000-4000-8000-000000000304'),
-  4, '4 par levels stored for TROLLEY1'
+  4::bigint, '4 par levels stored for TROLLEY1'
 );
 select is(
   (select par_qty from public.trolley_par_levels
    where trolley_warehouse_id = 'd0340000-0000-4000-8000-000000000304'
      and item_id = 'd0340000-0000-4000-8000-000000000501'),
-  20, 'BANCHAI par is 20'
+  20::numeric, 'BANCHAI par is 20'
 );
 insert into t034_resp values ('par1b', public.trolley_par_set(
   p_property_id := 'd0340000-0000-4000-8000-000000000201',
@@ -388,13 +395,13 @@ insert into t034_resp values ('par1b', public.trolley_par_set(
 select is(
   (select count(*) from public.trolley_par_levels
    where trolley_warehouse_id = 'd0340000-0000-4000-8000-000000000304'),
-  4, 'par upsert does not duplicate rows'
+  4::bigint, 'par upsert does not duplicate rows'
 );
 select is(
   (select par_qty from public.trolley_par_levels
    where trolley_warehouse_id = 'd0340000-0000-4000-8000-000000000304'
      and item_id = 'd0340000-0000-4000-8000-000000000501'),
-  20, 'par upsert keeps par 20'
+  20::numeric, 'par upsert keeps par 20'
 );
 
 -- E. Mo ca 1: dem dau BANCHAI 5, NUOC 10; par 20/15/30/10 -> bu 15/15/20/10 (18).
@@ -437,26 +444,29 @@ select is(
   (select qty_stock from public.requisition_lines
    where requisition_id = (select (resp ->> 'requisition_id')::uuid from t034_resp where key = 's1')
      and item_id = 'd0340000-0000-4000-8000-000000000501'),
-  15, 'top-up BANCHAI 20 par - 5 opening = 15'
+  15::numeric, 'top-up BANCHAI 20 par - 5 opening = 15'
 );
 select is(
   (select qty_stock from public.requisition_lines
    where requisition_id = (select (resp ->> 'requisition_id')::uuid from t034_resp where key = 's1')
      and item_id = 'd0340000-0000-4000-8000-000000000502'),
-  15, 'top-up GIAY 15 par - 0 opening = 15'
+  15::numeric, 'top-up GIAY 15 par - 0 opening = 15'
 );
 select is(
   (select qty_stock from public.requisition_lines
    where requisition_id = (select (resp ->> 'requisition_id')::uuid from t034_resp where key = 's1')
      and item_id = 'd0340000-0000-4000-8000-000000000503'),
-  20, 'top-up NUOC 30 par - 10 opening = 20'
+  20::numeric, 'top-up NUOC 30 par - 10 opening = 20'
 );
 select is(
   (select qty_stock from public.requisition_lines
    where requisition_id = (select (resp ->> 'requisition_id')::uuid from t034_resp where key = 's1')
      and item_id = 'd0340000-0000-4000-8000-000000000504'),
-  10, 'top-up CAPHE 10 par - 0 opening = 10'
+  10::numeric, 'top-up CAPHE 10 par - 0 opening = 10'
 );
+-- Doc dem (stock_counts/lines) chi doc duoc voi count.view_variance va
+-- KHONG phai nguoi dem (u2 la counter) -> doc duoi u1 (giam sat).
+select public._t034_as('d0340000-0000-4000-8000-000000000a01');
 select is(
   (select kind from public.stock_counts
    where id = (select (resp ->> 'opening_count_id')::uuid from t034_resp where key = 's1')),
@@ -470,13 +480,13 @@ select is(
 select is(
   (select count(*) from public.stock_count_lines
    where count_id = (select (resp ->> 'opening_count_id')::uuid from t034_resp where key = 's1')),
-  2, 'opening count has 2 lines (only counted items)'
+  2::bigint, 'opening count has 2 lines (only counted items)'
 );
 select is(
   (select final_qty from public.stock_count_lines
    where count_id = (select (resp ->> 'opening_count_id')::uuid from t034_resp where key = 's1')
      and item_id = 'd0340000-0000-4000-8000-000000000501'),
-  5, 'opening count BANCHAI final_qty 5'
+  5::numeric, 'opening count BANCHAI final_qty 5'
 );
 select ok(
   (select bool_and(book_qty is null) from public.stock_count_lines
@@ -499,6 +509,7 @@ select is(
   (select resp ->> 'opening_count_id' from t034_resp where key = 's1'),
   'shift links opening_count_id'
 );
+select public._t034_as('d0340000-0000-4000-8000-000000000a02');
 
 -- F. Mo ca: validate (8).
 select throws_ok(
@@ -631,14 +642,14 @@ select is(
    where warehouse_id = 'd0340000-0000-4000-8000-000000000303'
      and item_id = 'd0340000-0000-4000-8000-000000000501'
      and lot_id is null),
-  85, 'issue: floor BANCHAI balance 100 -> 85'
+  85::numeric, 'issue: floor BANCHAI balance 100 -> 85'
 );
 select is(
   (select qty from public.stock_balances
    where warehouse_id = 'd0340000-0000-4000-8000-000000000302'
      and item_id = 'd0340000-0000-4000-8000-000000000501'
      and lot_id is null),
-  15, 'issue: transit BANCHAI balance 15'
+  15::numeric, 'issue: transit BANCHAI balance 15'
 );
 select public._t034_as('d0340000-0000-4000-8000-000000000a02');
 insert into t034_resp values ('r1rcv', public.requisition_confirm_receipt(
@@ -659,41 +670,44 @@ select is(
   (select resp ->> 'status' from t034_resp where key = 'r1rcv'),
   'received', 'top-up requisition is received'
 );
+-- Ton kho chi doc duoc voi stock.view_qty -> doc duoi u7 (thu kho).
+select public._t034_as('d0340000-0000-4000-8000-000000000a07');
 select is(
   (select qty from public.stock_balances
    where warehouse_id = 'd0340000-0000-4000-8000-000000000304'
      and item_id = 'd0340000-0000-4000-8000-000000000501'
      and lot_id is null),
-  20, 'trolley BANCHAI 5 + 15 = 20 after receipt'
+  20::numeric, 'trolley BANCHAI 5 + 15 = 20 after receipt'
 );
 select is(
   (select qty from public.stock_balances
    where warehouse_id = 'd0340000-0000-4000-8000-000000000304'
      and item_id = 'd0340000-0000-4000-8000-000000000502'
      and lot_id is null),
-  15, 'trolley GIAY 0 + 15 = 15 after receipt'
+  15::numeric, 'trolley GIAY 0 + 15 = 15 after receipt'
 );
 select is(
   (select qty from public.stock_balances
    where warehouse_id = 'd0340000-0000-4000-8000-000000000304'
      and item_id = 'd0340000-0000-4000-8000-000000000503'
      and lot_id is null),
-  30, 'trolley NUOC 10 + 20 = 30 after receipt'
+  30::numeric, 'trolley NUOC 10 + 20 = 30 after receipt'
 );
 select is(
   (select qty from public.stock_balances
    where warehouse_id = 'd0340000-0000-4000-8000-000000000304'
      and item_id = 'd0340000-0000-4000-8000-000000000504'
      and lot_id is null),
-  10, 'trolley CAPHE 0 + 10 = 10 after receipt'
+  10::numeric, 'trolley CAPHE 0 + 10 = 10 after receipt'
 );
 select is(
   (select qty from public.stock_balances
    where warehouse_id = 'd0340000-0000-4000-8000-000000000302'
      and item_id = 'd0340000-0000-4000-8000-000000000501'
      and lot_id is null),
-  0, 'transit BANCHAI 0 after full receipt'
+  0::numeric, 'transit BANCHAI 0 after full receipt'
 );
+select public._t034_as('d0340000-0000-4000-8000-000000000a02');
 
 -- H. Dong ca 1: dem cuoi 12/9/18/7 -> tieu hao 8/6/12/3 (20).
 insert into t034_resp values ('s1c', public.trolley_shift_close(
@@ -713,6 +727,9 @@ select ok(
   (select resp ->> 'purpose_issue_id' from t034_resp where key = 's1c') is not null,
   'close creates a purpose_issue'
 );
+-- Phieu tieu hao + ton kho chi doc duoc voi stock.view_qty (u7);
+-- expense_categories con doi item.view (da gan cho thu kho o fixture).
+select public._t034_as('d0340000-0000-4000-8000-000000000a07');
 select is(
   (select status from public.purpose_issues
    where id = (select (resp ->> 'purpose_issue_id')::uuid from t034_resp where key = 's1c')),
@@ -739,59 +756,62 @@ select is(
   (select qty from public.purpose_issue_lines
    where purpose_issue_id = (select (resp ->> 'purpose_issue_id')::uuid from t034_resp where key = 's1c')
      and item_id = 'd0340000-0000-4000-8000-000000000501'),
-  8, 'consumption BANCHAI 5 + 15 - 12 = 8'
+  8::numeric, 'consumption BANCHAI 5 + 15 - 12 = 8'
 );
 select is(
   (select qty from public.purpose_issue_lines
    where purpose_issue_id = (select (resp ->> 'purpose_issue_id')::uuid from t034_resp where key = 's1c')
      and item_id = 'd0340000-0000-4000-8000-000000000502'),
-  6, 'consumption GIAY 0 + 15 - 9 = 6'
+  6::numeric, 'consumption GIAY 0 + 15 - 9 = 6'
 );
 select is(
   (select qty from public.purpose_issue_lines
    where purpose_issue_id = (select (resp ->> 'purpose_issue_id')::uuid from t034_resp where key = 's1c')
      and item_id = 'd0340000-0000-4000-8000-000000000503'),
-  12, 'consumption NUOC 10 + 20 - 18 = 12'
+  12::numeric, 'consumption NUOC 10 + 20 - 18 = 12'
 );
 select is(
   (select qty from public.purpose_issue_lines
    where purpose_issue_id = (select (resp ->> 'purpose_issue_id')::uuid from t034_resp where key = 's1c')
      and item_id = 'd0340000-0000-4000-8000-000000000504'),
-  3, 'consumption CAPHE 0 + 10 - 7 = 3'
+  3::numeric, 'consumption CAPHE 0 + 10 - 7 = 3'
 );
 select is(
   (select qty from public.stock_balances
    where warehouse_id = 'd0340000-0000-4000-8000-000000000304'
      and item_id = 'd0340000-0000-4000-8000-000000000501'
      and lot_id is null),
-  12, 'trolley BANCHAI balance 20 - 8 = 12 after close'
+  12::numeric, 'trolley BANCHAI balance 20 - 8 = 12 after close'
 );
 select is(
   (select qty from public.stock_balances
    where warehouse_id = 'd0340000-0000-4000-8000-000000000304'
      and item_id = 'd0340000-0000-4000-8000-000000000502'
      and lot_id is null),
-  9, 'trolley GIAY balance 15 - 6 = 9 after close'
+  9::numeric, 'trolley GIAY balance 15 - 6 = 9 after close'
 );
 select is(
   (select qty from public.stock_balances
    where warehouse_id = 'd0340000-0000-4000-8000-000000000304'
      and item_id = 'd0340000-0000-4000-8000-000000000503'
      and lot_id is null),
-  18, 'trolley NUOC balance 30 - 12 = 18 after close'
+  18::numeric, 'trolley NUOC balance 30 - 12 = 18 after close'
 );
 select is(
   (select qty from public.stock_balances
    where warehouse_id = 'd0340000-0000-4000-8000-000000000304'
      and item_id = 'd0340000-0000-4000-8000-000000000504'
      and lot_id is null),
-  7, 'trolley CAPHE balance 10 - 3 = 7 after close'
+  7::numeric, 'trolley CAPHE balance 10 - 3 = 7 after close'
 );
+-- Dem dong ca doc duoi u1 nhu dem dau ca (count.view_variance, khong phai counter).
+select public._t034_as('d0340000-0000-4000-8000-000000000a01');
 select ok(
   (select bool_and(book_qty is null) from public.stock_count_lines
    where count_id = (select (resp ->> 'closing_count_id')::uuid from t034_resp where key = 's1c')),
   'closing count is blind (book_qty NULL)'
 );
+select public._t034_as('d0340000-0000-4000-8000-000000000a02');
 select is(
   (select status from public.trolley_shifts
    where id = (select (resp ->> 'shift_id')::uuid from t034_resp where key = 's1')),
@@ -878,13 +898,16 @@ select is(
   (select resp ->> 'status' from t034_resp where key = 'r2rcv'),
   'received', 'shift 2 top-up requisition is received'
 );
+-- Ton kho doc duoi u7 (stock.view_qty).
+select public._t034_as('d0340000-0000-4000-8000-000000000a07');
 select is(
   (select qty from public.stock_balances
    where warehouse_id = 'd0340000-0000-4000-8000-000000000304'
      and item_id = 'd0340000-0000-4000-8000-000000000501'
      and lot_id is null),
-  20, 'trolley BANCHAI 12 + 8 = 20 before shift 2 close'
+  20::numeric, 'trolley BANCHAI 12 + 8 = 20 before shift 2 close'
 );
+select public._t034_as('d0340000-0000-4000-8000-000000000a02');
 select throws_ok(
   $q$select public.trolley_shift_close(
     p_shift_id := (select (resp ->> 'shift_id')::uuid from t034_resp where key = 's2'),
@@ -901,7 +924,10 @@ select is(
 );
 insert into t034_resp values ('s2c', public.trolley_shift_close(
   p_shift_id := (select (resp ->> 'shift_id')::uuid from t034_resp where key = 's2'),
-  p_counts := '[{"item_id": "d0340000-0000-4000-8000-000000000501", "qty": 25}, {"item_id": "d0340000-0000-4000-8000-000000000502", "qty": 9}, {"item_id": "d0340000-0000-4000-8000-000000000503", "qty": 18}, {"item_id": "d0340000-0000-4000-8000-000000000504", "qty": 7}]'::jsonb
+  -- Dem cuoi = dau + linh (15/30/10) de tieu hao = 0, chi BANCHAI thua 5
+  -- (25 - 20); dem 9/18/7 nhu ban cu se ra tieu hao 6/12/3, mau thuan
+  -- voi ky vong consumption_lines = 0 + khong co purpose_issue o duoi.
+  p_counts := '[{"item_id": "d0340000-0000-4000-8000-000000000501", "qty": 25}, {"item_id": "d0340000-0000-4000-8000-000000000502", "qty": 15}, {"item_id": "d0340000-0000-4000-8000-000000000503", "qty": 30}, {"item_id": "d0340000-0000-4000-8000-000000000504", "qty": 10}]'::jsonb
 ));
 select is(
   (select resp ->> 'ok' from t034_resp where key = 's2c'),
@@ -921,20 +947,23 @@ select is(
 );
 select is(
   (select (resp -> 'surplus_lines' -> 0 ->> 'surplus_qty')::numeric from t034_resp where key = 's2c'),
-  5, 'surplus BANCHAI 25 closing - 20 available = 5'
+  5::numeric, 'surplus BANCHAI 25 closing - 20 available = 5'
 );
 select is(
   (select status from public.trolley_shifts
    where id = (select (resp ->> 'shift_id')::uuid from t034_resp where key = 's2')),
   'closed', 'shift 2 status is closed'
 );
+-- Ton kho doc duoi u7 (stock.view_qty).
+select public._t034_as('d0340000-0000-4000-8000-000000000a07');
 select is(
   (select qty from public.stock_balances
    where warehouse_id = 'd0340000-0000-4000-8000-000000000304'
      and item_id = 'd0340000-0000-4000-8000-000000000501'
      and lot_id is null),
-  20, 'trolley BANCHAI balance stays 20 (no auto-adjust on surplus)'
+  20::numeric, 'trolley BANCHAI balance stays 20 (no auto-adjust on surplus)'
 );
+select public._t034_as('d0340000-0000-4000-8000-000000000a02');
 
 -- J. Dong ca khong ton tai (1).
 select throws_ok(
