@@ -15,6 +15,13 @@ insert into public.legal_entities (id, org_id, code, name) values
 insert into public.properties (id, org_id, legal_entity_id, code, name, sod_profile) values
   ('d0320000-0000-4000-8000-000000000201', 'd0320000-0000-4000-8000-000000000001', 'd0320000-0000-4000-8000-000000000101', 'P0321', 'Property T-032', 'with_cc');
 
+-- Q246: tu migration 543000 (R26) count_submit dung nguong lech % (mac dinh 5)
+-- thay vi 'moi lech deu phai dem lai'. Suite nay kiem hanh vi CU (moi lech deu
+-- do/dem lai) nen dat nguong 0 cho org fixture; hanh vi nguong % duoc kiem o
+-- recount_threshold_zero_count_test va count_recount_threshold_group_test.
+insert into public.settings (org_id, property_id, key, value) values
+  ('d0320000-0000-4000-8000-000000000001', null, 'count_recount_threshold_pct', '0'::jsonb);
+
 insert into public.uoms (code, name_vi) values
   ('kg', 'Kilôgam'),
   ('cai', 'Cái'),

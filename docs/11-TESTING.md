@@ -62,3 +62,18 @@ Viết test CSDL bằng cách đặt JWT giả: `set local role authenticated; s
 - ~60 vật tư lấy từ file Excel đã làm sạch (thịt, hải sản, rau, khô, rượu, amenities, minibar Lavie/Tiger/Coca, Dasani miễn phí).
 - 3 NCC (doanh nghiệp, hộ kinh doanh, cá nhân không hóa đơn), 20 phòng, kho đầy đủ loại.
 - Không seed dữ liệu thật của khách vào repo.
+
+## 12. Chạy pgTAP khi không có Docker / không có project test (cập nhật 12/11/2026)
+
+`supabase test db` cần Docker cục bộ. Dự án hiện chỉ có 1 project (ERP_hotel), nên dùng
+`scripts/pgtap-rehearse.py`: mỗi file test chạy trong MỘT transaction rồi `rollback`, không để lại dữ liệu.
+
+```bash
+python3 scripts/pgtap-rehearse.py                              # toàn bộ suite
+python3 scripts/pgtap-rehearse.py finance_invoices_test.sql    # chọn suite
+python3 scripts/pgtap-rehearse.py --migration supabase/migrations/<file>.sql <suite>   # thử migration CHƯA push
+```
+
+- Lệnh ghi lên database thật rồi rollback (cờ `--yes`): chỉ chạy khi chủ ý, đã `supabase link` tới ERP_hotel.
+- Test phải kết thúc bằng `rollback;`. `bootstrap_initial_org_test` chỉ đạt trên DB trống.
+- Trạng thái 12/11/2026: 53/54 suite, 2.210/2.220 ca.

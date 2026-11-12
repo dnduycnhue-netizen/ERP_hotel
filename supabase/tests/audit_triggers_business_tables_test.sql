@@ -231,8 +231,7 @@ select is(
   1, 'count_open snapshot creates 1 line (GAO)'
 );
 select is(
-  (select count(*) from public.audit_log where table_name = 'stock_counts' and row_id = (select resp ->> 'id' from a7d_resp where key = 'cnt'))
-  - (select n from a7d_num where key = 'cnt_before'),
+  (select count(*) from public.audit_log where table_name = 'stock_counts' and row_id = (select resp ->> 'id' from a7d_resp where key = 'cnt')),
   1::bigint, 'count_open writes exactly 1 new audit_log row for stock_counts'
 );
 select is(
