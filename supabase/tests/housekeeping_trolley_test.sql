@@ -33,12 +33,12 @@ insert into public.item_groups (id, org_id, code_prefix, name, kind) values
   ('d0340000-0000-4000-8000-000000000401', 'd0340000-0000-4000-8000-000000000001', 'AMEN', 'Amenities', 'amenity'),
   ('d0340000-0000-4000-8000-000000000402', 'd0340000-0000-4000-8000-000000000001', 'COMP', 'Complimentary', 'complimentary');
 
-insert into public.items (id, org_id, code, name, group_id, stock_uom, is_key_item, track_lot, shelf_life_days, allowed_channels, is_temp) values
-  ('d0340000-0000-4000-8000-000000000501', 'd0340000-0000-4000-8000-000000000001', 'ITM_BANCHAI', 'Bàn chải', 'd0340000-0000-4000-8000-000000000401', 'cai', false, false, null, array['contract', 'market'], false),
-  ('d0340000-0000-4000-8000-000000000502', 'd0340000-0000-4000-8000-000000000001', 'ITM_GIAY', 'Giấy vệ sinh', 'd0340000-0000-4000-8000-000000000401', 'cuon', false, false, null, array['contract', 'market'], false),
-  ('d0340000-0000-4000-8000-000000000503', 'd0340000-0000-4000-8000-000000000001', 'ITM_NUOC', 'Nước suối', 'd0340000-0000-4000-8000-000000000402', 'chai', false, false, null, array['contract', 'market'], false),
-  ('d0340000-0000-4000-8000-000000000504', 'd0340000-0000-4000-8000-000000000001', 'ITM_CAPHE', 'Cà phê gói', 'd0340000-0000-4000-8000-000000000402', 'goi', false, false, null, array['contract', 'market'], false),
-  ('d0340000-0000-4000-8000-000000000505', 'd0340000-0000-4000-8000-000000000001', 'TMP-034-1', 'Mã tạm 1', 'd0340000-0000-4000-8000-000000000401', 'cai', false, false, null, array['contract', 'market'], true);
+insert into public.items (id, org_id, code, name, group_id, stock_uom, is_key_item, track_lot, shelf_life_days, allowed_channels, is_temp, temp_created_at) values
+  ('d0340000-0000-4000-8000-000000000501', 'd0340000-0000-4000-8000-000000000001', 'ITM_BANCHAI', 'Bàn chải', 'd0340000-0000-4000-8000-000000000401', 'cai', false, false, null, array['contract', 'market'], false, null),
+  ('d0340000-0000-4000-8000-000000000502', 'd0340000-0000-4000-8000-000000000001', 'ITM_GIAY', 'Giấy vệ sinh', 'd0340000-0000-4000-8000-000000000401', 'cuon', false, false, null, array['contract', 'market'], false, null),
+  ('d0340000-0000-4000-8000-000000000503', 'd0340000-0000-4000-8000-000000000001', 'ITM_NUOC', 'Nước suối', 'd0340000-0000-4000-8000-000000000402', 'chai', false, false, null, array['contract', 'market'], false, null),
+  ('d0340000-0000-4000-8000-000000000504', 'd0340000-0000-4000-8000-000000000001', 'ITM_CAPHE', 'Cà phê gói', 'd0340000-0000-4000-8000-000000000402', 'goi', false, false, null, array['contract', 'market'], false, null),
+  ('d0340000-0000-4000-8000-000000000505', 'd0340000-0000-4000-8000-000000000001', 'TMP-034-1', 'Mã tạm 1', 'd0340000-0000-4000-8000-000000000401', 'cai', false, false, null, array['contract', 'market'], true, now());
 
 insert into public.outlet_types (id, org_id, code, name) values
   ('d0340000-0000-4000-8000-000000000801', 'd0340000-0000-4000-8000-000000000001', 'HK', 'Buồng phòng');
@@ -66,6 +66,12 @@ insert into public.room_types (id, property_id, code, name, max_guests) values
 insert into public.rooms (id, property_id, room_type_id, room_no, floor) values
   ('d0340000-0000-4000-8000-000000000c01', 'd0340000-0000-4000-8000-000000000201', 'd0340000-0000-4000-8000-000000000b01', '101', '1');
 
+insert into public.roles (id, org_id, code, name_vi) values
+  ('d0340000-0000-4000-8000-000000000601', 'd0340000-0000-4000-8000-000000000001', 'hk_supervisor', 'Giám sát buồng'),
+  ('d0340000-0000-4000-8000-000000000602', 'd0340000-0000-4000-8000-000000000001', 'hk_attendant', 'Nhân viên buồng'),
+  ('d0340000-0000-4000-8000-000000000607', 'd0340000-0000-4000-8000-000000000001', 'storekeeper', 'Thủ kho'),
+  ('d0340000-0000-4000-8000-000000000609', 'd0340000-0000-4000-8000-000000000001', 'r_view034', 'Chỉ xem');
+
 insert into public.approval_rules (
   org_id, property_id, doc_type, min_amount, max_amount,
   item_group_id, condition, step,
@@ -91,12 +97,6 @@ insert into public.profiles (id, employee_code, full_name) values
 on conflict (id) do update set
   employee_code = excluded.employee_code,
   full_name = excluded.full_name;
-
-insert into public.roles (id, org_id, code, name_vi) values
-  ('d0340000-0000-4000-8000-000000000601', 'd0340000-0000-4000-8000-000000000001', 'hk_supervisor', 'Giám sát buồng'),
-  ('d0340000-0000-4000-8000-000000000602', 'd0340000-0000-4000-8000-000000000001', 'hk_attendant', 'Nhân viên buồng'),
-  ('d0340000-0000-4000-8000-000000000607', 'd0340000-0000-4000-8000-000000000001', 'storekeeper', 'Thủ kho'),
-  ('d0340000-0000-4000-8000-000000000609', 'd0340000-0000-4000-8000-000000000001', 'r_view034', 'Chỉ xem');
 
 insert into public.role_permissions (role_id, permission_code) values
   ('d0340000-0000-4000-8000-000000000601', 'hk.standard.manage'),
