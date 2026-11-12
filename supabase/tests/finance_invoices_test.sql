@@ -153,6 +153,11 @@ select public._post_move('d0400000-0000-4000-8000-000000000101', 'd0400000-0000-
 create temp table t040_ctx (key text primary key, id uuid);
 create temp table t040_resp (key text primary key, resp jsonb);
 
+-- Hai bang tam tao duoi role postgres, nhung tu lenh 'set local role
+-- authenticated' tro di moi lenh INSERT/SELECT deu chay duoi authenticated
+-- (khong co quyen ghi bang cua role khac) -> cap quyen truoc khi doi role.
+grant all on t040_ctx, t040_resp to authenticated;
+
 -- Helper doi user: dat lai JWT claim (mau T-020).
 create or replace function public._t040_as(p_user uuid)
 returns void
