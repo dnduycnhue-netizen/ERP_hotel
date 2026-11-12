@@ -91,3 +91,13 @@ Mobile UI, Completion-2, Verify-prep: **đã merge vào `main`** (bản deploy n
 Việc deploy đi qua Vercel CLI (không có tích hợp git tự động), project `erp_hotel`,
 địa chỉ production `https://erphotel.vercel.app`. Trước ngày 12/11 21:xx bản đang chạy là
 commit `ec4c7be` (sửa Q235), trước toàn bộ thay đổi code của Q241–Q246.
+
+**Trạng thái 12/11 tối: CHƯA deploy bản mới nhất** (`main` = `c030691d6`) — lệnh `vercel --prod` do
+Claude Code chạy bị hệ thống chặn, cần Duy tự chạy hoặc cấp quyền. Bản đang chạy vẫn dùng được với
+cơ sở dữ liệu mới (đã kiểm chứng đăng nhập 6 tài khoản + RPC nhận hàng qua API); chênh lệch chỉ ở
+phía giao diện: câu báo lỗi tiếng Việt riêng cho `ERR_SOD_INVOICE_GR`/`ERR_SOD_PAYMENT_APPROVER`
+(bản cũ hiện câu SoD chung), 31 mã lỗi RPC mới dịch, và chuỗi chuyển vào `vi.ts`.
+
+Kiểm tra sau deploy (smoke): `/login` trả 200; đăng nhập `uat.gm@erp.internal` thấy đúng 1 khách sạn
+(TEST47); `uat.storekeeper` gọi `receiving_list_tasks` trên TEST47 được, trên SONHOIAN bị `ERR_FORBIDDEN`;
+`anon` gọi RPC bị 401.
