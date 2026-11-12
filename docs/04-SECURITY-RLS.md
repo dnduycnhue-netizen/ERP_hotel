@@ -165,15 +165,15 @@ Kiểm tra trong RPC bằng `assert_sod(rule_code, doc_id)`, dựa trên **ngư�
 | `SOD_PO_CREATOR_APPROVER` | Người tạo PO ≠ người duyệt bất kỳ bước nào |
 | `SOD_PO_RECEIVER` | Người tạo hoặc duyệt PO ≠ người nhận hàng của PO đó |
 | `SOD_MARKET_BUYER_RECEIVER` | Người giữ tạm ứng đi chợ ≠ người nhận hàng mua chợ |
-| `SOD_INVOICE_GR` | Người nhập hóa đơn ≠ người nhận hàng |
-| `SOD_PAYMENT_APPROVER` | Người duyệt thanh toán ≠ người nhập hóa đơn ≠ người yêu cầu đổi STK NCC (30 ngày) |
+| `SOD_INVOICE_GR` | Người nhập hóa đơn ≠ người nhận hàng — đã thực thi ở `invoice_match` (Q242) |
+| `SOD_PAYMENT_APPROVER` | Người duyệt thanh toán ≠ người nhập hóa đơn ≠ người yêu cầu đổi STK NCC (30 ngày) — đã thực thi ở `payment_request_decide`, chỉ khi duyệt (Q242) |
 | `SOD_BANK_ACCOUNT` | Người yêu cầu đổi STK ≠ người duyệt |
 | `SOD_SUPPLIER_APPROVER` | Người tạo NCC ≠ người phê duyệt NCC đó (T-013) |
 | `SOD_WASTE` | Người đề xuất hủy ≠ người duyệt |
 | `SOD_MINIBAR_WAIVE` | Người đề nghị miễn minibar ≠ người duyệt miễn |
 | `SOD_YIELD` (P2) | Người lập biên bản pha lóc ≠ người duyệt |
 | `SOD_COUNT_INDEPENDENT` | Đợt kiểm kê tháng có ≥ 1 người đếm không có quyền `receiving.post`/`requisition.issue` tại kho đó |
-| `SOD_GRANT` | Người cấp quyền ≠ người nhận quyền |
+| `SOD_GRANT` | ~~Người cấp quyền ≠ người nhận quyền~~ — **KHÔNG áp dụng** (Duy chốt 12/11/2026: quản trị được tự cấp quyền cho mình có chủ ý, xem ADR-007 admin-relax; vẫn có `audit_log` và alert `PERMISSION_CRITICAL_CHANGED`, vẫn chặn `ERR_LAST_ADMIN`) |
 
 `sod_exceptions` chỉ tạo được bởi người có `admin.permissions.override` **và** được người có `po.approve` mức GM xác nhận.
 
