@@ -1,75 +1,93 @@
 # Checklist go-live ERP_hotel — 1 bảng duy nhất
 
-> **Trạng thái:** Tổng hợp ngày 10/11/2026 (sau đợt verify-prep).
-> Nguồn trạng thái: báo cáo audit `~/workspace/erp-hotel-feature-audit-REPORT.md`
-> (§1, §3, §5.2), `docs/OPEN-QUESTIONS.md` (Q1–Q173), các doc go-live
-> trong `docs/go-live/` (V3–V5, V7 của đợt này). Không bịa trạng thái:
-> mục nào chưa kiểm chứng thì ghi rõ "chưa kiểm chứng".
-> Thứ tự làm = thứ tự bảng (từ trên xuống). Chủ sở hữu: **Duy** = chỉ Duy
-> làm được; **tau** = agent chính; **agent** = wave đang chạy.
+> **Trạng thái:** cập nhật 12/11/2026 (tối) bởi Claude Code, thay bản 10/11. Mọi dòng
+> "đã kiểm chứng" nghĩa là đã đọc lại từ production (project ERP_hotel
+> `ufxcjfntesafmqzsjsyr`) hoặc chạy thật trong phiên này; mục nào chưa kiểm chứng
+> được ghi rõ **chưa kiểm chứng**. Không bịa trạng thái.
+> Chủ sở hữu: **Duy** = chỉ Duy làm/quyết được; **Claude** = Claude Code; **Muse** = agent UI.
 
-## A. Cổng kỹ thuật (phải xanh mới go-live)
+## Tóm tắt một dòng
 
-| # | Cổng | Trạng thái hiện tại | Chủ sở hữu | Ghi chú |
+Mã nguồn và cơ sở dữ liệu **sẵn sàng cho UAT** (test có kiểm soát). **Chưa sẵn sàng vận hành thật**:
+thiếu dữ liệu thật (phòng, nhà cung cấp, tồn đầu kỳ, tài khoản nhân viên) và các tài khoản test mật khẩu
+yếu phải được tắt trước khi dùng thật.
+
+## A. Cổng kỹ thuật
+
+| # | Cổng | Trạng thái | Chủ | Ghi chú |
 |---|---|---|---|---|
-| A1 | pgTAP 35 suite / 1.709 assertion | **2/35 suite đã chạy, đều PASS**: T-023 87/87 (10/11 00:35), bootstrap 22 (08/11). Restaurant 69 assertion **kẹt lỗi fixture** (C13 đang sửa, test-only). 32 suite chưa chạy | tau + agent (C13) | Danh sách từng suite ở audit §5.2. Các suite lớn (>54KB) đã có bản chạy gọn trong `supabase/tests/run-ready/` (V1 đợt này). Chạy trên SQL Editor, mỗi file < 50.000 B |
-| A2 | pgTAP các suite chưa chạy (10 suite lớn đã nêu tên) | Chưa chạy: T-026 (49), T-030 (97), T-034 (93), T-035 (104), T-036 (49), T-040 (80), T-042 (67), T-043 (55), T-044 (82), T-045 (54); còn lại xem audit §5.2 | tau | Chạy sau khi bundle completion-2 merge (C13 sửa fixture xong thì chạy lại restaurant trước) |
-| A3 | Playwright tầng ghi W1–W11 | **Chưa chạy** — chỉ chạy được trên máy Mac của Duy (property test riêng TEST47 + TEST01/TEST02 + PIN 1234; VM Chromium không tới được production) | Duy | Tầng đọc public 5/5 PASS, Vitest 13/13 PASS (Duy chạy 10/11 10:15). Tầng ghi cần Duy chạy seed test-property + tạo 2 user test trước |
-| A4 | Q110 checklist tay (7 mục) | **0/7** | Duy | Đếm mù end-to-end trên điện thoại thật, đối chiếu Excel với `v_count_result`, test offline, kiểm tra `count_list_counters` theo kho, nhận hàng offline |
-| A5 | `database.types.ts` | **Stale từ T-012** — chỉ Duy regenerate được (`supabase gen types` trên máy Mac) | Duy | Làm trước khi go-live để typecheck khớp schema thật |
+| A1 | pgTAP | **XANH: 53/54 suite, 2.210/2.220 ca** (12/11) | Claude | Còn lại `bootstrap_initial_org_test` chỉ đạt trên DB trống (cần staging/Docker). Chạy lại: `python3 scripts/pgtap-rehearse.py` (docs/11-TESTING.md §12) |
+| A2 | Lint + typecheck + Vitest | **XANH**: eslint sạch, `tsc` sạch, 19 file / 156 test | Claude | ESLint có thêm luật chặn chuỗi tiếng Việt hard-code (Q243) |
+| A3 | `database.types.ts` | **XONG 12/11**: sinh lại từ ERP_hotel (9.468 dòng; bản cũ 2.554 dòng, dừng ở T-012) | Claude | Checklist cũ ghi "chỉ Duy làm được" — sai, CLI đã link |
+| A4 | Playwright tầng ghi | **Chưa chạy** | Duy | Chỉ chạy được trên máy Duy. `.env.local` đã sửa về ERP_hotel (12/11); còn thiếu `SUPABASE_SECRET_KEY` (dán từ Dashboard → API Keys → Secret) |
+| A5 | Kiểm tay trên điện thoại thật (Q110, 7 mục) | **Chưa kiểm chứng (0/7)** | Duy | Đếm mù end-to-end, đối chiếu Excel với `v_count_result`, test offline kiểm kê/nhận hàng |
+| A6 | Bản deploy khớp mã nguồn | Xem mục H (deploy ngày 12/11) | Claude | |
 
-## B. Cổng dữ liệu & cấu hình (cần Duy chốt/cung cấp)
+## B. Bảo mật và kiểm soát (mục mới — đã kiểm chứng trên production)
 
-| # | Cổng | Trạng thái hiện tại | Chủ sở hữu | Ghi chú |
-|---|---|---|---|---|
-| B1 | Sender T-045 (email + push) | **Chưa cấu hình được** — thiếu key của Duy (Q98/Q99) | Duy | Hướng dẫn đầy đủ ở `docs/go-live/notification-sender-setup.md` (V4). Cần: Resend API key, email gửi đã verify, VAPID public/private + subject, shared secret (Vault + EF giống hệt nhau). Zalo là stub 501 — làm riêng sau |
-| B2 | Tên pháp nhân thật | **Chưa có** — 3 bảng đang dùng tạm "Son Hoi An Boutique Hotel & Spa" | Duy | SQL mẫu 1 phút ở `docs/go-live/legal-entity-rename.md` (V5). Khuyến nghị: chỉ đổi `legal_entities.name` |
-| B3 | Tồn đầu kỳ (Q157) | **Chưa chốt** — runbook đã sẵn | Duy chốt, tau/GM làm | `docs/go-live/opening-stock-runbook.md` (V3): kiểm đếm thật ngày cutover, không dùng số 11/2019 (7 năm tuổi). Cần chốt thêm Q31/Q35/Q36/Q37/Q38 trước ngày cutover |
-| B4 | Công thức món ăn (Q168) | **Chưa chốt nguồn** — nháp đã sẵn | Duy chốt | `docs/sample-data/recipes-import-DRAFT.sql` (V2): 81 công thức, 392 dòng định lượng; 18 dòng [CẦN XÁC NHẬN]. Chốt import Excel hay nhập tay rồi mới chạy (sau seed, chia nhỏ file nếu >54KB) |
-| B5 | Dữ liệu go-live khác | Seed mẫu 668 items đã nạp + kiểm chứng (10/11 21:34); `stock_moves` = 0 theo thiết kế | tau | Minibar: 7 món chưa có giá bán (giá seed hết hạn 2018–2019) — nhập giá hiện hành trước khi bán. `room_setup_standards` + `trolley_par_levels` = 0 (seed §5/§6 lỗi, chưa chạy) — nhập lại khi có số thật |
+| # | Cổng | Trạng thái |
+|---|---|---|
+| B1 | RLS | **103/103 bảng** bật RLS; 5 bảng không policy (settings, approval_rules, alert_rules, doc_sequences, item_code_sequences) là thiết kế (chỉ qua RPC) |
+| B2 | Hàm `SECURITY DEFINER` | Tất cả có `search_path`; **0 hàm** `anon` gọi được (đã thu hồi 24 hàm, migration 562000) |
+| B3 | Audit | Trigger audit phủ mọi bảng nghiệp vụ trừ sổ cái/cache (536000); `pin_hash` không vào log (557000); cờ `rule.*` tắt/bật → alert `RULE_TOGGLED` |
+| B4 | SoD | Thêm `SOD_INVOICE_GR` + `SOD_PAYMENT_APPROVER` (563000). `SOD_GRANT` **không áp dụng** (Duy chốt). `SOD_YIELD` chờ P2 |
+| B5 | Ràng buộc đã nới (cờ, mặc định BẬT) | R25 (PIN nộp kiểm kê), R18 (PIN nhận hàng), R32 (đóng kỳ) — chưa tắt cờ nào; R26 ngưỡng đếm lại theo nhóm hàng; R30 cho nhập số 0 |
+| B6 | **Tài khoản test mật khẩu yếu** | **PHẢI xử lý trước khi dùng thật.** TEST01–05 (mật khẩu yếu, đã thu hẹp về TEST47 ngày 12/11) và 16 tài khoản `uat.<vai trò>@erp.internal` (mật khẩu yếu do Duy đặt, chỉ TEST47, tự hết hạn **26/11/2026**, không có `sys_admin`). Vô hiệu hóa hoặc xóa trước ngày vận hành thật |
+| B7 | Tài khoản quản trị | `0001` giữ đủ 17 vai trò toàn chuỗi, chưa đặt PIN; 1 tài khoản owner+sys_admin riêng. Nên tạo tài khoản nhân viên thật theo từng vai trò rồi hạ quyền `0001` (SoD sẽ chặn chính nó ở nhiều chứng từ) |
+| B8 | Danh mục dùng chung | Vật tư/NCC dùng chung cấp chuỗi: ai có `item.manage`/`supplier.manage` ở bất kỳ khách sạn nào sửa được danh mục của cả chuỗi (kể cả tài khoản test ở TEST47) |
 
-## C. Cổng quyết định nghiệp vụ (Duy chốt, gom 1 lần)
+## C. Dữ liệu và cấu hình (cần Duy cung cấp/chốt)
 
-| # | Câu hỏi | Trạng thái | Ảnh hưởng nếu không chốt |
+| # | Cổng | Trạng thái (đọc từ production 12/11) | Chủ |
 |---|---|---|---|
-| C1 | **Q71** — phiếu không hóa đơn có được ghi `ap_ledger` không | Mở | Màn tài chính hiển thị công nợ thiếu/không khớp |
-| C2 | **Q76** — ai nghiệm thu dịch vụ (`service.accept` hiện chỉ engineer) | Mở | Lễ tân/GM không nghiệm thu được dịch vụ |
-| C3 | **Q83** — ai được chạy `export.accounting` (hiện chỉ `chief_accountant`) | Mở | Chỉ kế toán trưởng xuất được file kế toán |
-| C4 | **Q58** — pháp nhân FIFO lỗi `ERR_NEGATIVE_STOCK` khi bán minibar từ kho phòng (transfer_in không tạo lớp FIFO) | Mở — **QUAN TRỌNG** | Chỉ `moving_avg` (mặc định) chạy được; kiểm tra costing method của SONHOIAN trước go-live |
-| C5 | **Q60** — lễ tân/owner/gm thiếu `item.view` nên phiếu kiểm hiện đủ tiền mà thiếu tên hàng | Mở — **QUAN TRỌNG** | Cần cấp `item.view` cho front_desk/owner/gm |
-| C6 | **Q73** — timeline duyệt đề nghị thanh toán không đọc được từ client (`approvals_select`/`approval_timeline` chỉ hỗ trợ pr/po) | Mở — **QUAN TRỌNG** | Màn tài chính thiếu lịch sử duyệt đề nghị thanh toán |
-| C7 | **Q81** — `service_accept` không nhận `note` dù bảng có cột | Mở | Nghiệm thu không ghi được ghi chú |
-| C8 | **T-022 (A/B)** — miễn kiểm tra giá cho PO chợ trong `po_submit` hay giữ luật chặn, sửa test | Mở | PO chợ có dòng không giá thì submit bị chặn (P0001 `ERR_PRICE_NOT_SET`) |
-| C9 | **Q101** — (xem OPEN-QUESTIONS) | Mở | Theo audit §1 — chốt cùng đợt với C1–C8 |
-| C10 | **Q31/Q42/Q80** — (xem OPEN-QUESTIONS) | Mở | Theo audit §1 — chốt cùng đợt |
+| C1 | Tồn đầu kỳ SONHOIAN (Q157) | Đã **dọn dữ liệu test**: 28 bút toán `adjust_count` giá 0 (đợt `CNT-SONHOIAN-2611-0001`) đã đảo bằng bút toán đảo; tồn = 0, giá vốn = 0 (Q244). Chờ **kiểm đếm thật ngày cutover** theo `opening-stock-runbook.md` | Duy + Claude |
+| C2 | Phòng | **0 phòng** ở cả 2 khách sạn → buồng phòng, minibar chưa dùng được. Cần danh sách phòng + loại phòng | Duy |
+| C3 | Nhà cung cấp | **1 NCC**, 0 hợp đồng khung, 2 giá trần. PO không có nguồn giá phải qua duyệt thủ công | Duy |
+| C4 | Minibar | 14 dòng giá, **7 dòng đã hết hạn** (giá 2018–2019); cần giá hiện hành | Duy |
+| C5 | Công thức món (Q168) | **82 công thức, 427 dòng định lượng đã có**; 0 dòng bán (`dish_sales`). Chưa kiểm chứng 18 dòng "[CẦN XÁC NHẬN]" của bản nháp | Duy |
+| C6 | Tên pháp nhân thật (B2 cũ) | **Chưa đổi** — vẫn "Son Hoi An Boutique Hotel & Spa". Đã có màn sửa (migration 535000, Q209) | Duy |
+| C7 | Thông báo email/push (Q98/Q99) | **Chưa cấu hình sender** (0 cấu hình, 0 thuê bao push). Duy đã chọn dùng chuông cảnh báo trong app (Q208). Bản tin 8h gửi email cần Resend + VAPID (`notification-sender-setup.md`) | Duy |
+| C8 | Tài khoản nhân viên thật | Chưa có (chỉ `0001`, owner riêng, TEST01–05, UAT) | Duy |
+| C9 | Cron | 8 job, **0 lỗi trong 7 ngày** | — |
 
-## D. Cổng giao diện & hiệu năng
+## D. Quyết định nghiệp vụ
 
-| # | Cổng | Trạng thái hiện tại | Chủ sở hữu | Ghi chú |
-|---|---|---|---|---|
-| D1 | Đợt redesign ClickUp (UI polish) | **Kế hoạch đã sẵn** (V7), chưa làm | agent (đợt riêng) | `docs/go-live/ui-polish-plan.md`. Làm sau khi xong hết chức năng, trước go-live (chỉ thị Duy 10/11 07:34). UI-1/UI-2 đã làm xong vỏ + 34 bảng |
-| D2 | Tốc độ tải (bom1, Q124–Q126) | **Chưa khắc phục** | agent | Trang chủ từng kẹt ~15 giây (09/11, đã sửa 1 phần); cần đo lại sau khi merge các wave |
-| D3 | Màn xe đẩy mobile | Đã làm (T-047 + Q105 chốt làm) | — | Đã xong; kiểm chứng lại trong A4 (Q110 tay) |
+| Câu hỏi | Trạng thái |
+|---|---|
+| Q58 (FIFO + minibar) | Giữ `moving_avg`; **đã kiểm chứng** cả 2 pháp nhân dùng `moving_avg` |
+| Q60 (`item.view` cho lễ tân/owner/gm) | **Xong** (migration 420000; đã kiểm chứng trên production) |
+| Q73 (timeline duyệt thanh toán), Q81 (ghi chú nghiệm thu) | **Xong** |
+| T-022A / Q171 (PO chợ không giá) | **Đã chốt phương án A** (miễn kiểm giá). Còn mở Q172 (dòng giá 0 vào nhận hàng/hóa đơn) và Q173 (bậc duyệt bị tính thấp) — chờ khách |
+| Q233 (ngày giao PO) | **Xong** (561000): PO từ PR có `expected_date = order_date`; NULL coi là đến hạn |
+| Q71, Q76, Q83, Q101, Q31, Q42, Q80 | Chờ khách |
+| Chờ khách, ảnh hưởng vận hành | Q152/Q199 (minibar offline), Q161 (bản tin 8h), Q165 + Q132 (tạo user, độ dài mật khẩu), Q174 (nội dung chuyển khoản) |
 
-## E. Các wave đang chạy (không được quên khi merge)
+## E. Giao diện và hiệu năng
 
-| Wave | Nhánh | Phạm vi | Trạng thái |
-|---|---|---|---|
-| Mobile UI | `merge/mobile-ui` | W1–W5: màn mobile + test | Đang chạy (coordinator riêng) |
-| Completion-2 | `merge/completion-2` | C1–C13: day-lock, photo-review, PO PDF + bank-transfer + export_batches, finance export, org/property UI, route còn thiếu, housekeeping/minibar, RPC thiếu + 5 alert code chết, docs + fix nhỏ, report matview + dashboard single-RPC, restaurant Q166–Q170, GR attachment, C13 sửa fixture pgTAP | Đang chạy (coordinator riêng) |
-| Verify-prep (đợt này) | `merge/verify-prep` | V1–V7: bản chạy pgTAP gọn, nháp công thức, runbook tồn đầu kỳ, hướng dẫn sender, đổi tên pháp nhân, checklist này, kế hoạch UI polish | V1–V7 xong, chờ merge chung |
+| # | Cổng | Trạng thái |
+|---|---|---|
+| E1 | Vỏ giao diện ClickUp, 34 bảng (UI-1/UI-2) | Xong |
+| E2 | Chuỗi tiếng Việt hard-code | **Xong (Q243)**: chỉ có 50 chuỗi ở 10 file (không phải 222 như ghi nhầm trước đó), đã chuyển vào `vi.ts` + luật ESLint chặn tái phát |
+| E3 | Tốc độ tải (Q124–126) | **Chưa đo lại** sau các đợt merge |
+| E4 | Đợt UI polish theo `ui-polish-plan.md` | Chưa làm (không chặn go-live) |
 
-> **Quy tắc merge:** Duy merge 1 lần duy nhất cả 3 bundle (mobile +
-> completion-2 + verify-prep). Không merge lẻ từng wave. Sau merge: chạy
-> lại A1 (restaurant trước), A2, rồi A3–A4 trên máy Duy.
+## F. Các wave
 
-## F. Thứ tự làm (tóm tắt)
+Mobile UI, Completion-2, Verify-prep: **đã merge vào `main`** (bản deploy ngày 12/11 chứa chúng).
 
-1. Duy chốt C1–C10 (gom 1 lần) + cung cấp B1 (sender keys) + B2 (tên pháp nhân).
-2. Merge 3 bundle (mobile + completion-2 + verify-prep) → deploy.
-3. Chạy A1 (restaurant trước) + A2 (pgTAP còn lại) trên production.
-4. Duy chạy A3 (Playwright ghi) + A4 (Q110 tay) trên Mac/điện thoại thật.
-5. Duy regenerate A5 (`database.types.ts`).
-6. Chạy B3 (kiểm đếm cutover theo runbook V3) → khóa kỳ → B4 (công thức theo Q168).
-7. Đợt D1 (UI polish theo kế hoạch V7) + D2 (đo tốc độ bom1).
-8. Go-live.
+## G. Thứ tự làm từ bây giờ
+
+1. **Deploy bản mới nhất** (mục H) → UAT bằng tài khoản `uat.*` ở TEST47. *(Claude)*
+2. Duy kiểm tay A5 (điện thoại thật) + chạy A4 (Playwright) sau khi dán `SUPABASE_SECRET_KEY`. *(Duy)*
+3. Cung cấp dữ liệu thật C2–C6, C8. *(Duy)*
+4. Kiểm đếm cutover (C1) theo runbook → khóa kỳ → import công thức/dữ liệu còn thiếu. *(Duy + Claude)*
+5. **Tắt/xóa tài khoản test và UAT (B6)**, hạ quyền `0001` (B7). *(Duy + Claude)*
+6. Cấu hình sender nếu muốn bản tin email (C7); đo tốc độ (E3). *(Duy + Claude)*
+7. Tạo project staging để chạy `bootstrap_initial_org_test` và thử migration an toàn hơn. *(Duy)*
+8. Vận hành thật.
+
+## H. Ghi chú deploy
+
+Việc deploy đi qua Vercel CLI (không có tích hợp git tự động), project `erp_hotel`,
+địa chỉ production `https://erphotel.vercel.app`. Trước ngày 12/11 21:xx bản đang chạy là
+commit `ec4c7be` (sửa Q235), trước toàn bộ thay đổi code của Q241–Q246.
