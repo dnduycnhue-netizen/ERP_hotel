@@ -143,6 +143,12 @@ insert into public.goods_receipt_lines (id, gr_id, org_id, property_id, po_line_
   ('d0400000-0000-4000-8000-000000000e15', 'd0400000-0000-4000-8000-000000000e03', 'd0400000-0000-4000-8000-000000000001', 'd0400000-0000-4000-8000-000000000201', 'd0400000-0000-4000-8000-000000000c06', 'd0400000-0000-4000-8000-000000000501', 10, 0, 'kg', 10, 10000, 10, 'pass', 'd0400000-0000-4000-8000-000000000301');
 select set_config('app.receiving_guard_bypass', 'off', true);
 
+-- _post_move doi auth.uid() khac null (posted_by, 120000:439) nen phai set
+-- JWT truoc khi goi — mau inventory_core_test.sql (set_config sub+claims
+-- truoc lives_ok _post_move). Dung a07 (thu kho, nguoi nhan GR).
+select set_config('request.jwt.claim.sub', 'd0400000-0000-4000-8000-000000000a07', true);
+select set_config('request.jwt.claims', '{"sub":"d0400000-0000-4000-8000-000000000a07","role":"authenticated"}', true);
+
 select public._post_move('d0400000-0000-4000-8000-000000000101', 'd0400000-0000-4000-8000-000000000201', 'd0400000-0000-4000-8000-000000000301', 'd0400000-0000-4000-8000-000000000501', null, 'receipt', 10, 10000, '2026-11-09', 'goods_receipt', 'd0400000-0000-4000-8000-000000000e01', 'd0400000-0000-4000-8000-000000000e11');
 select public._post_move('d0400000-0000-4000-8000-000000000101', 'd0400000-0000-4000-8000-000000000201', 'd0400000-0000-4000-8000-000000000301', 'd0400000-0000-4000-8000-000000000502', null, 'receipt', 5, 60000, '2026-11-09', 'goods_receipt', 'd0400000-0000-4000-8000-000000000e01', 'd0400000-0000-4000-8000-000000000e12');
 select public._post_move('d0400000-0000-4000-8000-000000000101', 'd0400000-0000-4000-8000-000000000201', 'd0400000-0000-4000-8000-000000000301', 'd0400000-0000-4000-8000-000000000503', null, 'receipt', 20, 5000, '2026-11-09', 'goods_receipt', 'd0400000-0000-4000-8000-000000000e01', 'd0400000-0000-4000-8000-000000000e13');
@@ -152,6 +158,11 @@ select public._post_move('d0400000-0000-4000-8000-000000000101', 'd0400000-0000-
 -- Bang tam giu id chung tu tao trong test (mau T-020/T-023).
 create temp table t040_ctx (key text primary key, id uuid);
 create temp table t040_resp (key text primary key, resp jsonb);
+
+-- Hai bang tam tao duoi role postgres, nhung tu lenh 'set local role
+-- authenticated' tro di moi lenh INSERT/SELECT deu chay duoi authenticated
+-- (khong co quyen ghi bang cua role khac) -> cap quyen truoc khi doi role.
+grant all on t040_ctx, t040_resp to authenticated;
 
 -- Helper doi user: dat lai JWT claim (mau T-020).
 create or replace function public._t040_as(p_user uuid)
@@ -202,12 +213,12 @@ insert into public.ap_ledger (id, org_id, legal_entity_id, property_id, supplier
 select set_config('app.finance_guard_bypass', 'off', true);
 select throws_ok(
   $q$update public.ap_ledger set amount = 200 where id = 'd0400000-0000-4000-8000-000000000f01'$q$,
-  'P0001', 'ERR_IMMUTABLE_LEDGER:ap_ledger:UPDATE',
+  '55000', 'ERR_IMMUTABLE_LEDGER:ap_ledger:UPDATE',
   'ap_ledger UPDATE is blocked by immutable trigger'
 );
 select throws_ok(
   $q$delete from public.ap_ledger where id = 'd0400000-0000-4000-8000-000000000f01'$q$,
-  'P0001', 'ERR_IMMUTABLE_LEDGER:ap_ledger:DELETE',
+  '55000', 'ERR_IMMUTABLE_LEDGER:ap_ledger:DELETE',
   'ap_ledger DELETE is blocked by immutable trigger'
 );
 
@@ -366,7 +377,11 @@ insert into t040_resp values ('ret1', public.supplier_return_post(
 ));
 insert into t040_ctx values ('ret1', (select (resp ->> 'id')::uuid from t040_resp where key = 'ret1'));
 select is((select resp ->> 'ok' from t040_resp where key = 'ret1'), 'true', 'return1 posted');
+-- Doc ap_ledger duoi quyen a01 (co ap.view): a07 (thu kho) bi policy
+-- ap_ledger_select chan nen doc thay null — xem diag+dump 12/11.
+select public._t040_as('d0400000-0000-4000-8000-000000000a01');
 select is((select amount from public.ap_ledger where doc_type = 'supplier_return' and doc_id = (select id from t040_ctx where key = 'ret1')), -40000::numeric, 'ap_ledger (-) 40000 for return1 (4kg x 10000 invoiced)');
+select public._t040_as('d0400000-0000-4000-8000-000000000a07');
 -- Tra hang chua co hoa don duyet (GR2, invoice4 moi 'matched') -> khong ghi so.
 insert into t040_resp values ('ret2', public.supplier_return_post(
   'd0400000-0000-4000-8000-000000000e02',
@@ -374,7 +389,11 @@ insert into t040_resp values ('ret2', public.supplier_return_post(
 ));
 insert into t040_ctx values ('ret2', (select (resp ->> 'id')::uuid from t040_resp where key = 'ret2'));
 select is((select resp ->> 'ok' from t040_resp where key = 'ret2'), 'true', 'return2 posted');
+-- Doc duoi quyen a01 (co ap.view) de assert co nghia that: duoi a07 thi
+-- count luon = 0 do RLS chan, du co dong ledger cung khong thay.
+select public._t040_as('d0400000-0000-4000-8000-000000000a01');
 select is((select count(*) from public.ap_ledger where doc_type = 'supplier_return' and doc_id = (select id from t040_ctx where key = 'ret2')), 0::bigint, 'no ap_ledger entry for return2 (no approved invoice)');
+select public._t040_as('d0400000-0000-4000-8000-000000000a07');
 -- Tra not 6kg GAO con lai cua GR1 -> tru not phan hoa don con lai 60000.
 insert into t040_resp values ('ret3', public.supplier_return_post(
   'd0400000-0000-4000-8000-000000000e01',
@@ -382,6 +401,7 @@ insert into t040_resp values ('ret3', public.supplier_return_post(
 ));
 insert into t040_ctx values ('ret3', (select (resp ->> 'id')::uuid from t040_resp where key = 'ret3'));
 select is((select resp ->> 'ok' from t040_resp where key = 'ret3'), 'true', 'return3 posted');
+select public._t040_as('d0400000-0000-4000-8000-000000000a01');
 select is((select amount from public.ap_ledger where doc_type = 'supplier_return' and doc_id = (select id from t040_ctx where key = 'ret3')), -60000::numeric, 'ap_ledger (-) 60000 for return3 (remaining invoiced 6kg)');
 
 -- 13. Quyet toan tam ung.
@@ -560,12 +580,12 @@ select throws_ok(
   'submitted payment request cannot be marked paid'
 );
 
--- 17. RLS ap_ledger: thu kho khong thay gi; ke toan thay du 6 dong
+-- 17. RLS ap_ledger: thu kho khong thay gi; ke toan thay du 7 dong
 --     (tru dong f01 cua test guard o muc 2).
 select public._t040_as('d0400000-0000-4000-8000-000000000a07');
 select is((select count(*) from public.ap_ledger), 0::bigint, 'storekeeper sees 0 ap_ledger rows');
 select public._t040_as('d0400000-0000-4000-8000-000000000a01');
-select is((select count(*) from public.ap_ledger where id <> 'd0400000-0000-4000-8000-000000000f01'), 6::bigint, 'accountant sees 6 ap_ledger rows (2 invoice + 2 returns + 2 payments)');
+select is((select count(*) from public.ap_ledger where id <> 'd0400000-0000-4000-8000-000000000f01'), 7::bigint, 'accountant sees 7 ap_ledger rows (3 invoice + 2 returns + 2 payments)');
 
 -- 18. Bang ke khong hoa don.
 select public._t040_as('d0400000-0000-4000-8000-000000000a01');
