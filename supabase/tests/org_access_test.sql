@@ -418,12 +418,6 @@ select ok(
         ('legal_entities'),
         ('properties'),
         ('profiles'),
-        ('outlet_types'),
-        ('cost_centers'),
-        ('outlets'),
-        ('room_types'),
-        ('rooms'),
-        ('warehouses'),
         ('permissions'),
         ('roles'),
         ('role_permissions'),
@@ -438,7 +432,7 @@ select ok(
       'INSERT'
     )
   ),
-  'authenticated users cannot insert directly into organization/access tables'
+  'authenticated users cannot insert directly into organization/access tables (master-data tables excluded: ADR-010, guarded by RLS has_perm)'
 );
 select set_config(
   'request.jwt.claim.sub',

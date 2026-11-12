@@ -103,6 +103,11 @@ insert into public.role_permissions (role_id, permission_code) values
 insert into public.user_property_roles (user_id, role_id, property_id) values
   ('d0460000-0000-4000-8000-000000000a01', 'd0460000-0000-4000-8000-000000000601', 'd0460000-0000-4000-8000-000000000201'),
   ('d0460000-0000-4000-8000-000000000a02', 'd0460000-0000-4000-8000-000000000602', 'd0460000-0000-4000-8000-000000000201'),
+  -- Q246: _decide_approval kiem quyen (42501) roi kiem 'co phai nguoi duyet cua buoc'
+  -- (ERR_NOT_APPROVER) TRUOC buoc SoD (547000). De test duoc SoD "nguoi tao phieu
+  -- linh bu khong tu duyet", a02 (nguoi tao) phai la nguoi duyet hop le => gan them
+  -- vai tro 601 (vai tro cua buoc duyet).
+  ('d0460000-0000-4000-8000-000000000a02', 'd0460000-0000-4000-8000-000000000601', 'd0460000-0000-4000-8000-000000000201'),
   ('d0460000-0000-4000-8000-000000000a07', 'd0460000-0000-4000-8000-000000000607', 'd0460000-0000-4000-8000-000000000201'),
   ('d0460000-0000-4000-8000-000000000a10', 'd0460000-0000-4000-8000-000000000609', 'd0460000-0000-4000-8000-000000000201');
 

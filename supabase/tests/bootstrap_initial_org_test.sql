@@ -1,3 +1,7 @@
+-- LUU Y (Q246): test nay chi dat tren CO SO DU LIEU TRONG. bootstrap_initial_org
+-- tu choi khi da co to chuc (ERR_BOOTSTRAP_ALREADY_INITIALIZED) — dung hanh vi
+-- can kiem. Tren production (da co to chuc that) 10/22 ca se do va KHONG phai loi
+-- san pham. Chay no tren DB moi (vd supabase db reset cuc bo hoac project staging).
 begin;
 
 create extension if not exists pgtap with schema extensions;
