@@ -1,6 +1,6 @@
-# Hồ sơ vai trò gọn cho khách sạn nhỏ (ĐỀ XUẤT — chưa áp)
+# Hồ sơ vai trò gọn cho khách sạn nhỏ (ĐÃ ÁP production 13/11/2026)
 
-Ngày 13/11/2026 · Q257 · Chờ Duy duyệt. Vai trò cũ (17 vai trò) **giữ nguyên**; bộ này chỉ **thêm** 7 vai trò mẫu `sm_*`. Mỗi quyền đều lấy từ quyền đang có trong hệ thống (không thêm quyền mới).
+Ngày 13/11/2026 · Q257 · Duy đã duyệt; migration `20261109570000_compact_role_profiles.sql`. Bảng quyền chi tiết bên dưới là bản ĐỀ XUẤT ban đầu; bản đã áp khác ở phần "Quyết định đã chốt". Vai trò cũ (17 vai trò) **giữ nguyên**; bộ này chỉ **thêm** 7 vai trò mẫu `sm_*`. Mỗi quyền đều lấy từ quyền đang có trong hệ thống (không thêm quyền mới).
 
 ## Nguyên tắc
 
@@ -178,3 +178,12 @@ Nhập số liệu PMS, yêu cầu kiểm minibar, thu tiền minibar, xin miễ
 ## Cách áp (sau khi duyệt)
 
 Migration tạo 7 vai trò `sm_*` (is_system) cho mọi tổ chức + gán quyền như bảng trên; có pgTAP kiểm tra mỗi quyền tồn tại, không vai trò nào có cặp SoD cùng chứng từ ngoài danh sách đã nêu, và `receiver` không bị đổi. Không gán vai trò cho người dùng nào tự động.
+
+## Quyết định đã chốt (Duy, 13/11/2026) và kết quả áp
+
+1. `payment.approve`: **cả Chủ đầu tư và Quản lý** đều có. Kế toán không còn quyền duyệt thanh toán và duyệt hóa đơn.
+2. Quản lý có thêm `pr.approve`, `requisition.approve`, `waste.approve`, `invoice.approve` và `admin.approval_rules.manage` (tự chỉnh bậc duyệt) → **68 quyền**. Bếp/Buồng phòng vẫn giữ quyền đề xuất + duyệt phiếu bộ phận; SoD theo từng chứng từ vẫn chặn người tự duyệt chứng từ do chính mình tạo (Quản lý là người duyệt thứ hai).
+3. Cần ít nhất một người giữ vai trò `receiver` để nhận hàng mù.
+4. Bậc duyệt đơn mua: Duy chọn **2 bậc, Quản lý tự điền hạn mức** trong `/admin/approval-rules`. Migration **không sửa** `approval_rules` vì bước duyệt chỉ cho người đang giữ đúng vai trò của bước đó (`_approval_can_decide`): đổi sang vai trò mới khi chưa gán người sẽ làm đơn mua kẹt. Khi gán người dùng sang vai trò mới, Quản lý đặt 2 bậc: bậc 1 → `sm_manager`, bậc 2 → `sm_owner` và điền hạn mức (4 bậc hiện tại: outlet_head / cost_controller / gm / owner với mốc 0 / 10tr / 20tr / 100tr; lưu ý mốc bậc 1 đang tối đa 5tr nhưng bậc 2 bắt đầu từ 10tr).
+
+Số quyền đã áp: sm_owner 57, sm_manager 68, sm_accountant 40, sm_purchasing_store 28, sm_kitchen 18, sm_housekeeping 15, sm_frontdesk 11. Tổ chức mới: gọi `seed_compact_roles(org_id)` sau khi tạo tổ chức.
