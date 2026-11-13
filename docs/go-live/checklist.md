@@ -8,6 +8,13 @@
 
 ## Tóm tắt một dòng
 
+**CHẾ ĐỘ DEMO (Duy chốt 13/11/2026: hệ thống đang xây dựng, chưa cần dữ liệu thật).** Production chạy với dữ liệu **GIẢ LẬP**
+để thao tác thử: 30 phòng + 3 loại phòng + 2 xe đẩy + bếp/nhà hàng (Q261), 16 nhà cung cấp (Q256), 82 công thức và 668 vật tư từ file Excel
+mẫu, giá minibar hiện hành (từ 11/11), 7 vai trò gọn đã gán cho tài khoản UAT (Q260). **Chưa phải vận hành thật**: các cổng dưới đây
+(tài khoản nhân viên thật, tồn đầu kỳ thật, tên pháp nhân, tắt tài khoản test, kiểm tay điện thoại) **vẫn chặn go-live thật**. Tồn kho demo = 0:
+tạo tồn bằng 1 chu trình mua → nhận hàng qua giao diện (mua hàng bằng tài khoản `uat.purchaser`, duyệt bằng `uat.gm`, nhận bằng `uat.receiver`).
+Số liệu bên dưới là bản đọc trước khi tạo dữ liệu demo phòng.
+
 Mã nguồn và cơ sở dữ liệu **sẵn sàng cho UAT** (test có kiểm soát) và đã deploy production (13/11).
 **CHƯA đủ điều kiện vận hành thật** — số liệu production đọc lại 13/11 (chiều): **0 phòng, 0 loại phòng**, **17 nhà cung cấp (16 là GIẢ LẬP, Q256)**,
 **7 dòng giá minibar hết hạn**, **23 tài khoản đang hoạt động, toàn bộ là test/UAT/quản trị** (mật khẩu yếu), 0 tài khoản nhân viên thật,
@@ -42,9 +49,9 @@ tồn đầu kỳ chưa kiểm đếm (tồn = 0), tên pháp nhân vẫn là t�
 | # | Cổng | Trạng thái (đọc từ production 12/11) | Chủ |
 |---|---|---|---|
 | C1 | Tồn đầu kỳ SONHOIAN (Q157) | Đã **dọn dữ liệu test**: 28 bút toán `adjust_count` giá 0 (đợt `CNT-SONHOIAN-2611-0001`) đã đảo bằng bút toán đảo; tồn = 0, giá vốn = 0 (Q244). Chờ **kiểm đếm thật ngày cutover** theo `opening-stock-runbook.md` | Duy + Claude |
-| C2 | Phòng | **0 phòng** ở cả 2 khách sạn → buồng phòng, minibar chưa dùng được. Cần danh sách phòng + loại phòng | Duy |
+| C2 | Phòng | **DEMO 13/11: SONHOIAN có 30 phòng/3 loại (giả lập, Q261)**; TEST47 vẫn 0 phòng trong bảng `rooms`. Ban đầu: **0 phòng** ở cả 2 khách sạn → buồng phòng, minibar chưa dùng được. Cần danh sách phòng + loại phòng | Duy |
 | C3 | Nhà cung cấp | **17 NCC, trong đó 16 GIẢ LẬP** (seed Q256, đánh dấu `external_codes.source=synthetic`) — thay bằng NCC thật trước khi vận hành; 0 hợp đồng khung, 2 giá trần. PO không có nguồn giá phải qua duyệt thủ công | Duy |
-| C4 | Minibar | 14 dòng giá, **7 dòng đã hết hạn** (giá 2018–2019); cần giá hiện hành | Duy |
+| C4 | Minibar | 14 dòng giá: 7 dòng lịch sử 2018–2019 (hết hạn, bình thường) **+ 7 dòng giá hiện hành từ 11/11/2026** (giá tham khảo 2018, cần chốt lại khi vận hành thật) | Duy |
 | C5 | Công thức món (Q168) | **82 công thức, 427 dòng định lượng đã có**; 0 dòng bán (`dish_sales`). Chưa kiểm chứng 18 dòng "[CẦN XÁC NHẬN]" của bản nháp | Duy |
 | C6 | Tên pháp nhân thật (B2 cũ) | **Chưa đổi** — vẫn "Son Hoi An Boutique Hotel & Spa". Đã có màn sửa (migration 535000, Q209) | Duy |
 | C7 | Thông báo email/push (Q98/Q99) | **Chưa cấu hình sender** (0 cấu hình, 0 thuê bao push). Duy đã chọn dùng chuông cảnh báo trong app (Q208). Bản tin 8h gửi email cần Resend + VAPID (`notification-sender-setup.md`) | Duy |
