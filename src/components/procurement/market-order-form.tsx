@@ -167,7 +167,7 @@ export function MarketOrderForm({
             <input
               type="number"
               min="1"
-              step="1000"
+              step="any"
               value={advanceAmount}
               onChange={(e) => setAdvanceAmount(e.target.value)}
               className="mt-1 h-9 w-full rounded-md border bg-background px-3 text-sm"

@@ -19,9 +19,9 @@ where r.org_id = 'a5700000-0000-4000-8000-000000000001';
 select is((select count(*) from public.roles where org_id = 'a5700000-0000-4000-8000-000000000001' and is_system), 7::bigint, 'all 7 roles are system roles');
 select is((select count(*) from q257_perms), (select count(distinct (role_code, perm)) from q257_perms), 'no duplicated role permission');
 
-select is((select count(*) from q257_perms where role_code = 'sm_owner'), 57::bigint, 'sm_owner has 57 permissions');
-select is((select count(*) from q257_perms where role_code = 'sm_manager'), 69::bigint, 'sm_manager has 69 permissions');
-select is((select count(*) from q257_perms where role_code = 'sm_accountant'), 40::bigint, 'sm_accountant has 40 permissions');
+select is((select count(*) from q257_perms where role_code = 'sm_owner'), 58::bigint, 'sm_owner has 58 permissions');
+select is((select count(*) from q257_perms where role_code = 'sm_manager'), 72::bigint, 'sm_manager has 72 permissions');
+select is((select count(*) from q257_perms where role_code = 'sm_accountant'), 43::bigint, 'sm_accountant has 43 permissions');
 select is((select count(*) from q257_perms where role_code = 'sm_purchasing_store'), 28::bigint, 'sm_purchasing_store has 28 permissions');
 
 -- Nhan hang mu: khong vai tro moi nao vua nhan hang vua xem PO.

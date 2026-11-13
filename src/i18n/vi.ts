@@ -1709,6 +1709,9 @@ export const vi = {
       emptyTitle: "Không có chứng từ nào chờ bạn duyệt",
       emptyDescription:
         "Khi có yêu cầu mua hoặc đơn mua tới bước duyệt của bạn, chúng sẽ hiện ở đây.",
+      noApproveRightTitle: "Bạn không có quyền duyệt chứng từ nào",
+      noApproveRightDescription:
+        "Việc duyệt do Quản lý và Chủ đầu tư đảm nhiệm. Bạn chỉ cần tạo và gửi duyệt chứng từ của mình.",
       stepRole: "Bước duyệt",
       approveNow: "Duyệt ngay",
       openDetail: "Xem chi tiết",

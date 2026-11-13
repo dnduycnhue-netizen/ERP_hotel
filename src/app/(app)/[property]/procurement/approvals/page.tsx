@@ -1,3 +1,4 @@
+import { EmptyState } from "@/components/common/empty-state";
 import { ErrorState } from "@/components/common/error-state";
 import {
   ApprovalInbox,
@@ -8,6 +9,7 @@ import {
   listPos,
   listPrs,
 } from "@/features/procurement/queries";
+import { vi } from "@/i18n/vi";
 import { createClient } from "@/lib/supabase/server";
 
 /**
@@ -34,6 +36,20 @@ export default async function ProcurementApprovalsPage({
     supabase.rpc("my_permissions", { p_property: propertyId }),
   ]);
   const myPermSet = new Set(myPerms ?? []);
+
+  // Người không có quyền duyệt nào: hiện trạng thái rỗng thay vì lỗi quyền
+  // của các RPC danh sách (Muse, demo 13/11: uat.chef thấy "không có quyền").
+  const canApproveAny = ["pr.approve", "po.approve", "po.approve.over_ceiling"].some(
+    (code) => myPermSet.has(code),
+  );
+  if (!canApproveAny) {
+    return (
+      <EmptyState
+        title={vi.procurement.inbox.noApproveRightTitle}
+        description={vi.procurement.inbox.noApproveRightDescription}
+      />
+    );
+  }
 
   const [prsRes, posRes] = await Promise.all([
     listPrs(propertyId, { status: "submitted", pageSize: 20 }),
