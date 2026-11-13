@@ -143,6 +143,8 @@ export const rpcErrorMessages: Record<string, string> = {
     "Gửi thông báo quá thời gian chờ. Hệ thống sẽ thử lại.",
   ERR_COUNT_INDEPENDENT:
     "Đợt kiểm kê cần ít nhất một người đếm độc lập, không phải người nhập hoặc xuất kho tại kho này.",
+  ERR_SOD_COUNT_INDEPENDENT:
+    "Đợt kiểm kê cần ít nhất một người đếm độc lập, không phải người nhập hoặc xuất kho tại kho này.",
   ERR_SOD_INVOICE_GR:
     "Người nhập hóa đơn không được là người nhận hàng của chính các dòng hóa đơn này. Nhờ người khác nhập hoặc khớp hóa đơn.",
   ERR_SOD_PAYMENT_APPROVER:
