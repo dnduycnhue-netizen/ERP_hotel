@@ -253,6 +253,10 @@ export const vi = {
       dbMovesRows: "Số dòng sổ kho (ước tính)",
       statusOk: "Ổn",
       statusWarn: "Cần xem",
+      statusOkDetail: "Mọi chỉ số trong ngưỡng.",
+      statusWarnDetail: "Có chỉ số vượt ngưỡng — xem chi tiết bên dưới.",
+      dbLimitNote:
+        "Giới hạn dung lượng của gói chưa được cấu hình trong hệ thống, nên chỉ hiển thị dung lượng hiện tại.",
     },
     backToDashboard: "Về tổng quan",
     noAccessTitle: "Bạn chưa được cấp quyền quản trị",
