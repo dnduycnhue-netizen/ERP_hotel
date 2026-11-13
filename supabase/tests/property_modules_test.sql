@@ -76,7 +76,7 @@ select ok(jsonb_path_exists(public.admin_modules_overview(), '$[*] ? (@.code == 
 reset role;
 select is(public.module_enabled('a5400000-0000-4000-8000-000000000201', 'restaurant'), false, 'module_enabled sees restaurant off');
 select is(public.module_enabled('a5400000-0000-4000-8000-000000000201', 'hk_frontdesk'), true, 'hk_frontdesk stays on');
-select is((select count(*) from public.audit_log where table_name = 'property_modules'), 1::bigint, 'toggle is audited');
+select is((select count(*) from public.audit_log where table_name = 'property_modules' and new_data ->> 'property_id' = 'a5400000-0000-4000-8000-000000000201'), 1::bigint, 'toggle is audited');
 
 -- Chan o tang du lieu khi tat Nha hang.
 select throws_ok(

@@ -24,8 +24,8 @@ tồn đầu kỳ chưa kiểm đếm (tồn = 0), tên pháp nhân vẫn là t�
 
 | # | Cổng | Trạng thái | Chủ | Ghi chú |
 |---|---|---|---|---|
-| A1 | pgTAP | **XANH: 53/54 suite, 2.210/2.220 ca** (12/11) | Claude | Còn lại `bootstrap_initial_org_test` chỉ đạt trên DB trống (cần staging/Docker). Chạy lại: `python3 scripts/pgtap-rehearse.py` (docs/11-TESTING.md §12) |
-| A2 | Lint + typecheck + Vitest | **XANH 13/11**: eslint sạch, `tsc` sạch, 20 file / 160 test | Claude | ESLint có thêm luật chặn chuỗi tiếng Việt hard-code (Q243) |
+| A1 | pgTAP | **XANH 13/11 (chạy lại toàn bộ sau Q252–Q264): 61 suite, 2.303 ca; 59 suite đạt + `property_modules_test` đã sửa (đạt 17/17) → chỉ còn `bootstrap_initial_org_test` lỗi (cần DB trống, không liên quan)** | Claude | Chạy lại: `python3 scripts/pgtap-rehearse.py` (docs/11-TESTING.md §12) |
+| A2 | Lint + typecheck + Vitest + build | **XANH 13/11**: eslint sạch, `tsc` sạch, 27 file / 213 test, `next build` thành công | Claude | ESLint có luật chặn chuỗi tiếng Việt hard-code (Q243) |
 | A3 | `database.types.ts` | **XONG, cập nhật 13/11** sau migration 565000–567000: sinh lại từ ERP_hotel (~9.500 dòng; bản cũ 2.554 dòng, dừng ở T-012) | Claude | Checklist cũ ghi "chỉ Duy làm được" — sai, CLI đã link |
 | A4 | Playwright tầng ghi | **Chưa chạy** | Duy | Chỉ chạy được trên máy Duy. `.env.local` đã sửa về ERP_hotel (12/11); còn thiếu `SUPABASE_SECRET_KEY` (dán từ Dashboard → API Keys → Secret) |
 | A5 | Kiểm tay trên điện thoại thật (Q110, 7 mục) | **Chưa kiểm chứng (0/7)** | Duy | Đếm mù end-to-end, đối chiếu Excel với `v_count_result`, test offline kiểm kê/nhận hàng |
