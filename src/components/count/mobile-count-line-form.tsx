@@ -291,6 +291,7 @@ export function MobileCountLineForm({
           size="sm"
           onClick={onClose}
           aria-label={vi.common.close}
+          className="min-h-11 min-w-11"
         >
           <X className="size-4" />
         </Button>
@@ -302,6 +303,7 @@ export function MobileCountLineForm({
             variant={mode === "uom" ? "default" : "outline"}
             size="sm"
             onClick={() => setMode("uom")}
+            className="min-h-11"
           >
             {vi.count.uomMode}
           </Button>
@@ -309,6 +311,7 @@ export function MobileCountLineForm({
             variant={mode === "bottle" ? "default" : "outline"}
             size="sm"
             onClick={() => setMode("bottle")}
+            className="min-h-11"
           >
             {vi.count.bottleMode}
           </Button>
@@ -358,6 +361,7 @@ export function MobileCountLineForm({
                     setRows((prev) => prev.filter((_, i) => i !== index))
                   }
                   aria-label={vi.count.removeRow}
+                  className="min-h-11 min-w-11"
                 >
                   <X className="size-4" />
                 </Button>
@@ -370,6 +374,7 @@ export function MobileCountLineForm({
             onClick={() =>
               setRows((prev) => [...prev, { qty: "", uom: item.stock_uom }])
             }
+            className="min-h-11"
           >
             {vi.count.addRow}
           </Button>
