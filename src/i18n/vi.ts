@@ -742,6 +742,22 @@ export const vi = {
     },
   },
   property: {
+    brief: {
+      title: "Sáng nay",
+      viewFull: "Xem bản tin đầy đủ",
+      loadError: "Không tải được bản tin sáng nay.",
+      attention: "Có việc cần xem: cảnh báo đỏ, tạm ứng quá hạn hoặc hợp đồng sắp đến hạn.",
+      allClear: "Không có việc khẩn nào cần xử lý sáng nay.",
+      purchaseYesterday: "Chi mua hàng hôm qua",
+      wasteYesterday: "Giá trị hủy hôm qua",
+      redAlerts: "Cảnh báo đỏ chưa xử lý",
+      apDue7d: "Công nợ đến hạn 7 ngày",
+      advancesOverdue: "Tạm ứng quá hạn",
+      redAlerts24h: "Cảnh báo đỏ trong 24 giờ",
+      allAlerts: "Xem tất cả cảnh báo",
+      contractsNote:
+        "Hợp đồng dịch vụ sắp hết hạn: {expiring}. Kỳ dịch vụ chưa nghiệm thu: {unaccepted}.",
+    },
     dashboard: "Tổng quan",
     welcome: "Chào mừng đến với hệ thống quản lý khách sạn",
     dashboardDescription:

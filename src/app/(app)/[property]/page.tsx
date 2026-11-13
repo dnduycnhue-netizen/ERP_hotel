@@ -10,6 +10,8 @@ import {
   Users,
   Warehouse,
 } from "lucide-react";
+import { MorningBrief } from "@/components/property/morning-brief";
+import { getReportPerms } from "@/features/report/queries";
 import { PageHeader } from "@/components/shell/page-header";
 import { getPropertyDashboardOverview } from "@/features/property/dashboard";
 import { vi } from "@/i18n/vi";
@@ -31,6 +33,7 @@ export default async function PropertyHome({
     notFound();
   }
 
+  const reportPerms = await getReportPerms(propertyId);
   const property = overview.property;
   const counts = overview.counts;
   const le = property.legal_entity;
@@ -162,6 +165,10 @@ export default async function PropertyHome({
           {vi.property.activeStatus}
         </span>
       </PageHeader>
+
+      {reportPerms.RPT_DAILY_BRIEF ? (
+        <MorningBrief propertyId={propertyId} />
+      ) : null}
 
       {/* KPI */}
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
