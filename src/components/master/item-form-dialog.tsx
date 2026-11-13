@@ -265,7 +265,7 @@ export function ItemFormDialog({
                 min="0"
                 value={stockToRecipe}
                 onChange={(e) => setStockToRecipe(e.target.value)}
-                placeholder={vi.master.stockToRecipeExample}
+                placeholder={vi.master.items.stockToRecipeExample}
                 className="mt-1 h-9 w-full rounded-md border bg-background px-3 text-sm"
               />
             </div>
@@ -376,7 +376,7 @@ export function ItemFormDialog({
                 min="0"
                 value={densityGMl}
                 onChange={(e) => setDensityGMl(e.target.value)}
-                placeholder={vi.master.densityExample}
+                placeholder={vi.master.items.densityExample}
                 className="mt-1 h-9 w-full rounded-md border bg-background px-3 text-sm"
               />
             </div>
