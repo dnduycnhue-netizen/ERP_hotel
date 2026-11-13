@@ -183,7 +183,9 @@ export default async function AuditLogPage({
                     </td>
                     <td className="p-2">
                       {changes.length === 0 ? (
-                        "—"
+                        <span className="text-muted-foreground">
+                          {row.action === "UPDATE" ? t.onlyTimestamp : "—"}
+                        </span>
                       ) : (
                         <details>
                           <summary className="cursor-pointer text-primary">

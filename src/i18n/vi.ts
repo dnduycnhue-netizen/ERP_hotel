@@ -279,6 +279,7 @@ export const vi = {
       colTable: "Bảng / mã dòng",
       colChanges: "Thay đổi",
       changeCount: "{n} cột",
+      onlyTimestamp: "Chỉ cập nhật thời điểm sửa",
       system: "Hệ thống",
       prev: "← Trang trước",
       next: "Trang sau →",
