@@ -9,9 +9,9 @@
 ## Tóm tắt một dòng
 
 Mã nguồn và cơ sở dữ liệu **sẵn sàng cho UAT** (test có kiểm soát) và đã deploy production (13/11).
-**CHƯA đủ điều kiện vận hành thật** — số liệu production đọc 13/11: **0 phòng**, **1 nhà cung cấp**,
-**7 dòng giá minibar hết hạn**, **21 tài khoản test/UAT** còn hoạt động (mật khẩu yếu), 0 tài khoản nhân viên thật,
-tồn đầu kỳ chưa kiểm đếm. Cron 0 lỗi/7 ngày. Xem **Cổng go-live** ở mục G.
+**CHƯA đủ điều kiện vận hành thật** — số liệu production đọc lại 13/11 (chiều): **0 phòng, 0 loại phòng**, **17 nhà cung cấp (16 là GIẢ LẬP, Q256)**,
+**7 dòng giá minibar hết hạn**, **23 tài khoản đang hoạt động, toàn bộ là test/UAT/quản trị** (mật khẩu yếu), 0 tài khoản nhân viên thật,
+tồn đầu kỳ chưa kiểm đếm (tồn = 0), tên pháp nhân vẫn là tên mẫu. Đã xong thêm 13/11: module bật/tắt theo khách sạn (Q254), 7 vai trò gọn + gán cho tài khoản UAT (Q257/Q260), công tắc tự duyệt (Q258), duyệt PO 2 bậc. Cron 0 lỗi/7 ngày. Xem **Cổng go-live** ở mục G.
 
 ## A. Cổng kỹ thuật
 
@@ -43,7 +43,7 @@ tồn đầu kỳ chưa kiểm đếm. Cron 0 lỗi/7 ngày. Xem **Cổng go-liv
 |---|---|---|---|
 | C1 | Tồn đầu kỳ SONHOIAN (Q157) | Đã **dọn dữ liệu test**: 28 bút toán `adjust_count` giá 0 (đợt `CNT-SONHOIAN-2611-0001`) đã đảo bằng bút toán đảo; tồn = 0, giá vốn = 0 (Q244). Chờ **kiểm đếm thật ngày cutover** theo `opening-stock-runbook.md` | Duy + Claude |
 | C2 | Phòng | **0 phòng** ở cả 2 khách sạn → buồng phòng, minibar chưa dùng được. Cần danh sách phòng + loại phòng | Duy |
-| C3 | Nhà cung cấp | **1 NCC**, 0 hợp đồng khung, 2 giá trần. PO không có nguồn giá phải qua duyệt thủ công | Duy |
+| C3 | Nhà cung cấp | **17 NCC, trong đó 16 GIẢ LẬP** (seed Q256, đánh dấu `external_codes.source=synthetic`) — thay bằng NCC thật trước khi vận hành; 0 hợp đồng khung, 2 giá trần. PO không có nguồn giá phải qua duyệt thủ công | Duy |
 | C4 | Minibar | 14 dòng giá, **7 dòng đã hết hạn** (giá 2018–2019); cần giá hiện hành | Duy |
 | C5 | Công thức món (Q168) | **82 công thức, 427 dòng định lượng đã có**; 0 dòng bán (`dish_sales`). Chưa kiểm chứng 18 dòng "[CẦN XÁC NHẬN]" của bản nháp | Duy |
 | C6 | Tên pháp nhân thật (B2 cũ) | **Chưa đổi** — vẫn "Son Hoi An Boutique Hotel & Spa". Đã có màn sửa (migration 535000, Q209) | Duy |
