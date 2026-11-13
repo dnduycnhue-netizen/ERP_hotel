@@ -16,8 +16,8 @@ tạo tồn bằng 1 chu trình mua → nhận hàng qua giao diện (mua hàng 
 Số liệu bên dưới là bản đọc trước khi tạo dữ liệu demo phòng.
 
 Mã nguồn và cơ sở dữ liệu **sẵn sàng cho UAT** (test có kiểm soát) và đã deploy production (13/11).
-**CHƯA đủ điều kiện vận hành thật** — số liệu production đọc lại 13/11 (chiều): **0 phòng, 0 loại phòng**, **17 nhà cung cấp (16 là GIẢ LẬP, Q256)**,
-**7 dòng giá minibar hết hạn**, **23 tài khoản đang hoạt động, toàn bộ là test/UAT/quản trị** (mật khẩu yếu), 0 tài khoản nhân viên thật,
+**CHƯA đủ điều kiện vận hành thật** — số liệu production đọc lại 13/11 (chiều) + kiểm chứng live tối 13/11 (M9): **TEST47 có 30 phòng demo** (M9: lễ tân thấy 8 phòng 101–306, buồng phòng thấy đủ 30 phòng theo tầng — số liệu chiều ghi 0 phòng là sai), **17 nhà cung cấp (16 là GIẢ LẬP, Q256)**,
+**7 dòng giá minibar hiện hành từ 11/11** (M9 kiểm chứng, không phải chỉ 7 dòng hết hạn), **23 tài khoản đang hoạt động, toàn bộ là test/UAT/quản trị** (mật khẩu yếu), 0 tài khoản nhân viên thật,
 tồn đầu kỳ chưa kiểm đếm (tồn = 0), tên pháp nhân vẫn là tên mẫu. Đã xong thêm 13/11: module bật/tắt theo khách sạn (Q254), 7 vai trò gọn + gán cho tài khoản UAT (Q257/Q260), công tắc tự duyệt (Q258), duyệt PO 2 bậc. Cron 0 lỗi/7 ngày. Xem **Cổng go-live** ở mục G.
 
 ## A. Cổng kỹ thuật
@@ -25,7 +25,7 @@ tồn đầu kỳ chưa kiểm đếm (tồn = 0), tên pháp nhân vẫn là t�
 | # | Cổng | Trạng thái | Chủ | Ghi chú |
 |---|---|---|---|---|
 | A1 | pgTAP | **XANH 13/11 (chạy lại toàn bộ sau Q252–Q264): 61 suite, 2.303 ca; 59 suite đạt + `property_modules_test` đã sửa (đạt 17/17) → chỉ còn `bootstrap_initial_org_test` lỗi (cần DB trống, không liên quan)** | Claude | Chạy lại: `python3 scripts/pgtap-rehearse.py` (docs/11-TESTING.md §12) |
-| A2 | Lint + typecheck + Vitest + build | **XANH 13/11**: eslint sạch, `tsc` sạch, 27 file / 213 test, `next build` thành công | Claude | ESLint có luật chặn chuỗi tiếng Việt hard-code (Q243) |
+| A2 | Lint + typecheck + Vitest + build | **XANH 13/11 (đêm, overnight)**: eslint sạch, `tsc` sạch, **31 file / 285 test** (M12 thêm 72 test schema), `next build` thành công; Playwright mới (M11): ma trận quyền 9 vai trò 8/9 + không tràn ngang mobile 14/14 + public 5/5 (chạy thật trên TEST47) | Muse | ESLint có luật chặn chuỗi tiếng Việt hard-code (Q243) |
 | A3 | `database.types.ts` | **XONG, cập nhật 13/11** sau migration 565000–567000: sinh lại từ ERP_hotel (~9.500 dòng; bản cũ 2.554 dòng, dừng ở T-012) | Claude | Checklist cũ ghi "chỉ Duy làm được" — sai, CLI đã link |
 | A4 | Playwright tầng ghi | **Chưa chạy** | Duy | Chỉ chạy được trên máy Duy. `.env.local` đã sửa về ERP_hotel (12/11); còn thiếu `SUPABASE_SECRET_KEY` (dán từ Dashboard → API Keys → Secret) |
 | A5 | Kiểm tay trên điện thoại thật (Q110, 7 mục) | **Chưa kiểm chứng (0/7)** | Duy | Đếm mù end-to-end, đối chiếu Excel với `v_count_result`, test offline kiểm kê/nhận hàng |
@@ -49,9 +49,9 @@ tồn đầu kỳ chưa kiểm đếm (tồn = 0), tên pháp nhân vẫn là t�
 | # | Cổng | Trạng thái (đọc từ production 12/11) | Chủ |
 |---|---|---|---|
 | C1 | Tồn đầu kỳ SONHOIAN (Q157) | Đã **dọn dữ liệu test**: 28 bút toán `adjust_count` giá 0 (đợt `CNT-SONHOIAN-2611-0001`) đã đảo bằng bút toán đảo; tồn = 0, giá vốn = 0 (Q244). Chờ **kiểm đếm thật ngày cutover** theo `opening-stock-runbook.md` | Duy + Claude |
-| C2 | Phòng | **DEMO 13/11: SONHOIAN có 30 phòng/3 loại (giả lập, Q261)**; TEST47 vẫn 0 phòng trong bảng `rooms`. Ban đầu: **0 phòng** ở cả 2 khách sạn → buồng phòng, minibar chưa dùng được. Cần danh sách phòng + loại phòng | Duy |
+| C2 | Phòng | **SONHOIAN 30 phòng/3 loại (giả lập, Q261); TEST47 30 phòng demo (Q262) — đã kiểm chứng live tối 13/11 (M9)**: lễ tân thấy 8 phòng 101–306, buồng phòng thấy đủ 30 phòng (tầng 1: 10, tầng 2: 14, tầng 3: 6). Số liệu chiều 13/11 ghi "TEST47 0 phòng" là sai. Phòng thật vẫn cần danh sách từ Duy | Duy |
 | C3 | Nhà cung cấp | **17 NCC, trong đó 16 GIẢ LẬP** (seed Q256, đánh dấu `external_codes.source=synthetic`) — thay bằng NCC thật trước khi vận hành; 0 hợp đồng khung, 2 giá trần. PO không có nguồn giá phải qua duyệt thủ công | Duy |
-| C4 | Minibar | 14 dòng giá: 7 dòng lịch sử 2018–2019 (hết hạn, bình thường) **+ 7 dòng giá hiện hành từ 11/11/2026** (giá tham khảo 2018, cần chốt lại khi vận hành thật) | Duy |
+| C4 | Minibar | 14 dòng giá: 7 dòng lịch sử 2018–2019 (hết hạn, bình thường) **+ 7 dòng giá hiện hành từ 11/11/2026** (giá tham khảo 2018, cần chốt lại khi vận hành thật) — **đã kiểm chứng live tối 13/11 (M9)**: đủ 7 món có giá trên TEST47 (Tiger 35.000đ … Rượu vang 245.000đ) | Duy |
 | C5 | Công thức món (Q168) | **82 công thức, 427 dòng định lượng đã có**; 0 dòng bán (`dish_sales`). Chưa kiểm chứng 18 dòng "[CẦN XÁC NHẬN]" của bản nháp | Duy |
 | C6 | Tên pháp nhân thật (B2 cũ) | **Chưa đổi** — vẫn "Son Hoi An Boutique Hotel & Spa". Đã có màn sửa (migration 535000, Q209) | Duy |
 | C7 | Thông báo email/push (Q98/Q99) | **Chưa cấu hình sender** (0 cấu hình, 0 thuê bao push). Duy đã chọn dùng chuông cảnh báo trong app (Q208). Bản tin 8h gửi email cần Resend + VAPID (`notification-sender-setup.md`) | Duy |
@@ -94,6 +94,23 @@ Mobile UI, Completion-2, Verify-prep: **đã merge vào `main`** (bản deploy n
 | Q161, Q165 | Chốt giữ tính live; xác nhận đã sửa | Xong |
 | Q172 | Giá 0 của PO chợ: nhập giá lúc đối chiếu hóa đơn | **Chưa code** — cần kế toán duyệt cách điều chỉnh giá vốn |
 | Staging | Project Supabase riêng | **Chưa tạo** (chờ Duy đồng ý chi phí) |
+
+## F3. Đợt overnight 13/11 (Muse) — code/test/docs xong, chưa merge
+
+| Mã | Việc | Trạng thái |
+|---|---|---|
+| M9 | Ma trận quyền 9 tài khoản × 20 URL (180 lượt mở) + nhận hàng mù | Xong, báo cáo `docs/go-live/overnight/M9-ma-tran-quyen.md`. Nhận hàng mù ĐẠT. 10 phát hiện (menu cũ sau đăng nhập, /reports lỗi tải, trùng phiếu nháp, filter lộ tên danh mục…) |
+| M11 | Playwright: ma trận quyền theo vai trò (8/9 — R-receiver rớt do React #419) + không tràn ngang mobile 14/14 + public 5/5 | Xong, báo cáo `docs/go-live/overnight/M11-playwright.md`. Spec cũ M4/M5 rớt (M4 kỳ vọng lỗi thời, M5 timing) |
+| M12 | Vitest schema Zod + mapping lỗi ERR_* (72 test mới, suite 285/285) | Xong |
+| M13 | Chuỗi cứng i18n + bảng thuật ngữ (6 placeholder vào vi.ts) | Xong (có 1 fix typecheck đi kèm) |
+| M14 | Trạng thái màn hình (thêm loading/error cho /m và /admin) | Xong |
+| M15 | A11y + mobile (5 nút form đếm 44px) | Xong |
+| M16 | Rà soát bảo mật phía client | Xong — không tìm thấy lỗi |
+| M17 | Hướng dẫn sử dụng theo vai trò (7 file) | Xong |
+| M18 | Cập nhật walkthrough/uat-guide/checklist + mục lỗi đã biết | Xong (mục này) |
+
+Nhánh `feat/muse-overnight` — chưa merge, chưa push (VM không push được GitHub); giao bằng bundle
+như các đợt trước. M1–M8, M10 chưa làm trong đợt này (xem báo cáo tổng overnight).
 
 ## G. Thứ tự làm từ bây giờ
 

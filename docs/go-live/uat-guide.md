@@ -25,6 +25,9 @@
    **Mật khẩu do Duy cấp riêng cho từng người — không có trong tài liệu này.**
 3. Sau khi đăng nhập, chỉ chọn khách sạn **TEST47**. Nếu thấy thêm khách sạn khác, dừng lại
    và báo ngay cho Duy.
+4. **Lưu ý menu sau khi đăng nhập:** vừa đăng nhập xong, menu trái có thể hiện bộ mục của
+   tài khoản đăng nhập trước đó (lỗi hiển thị đã ghi nhận, M9). Chuyển sang một trang khác,
+   menu sẽ hiện đúng bộ mục của bạn. Các mục lạ chỉ hiện tên — đừng bấm vào, bấm vào sẽ bị chặn.
 4. Nếu hệ thống hỏi **mã PIN** (khi nhận hàng, đăng phiếu, kiểm kê…), dùng mã PIN Duy đã cấp
    cho vai trò của mình. Không đoán PIN.
 
@@ -41,6 +44,11 @@
 ### 1.3. Dữ liệu thử có sẵn trên TEST47 (để biết trước)
 
 - Nhà cung cấp: **NCC-T047**. Kho chính: **KHO-T047**. Kho minibar: **MINIBAR_MAIN**.
+- Phòng: TEST47 có **30 phòng demo** (3 loại phòng, 2 xe đẩy) — lễ tân thấy 8 phòng
+  101–306 ở màn Minibar, buồng phòng thấy đủ 30 phòng theo tầng (đã kiểm chứng M9, tối 13/11).
+- Giá minibar: **7 món có giá hiện hành** (hiệu lực từ 11/11): Bia Tiger 35.000đ, Diet Coke
+  25.000đ, Nước suối Lavie 15.000đ, Sprite 25.000đ, Coca-Cola 25.000đ, Rượu vang 245.000đ,
+  Bia Larue 25.000đ (đã kiểm chứng M9, tối 13/11).
 - Mã vật tư dùng trong ví dụ: **NVL0388** (kg), **NVL0561** (cái). Mã món minibar ví dụ: **MON01**.
 - File POS mẫu (GIẢ LẬP, chỉ để thử thao tác): `docs/samples/pos-export-sample-SYNTHETIC.csv`.
   File POS thật sẽ có tên cột khác — màn nạp file có bước ánh xạ cột, cứ làm theo hướng dẫn
@@ -69,6 +77,13 @@
 
 > Không có tài khoản `uat.sys_admin` — vai trò quản trị hệ thống không đưa vào UAT.
 > Mật khẩu/PIN không ghi trong tài liệu này.
+>
+> **Đã kiểm chứng ma trận quyền (M9, tối 13/11):** 9/16 tài khoản đã được mở thử từng màn
+> (owner, gm, accountant, purchaser, chef, hk_supervisor, front_desk, receiver,
+> storekeeper) — 180 lượt mở, không lỗi 500, nhận hàng mù đạt. 7 tài khoản còn lại
+> (chief_accountant, cost_controller, outlet_head, bartender, hk_attendant, engineer,
+> internal_audit) chưa được kiểm tra theo ma trận trong đợt này; kịch bản của họ dưới
+> đây dựa trên quyền trong seed/migration, cần ghi lại kết quả thật khi thử.
 
 ---
 
@@ -115,13 +130,19 @@
 | 5 | Xem báo cáo công nợ | `/b0000000-0000-4000-8000-000000000002/reports` | 1. Mở báo cáo công nợ phải trả. 2. Lọc theo NCC-T047. | Số công nợ khớp với hóa đơn đã duyệt ở kịch bản 1. | ☐ | ☐ | |
 | 6 | Nạp file POS của ca | `/b0000000-0000-4000-8000-000000000002/inventory/pos-import` | Làm như kịch bản 5 của GM. | Như kịch bản 5 của GM. | ☐ | ☐ | |
 
+> **Lưu ý bước duyệt hóa đơn/thanh toán (Q263):** theo demo-walkthrough 13/11, bước duyệt
+> hóa đơn giao cho **Quản lý**, bước duyệt thanh toán giao cho **Quản lý hoặc Chủ đầu tư**.
+> Tài khoản này giữ vai trò cũ nên vẫn còn quyền duyệt cũ — khi thử, nếu duyệt được thì ghi
+> Đạt, nếu màn Chờ duyệt trống hoặc bị chặn thì ghi lại kết quả (không tính là lỗi của người
+> thử); Duy sẽ chốt người duyệt cuối theo mô hình gọn.
+
 ### 3.4. Kế toán khách sạn — `uat.accountant@erp.internal`
 
 **Người thử:** ______________ **Ngày thử:** ______________
 
 | # | Kịch bản | Đường dẫn | Các bước | Kết quả mong đợi | Đạt | Không đạt | Ghi chú |
 |---|----------|-----------|----------|------------------|-----|-----------|---------|
-| 1 | Nhập hóa đơn NCC | `/b0000000-0000-4000-8000-000000000002/finance/invoices/new` | 1. Chọn NCC-T047 và PO đã nhận hàng. 2. Nhập số hóa đơn, ngày, số tiền. 3. Lưu. | Hóa đơn được tạo ở trạng thái chờ duyệt, khớp 3 chiều với PO và phiếu nhận. | ☐ | ☐ | |
+| 1 | Nhập hóa đơn NCC | `/b0000000-0000-4000-8000-000000000002/finance/invoices/new` | 1. Chọn NCC-T047 và PO đã nhận hàng. 2. Nhập số hóa đơn, ngày, số tiền. 3. Lưu. | Hóa đơn được tạo ở trạng thái chờ duyệt, khớp 3 chiều với PO và phiếu nhận. **Lưu ý 13/11: chạy thử thì màn này bị chặn với thông báo thiếu quyền dù vai trò có quyền nhập hóa đơn — nếu vẫn bị chặn, ghi Không đạt + thông báo nguyên văn (đang chờ kiểm tra lại, M1).** | ☐ | ☐ | |
 | 2 | Tạo đề nghị thanh toán | `/b0000000-0000-4000-8000-000000000002/finance/payment-requests/new` | 1. Chọn hóa đơn đã duyệt. 2. Nhập số tiền đề nghị. 3. Gửi. | Đề nghị được tạo ở trạng thái chờ duyệt. | ☐ | ☐ | |
 | 3 | Đánh dấu đã thanh toán | `/b0000000-0000-4000-8000-000000000002/finance/payment-requests` | 1. Mở đề nghị đã duyệt. 2. Bấm **Đánh dấu đã trả** và nhập ngày trả. | Đề nghị chuyển sang đã trả, công nợ giảm đúng số tiền. | ☐ | ☐ | |
 | 4 | Giải ngân tạm ứng | `/b0000000-0000-4000-8000-000000000002/finance/advances` | 1. Mở tạm ứng đã duyệt. 2. Bấm **Giải ngân**, nhập số tiền thực chi. | Tạm ứng chuyển sang đã giải ngân. | ☐ | ☐ | |
@@ -134,7 +155,7 @@
 
 | # | Kịch bản | Đường dẫn | Các bước | Kết quả mong đợi | Đạt | Không đạt | Ghi chú |
 |---|----------|-----------|----------|------------------|-----|-----------|---------|
-| 1 | Duyệt PO (bước kiểm soát giá) | `/b0000000-0000-4000-8000-000000000002/procurement/approvals` | 1. Mở PO từ 10 đến 20 triệu đang chờ. 2. Kiểm tra giá từng dòng so với giá trần/hợp đồng. 3. Bấm **Duyệt** (hoặc **Từ chối** kèm lý do nếu giá sai). | PO đi tiếp bước duyệt sau; nếu từ chối thì PO quay về cho thu mua sửa. | ☐ | ☐ | |
+| 1 | Kiểm tra bước duyệt PO theo mô hình mới | `/b0000000-0000-4000-8000-000000000002/procurement/approvals` | 1. Mở màn Chờ duyệt. 2. Ghi lại PO nào hiện ra cho vai trò này (nếu có). | **Mô hình duyệt PO đã đổi (Q260/Q263): 2 bậc Quản lý (từ 0 đ) + Chủ đầu tư (từ 100 triệu); ngưỡng 10–20 triệu cũ không còn đúng.** Nếu không có PO nào chờ bạn duyệt thì ghi Đạt với ghi chú đó; nếu có PO chờ duyệt thì duyệt theo giá trần/hợp đồng như trước. | ☐ | ☐ | |
 | 2 | Xem chênh lệch kiểm kê | `/b0000000-0000-4000-8000-000000000002/inventory/counts` | 1. Mở đợt kiểm kê đã đếm xong. 2. Xem cột chênh lệch và giá trị chênh lệch. | Thấy rõ mã nào thừa/thiếu, số lượng và giá trị; mã không chênh lệch không hiện cảnh báo. | ☐ | ☐ | |
 | 3 | Xem lại ảnh nhận hàng | `/b0000000-0000-4000-8000-000000000002/receiving/review` | 1. Mở một phiếu nhận có ảnh đính kèm. 2. Xem ảnh chụp hàng và cân. | Ảnh hiển thị rõ, đúng phiếu nhận; có cảnh báo nếu ảnh bị dùng lại ở phiếu khác. | ☐ | ☐ | |
 | 4 | Duyệt đề xuất hủy hàng | `/b0000000-0000-4000-8000-000000000002/inventory/waste` | 1. Mở đề xuất hủy đang chờ. 2. Xem lý do, số lượng, giá trị. 3. Bấm **Duyệt**. | Hàng hủy được ghi giảm tồn kho, có nhật ký. | ☐ | ☐ | |
@@ -148,7 +169,7 @@
 |---|----------|-----------|----------|------------------|-----|-----------|---------|
 | 1 | Tạo phiếu yêu cầu mua (PR) | `/b0000000-0000-4000-8000-000000000002/procurement/pr/new` | 1. Chọn bộ phận và kho nhận. 2. Thêm dòng: NVL0388, số lượng 10 kg. 3. Lưu nháp rồi bấm **Gửi duyệt**. | PR được tạo, chuyển sang chờ duyệt; người tạo không tự duyệt được PR của mình. | ☐ | ☐ | |
 | 2 | Tạo PO từ PR đã duyệt | `/b0000000-0000-4000-8000-000000000002/procurement/po` | 1. Mở PR đã duyệt ở kịch bản 1. 2. Tạo PO cho NCC-T047. 3. Kiểm tra giá dòng tự lấy theo hợp đồng/giá trần. 4. Gửi duyệt. | PO được tạo với giá đúng; đi đúng các bước duyệt theo giá trị. | ☐ | ☐ | |
-| 3 | Tạo PO chợ + nhập tổng ước tính | `/b0000000-0000-4000-8000-000000000002/procurement/market/new` | 1. Tạo PO chợ cho NCC chợ. 2. Thêm dòng chưa có giá. 3. Nhập **tổng ước tính** rồi gửi duyệt. | Hệ thống bắt buộc nhập tổng ước tính trước khi gửi (không nhập thì báo lỗi, không cho gửi); sau khi nhập thì gửi được. | ☐ | ☐ | |
+| 3 | Tạo PO chợ + nhập tổng ước tính | `/b0000000-0000-4000-8000-000000000002/procurement/market/new` | 1. Tạo PO chợ cho NCC chợ. 2. Thêm dòng chưa có giá. 3. Nhập **tổng ước tính** rồi gửi duyệt. | Hệ thống bắt buộc nhập tổng ước tính trước khi gửi (không nhập thì báo lỗi, không cho gửi); sau khi nhập thì gửi được. **Lưu ý 13/11: ô tổng ước tính từ chối số tròn (ví dụ 500.000) — nhập lệch 1 đồng (500.001) thì qua; form Sửa nháp PO chợ không lưu được (bấm Lưu báo dữ liệu không hợp lệ, nội dung sửa bị hoàn lại) — đang chờ kiểm tra lại (M1).** | ☐ | ☐ | |
 | 4 | Xem hợp đồng khung / giá trần | `/b0000000-0000-4000-8000-000000000002/master/prices` | 1. Mở giá của NVL0388. 2. Kiểm tra giá hợp đồng và giá trần. | Giá hiển thị đúng, có ngày hiệu lực. | ☐ | ☐ | |
 | 5 | Tạo NCC mới | `/b0000000-0000-4000-8000-000000000002/master/suppliers` | 1. Thêm NCC mới (tên, mã số thuế, tài khoản ngân hàng). 2. Lưu và gửi duyệt. | NCC được tạo ở trạng thái chờ duyệt; chưa dùng được để tạo PO cho tới khi được duyệt. | ☐ | ☐ | |
 | 6 | Gửi PO đã duyệt cho NCC | `/b0000000-0000-4000-8000-000000000002/procurement/po` | 1. Mở PO đã duyệt hết các bước. 2. Bấm **Gửi cho nhà cung cấp** (bấm OK ở hộp thoại xác nhận). | PO chuyển sang đã gửi; ngày giao dự kiến hiển thị đúng. | ☐ | ☐ | |
@@ -159,8 +180,8 @@
 
 | # | Kịch bản | Đường dẫn | Các bước | Kết quả mong đợi | Đạt | Không đạt | Ghi chú |
 |---|----------|-----------|----------|------------------|-----|-----------|---------|
-| 1 | Nhận hàng mù (điện thoại) | `/m/b0000000-0000-4000-8000-000000000002/receive` | 1. Mở phiếu nhận của PO đã gửi. 2. Cân và nhập số lượng thực nhận **không xem** số lượng PO. 3. Chụp ảnh hàng. 4. Nhập mã PIN để xác nhận. | Phiếu nhận được ghi; màn hình không hiện số lượng PO hay giá trong lúc nhận. | ☐ | ☐ | |
-| 2 | Đăng phiếu nhận (máy tính) | `/b0000000-0000-4000-8000-000000000002/receiving` | 1. Mở phiếu nhận vừa tạo. 2. Kiểm tra dòng hàng. 3. Bấm **Đăng phiếu** (nhập PIN nếu hỏi). | Tồn kho tăng đúng số lượng đã nhận; phiếu không sửa được nữa sau khi đăng. | ☐ | ☐ | |
+| 1 | Nhận hàng mù (điện thoại) | `/m/b0000000-0000-4000-8000-000000000002/receive` | 1. Mở phiếu nhận của PO đã gửi. **Đừng mở lại PO đã có phiếu nháp — mỗi lần mở lại tạo thêm 1 phiếu nháp trùng; tìm phiếu nháp đang mở dở và làm tiếp.** 2. Cân và nhập số lượng thực nhận **không xem** số lượng PO. 3. Chụp ảnh hàng — **bắt buộc từng dòng, nút Ghi dòng chỉ bật khi đủ số cân và ảnh**. 4. Nhập mã PIN để xác nhận (mã PIN gồm đúng 6 số). | Phiếu nhận được ghi; màn hình không hiện số lượng PO hay giá trong lúc nhận. | ☐ | ☐ | |
+| 2 | Đăng phiếu nhận (máy tính) | `/b0000000-0000-4000-8000-000000000002/receiving` | 1. Mở phiếu nhận vừa tạo. 2. Kiểm tra dòng hàng. 3. Bấm **Đăng phiếu** (nhập PIN nếu hỏi). **Chỉ người mở phiếu mới đăng được phiếu đó — nếu người mở phiếu từng duyệt PO này thì hệ thống chặn đăng (SoD); trường hợp đó bỏ phiếu nháp và mở lại bằng tài khoản khác chưa từng duyệt PO.** | Tồn kho tăng đúng số lượng đã nhận; phiếu không sửa được nữa sau khi đăng. | ☐ | ☐ | |
 | 3 | Mở đợt kiểm kê + đếm mù | `/m/b0000000-0000-4000-8000-000000000002/count` | 1. Mở đợt kiểm kê đang mở. 2. Đếm mù: nhập số đếm thực tế, không thấy số tồn trên hệ thống. 3. Gửi kết quả đếm. | Số đếm được ghi; màn hình đếm không hiện tồn kho hệ thống. | ☐ | ☐ | |
 | 4 | Xuất phiếu lĩnh cho bộ phận | `/b0000000-0000-4000-8000-000000000002/inventory/requisitions` | 1. Mở phiếu lĩnh đã duyệt. 2. Kiểm tra số lượng. 3. Bấm **Xuất kho**. | Tồn kho giảm đúng số lượng; phiếu chuyển sang đã xuất. | ☐ | ☐ | |
 | 5 | Điều chuyển kho | `/b0000000-0000-4000-8000-000000000002/inventory/transfers` | 1. Tạo phiếu điều chuyển từ KHO-T047 sang kho minibar. 2. Kho nhận xác nhận. | Tồn kho kho nguồn giảm, kho đích tăng đúng số lượng. | ☐ | ☐ | |
@@ -173,7 +194,7 @@
 | # | Kịch bản | Đường dẫn | Các bước | Kết quả mong đợi | Đạt | Không đạt | Ghi chú |
 |---|----------|-----------|----------|------------------|-----|-----------|---------|
 | 1 | Nhận hàng mù (điện thoại) | `/m/b0000000-0000-4000-8000-000000000002/receive` | 1. Mở phiếu nhận của PO đã gửi. 2. Cân 2 lần và nhập số lượng thực nhận. 3. Chụp ảnh hàng. | Phiếu nhận được ghi; số lượng 2 lần cân chênh nhau trong ngưỡng cho phép thì qua, vượt ngưỡng thì báo kiểm tra lại. | ☐ | ☐ | |
-| 2 | Xem phiếu đã nhận | `/b0000000-0000-4000-8000-000000000002/receiving` | 1. Mở danh sách phiếu nhận. 2. Mở phiếu mình vừa nhận. | Thấy được phiếu của mình; phiếu chưa đăng thì vẫn sửa được. | ☐ | ☐ | |
+| 2 | Xem phiếu đã nhận | `/m/b0000000-0000-4000-8000-000000000002/receive` | 1. Mở danh sách chờ nhận trên mobile. 2. Mở phiếu mình vừa nhận. | Thấy được phiếu của mình; phiếu chưa đăng thì vẫn sửa được. **Lưu ý: đường máy tính `/receiving` trả 404 với vai trò này (M9) — chỉ xem phiếu qua màn mobile.** | ☐ | ☐ | |
 | 3 | Kiểm tra không thấy giá/số PO | `/m/b0000000-0000-4000-8000-000000000002/receive` | 1. Mở lại màn hình nhận hàng của một PO chưa nhận. 2. Tìm số lượng PO và đơn giá trên màn hình. | **Không** thấy số lượng PO và đơn giá ở bất kỳ đâu trên màn hình nhận. | ☐ | ☐ | |
 | 4 | Hàng lỗi: chụp ảnh + ghi chú | `/m/b0000000-0000-4000-8000-000000000002/receive` | 1. Nhận một mặt hàng có lỗi chất lượng. 2. Chụp ảnh lỗi, ghi chú rõ. 3. Gửi phiếu. | Phiếu nhận ghi rõ hàng lỗi kèm ảnh; thủ kho thấy được để làm phiếu trả hàng. | ☐ | ☐ | |
 
@@ -183,10 +204,10 @@
 
 | # | Kịch bản | Đường dẫn | Các bước | Kết quả mong đợi | Đạt | Không đạt | Ghi chú |
 |---|----------|-----------|----------|------------------|-----|-----------|---------|
-| 1 | Duyệt PR của bộ phận | `/b0000000-0000-4000-8000-000000000002/procurement/pr` | 1. Mở PR đang chờ duyệt bước trưởng bộ phận. 2. Xem mặt hàng, số lượng, lý do. 3. Bấm **Duyệt** (hoặc **Từ chối** kèm lý do). | PR đi tiếp bước sau (hoặc quay về cho người tạo sửa nếu từ chối). | ☐ | ☐ | |
+| 1 | Tạo PR cho bộ phận và gửi duyệt | `/b0000000-0000-4000-8000-000000000002/procurement/pr/new` | 1. Tạo PR cho bộ phận mình. 2. Gửi duyệt. 3. Mở lại PR và thử bấm **Duyệt**. | PR được tạo và chờ duyệt. **Bước duyệt PR nay do Quản lý đảm nhiệm (Q263) — trưởng bộ phận chỉ đề xuất, không duyệt; nếu hệ thống cho bạn duyệt thì ghi lại (lệch mô hình mới).** | ☐ | ☐ | |
 | 2 | Không tự duyệt PR mình tạo | `/b0000000-0000-4000-8000-000000000002/procurement/pr/new` | 1. Tự tạo một PR mới và gửi duyệt. 2. Mở lại PR đó và thử bấm **Duyệt**. | Hệ thống **chặn** (báo lỗi người tạo không được duyệt) — đây là kiểm soát bắt buộc. | ☐ | ☐ | |
 | 3 | Tạo phiếu lĩnh cho bộ phận | `/b0000000-0000-4000-8000-000000000002/inventory/requisitions` | 1. Tạo phiếu lĩnh từ KHO-T047. 2. Thêm mặt hàng cần dùng. 3. Gửi duyệt. | Phiếu lĩnh được tạo ở trạng thái chờ duyệt. | ☐ | ☐ | |
-| 4 | Duyệt phiếu lĩnh | `/b0000000-0000-4000-8000-000000000002/inventory/requisitions` | 1. Mở phiếu lĩnh đang chờ duyệt. 2. Bấm **Duyệt**. | Phiếu lĩnh chuyển sang đã duyệt, chờ thủ kho xuất. | ☐ | ☐ | |
+| 4 | Xem phiếu lĩnh đã gửi | `/b0000000-0000-4000-8000-000000000002/inventory/requisitions` | 1. Mở phiếu lĩnh đang chờ duyệt. 2. Ghi lại ai là người duyệt theo màn hình. | **Bước duyệt phiếu lĩnh nay do Quản lý đảm nhiệm (Q263).** Phiếu lĩnh chờ Quản lý duyệt rồi mới tới thủ kho xuất. | ☐ | ☐ | |
 | 5 | Đề xuất hủy hàng hỏng | `/b0000000-0000-4000-8000-000000000002/inventory/waste` | 1. Tạo đề xuất hủy: chọn mặt hàng, số lượng, lý do. 2. Gửi. | Đề xuất được tạo ở trạng thái chờ duyệt; tồn kho chưa giảm cho tới khi được duyệt. | ☐ | ☐ | |
 
 ### 3.10. Bếp trưởng / Bếp — `uat.chef@erp.internal`
@@ -195,7 +216,7 @@
 
 | # | Kịch bản | Đường dẫn | Các bước | Kết quả mong đợi | Đạt | Không đạt | Ghi chú |
 |---|----------|-----------|----------|------------------|-----|-----------|---------|
-| 1 | Duyệt PR của bếp | `/b0000000-0000-4000-8000-000000000002/procurement/pr` | 1. Mở PR của bếp đang chờ duyệt. 2. Bấm **Duyệt**. | PR đi tiếp bước sau. | ☐ | ☐ | |
+| 1 | Tạo PR cho bếp và gửi duyệt | `/b0000000-0000-4000-8000-000000000002/procurement/pr/new` | 1. Tạo PR nguyên liệu cho bếp. 2. Gửi duyệt. | PR được tạo và chờ duyệt. **Bước duyệt PR nay do Quản lý đảm nhiệm (Q263) — bếp chỉ đề xuất, không duyệt.** | ☐ | ☐ | |
 | 2 | Tạo phiếu lĩnh nguyên liệu | `/b0000000-0000-4000-8000-000000000002/inventory/requisitions` | 1. Tạo phiếu lĩnh từ KHO-T047. 2. Thêm NVL0388 và NVL0561. 3. Gửi duyệt. | Phiếu lĩnh được tạo ở trạng thái chờ duyệt. | ☐ | ☐ | |
 | 3 | Đếm kiểm kê khu bếp | `/m/b0000000-0000-4000-8000-000000000002/count` | 1. Mở đợt kiểm kê đang mở. 2. Đếm mù các mã khu bếp, gửi kết quả. | Số đếm được ghi; không thấy tồn hệ thống trong lúc đếm. | ☐ | ☐ | |
 | 4 | Xem món và công thức | `/b0000000-0000-4000-8000-000000000002/restaurant/dishes` | 1. Mở danh sách món. 2. Mở một món, xem công thức và định lượng. | Món hiển thị đúng công thức; không sửa được nếu không có quyền. | ☐ | ☐ | |
@@ -219,7 +240,7 @@
 | 1 | Mở ca xe đẩy (điện thoại) | `/m/b0000000-0000-4000-8000-000000000002/trolley` | 1. Mở ca xe đẩy mới. 2. Chọn xe và nhân viên. 3. Bấm **Mở ca**. | Ca xe đẩy được mở, ghi đúng người mở và giờ mở. | ☐ | ☐ | |
 | 2 | Bổ sung minibar vào phòng | `/b0000000-0000-4000-8000-000000000002/housekeeping/minibar` | 1. Chọn phòng cần bổ sung. 2. Thêm món minibar (MON01) và số lượng. 3. Lưu. | Minibar phòng tăng đúng số lượng; có nhật ký bổ sung. | ☐ | ☐ | |
 | 3 | Quản lý phòng | `/b0000000-0000-4000-8000-000000000002/master/rooms` | 1. Mở danh sách phòng. 2. Thêm/sửa một phòng (số phòng, loại phòng, tầng). 3. Lưu. | Phòng được lưu và hiện trong danh sách; dùng được cho minibar và PMS. | ☐ | ☐ | |
-| 4 | Duyệt phiếu lĩnh của buồng | `/b0000000-0000-4000-8000-000000000002/inventory/requisitions` | 1. Mở phiếu lĩnh đang chờ duyệt. 2. Bấm **Duyệt**. | Phiếu lĩnh chuyển sang đã duyệt, chờ thủ kho xuất. | ☐ | ☐ | |
+| 4 | Xem phiếu lĩnh của buồng | `/b0000000-0000-4000-8000-000000000002/inventory/requisitions` | 1. Mở phiếu lĩnh đang chờ duyệt. 2. Ghi lại ai là người duyệt theo màn hình. | **Bước duyệt phiếu lĩnh nay do Quản lý đảm nhiệm (Q263).** Phiếu lĩnh chờ Quản lý duyệt rồi mới tới thủ kho xuất. | ☐ | ☐ | |
 | 5 | Đóng ca xe đẩy | `/m/b0000000-0000-4000-8000-000000000002/trolley` | 1. Mở ca đang mở. 2. Kiểm kê lại đồ trên xe. 3. Bấm **Đóng ca**. | Ca được đóng, số liệu cuối ca được ghi; không mở được ca mới trùng xe khi ca cũ chưa đóng. | ☐ | ☐ | |
 
 ### 3.13. Nhân viên buồng — `uat.hk_attendant@erp.internal`
@@ -277,16 +298,16 @@ Dùng khi muốn thử một nghiệp vụ trọn vẹn từ đầu tới cuối
 | Bước | Vai trò | Làm gì | Đường dẫn |
 |------|---------|--------|-----------|
 | 1 | purchaser | Tạo PR (NVL0388, 10 kg) và gửi duyệt | `/b0000000-0000-4000-8000-000000000002/procurement/pr/new` |
-| 2 | outlet_head | Duyệt PR | `/b0000000-0000-4000-8000-000000000002/procurement/pr` |
+| 2 | gm | Duyệt PR (bước duyệt PR nay do Quản lý) | `/b0000000-0000-4000-8000-000000000002/procurement/approvals` |
 | 3 | purchaser | Tạo PO từ PR cho NCC-T047, gửi duyệt | `/b0000000-0000-4000-8000-000000000002/procurement/po` |
-| 4 | cost_controller / gm / owner | Duyệt PO theo đúng ngưỡng giá trị | `/b0000000-0000-4000-8000-000000000002/procurement/approvals` |
+| 4 | gm (bậc 1, từ 0 đ) + owner (bậc 2, từ 100 triệu) | Duyệt PO | `/b0000000-0000-4000-8000-000000000002/procurement/approvals` |
 | 5 | purchaser | Gửi PO cho NCC | `/b0000000-0000-4000-8000-000000000002/procurement/po` |
 | 6 | receiver | Nhận hàng mù trên điện thoại | `/m/b0000000-0000-4000-8000-000000000002/receive` |
 | 7 | storekeeper | Đăng phiếu nhận | `/b0000000-0000-4000-8000-000000000002/receiving` |
 | 8 | accountant | Nhập hóa đơn NCC theo PO + phiếu nhận | `/b0000000-0000-4000-8000-000000000002/finance/invoices/new` |
-| 9 | chief_accountant | Duyệt hóa đơn | `/b0000000-0000-4000-8000-000000000002/finance/invoices` |
+| 9 | gm | Duyệt hóa đơn (Kế toán không tự duyệt) | `/b0000000-0000-4000-8000-000000000002/finance/invoices` |
 | 10 | accountant | Tạo đề nghị thanh toán | `/b0000000-0000-4000-8000-000000000002/finance/payment-requests/new` |
-| 11 | chief_accountant | Duyệt đề nghị thanh toán | `/b0000000-0000-4000-8000-000000000002/finance/payment-requests` |
+| 11 | owner hoặc gm | Duyệt đề nghị thanh toán | `/b0000000-0000-4000-8000-000000000002/finance/payment-requests` |
 | 12 | accountant | Đánh dấu đã thanh toán | `/b0000000-0000-4000-8000-000000000002/finance/payment-requests` |
 
 ### 4.2. PO chợ (mua ngoài chợ, chưa có giá)
@@ -306,6 +327,10 @@ Dùng khi muốn thử một nghiệp vụ trọn vẹn từ đầu tới cuối
 | 2 | hk_attendant | Kiểm minibar trên điện thoại (thử cả lúc mất mạng) | `/m/b0000000-0000-4000-8000-000000000002/minibar` |
 | 3 | front_desk | Xác nhận thu tiền, nhập số folio | `/b0000000-0000-4000-8000-000000000002/frontdesk/minibar` |
 | 4 | gm | Duyệt miễn tiền (nếu có đề nghị miễn) | `/b0000000-0000-4000-8000-000000000002/frontdesk/minibar` |
+
+> **Lưu ý:** giá minibar 7 món đã có hiệu lực từ 11/11 (M9 kiểm chứng tối 13/11). Nếu
+> món nào hiện "Chưa có giá" khi kiểm thì phiếu đó chưa gửi được — ghi lại và báo Quản lý
+> cập nhật giá rồi kiểm lại.
 
 ### 4.4. Kiểm kê theo ca (cần file POS)
 
@@ -348,3 +373,75 @@ dừng kịch bản đó, ghi rõ, làm kịch bản khác.
 
 **Lưu ý cuối:** tài khoản UAT hết hạn **26/11/2026** và phải vô hiệu hóa trước khi vận hành thật.
 Không dùng tài khoản UAT để nhập dữ liệu thật.
+
+---
+
+## 6. Lỗi đã biết & cách né (cập nhật tối 13/11/2026 — từ demo test, Day 1, M9, M11)
+
+Mỗi lỗi ghi rõ: hiện tượng, ai gặp, cách né, trạng thái. Lỗi nào chưa sửa thì khi thử gặp
+lại, ghi **Không đạt + thông báo nguyên văn** thay vì cố làm tiếp.
+
+### Chặn làm tiếp (phải né hoặc chờ sửa)
+
+1. **Nhập hóa đơn bị chặn với tài khoản kế toán.** Mở `/finance/invoices/new` thì thấy
+   "Không thể tải dữ liệu / Bạn chưa được cấp quyền…" dù vai trò kế toán có quyền nhập hóa
+   đơn (demo test 13/11). **Cách né:** dừng ở bước nhập hóa đơn, ghi lại thông báo, làm
+   tiếp các bước khác không cần hóa đơn. Đang chờ kiểm tra lại (M1). Lớp: quyền.
+2. **Form Sửa nháp PO chợ không lưu được.** Sửa PO chợ nháp rồi bấm Lưu thì báo "Dữ liệu
+   không hợp lệ", nội dung sửa bị hoàn lại (demo test 13/11, thử 5 lần đều vậy). **Cách né:**
+   đừng sửa nháp PO chợ; tạo mới PO chợ khác nếu cần. Đang chờ kiểm tra lại (M1). Lớp: UI.
+3. **Người mở phiếu nhận từng duyệt PO thì không đăng được phiếu (SoD).** Phiếu nhận kẹt ở
+   trạng thái nháp, không ai đăng được (chỉ người mở mới được đăng). Đã gặp thật ngày 13/11
+   (phiếu GRN-...-0001). **Cách né:** ngay từ đầu, để người nhận hàng là người chưa từng
+   duyệt PO đó. Lớp: thiết kế SoD (đúng luật, sai người làm).
+4. **Chụp ảnh bắt buộc từng dòng nhận hàng, không có đường tải ảnh lên.** Trình duyệt máy
+   tính không có camera thì không bấm được Ghi dòng. **Cách né:** nhận hàng bằng điện thoại
+   thật, cấp quyền camera trước khi mở phiếu. Lớp: UI/thiết bị.
+
+### Sai số liệu hoặc hiển thị sai
+
+5. **Ô tổng ước tính PO chợ từ chối số tròn.** Nhập 500.000 thì ô không nhận (bước nhảy
+   1.000); nhập 500.001 thì qua (demo test 13/11). **Cách né tạm thời:** nhập lệch 1 đồng.
+   Lớp: UI.
+6. **Mở lại PO đã có phiếu nháp thì tạo thêm phiếu nháp mới.** TEST47 hiện có 5 phiếu nháp
+   trùng cho cùng các PO (GRN-...-0001 đến -0005). **Cách né:** tìm phiếu nháp đang mở dở
+   và làm tiếp, đừng bấm Mở phiếu nhận lần nữa. Lớp: UI.
+7. **Màn Báo cáo hiện đồng thời "không có quyền" và "Đã xảy ra lỗi khi tải dữ liệu".**
+   Gặp ở cả 9 tài khoản đã kiểm tra (M9). Có dấu hiệu tải dữ liệu phía sau bị lỗi thật, không
+   chỉ do thiếu quyền. **Cách né:** không có — ghi lại khi gặp. Lớp: UI.
+8. **Số liệu PO do agent báo ở đợt kiểm tra 2 mâu thuẫn với giá trị đã biết** (PO-...-0002
+   báo 600.000đ trong khi giá trị đúng là 1.040.000đ). Chưa xác minh là lỗi hiển thị hay lỗi
+   đọc số liệu — cần đối chiếu lại danh sách PO khi chạy M1/M2. Lớp: chưa kết luận.
+
+### Giao diện / quyền hiển thị không khớp
+
+9. **Menu hiện bộ mục của tài khoản trước ngay sau khi đăng nhập.** Gặp ở cả 6 lần đổi tài
+   khoản (M9). **Cách né:** chuyển sang một trang khác, menu sẽ hiện đúng. Lớp: UI.
+10. **Menu có mục nhưng mở ra bị chặn, và ngược lại.** Quản lý: menu có "Nhận hàng" nhưng
+    mở ra 404. Kế toán: menu không có "Nhận hàng" nhưng gõ đường dẫn thì mở được; menu có
+    "Nhà hàng" nhưng mở ra 404. Giám sát buồng: menu có "Kho" nhưng Tồn kho bị chặn.
+    **Cách né:** dùng đúng các mục đã kiểm chứng trong hướng dẫn theo vai trò (M17). Lớp: UI.
+11. **Ô lọc lộ tên danh mục trên màn trống.** Bộ lọc nhà cung cấp liệt kê tên 16 NCC, bộ lọc
+    kho liệt kê tên 8 kho — dù số lượng/giá trị bị ẩn. Không lộ số tiền hay chứng từ.
+    Lớp: UI (chờ quyết định có nên ẩn).
+12. **Trang tổng quan hiện thẻ quản trị cho mọi vai trò** ("Người dùng & Phân quyền",
+    "Cấu hình & Quy tắc duyệt") dù 7/9 vai trò bị chặn ở màn quản trị. **Cách né:** đừng
+    bấm các thẻ đó nếu bạn không phải Chủ đầu tư/Quản lý. Lớp: UI.
+13. **Trang 404 không nhất quán + render 2 thẻ `<main>`.** Trang 404 có tài khoản hiện menu
+    trái, có tài khoản không; trang 404 và lúc đang tải đều render 2 thẻ `<main>` (lỗi a11y).
+    **Cách né:** không có — ghi lại khi gặp. Lớp: UI/a11y.
+14. **Trang 404 có lúc báo lỗi React #419 (hydration).** Gặp ở tài khoản nhận hàng trong
+    suite Playwright M11 (chạy đủ bộ thì rớt, chạy riêng thì đậu — phụ thuộc thứ tự, nghi do
+    shell cũ từ service worker). Trang vẫn hiển thị được. Lớp: UI.
+15. **Kế toán mở được Minibar — Lễ tân nhưng trống** (không thấy phiếu kiểm mà Chủ đầu tư /
+    Quản lý / Lễ tân thấy). Buồng phòng thấy bảng giá minibar nhưng không thấy tồn kho phòng
+    của chính mình. Lớp: quyền (chờ quyết định thiết kế).
+
+### Spec test cũ lỗi thời (không phải lỗi app)
+
+16. **M4 (Playwright): DB offline "erp-hotel-offline" không xuất hiện sau khi mở màn nhận
+    hàng.** Code dùng lazy singleton — DB chỉ được tạo khi enqueue job offline thật, không
+    phải khi mở màn. Kỳ vọng của spec cũ đã lỗi thời. Lớp: test.
+17. **M5 (Playwright): service worker đã đăng ký nhưng chưa active** ngay sau khi mở trang.
+    Có thể do test kiểm tra quá sớm (install chưa xong). Cần chạy lại trên máy Mac hoặc thêm
+    bước chờ activation. Lớp: test/timing.
