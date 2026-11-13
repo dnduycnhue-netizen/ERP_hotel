@@ -204,7 +204,7 @@ export function DishForm({
           <input
             value={groupName}
             onChange={(e) => setGroupName(e.target.value)}
-            placeholder="hot / salad / dessert / bread…"
+            placeholder={vi.restaurant.dishGroupExample}
             className="h-9 w-full rounded-lg border border-border bg-background px-2.5"
           />
         </label>
@@ -240,7 +240,7 @@ export function DishForm({
           <input
             value={dietFlags}
             onChange={(e) => setDietFlags(e.target.value)}
-            placeholder="lactose-free, vegetarian"
+            placeholder={vi.restaurant.dietFlagsExample}
             className="h-9 w-full rounded-lg border border-border bg-background px-2.5"
           />
         </label>

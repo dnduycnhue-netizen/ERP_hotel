@@ -98,7 +98,7 @@ export default async function AuditLogPage({
           <input
             name="table"
             defaultValue={filters.table ?? ""}
-            placeholder="stock_moves"
+            placeholder={t.filterTableExample}
             className="h-9 rounded-md border bg-background px-2 font-mono text-xs"
           />
         </label>

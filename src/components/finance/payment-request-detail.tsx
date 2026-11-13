@@ -256,7 +256,7 @@ export function PaymentRequestDetailView({
                 value={bankRef}
                 onChange={(e) => setBankRef(e.target.value)}
                 className="mt-1 w-full rounded-md border bg-background px-3 py-2 text-sm"
-                placeholder="VD: FT260110123456"
+                placeholder={vi.finance.bankRefExample}
               />
             </label>
             <Button
