@@ -17,7 +17,7 @@
 | # | Tài khoản | Việc cần làm | Đường dẫn | Kết quả mong đợi |
 |---|---|---|---|---|
 | 1 | `uat.purchaser` | Tạo PR: NVL0388, 10 kg, chọn kho nhận KHO-T047 → **Gửi duyệt** | `/TEST47/procurement/pr/new` | PR chờ duyệt |
-| 2 | `uat.outlet_head` | Duyệt PR | `/TEST47/procurement/approvals` | PR đã duyệt |
+| 2 | `uat.gm` (Quản lý) | Duyệt PR (bước duyệt PR đã chuyển sang Quản lý, Q263) | `/TEST47/procurement/approvals` | PR đã duyệt |
 | 3 | `uat.purchaser` | Tạo PO từ PR cho `NCC-T047` hoặc một `SUP00xx` đã duyệt, kiểm giá dòng = 100.000, **Gửi duyệt** | `/TEST47/procurement/po` | PO chờ duyệt, tổng 1.000.000 đ, **1 bậc duyệt** |
 | 4 | `uat.gm` (vai trò Quản lý) | Duyệt PO | `/TEST47/procurement/approvals` | PO đã duyệt |
 | 5 | `uat.purchaser` | **Gửi cho nhà cung cấp** | `/TEST47/procurement/po` | PO "đã gửi" |
@@ -36,7 +36,7 @@
 | Tính năng | Cách thử | Kết quả mong đợi |
 |---|---|---|
 | Bật/tắt module (Q254) | `dnduy@hueic.edu.vn` → `/admin/modules` → tắt **Nhà hàng** ở TEST47 → vào `/TEST47/restaurant` và `/inventory` | "Module đang tắt"; menu POS biến mất; bật lại là dùng tiếp, dữ liệu còn nguyên |
-| Cờ tự duyệt (Q258) | `dnduy@` (hoặc tài khoản có `admin.settings.manage`) → `/admin/settings` → "Bật/tắt ràng buộc" → đặt **Chặn tự duyệt đề xuất mua** = 0; sau đó `uat.outlet_head` tạo PR rồi tự duyệt (bước duyệt PR hiện gắn với vai trò `outlet_head`, xem lưu ý cuối) | Tự duyệt được; có cảnh báo `SOD_EXCEPTION_USED`; đặt lại = 1 thì lại bị chặn. PO thì **luôn** bị chặn |
+| Cờ tự duyệt (Q258) | Chỉ còn ý nghĩa khi người tạo phiếu cũng là người được giao bước duyệt. Vì PR/phiếu lĩnh/phiếu hủy nay do **Quản lý duyệt** (Q263) mà Quản lý hầu như không tự tạo phiếu, cờ gần như không còn tác dụng. Vẫn có thể xem 3 cờ tại `/admin/settings` → "Bật/tắt ràng buộc" | Mặc định 1 (chặn). PO luôn bị chặn tự duyệt |
 | Nhật ký thay đổi (Q252) | `dnduy@` → `/admin/audit` → lọc bảng `purchase_orders` | Thấy từng bước của chu trình trên, đúng người và giờ |
 | Vai trò gọn (Q257) | `/admin/roles` → xem 7 vai trò `sm_*` | Mỗi vai trò đúng số quyền: 57 / 69 / 40 / 28 / 18 / 15 / 11 |
 | Minibar + buồng phòng | `uat.front_desk` yêu cầu kiểm phòng 101 → `uat.hk_attendant` kiểm trên điện thoại → lễ tân thu tiền | Làm theo `uat-guide.md` §4.3 (TEST47 đã có phòng) |
@@ -46,8 +46,8 @@
 Mỗi bước làm xong ghi Đạt/Không đạt. Lỗi ghi đủ 4 ý: tài khoản + bước số mấy, làm tới đâu thì lỗi, thông báo lỗi nguyên văn, ảnh chụp màn hình.
 Bước 7 phụ thuộc PIN của `uat.storekeeper`/`uat.receiver` (cờ R18 đang bật): chưa có PIN thì báo Duy, đừng tắt cờ.
 
-## 4. Lưu ý đã biết (chưa xử lý)
+## 4. Duyệt phiếu (Q263, đã xử lý 13/11)
 
-Quy tắc duyệt **PR và phiếu lĩnh** vẫn gắn với vai trò cũ `outlet_head`, **phiếu hủy** gắn `cost_controller`; chỉ **PO** đã chuyển sang vai trò gọn (Quản lý/Chủ đầu tư).
-Hệ quả: người chỉ giữ `sm_kitchen`/`sm_housekeeping`/`sm_manager` **có quyền** duyệt PR/phiếu lĩnh/phiếu hủy nhưng **không được giao bước duyệt** nên bấm duyệt sẽ báo "không phải người duyệt được giao".
-Cần Duy chọn: (a) đổi bước duyệt PR/phiếu lĩnh/hủy sang `sm_manager` (Quản lý duyệt hết) hoặc (b) giữ trưởng bộ phận duyệt và gán thêm vai trò cũ cho họ.
+Duyệt **PR, phiếu lĩnh kho, phiếu hủy hàng** đã chuyển sang vai trò **Quản lý** (`sm_manager`); duyệt PO: Quản lý (bậc 1) + Chủ đầu tư (từ 100 triệu, bậc 2).
+Trưởng bộ phận/Bếp/Buồng phòng chỉ **đề xuất**. Người tạo phiếu mà không phải Quản lý thì không duyệt được phiếu của chính mình (và cũng không duyệt phiếu bộ phận khác).
+Hạn mức và vai trò duyệt do Quản lý tự chỉnh ở `/admin/approval-rules`.
