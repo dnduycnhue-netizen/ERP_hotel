@@ -14,6 +14,10 @@
 
 ## 1. Chu trình mua → nhận hàng → thanh toán (tạo tồn 10 kg NVL0388)
 
+> **Bước 1–5 đã được chạy sẵn (Q264, 13/11/2026)** bằng `docs/sample-data/demo-cycle-po.sql` với tài khoản `uat.purchaser` và `uat.gm` qua RPC thật:
+> PO **PO-TEST47-LE-2611-0003** (NCC `SUP0001`, NVL0388 10 kg × 100.000 = 1.000.000 đ) đang ở trạng thái **đã gửi**, chờ nhận hàng.
+> **Bắt đầu từ bước 6.** Bước 6–12 cần PIN và ảnh của từng tài khoản (do Duy giữ) nên không chạy thay được.
+
 | # | Tài khoản | Việc cần làm | Đường dẫn | Kết quả mong đợi |
 |---|---|---|---|---|
 | 1 | `uat.purchaser` | Tạo PR: NVL0388, 10 kg, chọn kho nhận KHO-T047 → **Gửi duyệt** | `/TEST47/procurement/pr/new` | PR chờ duyệt |
