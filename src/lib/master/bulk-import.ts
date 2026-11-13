@@ -2,106 +2,11 @@ import { read } from "xlsx";
 import { cellToString, detectHeaderRow, getSheetGrid } from "@/lib/import/xlsx";
 import { splitCsv } from "@/lib/pos/parse-csv";
 
-/**
- * NOTE: the three normalize helpers below intentionally mirror
- * `src/lib/pos/column-mapping.ts` (M-01, separate branch). This branch
- * is based on main and must stand alone; after both branches merge,
- * delete the copies here and import from column-mapping instead.
- */
-
-/** Normalize a header for comparison: lowercase, no diacritics/spaces. */
-function normalizeHeaderName(name: string): string {
-  return name
-    .trim()
-    .toLowerCase()
-    .replace(/đ/g, "d")
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-z0-9]/g, "");
-}
-
-/** Convert an Excel date serial (days since 1899-12-30) to ISO date. */
-function excelSerialToIso(serial: number): string | null {
-  if (!Number.isInteger(serial) || serial < 20000 || serial > 80000) {
-    return null;
-  }
-  const ms = Date.UTC(1899, 11, 30) + serial * 86_400_000;
-  const d = new Date(ms);
-  return Number.isNaN(d.getTime()) ? null : d.toISOString().slice(0, 10);
-}
-
-function toIsoDate(year: number, month: number, day: number): string | null {
-  if (month < 1 || month > 12 || day < 1 || day > 31) return null;
-  const d = new Date(Date.UTC(year, month - 1, day));
-  if (
-    d.getUTCFullYear() !== year ||
-    d.getUTCMonth() !== month - 1 ||
-    d.getUTCDate() !== day
-  ) {
-    return null;
-  }
-  return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
-}
-
-/**
- * Normalize a business date to `YYYY-MM-DD`. Accepts ISO dates,
- * `DD/MM/YYYY` (also with `-` or `.` separators), `DD/MM/YY`, and Excel
- * serial numbers.
- */
-function normalizePosDate(raw: unknown): string | null {
-  if (typeof raw === "number") return excelSerialToIso(raw);
-  if (typeof raw !== "string") return null;
-  const s = raw.trim();
-  if (s === "") return null;
-  const iso = s.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-  if (iso) {
-    return toIsoDate(Number(iso[1]), Number(iso[2]), Number(iso[3]));
-  }
-  const dmy = s.match(/^(\d{1,2})[/.\-](\d{1,2})[/.\-](\d{4})$/);
-  if (dmy) {
-    return toIsoDate(Number(dmy[3]), Number(dmy[2]), Number(dmy[1]));
-  }
-  const dmyShort = s.match(/^(\d{1,2})[/.\-](\d{1,2})[/.\-](\d{2})$/);
-  if (dmyShort) {
-    return toIsoDate(
-      2000 + Number(dmyShort[3]),
-      Number(dmyShort[2]),
-      Number(dmyShort[1]),
-    );
-  }
-  return null;
-}
-
-/**
- * Normalize a number to a plain string with `.` as the decimal separator
- * and no thousands separator. Accepts `1.234,56`, `1,234.56`, `1,5`,
- * `1.234` (thousands) and plain numbers.
- */
-function normalizePosNumber(raw: unknown): string | null {
-  if (typeof raw === "number") {
-    return Number.isFinite(raw) ? String(raw) : null;
-  }
-  if (typeof raw !== "string") return null;
-  let s = raw.trim().replace(/[\s\u00a0]/g, "");
-  if (s === "") return null;
-  if (!/^-?[\d.,]+$/.test(s)) return null;
-  const hasDot = s.includes(".");
-  const hasComma = s.includes(",");
-  if (hasDot && hasComma) {
-    if (s.lastIndexOf(".") > s.lastIndexOf(",")) {
-      s = s.replace(/,/g, "");
-    } else {
-      s = s.replace(/\./g, "").replace(",", ".");
-    }
-  } else if (hasComma) {
-    s = /^-?\d{1,3}(,\d{3})+$/.test(s)
-      ? s.replace(/,/g, "")
-      : s.replace(",", ".");
-  } else if (hasDot) {
-    if (/^-?\d{1,3}(\.\d{3})+$/.test(s)) s = s.replace(/\./g, "");
-  }
-  return /^-?\d+(\.\d+)?$/.test(s) ? s : null;
-}
+import {
+  normalizeHeaderName,
+  normalizePosDate,
+  normalizePosNumber,
+} from "@/lib/pos/column-mapping";
 
 /**
  * Bulk import for master data (M-02).
