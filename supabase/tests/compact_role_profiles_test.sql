@@ -20,7 +20,7 @@ select is((select count(*) from public.roles where org_id = 'a5700000-0000-4000-
 select is((select count(*) from q257_perms), (select count(distinct (role_code, perm)) from q257_perms), 'no duplicated role permission');
 
 select is((select count(*) from q257_perms where role_code = 'sm_owner'), 57::bigint, 'sm_owner has 57 permissions');
-select is((select count(*) from q257_perms where role_code = 'sm_manager'), 68::bigint, 'sm_manager has 68 permissions');
+select is((select count(*) from q257_perms where role_code = 'sm_manager'), 69::bigint, 'sm_manager has 69 permissions');
 select is((select count(*) from q257_perms where role_code = 'sm_accountant'), 40::bigint, 'sm_accountant has 40 permissions');
 select is((select count(*) from q257_perms where role_code = 'sm_purchasing_store'), 28::bigint, 'sm_purchasing_store has 28 permissions');
 

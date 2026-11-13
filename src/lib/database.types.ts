@@ -9345,6 +9345,7 @@ export type Database = {
       runtests:
         | { Args: never; Returns: string[] }
         | { Args: { "": string }; Returns: string[] }
+      seed_compact_roles: { Args: { p_org_id: string }; Returns: number }
       service_accept: {
         Args: {
           p_note?: string

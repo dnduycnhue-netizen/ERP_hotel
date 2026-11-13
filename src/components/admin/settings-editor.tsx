@@ -27,12 +27,18 @@ const settingRanges: Record<
   "rule.R25.enabled": { min: "0", max: "1", step: "1" },
   "rule.R18.enabled": { min: "0", max: "1", step: "1" },
   "rule.R32.enabled": { min: "0", max: "1", step: "1" },
+  "rule.SELF_PR.enabled": { min: "0", max: "1", step: "1" },
+  "rule.SELF_REQ.enabled": { min: "0", max: "1", step: "1" },
+  "rule.SELF_WASTE.enabled": { min: "0", max: "1", step: "1" },
 };
 
 const ruleToggleKeys = new Set<SettingEntry["key"]>([
   "rule.R25.enabled",
   "rule.R18.enabled",
   "rule.R32.enabled",
+  "rule.SELF_PR.enabled",
+  "rule.SELF_REQ.enabled",
+  "rule.SELF_WASTE.enabled",
 ]);
 
 function sourceLabel(source: SettingEntry["source"]): string {

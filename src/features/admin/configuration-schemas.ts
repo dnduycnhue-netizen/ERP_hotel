@@ -17,6 +17,9 @@ const settingKey = z.enum([
   "rule.R25.enabled",
   "rule.R18.enabled",
   "rule.R32.enabled",
+  "rule.SELF_PR.enabled",
+  "rule.SELF_REQ.enabled",
+  "rule.SELF_WASTE.enabled",
 ]);
 
 const decimalString = z

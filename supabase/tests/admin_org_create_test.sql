@@ -158,7 +158,7 @@ select ok(
   'property links the new organization and legal entity'
 );
 
--- 10. Tổ chức mới được seed đủ 17 vai trò mẫu (sys_admin, owner + 15).
+-- 10. Tổ chức mới được seed đủ 24 vai trò mẫu (17 cũ + 7 sm_*).
 select is(
   (
     select count(*)
@@ -166,8 +166,8 @@ select is(
     join public.organizations o on o.id = r.org_id
     where o.name = 'Tap Corp'
   ),
-  17::bigint,
-  'new organization is seeded with 17 system roles'
+  24::bigint,
+  'new organization is seeded with 24 system roles (17 sample + 7 compact)'
 );
 
 -- 11. sys_admin của tổ chức mới có quyền tạo tổ chức.
@@ -419,7 +419,7 @@ select is(
   'second legal entity tax code is stored'
 );
 
--- 28. Tổ chức thứ hai cũng được seed đủ 17 vai trò mẫu.
+-- 28. Tổ chức thứ hai cũng được seed đủ 24 vai trò mẫu.
 select is(
   (
     select count(*)
@@ -427,8 +427,8 @@ select is(
     join public.organizations o on o.id = r.org_id
     where o.name = 'Tap Corp 2'
   ),
-  17::bigint,
-  'second organization is seeded with 17 system roles'
+  24::bigint,
+  'second organization is seeded with 24 system roles'
 );
 
 select ok(num_failed() = 0, 'all preceding pgTAP assertions passed');

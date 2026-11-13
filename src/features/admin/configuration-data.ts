@@ -21,7 +21,10 @@ export type SettingEntry = {
     | "invoice_price_tolerance_pct"
     | "rule.R25.enabled"
     | "rule.R18.enabled"
-    | "rule.R32.enabled";
+    | "rule.R32.enabled"
+    | "rule.SELF_PR.enabled"
+    | "rule.SELF_REQ.enabled"
+    | "rule.SELF_WASTE.enabled";
   value: string;
   source: "property" | "organization" | "default";
 };

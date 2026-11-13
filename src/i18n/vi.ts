@@ -448,7 +448,7 @@ export const vi = {
       "Điều chỉnh các ngưỡng nghiệp vụ. Giá trị riêng khách sạn ghi đè giá trị toàn chuỗi.",
     configRuleTogglesTitle: "Bật/tắt ràng buộc",
     configRuleTogglesDescription:
-      "Tắt một ràng buộc sẽ nới lỏng kiểm soát ở đúng chỗ đó; mặc định tất cả đều bật. Thay đổi có hiệu lực ngay sau khi lưu.",
+      "Tắt một ràng buộc sẽ nới lỏng kiểm soát ở đúng chỗ đó; mặc định tất cả đều bật. 1 = bật (chặn), 0 = tắt (cho phép). Tắt chặn tự duyệt thì người tạo chứng từ được tự duyệt, mỗi lần đều có cảnh báo để truy vết; đơn mua (PO) luôn không được tự duyệt. Thay đổi có hiệu lực ngay sau khi lưu.",
     configSettingLabels: {
       price_spike_pct: "Ngưỡng cảnh báo tăng giá",
       receiving_tolerance_pct: "Dung sai nhận hàng so với PO",
@@ -462,6 +462,9 @@ export const vi = {
       "rule.R25.enabled": "Yêu cầu đủ PIN khi nộp phiếu kiểm kê",
       "rule.R18.enabled": "Yêu cầu PIN khi post phiếu nhận",
       "rule.R32.enabled": "Chặn đóng kỳ khi còn PO treo/tạm ứng quá hạn",
+      "rule.SELF_PR.enabled": "Chặn tự duyệt đề xuất mua (người tạo không được tự duyệt)",
+      "rule.SELF_REQ.enabled": "Chặn tự duyệt phiếu lĩnh kho",
+      "rule.SELF_WASTE.enabled": "Chặn tự duyệt phiếu hủy hàng",
     },
     configSettingUnits: {
       price_spike_pct: "%",
@@ -476,6 +479,9 @@ export const vi = {
       "rule.R25.enabled": "",
       "rule.R18.enabled": "",
       "rule.R32.enabled": "",
+      "rule.SELF_PR.enabled": "",
+      "rule.SELF_REQ.enabled": "",
+      "rule.SELF_WASTE.enabled": "",
     },
     configSettingSaved: "Đã lưu cấu hình.",
     configApprovalTitle: "Quy tắc duyệt",
