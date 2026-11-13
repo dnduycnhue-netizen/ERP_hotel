@@ -9,6 +9,7 @@ import {
   ClipboardCheck,
   ClipboardList,
   HeartPulse,
+  ScrollText,
   Hotel,
   KeyRound,
   LayoutDashboard,
@@ -285,6 +286,7 @@ export type AdminNavVisibility = {
   approvalRules: boolean;
   alertRules: boolean;
   health: boolean;
+  audit: boolean;
 };
 
 export type AdminNavItem = {
@@ -330,6 +332,12 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
     label: vi.admin.health.title,
     href: "/admin/health",
     icon: HeartPulse,
+  },
+  {
+    key: "audit",
+    label: vi.admin.auditNav,
+    href: "/admin/audit",
+    icon: ScrollText,
   },
 ];
 
