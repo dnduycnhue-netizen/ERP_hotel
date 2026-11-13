@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { notFound } from "next/navigation";
 import { AppShell } from "@/components/shell/app-shell";
 import { countUnreadAlerts } from "@/features/alerts/queries";
+import { getModuleAwarePermissions } from "@/lib/modules/server";
 import { PermissionsProvider } from "@/lib/permissions/permissions-provider";
 import { listAccessibleProperties } from "@/lib/supabase/access";
 import {
@@ -42,13 +43,13 @@ export default async function PropertyLayout({
     : Promise.resolve({ data: null as { full_name: string } | null });
   const [
     properties,
-    { data: myPermissions },
+    myPermissions,
     unreadAlerts,
     userEmail,
     profileResponse,
   ] = await Promise.all([
     listAccessibleProperties(supabase),
-    supabase.rpc("my_permissions", { p_property: propertyId }),
+    getModuleAwarePermissions(supabase, propertyId),
     countUnreadAlerts(propertyId),
     getAuthenticatedUserEmail(supabase),
     profileQuery,
@@ -62,7 +63,7 @@ export default async function PropertyLayout({
 
   // Chuông chỉ hiện khi người dùng có ít nhất một quyền nhận cảnh báo
   // tại khách sạn (Q208); người không có quyền nào không thấy chuông.
-  const canViewAlerts = (myPermissions ?? []).some((p: string) =>
+  const canViewAlerts = myPermissions.some((p) =>
     p.startsWith("alert.receive."),
   );
 
@@ -75,7 +76,7 @@ export default async function PropertyLayout({
     <PermissionsProvider
       key={propertyId}
       propertyId={propertyId}
-      initialPermissions={myPermissions ?? []}
+      initialPermissions={myPermissions}
     >
       <AppShell
         propertyId={currentProperty.id}

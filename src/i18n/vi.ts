@@ -218,6 +218,29 @@ export const vi = {
     approvalRules: "Quy tắc duyệt",
     alertRules: "Quy tắc cảnh báo",
     auditNav: "Nhật ký thay đổi",
+    modulesNav: "Module",
+    modules: {
+      title: "Bật/tắt module",
+      description:
+        "Chọn module mà từng khách sạn sử dụng. Lõi (mua hàng, nhận hàng, kho, tài chính, báo cáo chung) luôn bật. Tắt module chỉ ẩn màn hình và chặn ghi mới; dữ liệu cũ giữ nguyên và bật lại là dùng tiếp.",
+      loadError: "Không tải được danh sách module.",
+      empty: "Chưa có khách sạn nào.",
+      property: "Khách sạn",
+      hkFrontdesk: "Buồng phòng & Lễ tân",
+      hkFrontdeskHint: "Minibar, xe đẩy, chuẩn setup phòng, số liệu PMS ngày",
+      restaurant: "Nhà hàng",
+      restaurantHint: "Món, buffet, tiệc, bán hàng, nạp file POS",
+      on: "Đang bật",
+      off: "Đã tắt",
+      turnOn: "Bật",
+      turnOff: "Tắt",
+      confirmOff:
+        "Tắt module này? Màn hình sẽ ẩn và không ghi thêm dữ liệu mới. Dữ liệu cũ vẫn giữ.",
+      saved: "Đã lưu.",
+      disabledTitle: "Module đang tắt",
+      disabledDescription:
+        "Khách sạn này không sử dụng module này. Quản trị chuỗi có thể bật lại trong Quản trị → Module.",
+    },
     health: {
       title: "Sức khỏe hệ thống",
       description:

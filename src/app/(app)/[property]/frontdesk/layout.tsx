@@ -1,5 +1,8 @@
 import type { ReactNode } from "react";
 import { notFound } from "next/navigation";
+import { ModuleDisabled } from "@/components/common/module-disabled";
+import { getPropertyModules } from "@/lib/modules/server";
+import { vi } from "@/i18n/vi";
 import { createClient } from "@/lib/supabase/server";
 
 /**
@@ -15,6 +18,10 @@ export default async function FrontdeskLayout({
 }>) {
   const { property: propertyId } = await params;
   const supabase = await createClient();
+  const modules = await getPropertyModules(supabase, propertyId);
+  if (!modules.hk_frontdesk) {
+    return <ModuleDisabled name={vi.admin.modules.hkFrontdesk} />;
+  }
 
   const { data: myPerms } = await supabase.rpc("my_permissions", {
     p_property: propertyId,

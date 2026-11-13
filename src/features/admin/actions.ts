@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { getRpcErrorMessage } from "@/i18n/errors.vi";
 import { vi } from "@/i18n/vi";
+import { getModuleAwarePermissions } from "@/lib/modules/server";
 import { callAdminRpc, type AdminActionResult } from "./rpc";
 import {
   assignRoleSchema,
@@ -241,6 +242,9 @@ export async function getMyPermissionsAction(
   propertyId: string | null,
 ): Promise<string[]> {
   const supabase = await createClient();
+  if (propertyId) {
+    return getModuleAwarePermissions(supabase, propertyId);
+  }
   const { data, error } = await supabase.rpc("my_permissions", {
     p_property: propertyId,
   });

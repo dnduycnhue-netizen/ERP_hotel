@@ -59,6 +59,8 @@ export const rpcErrorMessages: Record<string, string> = {
   ERR_NOT_APPROVER: "Bạn không phải người duyệt được giao cho bước này.",
   ERR_PRICE_NOT_SET:
     "Đơn hàng còn dòng chưa có đơn giá. Hãy nhập giá cho các dòng giá tay trước khi gửi duyệt.",
+  ERR_MODULE_DISABLED:
+    "Module này đang tắt ở khách sạn này. Hãy nhờ quản trị bật lại trong Quản trị → Module.",
   ERR_ESTIMATE_REQUIRED:
     "Đơn mua chợ còn dòng chưa có giá. Hãy nhập tổng tiền ước tính trước khi gửi duyệt.",
   ERR_BANQUET_HALL_CONFLICT:

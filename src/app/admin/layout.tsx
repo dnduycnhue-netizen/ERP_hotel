@@ -34,12 +34,13 @@ export default async function AdminLayout({
     redirect("/login");
   }
 
-  const [canRoles, canUsers, canOrg, canHealth, canAudit, properties] = await Promise.all([
+  const [canRoles, canUsers, canOrg, canHealth, canAudit, canModules, properties] = await Promise.all([
     hasChainPerm(supabase, "admin.roles.manage"),
     hasChainPerm(supabase, "admin.users.manage"),
     hasChainPerm(supabase, "admin.org.manage"),
     hasChainPerm(supabase, "admin.health.view"),
     hasChainPerm(supabase, "audit.view_all"),
+    hasChainPerm(supabase, "admin.modules.manage"),
     listAccessibleProperties(supabase),
   ]);
 
@@ -71,7 +72,8 @@ export default async function AdminLayout({
     !canApprovalRules &&
     !canAlertRules &&
     !canHealth &&
-    !canAudit
+    !canAudit &&
+    !canModules
   ) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-muted/30 px-4">
@@ -118,6 +120,7 @@ export default async function AdminLayout({
           alertRules: canAlertRules,
           health: canHealth,
           audit: canAudit,
+          modules: canModules,
         }}
         userEmail={user.email}
         userName={profile?.full_name ?? null}

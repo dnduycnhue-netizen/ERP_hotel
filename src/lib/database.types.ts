@@ -4085,6 +4085,38 @@ export type Database = {
           },
         ]
       }
+      property_modules: {
+        Row: {
+          enabled: boolean
+          module: string
+          property_id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          enabled?: boolean
+          module: string
+          property_id: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          enabled?: boolean
+          module?: string
+          property_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "property_modules_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       purchase_order_lines: {
         Row: {
           ceiling_price: number | null
@@ -8386,6 +8418,11 @@ export type Database = {
         Args: { p_legal_entity_id: string; p_name: string }
         Returns: Json
       }
+      admin_module_set: {
+        Args: { p_enabled: boolean; p_module: string; p_property_id: string }
+        Returns: Json
+      }
+      admin_modules_overview: { Args: never; Returns: Json }
       admin_org_create: { Args: { p_org: Json }; Returns: Json }
       admin_permission_override_set: {
         Args: {
@@ -8914,6 +8951,10 @@ export type Database = {
         Args: { p_check_id: string; p_reason: string }
         Returns: Json
       }
+      module_enabled: {
+        Args: { p_module: string; p_property_id: string }
+        Returns: boolean
+      }
       my_permissions: { Args: { p_property: string }; Returns: string[] }
       my_property_ids: { Args: never; Returns: string[] }
       my_warehouse_ids: { Args: { p_property: string }; Returns: string[] }
@@ -9097,6 +9138,7 @@ export type Database = {
         Args: { p_property_id: string }
         Returns: Json
       }
+      property_modules_get: { Args: { p_property_id: string }; Returns: Json }
       purpose_issue_cancel: {
         Args: { p_issue_id: string; p_property_id: string; p_reason: string }
         Returns: Json
@@ -9224,6 +9266,10 @@ export type Database = {
         Returns: Json
       }
       report_refresh_stock_card_mv: { Args: never; Returns: Json }
+      require_module: {
+        Args: { p_module: string; p_property_id: string }
+        Returns: undefined
+      }
       require_perm: {
         Args: { p_perm: string; p_property: string; p_warehouse?: string }
         Returns: undefined

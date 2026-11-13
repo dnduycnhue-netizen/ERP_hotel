@@ -7,6 +7,7 @@ import { MobileHeader } from "@/components/mobile/mobile-header";
 import { MobileOfflineBanner } from "@/components/mobile/mobile-offline-banner";
 import { InstallPrompt } from "@/components/pwa/install-prompt";
 import { vi } from "@/i18n/vi";
+import { getModuleAwarePermissions } from "@/lib/modules/server";
 import { PermissionsProvider } from "@/lib/permissions/permissions-provider";
 import { listAccessibleProperties } from "@/lib/supabase/access";
 import { createClient, getAuthenticatedUser } from "@/lib/supabase/server";
@@ -75,9 +76,9 @@ export default async function MobilePropertyLayout({
     );
   }
 
-  const [properties, { data: myPermissions }] = await Promise.all([
+  const [properties, myPermissions] = await Promise.all([
     listAccessibleProperties(supabase),
-    supabase.rpc("my_permissions", { p_property: propertyId }),
+    getModuleAwarePermissions(supabase, propertyId),
   ]);
 
   const currentProperty = properties.find(({ id }) => id === propertyId);
@@ -89,7 +90,7 @@ export default async function MobilePropertyLayout({
     <PermissionsProvider
       key={propertyId}
       propertyId={propertyId}
-      initialPermissions={myPermissions ?? []}
+      initialPermissions={myPermissions}
     >
       <div className="min-h-screen bg-muted/30 text-base">
         <MobileHeader

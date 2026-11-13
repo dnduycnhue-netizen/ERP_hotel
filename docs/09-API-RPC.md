@@ -115,6 +115,10 @@ Các RPC danh mục dưới đây thuộc các task sau, chưa được triển 
 | `service_contract_save`, `service_schedule_generate(p_month)`, `service_accept(p_schedule_id, p_rating, p_photos, p_po_id, p_note)` | `p_note` tuy chon, luu vao `service_acceptances.note` (Q81) |
 | `pms_daily_upsert(p_property_id, p_date, p_stats jsonb)` | Lễ tân nhập hằng ngày |
 | `pos_import_commit(p_property_id, p_file_name, p_file_sha256, p_lines)` | Q34: nạp file POS (quyền `pos.import`); tách theo (ngày, ca) thành các `pos_imports`; nạp lại cùng file → `ERR_ALREADY_IMPORTED`; mã món không có trong `recipes.code` lưu `recipe_id` NULL và trả về `unmapped_codes`. Định dạng cột là giả định (xem OPEN-QUESTIONS Q34) |
+| `admin_module_set(p_property_id, p_module, p_enabled)` | Q254: bật/tắt module `hk_frontdesk` (Buồng phòng & Lễ tân) hoặc `restaurant` (Nhà hàng) cho 1 khách sạn (quyền chuỗi `admin.modules.manage`). Module sai → `ERR_INVALID_VALUE`. Ghi audit |
+| `admin_modules_overview()` | Q254: danh sách khách sạn + trạng thái 2 module (quyền `admin.modules.manage`) |
+| `property_modules_get(p_property_id)` | Q254: trạng thái module của 1 khách sạn (mọi người có quyền vào khách sạn đọc được). Không có dòng = bật |
+| `module_enabled(p_property_id, p_module)` / `require_module(...)` | Q254: hàm kiểm tra; bảng của module có trigger `_module_guard` chặn INSERT/UPDATE khi tắt → `ERR_MODULE_DISABLED`. Lõi không bị ảnh hưởng. `count_open` kiểu `shift_key` chỉ đòi file POS khi Nhà hàng bật |
 
 ## 8. Nhà hàng (M06)
 
