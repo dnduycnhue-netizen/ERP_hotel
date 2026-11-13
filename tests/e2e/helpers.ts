@@ -44,6 +44,21 @@ export function requireTestUser(): void {
   );
 }
 
+/** Property TEST47 — noi ma tran quyen M9 da kiem chung (uat.* chi thay TEST47). */
+export const TEST47_PROPERTY_ID = "b0000000-0000-4000-8000-000000000002";
+
+/**
+ * Spec chay tren property test rieng (TEST47), khong chay tren SONHOIAN —
+ * tai khoan uat.* chi co vai tro tren TEST47, mo /SONHOIAN se 404.
+ * Can: TEST_PROPERTY_ID=<id TEST47>.
+ */
+export function requireTest47(): void {
+  test.skip(
+    TEST_PROPERTY_ID !== TEST47_PROPERTY_ID,
+    "Spec nay chay tren TEST47 (TEST_PROPERTY_ID phai la id TEST47) — xem tests/e2e/README.md.",
+  );
+}
+
 /**
  * Tang LIVE-DATA mobile (W5): chay tren property test rieng (TEST47),
  * khong chay tren SONHOIAN — tai khoan TEST02 chi co vai tro tren

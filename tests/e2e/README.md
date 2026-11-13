@@ -75,12 +75,33 @@ Lấy id property TEST47 trong SQL Editor:
 | `readonly/smoke.spec.ts` (S1–S3) | 14 | Skip (cần tài khoản) |
 | `readonly/reports.spec.ts` (R1–R5) | 5 | Skip (cần tài khoản) |
 | `readonly/mobile-pwa.spec.ts` (M1–M5) | 5 | Skip (cần tài khoản) |
+| `readonly/roles.spec.ts` (R-*, M11) | 9 | Có (cần TEST_PROPERTY_ID=TEST47 + TEST_ROLE_PASSWORD) |
+| `readonly/mobile-overflow.spec.ts` (O-*, M11) | 14 | Có (cần tài khoản owner + TEST47) |
 | `write/01-procurement.spec.ts` (W1–W4) | 4 | Skip (cần property test) |
 | `write/02-receiving.spec.ts` (W5–W6) | 2 | Skip (cần property test) |
 | `write/03-finance.spec.ts` (W7–W10) | 4 | Skip (cần property test) |
 | `write/04-admin-create-user-multirole.spec.ts` (W11) | 1 | Skip (cần tài khoản quản trị) |
 
-Tổng: 16 Vitest + 45 Playwright (5 public chạy được trên VM).
+Tổng: 16 Vitest + 68 Playwright (5 public + 9 roles + 14 overflow chạy được trên VM với tài khoản uat.*).
+
+### M11 — ma trận quyền theo vai trò (project readonly-roles)
+
+```bash
+TEST_PROPERTY_ID=<id TEST47> TEST_ROLE_PASSWORD=<mật khẩu chung uat.*>
+TEST_USER_EMAIL=uat.owner@erp.internal TEST_USER_PASSWORD=<mật khẩu>
+  npx playwright test --project=readonly-roles
+```
+
+Mỗi test đăng nhập 1 vai trò uat.* (email mặc định `uat.<vai trò>@erp.internal`,
+đổi qua `TEST_ROLE_<VAI TRÒ>_EMAIL`), mở 1 màn được phép (200 + tiêu đề tiếng
+Việt + không lỗi console) + 1 màn bị chặn (thông báo 404/quyền). Project
+mobile-overflow (14 màn, 390px, không tràn ngang) chạy cùng project
+readonly-mobile với tài khoản owner trên TEST47.
+
+Lưu ý VM: Chromium không qua được egress proxy nếu thiếu Proxy-Authorization
+preemptive (`ERR_TUNNEL_CONNECTION_FAILED`). Chạy forwarder
+`~/workspace/proxy-forwarder.cjs` (lắng nghe 127.0.0.1:18080) rồi đặt
+`HTTPS_PROXY=http://127.0.0.1:18080` cho lệnh test (xem báo cáo M11).
 
 ### W11 — tạo tài khoản đa vai trò (ngoại lệ tầng ghi)
 

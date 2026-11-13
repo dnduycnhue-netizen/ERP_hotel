@@ -81,8 +81,18 @@ export default defineConfig({
       },
     },
     {
+      name: "readonly-roles",
+      testMatch: /readonly\/roles\.spec\.ts/,
+      dependencies: ["setup"],
+      use: {
+        ...devices["Desktop Chrome"],
+        viewport: { width: 1280, height: 800 },
+        storageState: "tests/e2e/.auth/user.json",
+      },
+    },
+    {
       name: "readonly-mobile",
-      testMatch: /readonly\/mobile-pwa\.spec\.ts/,
+      testMatch: /readonly\/(mobile-pwa|mobile-overflow)\.spec\.ts/,
       dependencies: ["setup"],
       use: {
         viewport: { width: 390, height: 844 },
