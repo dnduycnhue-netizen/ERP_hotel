@@ -4,7 +4,9 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { MoneyText } from "@/components/common/money-text";
+import { BulkImportDialog } from "@/components/master/bulk-import-dialog";
 import { priceSetAction } from "@/features/minibar/actions";
+import type { BulkRow } from "@/lib/master/bulk-import";
 import type {
   MinibarItemRow,
   MinibarPriceRow,
@@ -37,6 +39,7 @@ export function OfficePriceManager({
   const [pending, setPending] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [bulkOpen, setBulkOpen] = useState(false);
 
   const priceNum = Number(price);
   const canSubmit =
@@ -126,14 +129,49 @@ export function OfficePriceManager({
           />
         </label>
       </div>
-      <Button
-        type="button"
-        className="mt-3"
-        disabled={!canSubmit}
-        onClick={handleSubmit}
-      >
-        {pending ? vi.minibar.priceSetting : vi.minibar.priceSetButton}
-      </Button>
+      <div className="mt-3 flex items-center gap-2">
+        <Button
+          type="button"
+          disabled={!canSubmit}
+          onClick={handleSubmit}
+        >
+          {pending ? vi.minibar.priceSetting : vi.minibar.priceSetButton}
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => setBulkOpen(true)}
+        >
+          {vi.minibar.bulkImportPrices}
+        </Button>
+      </div>
+
+      {bulkOpen ? (
+        <BulkImportDialog
+          kind="minibar_prices"
+          lookups={{
+            items: items.map((it) => ({ code: it.code, id: it.id })),
+          }}
+          saveRow={async (row: BulkRow) => {
+            const res = await priceSetAction({
+              propertyId,
+              itemId: String(row.resolved.itemId),
+              price: Number(row.resolved.price),
+              validFrom: String(row.resolved.validFrom),
+              validTo:
+                typeof row.resolved.validTo === "string"
+                  ? row.resolved.validTo
+                  : null,
+            });
+            return res.ok ? { ok: true } : { ok: false, error: res.error };
+          }}
+          onClose={() => setBulkOpen(false)}
+          onDone={() => {
+            setBulkOpen(false);
+            router.refresh();
+          }}
+        />
+      ) : null}
 
       {prices.length === 0 ? (
         <p className="mt-4 text-sm text-muted-foreground">

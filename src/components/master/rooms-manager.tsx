@@ -7,7 +7,9 @@ import {
   DataTable,
   type DataTableColumn,
 } from "@/components/common/data-table";
+import { BulkImportDialog } from "@/components/master/bulk-import-dialog";
 import { useCan } from "@/lib/permissions/permissions-provider";
+import type { BulkRow } from "@/lib/master/bulk-import";
 import { vi } from "@/i18n/vi";
 import { PageHeader } from "@/components/shell/page-header";
 import type { RoomRow, RoomTypeRow } from "@/features/master/queries";
@@ -42,6 +44,9 @@ export function RoomsManager({
 
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [bulkKind, setBulkKind] = useState<"rooms" | "room_types" | null>(
+    null,
+  );
 
   function startCreateRoom() {
     setEditingRoom(null);
@@ -180,6 +185,20 @@ export function RoomsManager({
               <Button
                 variant="outline"
                 size="sm"
+                onClick={() => setBulkKind("room_types")}
+              >
+                {vi.master.rooms.bulkImportRoomTypes}
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setBulkKind("rooms")}
+              >
+                {vi.master.rooms.bulkImportRooms}
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={() => setTypeOpen(true)}
               >
                 + {vi.master.rooms.addRoomType}
@@ -197,6 +216,50 @@ export function RoomsManager({
       />
 
       <DataTable columns={columns} rows={rooms} />
+
+      {bulkKind ? (
+        <BulkImportDialog
+          kind={bulkKind}
+          lookups={
+            bulkKind === "rooms"
+              ? {
+                  roomTypes: roomTypes.map((rt) => ({
+                    code: rt.code,
+                    id: rt.id,
+                  })),
+                  existingRoomNos: rooms.map((r) => r.room_no),
+                }
+              : {
+                  existingRoomTypeCodes: roomTypes.map((rt) => rt.code),
+                }
+          }
+          saveRow={async (row: BulkRow) => {
+            const res =
+              bulkKind === "rooms"
+                ? await saveRoomAction({
+                    propertyId,
+                    roomNo: row.values.room_no,
+                    floor: row.values.floor || null,
+                    roomTypeId: String(row.resolved.roomTypeId),
+                  })
+                : await saveRoomTypeAction({
+                    propertyId,
+                    code: row.values.code,
+                    name: row.values.name,
+                    maxGuests:
+                      typeof row.resolved.maxGuests === "number"
+                        ? row.resolved.maxGuests
+                        : null,
+                  });
+            return res.ok ? { ok: true } : { ok: false, error: res.error };
+          }}
+          onClose={() => setBulkKind(null)}
+          onDone={() => {
+            setBulkKind(null);
+            router.refresh();
+          }}
+        />
+      ) : null}
 
       {/* Dialog thêm phòng */}
       {roomOpen ? (

@@ -10,6 +10,8 @@ import {
 import { useCan } from "@/lib/permissions/permissions-provider";
 import { vi } from "@/i18n/vi";
 import { PageHeader } from "@/components/shell/page-header";
+import { BulkImportDialog } from "@/components/master/bulk-import-dialog";
+import type { BulkRow } from "@/lib/master/bulk-import";
 import type {
   PriceAgreementRow,
   PriceAgreementLineRow,
@@ -112,6 +114,7 @@ export function PricesManager({
   const [ceilingValidFrom, setCeilingValidFrom] = useState("");
   const [ceilingValidTo, setCeilingValidTo] = useState("");
   const [ceilingSaving, setCeilingSaving] = useState(false);
+  const [bulkCeiling, setBulkCeiling] = useState(false);
 
   function startCreateAgreement() {
     setEditingAgreement(null);
@@ -568,13 +571,50 @@ export function PricesManager({
             </p>
           </div>
           {canManageCeilings ? (
-            <Button size="sm" onClick={startCreateCeiling}>
-              + {vi.master.prices.addCeiling}
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setBulkCeiling(true)}
+              >
+                {vi.master.prices.bulkImportCeilings}
+              </Button>
+              <Button size="sm" onClick={startCreateCeiling}>
+                + {vi.master.prices.addCeiling}
+              </Button>
+            </div>
           ) : null}
         </div>
 
         <DataTable columns={ceilingColumns} rows={ceilings} />
+
+        {bulkCeiling ? (
+          <BulkImportDialog
+            kind="ceiling_prices"
+            lookups={{
+              items: items.map((it) => ({ code: it.code, id: it.id })),
+              uoms: uoms.map((u) => ({ code: u.code })),
+            }}
+            saveRow={async (row: BulkRow) => {
+              const res = await saveCeilingPriceAction({
+                propertyId,
+                propertyScopeId:
+                  row.resolved.scope === "property" ? propertyId : null,
+                itemId: String(row.resolved.itemId),
+                uom: String(row.resolved.uom),
+                price: Number(row.resolved.price),
+                validFrom: String(row.resolved.validFrom),
+                validTo: String(row.resolved.validTo),
+              });
+              return res.ok ? { ok: true } : { ok: false, error: res.error };
+            }}
+            onClose={() => setBulkCeiling(false)}
+            onDone={() => {
+              setBulkCeiling(false);
+              router.refresh();
+            }}
+          />
+        ) : null}
       </div>
 
       {agreementOpen ? (
