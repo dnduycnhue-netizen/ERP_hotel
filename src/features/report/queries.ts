@@ -1,5 +1,6 @@
 import "server-only";
 
+import { getModuleAwarePermissions } from "@/lib/modules/server";
 import { createClient } from "@/lib/supabase/server";
 import { callReportRpc } from "./rpc";
 import { REPORT_CODES, getReportMeta, type ReportCode } from "./definitions";
@@ -39,14 +40,16 @@ export function monthStartVn(): string {
 
 /**
  * Quyền xem từng báo cáo của người dùng hiện tại trên khách sạn đang chọn.
- * Dùng has_perm qua my_permissions (tiền lệ finance/getFinancePerms).
+ * Dùng has_perm qua my_permissions (tiền lệ finance/getFinancePerms), đã bỏ
+ * quyền của module đang tắt.
  */
 export async function getReportPerms(propertyId: string): Promise<ReportPerms> {
   const supabase = await createClient();
-  const { data } = await supabase.rpc("my_permissions", {
-    p_property: propertyId,
-  });
-  const perms = new Set<string>(data ?? []);
+  // Q254: báo cáo của module đang tắt (minibar, amenities, doanh thu F&B)
+  // bị bỏ khỏi danh sách quyền nên không hiện và không mở được qua URL.
+  const perms = new Set<string>(
+    await getModuleAwarePermissions(supabase, propertyId),
+  );
   const out = {} as ReportPerms;
   for (const code of REPORT_CODES) {
     out[code] = perms.has(getReportMeta(code).permission);
