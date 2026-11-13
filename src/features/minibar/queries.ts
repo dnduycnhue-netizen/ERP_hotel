@@ -376,7 +376,7 @@ export async function getRoomStocks(
   const client = untyped(supabase);
   const { data: warehouses, error: whError } = await client
     .from("warehouses")
-    .select("id, room_id, room:rooms(room_no, floor)")
+    .select("id, room_id, room:rooms!warehouses_room_id_fkey(room_no, floor)")
     .eq("property_id", propertyId)
     .eq("kind", "minibar_room");
   if (whError) return toError(whError);
