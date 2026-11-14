@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { ArrowUpRight, Info, ShieldCheck, TriangleAlert } from "lucide-react";
 import { InlineText } from "@/components/help/inline-text";
+import { WorkflowDiagram } from "@/components/help/workflow-diagram";
+import { HELP_DIAGRAMS } from "@/i18n/help/diagrams";
 import type { HelpArticle, HelpBlock, HelpTone } from "@/i18n/help/types";
 import { vi } from "@/i18n/vi";
 import { cn } from "@/lib/utils";
@@ -144,8 +146,35 @@ export function HelpArticleView({
   /** Bản mobile ẩn nút "Mở màn hình" (đường dẫn của bản máy tính). */
   showLinks?: boolean;
 }) {
+  const diagrams = HELP_DIAGRAMS[article.slug] ?? [];
   return (
-    <article className="max-w-3xl space-y-3">
+    <article className="space-y-3">
+      {diagrams.length > 0 ? (
+        <section aria-label={vi.help.flowTitle} className="mb-6 space-y-5">
+          <h2 className="text-lg font-semibold tracking-tight">
+            {vi.help.flowTitle}
+          </h2>
+          <ul className="flex flex-wrap gap-x-5 gap-y-1 text-xs text-muted-foreground">
+            <li>{vi.help.flowLegendLane}</li>
+            <li className="flex items-center gap-1">
+              <span className="text-amber-500">◇</span>
+              {vi.help.flowLegendDecision}
+            </li>
+            <li className="flex items-center gap-1">
+              <span className="inline-block h-0 w-5 border-t-2 border-dashed border-destructive" />
+              {vi.help.flowLegendBad}
+            </li>
+            <li className="flex items-center gap-1">
+              <span className="inline-block size-3 rounded border border-dashed bg-muted/40" />
+              {vi.help.flowLegendSystem}
+            </li>
+          </ul>
+          {diagrams.map((d) => (
+            <WorkflowDiagram key={d.title} diagram={d} />
+          ))}
+        </section>
+      ) : null}
+      <div className="max-w-3xl space-y-3">
       {article.blocks.map((block, i) => (
         <Block
           key={i}
@@ -154,6 +183,7 @@ export function HelpArticleView({
           showLinks={showLinks}
         />
       ))}
+      </div>
     </article>
   );
 }

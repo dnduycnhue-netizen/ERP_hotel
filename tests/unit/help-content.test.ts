@@ -124,3 +124,60 @@ describe("Ngữ cảnh hướng dẫn (nút ?)", () => {
     expect(suggestedItems("count", on).map((i) => i.slug)[0]).toBe("sop-kiem-ke-cuoi-thang");
   });
 });
+
+import { HELP_DIAGRAMS } from "@/i18n/help/diagrams";
+import { edgePath } from "@/components/help/workflow-diagram";
+
+describe("Sơ đồ luồng (Q281)", () => {
+  it("khóa là slug có thật; mỗi sơ đồ hợp lệ (nút duy nhất, cạnh trỏ đúng, hàng bơi hợp lệ)", () => {
+    const slugs = new Set(HELP_ARTICLES.map((a) => a.slug));
+    for (const [slug, diagrams] of Object.entries(HELP_DIAGRAMS)) {
+      expect(slugs.has(slug), slug).toBe(true);
+      expect(diagrams.length, slug).toBeGreaterThan(0);
+      for (const d of diagrams) {
+        const ids = d.nodes.map((n) => n.id);
+        expect(new Set(ids).size, `${slug}/${d.title}`).toBe(ids.length);
+        const cells = d.nodes.map((n) => `${n.lane}:${n.col}`);
+        expect(new Set(cells).size, `${slug}/${d.title} ô trùng vị trí`).toBe(cells.length);
+        for (const n of d.nodes) {
+          expect(n.lane, n.id).toBeGreaterThanOrEqual(0);
+          expect(n.lane, n.id).toBeLessThan(d.lanes.length);
+          expect(Number.isInteger(n.col), n.id).toBe(true);
+          expect(n.label.length, n.id).toBeGreaterThan(2);
+        }
+        for (const e of d.edges) {
+          expect(ids.includes(e.from), `${d.title}: ${e.from}`).toBe(true);
+          expect(ids.includes(e.to), `${d.title}: ${e.to}`).toBe(true);
+          expect(e.from).not.toBe(e.to);
+        }
+        // Mọi nút (trừ nút đầu) phải được nối vào — không có ô mồ côi.
+        for (const n of d.nodes) {
+          const connected = d.edges.some((e) => e.from === n.id || e.to === n.id);
+          expect(connected || d.nodes.length === 1, `${d.title}: ${n.id} mồ côi`).toBe(true);
+        }
+      }
+    }
+  });
+
+  it("các luồng chính, SOP quan trọng và 8 vai trò đều có sơ đồ", () => {
+    for (const s of [
+      "luong-mua-hang-nhan-thanh-toan", "luong-mua-cho-va-tam-ung", "luong-linh-kho-dieu-chuyen-huy",
+      "luong-ban-hang-nha-hang", "luong-minibar-tinh-tien", "luong-kiem-ke-thang",
+      "sop-nhan-hang-mu", "sop-kiem-ke-cuoi-thang", "sop-huy-hang", "sop-thanh-toan-ncc",
+      "sop-duyet-chung-tu", "quy-tac-dung-sai-can-lai",
+      "vai-tro-chu-dau-tu", "vai-tro-quan-ly", "vai-tro-ke-toan", "vai-tro-thu-mua-thu-kho",
+      "vai-tro-nhan-hang", "vai-tro-bep-nha-hang", "vai-tro-buong-phong", "vai-tro-le-tan",
+    ]) {
+      expect(HELP_DIAGRAMS[s], s).toBeDefined();
+    }
+  });
+
+  it("đường nối: cùng hàng đi ngang; khác hàng gấp khúc; quay lại là vòng đáy", () => {
+    const a = { id: "a", lane: 0, col: 0, label: "A" };
+    const b = { id: "b", lane: 0, col: 1, label: "B" };
+    const c = { id: "c", lane: 1, col: 2, label: "C" };
+    expect(edgePath(a, b).d).toMatch(/^M [\d.]+ [\d.]+ H [\d.]+$/);
+    expect(edgePath(a, c).d).toMatch(/H [\d.]+ V [\d.]+ H [\d.]+$/);
+    expect(edgePath(c, a).d).toMatch(/V [\d.]+ H [\d.]+ V [\d.]+$/);
+  });
+});

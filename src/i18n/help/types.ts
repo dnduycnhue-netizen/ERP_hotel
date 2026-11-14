@@ -97,3 +97,61 @@ export function sop(input: {
     ],
   };
 }
+
+/** ---- Sơ đồ luồng (swimlane) hiển thị đầu bài (Q281) ---- */
+export type FlowNodeKind = "step" | "decision" | "start" | "end" | "system";
+
+export type FlowNode = {
+  id: string;
+  /** Hàng bơi (người/bộ phận làm) — chỉ số trong `lanes`. */
+  lane: number;
+  /** Cột theo thứ tự thời gian (trái → phải). */
+  col: number;
+  label: string;
+  kind?: FlowNodeKind;
+  /** Trạng thái chứng từ sau bước này (nhãn nhỏ dưới ô). */
+  status?: string;
+};
+
+export type FlowEdge = {
+  from: string;
+  to: string;
+  label?: string;
+  /** "bad" = nhánh từ chối/lỗi (nét đứt, màu đỏ). */
+  tone?: "ok" | "bad";
+};
+
+export type FlowDiagram = {
+  title: string;
+  /** Tên các hàng bơi, theo thứ tự từ trên xuống. */
+  lanes: string[];
+  nodes: FlowNode[];
+  edges: FlowEdge[];
+};
+
+/**
+ * Dựng sơ đồ gọn: nút `[id, lane, col, label, kind?, status?]`,
+ * cạnh `[from, to, label?, tone?]`.
+ */
+export function flow(
+  title: string,
+  lanes: string[],
+  nodes: Array<
+    [string, number, number, string, FlowNodeKind?, string?]
+  >,
+  edges: Array<[string, string, string?, ("ok" | "bad")?]>,
+): FlowDiagram {
+  return {
+    title,
+    lanes,
+    nodes: nodes.map(([id, lane, col, label, kind, status]) => ({
+      id,
+      lane,
+      col,
+      label,
+      kind,
+      status,
+    })),
+    edges: edges.map(([from, to, label, tone]) => ({ from, to, label, tone })),
+  };
+}
