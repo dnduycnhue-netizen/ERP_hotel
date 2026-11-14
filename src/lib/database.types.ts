@@ -2541,6 +2541,7 @@ export type Database = {
           name: string
           name_en: string | null
           name_norm: string | null
+          name_search: string | null
           org_id: string
           recipe_uom: string | null
           shelf_life_days: number | null
@@ -2571,6 +2572,7 @@ export type Database = {
           name: string
           name_en?: string | null
           name_norm?: string | null
+          name_search?: string | null
           org_id: string
           recipe_uom?: string | null
           shelf_life_days?: number | null
@@ -2601,6 +2603,7 @@ export type Database = {
           name?: string
           name_en?: string | null
           name_norm?: string | null
+          name_search?: string | null
           org_id?: string
           recipe_uom?: string | null
           shelf_life_days?: number | null
@@ -9346,6 +9349,10 @@ export type Database = {
         | { Args: never; Returns: string[] }
         | { Args: { "": string }; Returns: string[] }
       seed_compact_roles: { Args: { p_org_id: string }; Returns: number }
+      seed_standard_warehouses: {
+        Args: { p_property_id: string }
+        Returns: number
+      }
       service_accept: {
         Args: {
           p_note?: string

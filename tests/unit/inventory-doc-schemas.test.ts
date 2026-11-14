@@ -55,14 +55,28 @@ describe("saveDocDraftSchema", () => {
       propertyId: P,
       warehouseId: W1,
       purposeCode: "staff_meal",
+      costCenterId: O,
+      expenseCategoryId: W2,
       lines: [line],
     });
     expect(ok.success).toBe(true);
+    // Thiếu cost center/khoản mục: RPC ghi sổ sẽ từ chối nên form chặn sớm.
+    expect(
+      saveDocDraftSchema.safeParse({
+        kind: "purpose_issue",
+        propertyId: P,
+        warehouseId: W1,
+        purposeCode: "staff_meal",
+        lines: [line],
+      }).success,
+    ).toBe(false);
     const bad = saveDocDraftSchema.safeParse({
       kind: "purpose_issue",
       propertyId: P,
       warehouseId: W1,
       purposeCode: "gift",
+      costCenterId: O,
+      expenseCategoryId: W2,
       lines: [line],
     });
     expect(bad.success).toBe(false);
@@ -107,5 +121,14 @@ describe("docOpSchema / docLineQtySchema", () => {
         lines: [{ lineId: I, qtyStock: 1.5 }],
       }).success,
     ).toBe(true);
+  });
+});
+
+describe("searchWords (V10-N1)", () => {
+  it("tách từ, bỏ dấu kể cả đ, bỏ ký tự đặc biệt của bộ lọc", async () => {
+    const { searchWords } = await import("@/lib/text/normalize");
+    expect(searchWords("Đường  thẻ")).toEqual(["duong", "the"]);
+    expect(searchWords("ba chỉ,nách (x)")).toEqual(["ba", "chi", "nach", "x"]);
+    expect(searchWords("   ")).toEqual([]);
   });
 });

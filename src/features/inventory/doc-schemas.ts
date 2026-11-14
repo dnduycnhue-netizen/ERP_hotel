@@ -68,6 +68,9 @@ export const saveDocDraftSchema = z
     } else if (v.kind === "purpose_issue") {
       need(!!v.warehouseId, vi.inventory.doc.needWarehouse);
       need(!!v.purposeCode, vi.inventory.doc.needPurpose);
+      // RPC purpose_issue_post bắt buộc cost center + khoản mục (xuất mục đích tính vào chi phí).
+      need(!!v.costCenterId, vi.inventory.doc.needCostCenter);
+      need(!!v.expenseCategoryId, vi.inventory.doc.needExpenseCategory);
     } else if (v.kind === "transfer") {
       need(
         !!v.fromWarehouseId && !!v.toWarehouseId,

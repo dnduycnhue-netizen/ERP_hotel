@@ -48,13 +48,15 @@ export function ToggleDishButton({
 
   return (
     <span className="inline-flex flex-col items-start gap-1">
-      <InlineConfirmButton
+      <Button
+        type="button"
         variant="outline"
-        label={vi.restaurant.voidSale}
-        confirmText={vi.restaurant.saleVoidConfirm}
-        onConfirm={handleClick}
+        size="sm"
         disabled={pending}
-      />
+        onClick={handleClick}
+      >
+        {isActive ? vi.restaurant.setInactive : vi.restaurant.setActive}
+      </Button>
       {error ? <span className="text-xs text-destructive">{error}</span> : null}
     </span>
   );
@@ -354,15 +356,14 @@ export function VoidSaleButton({
 
   return (
     <span className="inline-flex flex-col items-start gap-1">
-      <Button
-        type="button"
+      <InlineConfirmButton
         variant="outline"
         size="sm"
+        label={vi.restaurant.voidSale}
+        confirmText={vi.restaurant.saleVoidConfirm}
+        onConfirm={handleClick}
         disabled={pending}
-        onClick={handleClick}
-      >
-        {vi.restaurant.voidSale}
-      </Button>
+      />
       {error ? <span className="text-xs text-destructive">{error}</span> : null}
     </span>
   );

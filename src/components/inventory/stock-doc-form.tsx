@@ -229,7 +229,7 @@ export function StockDocForm({
               </select>
             </label>
             <label className="flex flex-col gap-1 text-sm font-medium">
-              {vi.inventory.costCenter}
+              {vi.inventory.costCenter} *
               <select
                 value={costCenterId}
                 onChange={(e) => setCostCenterId(e.target.value)}
@@ -244,7 +244,7 @@ export function StockDocForm({
               </select>
             </label>
             <label className="flex flex-col gap-1 text-sm font-medium">
-              {vi.inventory.expenseCategory}
+              {vi.inventory.expenseCategory} *
               <select
                 value={expenseCategoryId}
                 onChange={(e) => setExpenseCategoryId(e.target.value)}

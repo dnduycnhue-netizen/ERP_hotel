@@ -208,7 +208,7 @@ describe("minibar schemas", () => {
     ).toBe(false);
   });
 
-  it("minibarSubmitCheckSchema: bắt buộc ít nhất 1 dòng thiếu", () => {
+  it("minibarSubmitCheckSchema: cho phép 0 dòng (phòng không dùng món nào, B-39)", () => {
     expect(
       minibarSubmitCheckSchema.safeParse({
         propertyId: UUID_A,
@@ -216,7 +216,7 @@ describe("minibar schemas", () => {
         lines: [],
         clientUuid: UUID_C,
       }).success,
-    ).toBe(false);
+    ).toBe(true);
     expect(
       minibarSubmitCheckSchema.safeParse({
         propertyId: UUID_A,

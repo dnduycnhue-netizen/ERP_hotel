@@ -28,9 +28,8 @@ export type MinibarRequestCheckInput = z.infer<
 export const minibarSubmitCheckSchema = z.object({
   propertyId: uuidSchema,
   checkId: uuidSchema,
-  lines: z
-    .array(minibarSubmitLineSchema)
-    .min(1, vi.minibar.needAtLeastOneMissingToSubmit),
+  // Cho phép 0 dòng: phòng không dùng món nào (UI bắt buộc tick xác nhận, B-39).
+  lines: z.array(minibarSubmitLineSchema),
   clientUuid: uuidSchema,
 });
 export type MinibarSubmitCheckInput = z.infer<typeof minibarSubmitCheckSchema>;

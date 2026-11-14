@@ -93,6 +93,8 @@ export const rpcErrorMessages: Record<string, string> = {
   ERR_INVALID_VALUE:
     "Dữ liệu không hợp lệ. Hãy kiểm tra lại các trường đã nhập.",
   ERR_DUPLICATE_CODE: "Mã đã tồn tại. Hãy chọn mã khác.",
+  ERR_TRANSIT_WAREHOUSE_MISSING:
+    "Khách sạn chưa có kho trung chuyển nên chưa xuất/chuyển hàng được. Hãy liên hệ quản trị để bổ sung kho chuẩn.",
   ERR_INSUFFICIENT_STOCK:
     "Tồn kho minibar tổng không đủ để bổ sung. Hãy kiểm tra tồn kho tổng trước.",
   ERR_SUPPLIER_HAS_BANK_ACCOUNTS:

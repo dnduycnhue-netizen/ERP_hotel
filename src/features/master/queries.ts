@@ -1,3 +1,4 @@
+import { searchWords } from "@/lib/text/normalize";
 import "server-only";
 
 import { createClient } from "@/lib/supabase/server";
@@ -80,9 +81,9 @@ export async function listItems({
     )
     .eq("org_id", orgId);
 
-  if (search && search.trim()) {
-    const term = `%${search.trim()}%`;
-    query = query.or(`name.ilike.${term},code.ilike.${term}`);
+  // Tìm không dấu, từng từ (AND) trên cột name_search (Q273, V10-N1).
+  for (const word of searchWords(search ?? "")) {
+    query = query.ilike("name_search", `%${word}%`);
   }
 
   if (groupId) {

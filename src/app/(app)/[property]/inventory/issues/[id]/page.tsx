@@ -27,7 +27,7 @@ export default async function PurposeIssueDetailPage({
   function purposeLabel(code: string): string {
     return (
       vi.inventory.purposeCodes[
-        code as keyof typeof vi.inventory.purposeCodes
+        code.replace(/_([a-z])/g, (_, c: string) => c.toUpperCase()) as keyof typeof vi.inventory.purposeCodes
       ] ?? code
     );
   }

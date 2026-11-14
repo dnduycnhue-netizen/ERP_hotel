@@ -11,10 +11,12 @@ import { vi } from "@/i18n/vi";
 export function ExportButton({ href }: { href: string }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [done, setDone] = useState<string | null>(null);
 
   async function handleClick() {
     setBusy(true);
     setError(null);
+    setDone(null);
     try {
       const res = await fetch(href, { credentials: "same-origin" });
       if (!res.ok) {
@@ -39,6 +41,7 @@ export function ExportButton({ href }: { href: string }) {
       a.click();
       a.remove();
       URL.revokeObjectURL(url);
+      setDone(vi.reports.exported.replace("{name}", a.download));
     } catch {
       setError(vi.reports.exportFailed);
     } finally {
@@ -57,6 +60,11 @@ export function ExportButton({ href }: { href: string }) {
       >
         {busy ? vi.reports.exporting : vi.reports.exportExcel}
       </Button>
+      {done ? (
+        <p role="status" className="text-xs text-emerald-700">
+          {done}
+        </p>
+      ) : null}
       {error ? (
         <p role="alert" className="text-xs text-destructive">
           {error}
