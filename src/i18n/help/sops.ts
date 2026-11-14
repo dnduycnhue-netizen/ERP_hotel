@@ -127,7 +127,7 @@ export const SOP_ARTICLES: HelpArticle[] = [
       { who: "Kế toán", text: "**Khớp 3 chiều**. Khớp thì chuyển duyệt; lệch thì hóa đơn **Tạm giữ**: kiểm số đã nhận/đơn giá, trao đổi NCC, sửa hoặc đối chiếu lại." },
       { who: "Quản lý", text: "**Duyệt hóa đơn** (không phải người nhập hóa đơn). Hóa đơn đã duyệt mới ghi công nợ." },
       { who: "Kế toán", text: "**Tạo đề nghị mới**: chọn hóa đơn và tài khoản NCC.", href: "/finance/payment-requests" },
-      { who: "Người duyệt thanh toán", text: "**Duyệt** đề nghị (không phải người lập). NCC vừa đổi tài khoản ngân hàng trong 30 ngày cần thêm duyệt Chủ đầu tư." },
+      { who: "Người duyệt thanh toán", text: "**Duyệt** đề nghị (không phải người lập). Người vừa đổi tài khoản ngân hàng của NCC trong 30 ngày (hoặc là người lập hóa đơn trong đề nghị) không được tự duyệt — hệ thống chặn tách biệt nhiệm vụ." },
       { who: "Kế toán", text: "Chuyển tiền qua ngân hàng, rồi bấm **Đã thanh toán**, nhập **tham chiếu ngân hàng**." },
       { who: "Kế toán", text: "Kiểm **Công nợ** về đúng số còn phải trả.", href: "/finance/payables" },
     ],

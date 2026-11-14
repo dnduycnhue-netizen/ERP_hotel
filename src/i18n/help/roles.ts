@@ -102,7 +102,7 @@ export const ROLE_ARTICLES: HelpArticle[] = [
         "**Không chọn được đơn mua:** chọn nhà cung cấp trước; đơn chỉ hiện khi đã gửi nhà cung cấp.",
         "**Hóa đơn Tạm giữ:** số lượng hóa đơn lớn hơn số đã nhận ghi sổ, hoặc đơn giá lệch quá 1% so với đơn mua.",
         "**Không bấm được Đã thanh toán:** đề nghị chưa được duyệt.",
-        "**Đổi tài khoản ngân hàng NCC trong 30 ngày gần nhất:** mọi đề nghị thanh toán cho NCC đó cần thêm duyệt của Chủ đầu tư.",
+        "**Đổi tài khoản ngân hàng NCC trong 30 ngày gần nhất:** người vừa đổi tài khoản đó (hoặc là người lập hóa đơn trong đề nghị) **không được tự duyệt** đề nghị thanh toán đó — hệ thống chặn tách biệt nhiệm vụ.",
       ]},
     ],
   },

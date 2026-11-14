@@ -108,7 +108,7 @@ export const RULE_ARTICLES: HelpArticle[] = [
       "Phần **hỏng** nhập riêng: không vào kho, thành phiếu trả nhà cung cấp; dung sai tính trên phần tốt.",
       "QC **Không đạt** cả dòng: không nhập kho, tự lập phiếu trả. QC **Chờ quyết định**: vào kho cách ly chờ xử lý trong 24 giờ.",
     ],
-    config: ["Dung sai nhận hàng (mặc định 5%) ở Quản trị → Cài đặt, có thể theo nhóm hàng."],
+    config: ["Dung sai nhận hàng (mặc định 5%) ở Quản trị → Cài đặt, một mức chung cho khách sạn (không theo nhóm hàng; mức theo nhóm chỉ áp dụng cho ngưỡng đếm lại khi kiểm kê)."],
   }),
   rule({
     slug: "quy-tac-anh-bang-chung",
