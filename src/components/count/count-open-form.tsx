@@ -19,12 +19,16 @@ import { PageHeader } from "@/components/shell/page-header";
 export function CountOpenForm({
   propertyId,
   warehouses,
-  afterOpenHref,
+  afterOpenBase,
 }: {
   propertyId: string;
   warehouses: WarehouseRow[];
-  /** Đường dẫn sau khi mở xong, nhận countId (vd. `/m/${p}/count/${id}`). */
-  afterOpenHref: (countId: string) => string;
+  /**
+   * Đường dẫn gốc sau khi mở xong; form nối thêm `/<countId>`.
+   * Phải là chuỗi (không phải hàm): server component không truyền được hàm
+   * xuống client component.
+   */
+  afterOpenBase: string;
 }) {
   const router = useRouter();
   // Ngày nghiệp vụ theo Asia/Ho_Chi_Minh (AGENTS.md §3.8) — không dùng
@@ -108,7 +112,7 @@ export function CountOpenForm({
       setError(res.error);
       return;
     }
-    router.push(afterOpenHref(res.data.id));
+    router.push(`${afterOpenBase}/${res.data.id}`);
   }
 
   return (

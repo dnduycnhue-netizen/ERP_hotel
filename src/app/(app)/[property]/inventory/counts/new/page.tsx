@@ -18,7 +18,7 @@ export default async function CountNewPage({
     <CountOpenForm
       propertyId={propertyId}
       warehouses={warehouses}
-      afterOpenHref={(countId) => `/${propertyId}/inventory/counts/${countId}`}
+      afterOpenBase={`/${propertyId}/inventory/counts`}
     />
   );
 }

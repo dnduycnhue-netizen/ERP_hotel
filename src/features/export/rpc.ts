@@ -2,7 +2,7 @@ import "server-only";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/lib/database.types";
-import type { ExportPayload } from "./workbook";
+import { normalizeExportPayload, type ExportPayload } from "./workbook";
 
 type RpcClient = SupabaseClient<Database>;
 
@@ -58,8 +58,9 @@ export async function callExportRpc(
       message: error.message,
     };
   }
-  return { ok: true, data: data as ExportPayload };
+  return { ok: true, data: normalizeExportPayload(data) };
 }
+
 
 /**
  * Goi RPC tra jsonb bat ky (C3: `export_po_data`, `export_bank_transfer`,

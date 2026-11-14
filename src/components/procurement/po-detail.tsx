@@ -76,7 +76,11 @@ export function PoDetail({
 
   const overCeilingLines = lines.filter((line) => line.over_ceiling);
   const manualLines = lines.filter((line) => line.price_source === "manual");
-  const manualPriceMissing = manualLines.some((line) => !(line.unit_price > 0));
+  // PO chợ mua theo giá thực tế lúc đi chợ: server miễn kiểm giá (T-022A),
+  // nên UI cũng không chặn dòng giá 0 ở kênh chợ.
+  const manualPriceMissing =
+    po.channel !== "market" &&
+    manualLines.some((line) => !(line.unit_price > 0));
   const overCeilingBlocked =
     overCeilingLines.length > 0 &&
     (!po.over_ceiling_reason || !po.over_ceiling_reason.trim());
@@ -243,9 +247,11 @@ export function PoDetail({
                 onClick={handleSubmit}
                 disabled={busy || submitBlocked}
                 title={
-                  submitBlocked
+                  overCeilingBlocked
                     ? vi.procurement.detail.overCeilingReasonMissing
-                    : undefined
+                    : manualPriceMissing
+                      ? vi.procurement.detail.priceNotSetWarning
+                      : undefined
                 }
               >
                 {vi.procurement.po.submit}

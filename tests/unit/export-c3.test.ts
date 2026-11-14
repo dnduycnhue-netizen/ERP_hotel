@@ -204,3 +204,39 @@ describe("isPoPdfData", () => {
     expect(isPoPdfData(null)).toBe(false);
   });
 });
+
+describe("normalizeExportPayload (B-5)", () => {
+  it("gói entity/from/to/exported_* của RPC vào meta; không văng lỗi khi rows rỗng", async () => {
+    const { normalizeExportPayload, buildExportWorkbook } = await import(
+      "@/features/export/workbook"
+    );
+    const { getExportDefinition } = await import(
+      "@/features/export/definitions"
+    );
+    const payload = normalizeExportPayload({
+      ok: true,
+      entity: { id: "e1", code: "TEST47-LE", name: "Pháp nhân test" },
+      from: "2026-11-01",
+      to: "2026-11-14",
+      exported_at: "2026-11-14T02:04:41+00:00",
+      exported_by: "u1",
+      rows: [],
+      totals: { count: 0, amount: 0 },
+    });
+    expect(payload.meta.entity_code).toBe("TEST47-LE");
+    expect(payload.meta.from).toBe("2026-11-01");
+    for (const kind of [
+      "goods-receipts",
+      "stock-issues",
+      "invoices",
+      "payables",
+      "advances",
+    ]) {
+      const def = getExportDefinition(kind);
+      expect(def).toBeDefined();
+      if (def) {
+        expect(() => buildExportWorkbook(def, payload)).not.toThrow();
+      }
+    }
+  });
+});

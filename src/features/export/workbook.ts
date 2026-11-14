@@ -29,6 +29,35 @@ export interface ExportPayload {
   };
 }
 
+/**
+ * RPC `export_*` trả `entity`/`from`/`to`/`exported_*` ở cấp ngoài cùng,
+ * còn workbook cần gói trong `meta` (lỗi B-5 đêm 13–14/11: thiếu `meta` →
+ * TypeError → HTTP 500 cho mọi khoảng ngày đã qua kiểm tra khóa sổ).
+ * Chấp nhận cả hai dạng.
+ */
+export function normalizeExportPayload(raw: unknown): ExportPayload {
+  const d = (raw ?? {}) as Record<string, unknown>;
+  const entity = (d.entity ?? {}) as Record<string, unknown>;
+  const meta = (d.meta ?? {}) as Record<string, unknown>;
+  const pick = (a: unknown, b: unknown): string =>
+    typeof a === "string" ? a : typeof b === "string" ? b : "";
+  return {
+    ok: d.ok === true,
+    rows: Array.isArray(d.rows)
+      ? (d.rows as Array<Record<string, unknown>>)
+      : [],
+    totals: (d.totals ?? {}) as Record<string, unknown>,
+    meta: {
+      entity_code: pick(meta.entity_code, entity.code),
+      entity_name: pick(meta.entity_name, entity.name),
+      from: pick(meta.from, d.from),
+      to: pick(meta.to, d.to),
+      exported_by: pick(meta.exported_by, d.exported_by),
+      exported_at: pick(meta.exported_at, d.exported_at),
+    },
+  };
+}
+
 const MONEY_FORMAT = "#,##0.00";
 const QTY_FORMAT = "#,##0.0000";
 const INT_FORMAT = "#,##0";

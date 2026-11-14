@@ -18,7 +18,7 @@ export default async function MobileCountNewPage({
     <CountOpenForm
       propertyId={propertyId}
       warehouses={warehouses}
-      afterOpenHref={(countId) => `/m/${propertyId}/count/${countId}`}
+      afterOpenBase={`/m/${propertyId}/count`}
     />
   );
 }
