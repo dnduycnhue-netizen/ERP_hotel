@@ -6,7 +6,7 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 export function FitToWidth({
   width,
   height,
-  minScale = 0.62,
+  minScale = 0.8,
   children,
 }: {
   width: number;

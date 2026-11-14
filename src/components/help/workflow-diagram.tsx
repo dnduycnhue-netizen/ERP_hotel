@@ -5,9 +5,9 @@ import type { FlowDiagram, FlowNode } from "@/i18n/help/types";
 import { cn } from "@/lib/utils";
 
 /** Kích thước ô lưới (px). */
-const CW = 168; // chiều rộng cột
-const NW = 144; // chiều rộng ô
-const NH = 68; // chiều cao ô
+const CW = 150; // chiều rộng cột
+const NW = 134; // chiều rộng ô
+const NH = 70; // chiều cao ô
 const LH = 116; // chiều cao hàng bơi
 const LABEL_W = 116; // cột tên hàng bơi
 
@@ -74,7 +74,7 @@ function NodeBox({ n, lanes }: { n: FlowNode; lanes: string[] }) {
     >
       <div
         className={cn(
-          "flex h-full w-full flex-col items-center justify-center gap-0.5 px-2 py-1 text-center text-[11px] leading-tight shadow-sm",
+          "flex h-full w-full flex-col items-center justify-center gap-0.5 px-2 py-1 text-center text-xs leading-tight shadow-sm",
           kind === "step" && cn("rounded-lg border border-l-4 bg-card", style.bar),
           kind === "system" &&
             "rounded-lg border border-dashed bg-muted/40 text-muted-foreground",
@@ -91,7 +91,7 @@ function NodeBox({ n, lanes }: { n: FlowNode; lanes: string[] }) {
             ◇
           </span>
         ) : null}
-        <span className="line-clamp-3">{n.label}</span>
+        <span className="line-clamp-4">{n.label}</span>
         {n.status ? (
           <span className="rounded-full bg-primary/10 px-1.5 py-px text-[10px] font-semibold text-primary">
             {n.status}

@@ -201,20 +201,17 @@ const MINIBAR = flow(
   ],
 );
 
-// ───────────── Kiểm kê tháng ─────────────
-const KIEM_KE = flow(
-  "Kiểm kê tháng",
-  ["Thủ kho", "Người đếm", "Quản lý", "Hệ thống"],
+// ───────────── Kiểm kê tháng (chia 2 phần cho dễ đọc) ─────────────
+const KIEM_KE_1 = flow(
+  "Phần 1 — Mở đợt và đếm mù",
+  ["Thủ kho", "Người đếm", "Hệ thống"],
   [
     ["k1", 0, 0, "Mở đợt: ≥ 2 người đếm, có người độc lập", "start"],
-    ["k2", 3, 1, "Kho đóng băng nhập/xuất", "system"],
+    ["k2", 2, 1, "Kho đóng băng nhập/xuất", "system"],
     ["k3", 1, 2, "Đếm mù trên điện thoại", "step"],
-    ["k4", 3, 3, "Lệch quá ngưỡng?", "decision"],
+    ["k4", 2, 3, "Lệch quá ngưỡng?", "decision"],
     ["k5", 1, 4, "Đếm lại một lần", "step"],
-    ["k6", 1, 5, "Nộp đợt: mỗi người nhập PIN của mình", "step"],
-    ["k7", 2, 6, "Duyệt điều chỉnh?", "decision"],
-    ["k8", 3, 7, "Bút toán điều chỉnh theo giá bình quân", "system", "Tồn khớp"],
-    ["k9", 0, 8, "Khóa đợt — kho hết đóng băng", "end"],
+    ["k6", 1, 5, "Nộp đợt: mỗi người nhập PIN của mình", "end", "Chờ duyệt"],
   ],
   [
     ["k1", "k2"],
@@ -223,13 +220,25 @@ const KIEM_KE = flow(
     ["k4", "k5", "Có"],
     ["k4", "k6", "Không"],
     ["k5", "k6"],
-    ["k6", "k7"],
-    ["k7", "k8", "Duyệt"],
-    ["k7", "k3", "Cần đếm lại", "bad"],
-    ["k8", "k9"],
   ],
 );
 
+const KIEM_KE_2 = flow(
+  "Phần 2 — Duyệt chênh lệch, điều chỉnh và khóa",
+  ["Người đếm", "Quản lý", "Hệ thống", "Thủ kho / người khóa"],
+  [
+    ["q1", 0, 0, "Đợt đã nộp", "start"],
+    ["q2", 1, 1, "Xem chênh lệch, lý do — duyệt điều chỉnh?", "decision"],
+    ["q3", 2, 2, "Bút toán điều chỉnh theo giá bình quân", "system", "Tồn khớp"],
+    ["q4", 3, 3, "Khóa đợt — kho hết đóng băng", "end"],
+  ],
+  [
+    ["q1", "q2"],
+    ["q2", "q3", "Duyệt"],
+    ["q2", "q1", "Cần đếm lại", "bad"],
+    ["q3", "q4"],
+  ],
+);
 // ───────────── Duyệt chứng từ ─────────────
 const DUYET = flow(
   "Duyệt chứng từ nhiều bước",
@@ -338,10 +347,10 @@ export const HELP_DIAGRAMS: Record<string, FlowDiagram[]> = {
   "luong-linh-kho-dieu-chuyen-huy": [LINH, HUY],
   "luong-ban-hang-nha-hang": [BAN_HANG],
   "luong-minibar-tinh-tien": [MINIBAR],
-  "luong-kiem-ke-thang": [KIEM_KE],
+  "luong-kiem-ke-thang": [KIEM_KE_1, KIEM_KE_2],
   // SOP
   "sop-nhan-hang-mu": [NHAN],
-  "sop-kiem-ke-cuoi-thang": [KIEM_KE],
+  "sop-kiem-ke-cuoi-thang": [KIEM_KE_1, KIEM_KE_2],
   "sop-huy-hang": [HUY],
   "sop-thanh-toan-ncc": [THANH_TOAN],
   "sop-kiem-minibar-tra-phong": [MINIBAR],
@@ -357,7 +366,7 @@ export const HELP_DIAGRAMS: Record<string, FlowDiagram[]> = {
   "phan-he-nhan-hang": [NHAN],
   "phan-he-kho": [LINH, HUY],
   "phan-he-tai-chinh": [THANH_TOAN],
-  "phan-he-kiem-ke": [KIEM_KE],
+  "phan-he-kiem-ke": [KIEM_KE_1, KIEM_KE_2],
   "phan-he-nha-hang": [BAN_HANG],
   "phan-he-buong-phong-minibar": [MINIBAR],
   // vai trò: vòng việc hằng ngày
