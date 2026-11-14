@@ -88,6 +88,8 @@ export function MobileReceiveWorkspace({
   const [queuedPost, setQueuedPost] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [pinOpen, setPinOpen] = useState(false);
+  const [noPhotoPost, setNoPhotoPost] = useState(false);
+  const [noPhotoPostReason, setNoPhotoPostReason] = useState("");
   const [pinError, setPinError] = useState<string | null>(null);
   const [posting, setPosting] = useState(false);
 
@@ -203,6 +205,12 @@ export function MobileReceiveWorkspace({
       ?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
+  // Chỉ gửi lý do khi người dùng tích xác nhận "không có camera" lúc ghi sổ (Q278).
+  const postWaivedReason =
+    noPhotoPost && noPhotoPostReason.trim() !== ""
+      ? noPhotoPostReason.trim()
+      : null;
+
   async function handlePinSubmit(pin: string) {
     // Offline (T-025): xep hang ghi so — PIN luu trong job tren may cho
     // toi khi dong bo xong (xoa ngay sau khi gui); xem Q23.
@@ -218,7 +226,11 @@ export function MobileReceiveWorkspace({
           clientUuid: null,
           payload: {
             kind: "post",
-            input: { grId: receipt.id, pin },
+            input: {
+              grId: receipt.id,
+              pin,
+              photoWaivedReason: postWaivedReason,
+            },
           },
           createdAt: Date.now(),
         });
@@ -234,7 +246,11 @@ export function MobileReceiveWorkspace({
     }
     setPosting(true);
     setPinError(null);
-    const res = await postReceivingAction({ grId: receipt.id, pin });
+    const res = await postReceivingAction({
+      grId: receipt.id,
+      pin,
+      photoWaivedReason: postWaivedReason,
+    });
     setPosting(false);
     if (!res.ok) {
       setPinError(res.error);
@@ -425,6 +441,29 @@ export function MobileReceiveWorkspace({
             {vi.offline.queuedPost}
           </p>
         ) : null}
+        <div className="flex flex-col gap-2 rounded-md border border-dashed p-3">
+          <label className="flex min-h-11 items-center gap-3 text-sm">
+            <input
+              type="checkbox"
+              checked={noPhotoPost}
+              onChange={(e) => setNoPhotoPost(e.target.checked)}
+              disabled={posting || queuedPost}
+              className="size-5 accent-primary"
+            />
+            {vi.receiving.noCameraPostConfirm}
+          </label>
+          {noPhotoPost ? (
+            <input
+              value={noPhotoPostReason}
+              onChange={(e) => setNoPhotoPostReason(e.target.value)}
+              disabled={posting || queuedPost}
+              maxLength={300}
+              placeholder={vi.receiving.noCameraReasonPlaceholder}
+              aria-label={vi.receiving.noCameraReasonPlaceholder}
+              className="h-11 w-full rounded-md border bg-background px-3 text-base"
+            />
+          ) : null}
+        </div>
         <Button
           size="lg"
           className="h-14 w-full text-base"

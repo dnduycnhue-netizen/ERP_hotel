@@ -1867,6 +1867,8 @@ export const vi = {
     rejectedQtyInvalid: "Số hỏng phải lớn hơn 0 và nhỏ hơn số thực nhận. Hỏng cả dòng thì chọn QC \"Không đạt\".",
     rejectReasonPlaceholder: "Lý do hỏng (ví dụ: dập nát, hết hạn)",
     rejectedQtyHint: "Phần hỏng không nhập kho; hệ thống tự lập phiếu trả hàng NCC cho phần hỏng.",
+    noCameraPostConfirm:
+      "Phiếu này không có ảnh vì thiết bị không có camera — xác nhận khi ghi sổ (chỉ dùng khi phiếu chưa có ảnh nào)",
     newReturnButton: "Lập phiếu trả hàng NCC",
     noCameraConfirm:
       "Thiết bị không có camera / không chụp được ảnh — xác nhận nhận hàng không kèm ảnh",

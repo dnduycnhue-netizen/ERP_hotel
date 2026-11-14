@@ -68,8 +68,8 @@ export function CountSubmitDialog({
   return (
     <Dialog.Root open={open} onOpenChange={close}>
       <Dialog.Portal>
-        <Dialog.Backdrop className="fixed inset-0 bg-black/50" />
-        <Dialog.Popup className="fixed top-1/2 left-1/2 w-[calc(100vw-2rem)] max-w-md -translate-x-1/2 -translate-y-1/2 rounded-lg border bg-card p-6 shadow-lg">
+        <Dialog.Backdrop className="fixed inset-0 z-[60] bg-black/50" />
+        <Dialog.Popup className="fixed z-[61] top-1/2 left-1/2 w-[calc(100vw-2rem)] max-w-md -translate-x-1/2 -translate-y-1/2 rounded-lg border bg-card p-6 shadow-lg">
           <Dialog.Title className="text-lg font-semibold">
             {vi.count.submitTitle}
           </Dialog.Title>

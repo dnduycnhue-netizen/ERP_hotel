@@ -12,7 +12,7 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 set local search_path = public, extensions;
-select plan(91);
+select plan(92);
 
 -- 0. Fixture
 insert into public.organizations (id, name) values
@@ -994,6 +994,14 @@ select throws_ok(
   )$q$,
   'P0001', 'ERR_PHOTO_REQUIRED',
   'receipt without any photo cannot post'
+);
+-- Q278: ly do xac nhan khong anh tren post phai khong rong.
+select throws_ok(
+  $q$select public.receiving_post(
+    (select id from t023_ctx where key = 'gr_empty'), '1234', '   '
+  )$q$,
+  'P0001', 'ERR_PHOTO_REQUIRED',
+  'blank photo-waiver reason at post does not bypass the photo rule (Q278)'
 );
 
 -- Post thanh cong phieu gr1 (3 dong: GAO 9.6, THIT 4.7, MUOI 22 override).

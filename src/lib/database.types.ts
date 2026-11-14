@@ -4838,9 +4838,9 @@ export type Database = {
           created_by: string | null
           gr_id: string
           id: string
-          item_id: string
+          item_id: string | null
           org_id: string
-          po_line_id: string
+          po_line_id: string | null
           property_id: string
           reason: string
         }
@@ -4849,9 +4849,9 @@ export type Database = {
           created_by?: string | null
           gr_id: string
           id?: string
-          item_id: string
+          item_id?: string | null
           org_id: string
-          po_line_id: string
+          po_line_id?: string | null
           property_id: string
           reason: string
         }
@@ -4860,9 +4860,9 @@ export type Database = {
           created_by?: string | null
           gr_id?: string
           id?: string
-          item_id?: string
+          item_id?: string | null
           org_id?: string
-          po_line_id?: string
+          po_line_id?: string | null
           property_id?: string
           reason?: string
         }
@@ -9268,7 +9268,7 @@ export type Database = {
         Returns: Json
       }
       receiving_post: {
-        Args: { p_gr_id: string; p_pin: string }
+        Args: { p_gr_id: string; p_photo_waived_reason?: string; p_pin: string }
         Returns: Json
       }
       receiving_record_line: {

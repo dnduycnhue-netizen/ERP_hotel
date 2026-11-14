@@ -173,7 +173,7 @@ export function MobileLineForm({
 
   // Chỉ gửi lý do miễn ảnh khi thực sự không có ảnh nào.
   const waivedReason =
-    line.photo_required && photos.length === 0 && noCamera
+    photos.length === 0 && noCamera
       ? noCameraReason.trim() || null
       : null;
 
@@ -645,7 +645,7 @@ export function MobileLineForm({
           onCaptured={(photo) => void handleCaptured(photo)}
           disabled={submitting || uploading}
         />
-        {line.photo_required && photos.length === 0 ? (
+        {photos.length === 0 ? (
           <div className="flex flex-col gap-2 rounded-md border border-dashed p-3">
             <label className="flex min-h-11 items-center gap-3 text-sm">
               <input

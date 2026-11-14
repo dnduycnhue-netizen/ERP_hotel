@@ -152,6 +152,7 @@ export async function postReceivingAction(
   return callReceivingRpc<ReceivingPostResult>(supabase, "receiving_post", {
     p_gr_id: parsed.data.grId,
     p_pin: parsed.data.pin,
+    p_photo_waived_reason: parsed.data.photoWaivedReason ?? null,
   });
 }
 

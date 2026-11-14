@@ -64,6 +64,8 @@ export const receivingOverrideLineSchema = z.object({
 export const receivingPostSchema = z.object({
   grId: uuidSchema,
   pin: pinSchema,
+  /** Phiếu không có ảnh nào: xác nhận không có camera + lý do khi ghi sổ (Q278). */
+  photoWaivedReason: z.string().trim().max(300).optional().nullable(),
 });
 
 /** 1 dong tra hang da nhan ve NCC (RPC `supplier_return_post`, T-023). */
