@@ -3,7 +3,11 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { listCountersAction, openCountAction } from "@/features/count/actions";
+import {
+  listCountersAction,
+  listIndependentCountersAction,
+  openCountAction,
+} from "@/features/count/actions";
 import type { CountCounter } from "@/features/count/queries";
 import type { WarehouseRow } from "@/features/master/queries";
 import { vi } from "@/i18n/vi";
@@ -45,6 +49,7 @@ export function CountOpenForm({
   const [counters, setCounters] = useState<CountCounter[]>([]);
   const [countersLoading, setCountersLoading] = useState(true);
   const [countersError, setCountersError] = useState<string | null>(null);
+  const [independentIds, setIndependentIds] = useState<string[]>([]);
   const [selected, setSelected] = useState<string[]>([]);
   const [opening, setOpening] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -56,7 +61,10 @@ export function CountOpenForm({
       return;
     }
     let cancelled = false;
-    void listCountersAction({ propertyId, warehouseId }).then((res) => {
+    void Promise.all([
+      listCountersAction({ propertyId, warehouseId }),
+      listIndependentCountersAction({ propertyId, warehouseId }),
+    ]).then(([res, indep]) => {
       if (cancelled) {
         return;
       }
@@ -64,9 +72,11 @@ export function CountOpenForm({
       if (!res.ok) {
         setCountersError(res.error);
         setCounters([]);
+        setIndependentIds([]);
         return;
       }
       setCounters(res.data);
+      setIndependentIds(indep.ok ? indep.data : []);
     });
     return () => {
       cancelled = true;
@@ -86,6 +96,8 @@ export function CountOpenForm({
     warehouseId !== "" &&
     businessDate !== "" &&
     selected.length >= (needsTwo ? 2 : 1) &&
+    // Đợt tháng cần ≥ 1 người đếm độc lập (không ghi sổ nhận hàng/xuất kho tại kho này).
+    (!needsTwo || selected.some((id) => independentIds.includes(id))) &&
     !countersLoading;
 
   function toggleCounter(id: string): void {
@@ -194,6 +206,9 @@ export function CountOpenForm({
                       {c.full_name}
                       <span className="block text-xs font-normal text-muted-foreground">
                         {c.employee_code}
+                        {independentIds.includes(c.id)
+                          ? ` · ${vi.count.independentBadge}`
+                          : ""}
                       </span>
                     </span>
                   </label>
@@ -204,6 +219,18 @@ export function CountOpenForm({
         )}
         {needsTwo && selected.length > 0 && selected.length < 2 ? (
           <p className="text-sm text-destructive">{vi.count.minCounters}</p>
+        ) : null}
+        {needsTwo ? (
+          <p
+            className={
+              selected.length > 0 &&
+              !selected.some((id) => independentIds.includes(id))
+                ? "text-sm text-destructive"
+                : "text-xs text-muted-foreground"
+            }
+          >
+            {vi.count.independentHint}
+          </p>
         ) : null}
       </div>
 

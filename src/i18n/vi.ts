@@ -2235,6 +2235,9 @@ export const vi = {
     selectCounters: "Chọn người đếm",
     countersHint:
       "Kiểm kê tháng cần ít nhất 2 người đếm độc lập (người nhận hàng/xuất kho của kho này không được đếm).",
+    independentBadge: "Người đếm độc lập",
+    independentHint:
+      "Đợt kiểm kê tháng cần ít nhất một người đếm độc lập — người không có quyền ghi sổ nhận hàng hoặc xuất kho tại kho này (có nhãn \"Người đếm độc lập\").",
     minCounters: "Kiểm kê tháng cần ít nhất 2 người đếm.",
     noCounters: "Không có người nào được đếm tại kho này.",
     loadCountersError: "Không tải được danh sách người đếm.",

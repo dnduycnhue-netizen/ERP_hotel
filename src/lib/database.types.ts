@@ -8742,6 +8742,10 @@ export type Database = {
         Args: { p_count_id: string; p_reason: string }
         Returns: Json
       }
+      count_independent_counter_ids: {
+        Args: { p_property_id: string; p_warehouse_id: string }
+        Returns: string[]
+      }
       count_list_counters: {
         Args: { p_property_id: string; p_warehouse_id: string }
         Returns: {

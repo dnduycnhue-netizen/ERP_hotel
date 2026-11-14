@@ -113,6 +113,18 @@ export type CountCounter = {
   full_name: string;
 };
 
+/** Id người đếm "độc lập" tại kho (RPC `count_independent_counter_ids`, Q275). */
+export async function listIndependentCounterIds(
+  propertyId: string,
+  warehouseId: string,
+): Promise<CountActionResult<string[]>> {
+  const supabase = await createClient();
+  return callCountRpc<string[]>(supabase, "count_independent_counter_ids", {
+    p_property_id: propertyId,
+    p_warehouse_id: warehouseId,
+  });
+}
+
 /** Chi tiết vật tư phục vụ form ghi dòng đếm (đơn vị mua + cân chai). */
 export type CountItemDetail = {
   id: string;

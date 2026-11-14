@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { callCountRpc, type CountActionResult } from "./rpc";
 import {
   listCounters,
+  listIndependentCounterIds,
   type CountCounter,
   type CountRow,
   type CountSheetRow,
@@ -198,6 +199,17 @@ export async function listCountersAction(
     return validationError(parsed.error.issues);
   }
   return listCounters(parsed.data.propertyId, parsed.data.warehouseId);
+}
+
+/** Id người đếm độc lập tại kho (SoD đếm độc lập, Q275). */
+export async function listIndependentCountersAction(
+  input: CountListCountersInput,
+): Promise<CountActionResult<string[]>> {
+  const parsed = countListCountersSchema.safeParse(input);
+  if (!parsed.success) {
+    return validationError(parsed.error.issues);
+  }
+  return listIndependentCounterIds(parsed.data.propertyId, parsed.data.warehouseId);
 }
 
 export type {

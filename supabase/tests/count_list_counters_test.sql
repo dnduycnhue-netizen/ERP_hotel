@@ -2,7 +2,7 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 set local search_path = public, extensions;
-select plan(8);
+select plan(10);
 
 insert into public.organizations (id, name) values
   ('d0330000-0000-4000-8000-000000000001', 'T-033 Master Org');
@@ -161,6 +161,27 @@ select is(
   )),
   1::bigint,
   'nguoi dem vo hieu khong duoc liet ke'
+);
+
+-- Q275: count_independent_counter_ids — nguoi dem khong co receiving.post/requisition.issue.
+select public._t033_as('d0330000-0000-4000-8000-000000000a01');
+select is(
+  public.count_independent_counter_ids(
+    'd0330000-0000-4000-8000-000000000201',
+    'd0330000-0000-4000-8000-000000000301'
+  ),
+  array['d0330000-0000-4000-8000-000000000a01'::uuid],
+  'chi con thu kho (a02 da vo hieu) la nguoi dem doc lap vi fixture khong gan receiving.post'
+);
+select public._t033_as('d0330000-0000-4000-8000-000000000a05');
+select throws_ok(
+  $q$select public.count_independent_counter_ids(
+    'd0330000-0000-4000-8000-000000000201',
+    'd0330000-0000-4000-8000-000000000301'
+  )$q$,
+  '42501',
+  'ERR_FORBIDDEN:count.open',
+  'nguoi khong co count.open khong goi duoc count_independent_counter_ids'
 );
 
 select * from finish();
