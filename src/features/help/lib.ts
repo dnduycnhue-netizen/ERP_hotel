@@ -85,7 +85,10 @@ export const HELP_SECTION_SLUGS: Record<HelpSection, string[]> = {
   minibar: ["phan-he-buong-phong-minibar", "luong-minibar-tinh-tien", "sop-kiem-minibar-tra-phong", "quy-tac-minibar-doi-soat"],
   trolley: ["sop-ca-xe-day", "vai-tro-buong-phong", "phan-he-buong-phong-minibar"],
   reports: ["phan-he-bao-cao-canh-bao", "quy-tac-khoa-so-ngay-nghiep-vu"],
-  master: ["phan-he-danh-muc", "quy-tac-gia-tran-gia-tay", "quy-tac-phan-quyen-theo-quyen"],
+  // H2: bỏ "quy-tac-phan-quyen-theo-quyen" — bài về mô hình phân quyền (Quản trị),
+  // không liên quan tới Danh mục vật tư; giữ lại bài Danh mục + bài giá trần
+  // (giá trần là dữ liệu danh mục, bài Danh mục có nhắc tới).
+  master: ["phan-he-danh-muc", "quy-tac-gia-tran-gia-tay"],
 };
 
 /** Danh sách mục tiêu cho nút "?": giữ thứ tự gợi ý, chỉ lấy bài đang hiển thị. */
