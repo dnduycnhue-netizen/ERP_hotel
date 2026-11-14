@@ -95,7 +95,7 @@ export const SOP_ARTICLES: HelpArticle[] = [
       { who: "Người đề xuất", text: "**Kho → Hủy hàng → Lập phiếu hủy hàng**: chọn kho, lý do, mặt hàng, số lượng (theo đơn vị kho).", href: "/inventory/waste/new" },
       { who: "Người đề xuất", text: "Mở phiếu vừa lưu, **chụp ảnh** hàng hủy (thấy rõ hàng và nhãn/hạn)." },
       { who: "Người đề xuất", text: "**Gửi duyệt**." },
-      { who: "Quản lý", text: "Kiểm ảnh và số lượng, **Duyệt** hoặc **Từ chối** (lý do khi từ chối). Hủy giá trị lớn có thể cần thêm một người duyệt.", href: "/procurement/approvals" },
+      { who: "Quản lý", text: "Kiểm ảnh và số lượng, **Duyệt** hoặc **Từ chối** (lý do khi từ chối). Hiện chỉ có một bước duyệt (Quản lý); ngưỡng giá trị lớn có trong Cài đặt nhưng chưa tạo thêm bước duyệt trong Quy tắc duyệt.", href: "/procurement/approvals" },
       { who: "Hệ thống", text: "Sau khi duyệt đủ bước: xuất khỏi tồn kho, ghi giá trị hủy vào báo cáo." },
       { who: "Người đề xuất", text: "Xử lý hàng vật lý theo quy định (tiêu hủy) sau khi phiếu được duyệt." },
     ],

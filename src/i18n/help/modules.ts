@@ -86,7 +86,7 @@ export const MODULE_ARTICLES: HelpArticle[] = [
         ["Phiếu lĩnh", "Lập → Gửi duyệt → Duyệt → Xuất kho → Xác nhận nhận", "Lệch xuất ≠ nhận phải xử lý trước khi khóa ca"],
         ["Điều chuyển", "Lập → Chuyển hàng → Nhận", "Có thể hủy khi còn nháp"],
         ["Xuất mục đích", "Lập → Ghi sổ → (Đảo phiếu)", "Cost center + khoản mục bắt buộc; không tính vào giá vốn hàng bán"],
-        ["Hủy hàng", "Lập → Chụp ảnh → Gửi duyệt → Duyệt", "Từ 1.000.000 đ/phiếu có thể thêm bước duyệt"],
+        ["Hủy hàng", "Lập → Chụp ảnh → Gửi duyệt → Duyệt", "Chỉ một bước duyệt (Quản lý)"],
       ]},
       { t: "h", text: "Tồn kho và thẻ kho" },
       { t: "ul", items: [

@@ -60,7 +60,7 @@ export const ROLE_ARTICLES: HelpArticle[] = [
         ["Yêu cầu mua (PR)", "Duyệt/Từ chối", "Người đề xuất không duyệt phiếu của mình"],
         ["Đơn mua (PO)", "Duyệt bước 1 (từ 0 đồng)", "Từ 100 triệu cần thêm Chủ đầu tư; hạn mức chỉnh ở Quy tắc duyệt"],
         ["Phiếu lĩnh kho", "Duyệt/Từ chối", "Thủ kho mới xuất kho sau khi bạn duyệt"],
-        ["Hủy hàng", "Duyệt/Từ chối", "Phiếu hủy từ 1.000.000 đ trở lên có thể thêm bước duyệt"],
+        ["Hủy hàng", "Duyệt/Từ chối", "Chỉ một bước duyệt (Quản lý); chưa có bước duyệt thứ hai cho phiếu giá trị lớn"],
         ["Hóa đơn nhà cung cấp", "Duyệt sau đối chiếu 3 bên", "Kế toán nhập, không tự duyệt hóa đơn mình nhập"],
         ["Điều chỉnh kiểm kê", "Xem chênh lệch rồi duyệt", "Tồn chỉ đổi bằng bút toán điều chỉnh"],
         ["Miễn thu minibar / thu muộn", "Duyệt đề nghị của lễ tân", "Cần lý do"],
@@ -157,7 +157,7 @@ export const ROLE_ARTICLES: HelpArticle[] = [
       { t: "h", text: "Cách làm (trên điện thoại: Nhận hàng)" },
       { t: "steps", items: [
         { text: "Mở **Nhận hàng**, chọn nhiệm vụ nhận (đơn đã gửi nhà cung cấp), chọn **kho nhận** rồi **Mở phiếu nhận**.", href: "" },
-        { text: "Với từng mặt hàng: nhập **số cân cả bì**, **bì** (nếu có), chọn đơn vị. Số thực nhận = cân − bì." },
+        { text: "Với từng mặt hàng: nhập **Số cân**, **Bì** (nếu có). Số thực nhận = Số cân − Bì (hệ thống tự tính)." },
         { text: "**Chụp ảnh** hàng. Máy không có camera: tích ô xác nhận không có camera và ghi lý do (hệ thống lưu vết)." },
         { text: "Chọn kết quả kiểm chất lượng: **Đạt / Không đạt / Chờ quyết định**. Có phần hỏng: nhập **Số lượng hỏng** và lý do — phần tốt nhập kho, phần hỏng thành phiếu trả nhà cung cấp." },
         { text: "Nếu app báo **cần cân lại** (lệch ngoài dung sai): cân lần 2, nhập lại. Lần 2 là lần chốt." },
