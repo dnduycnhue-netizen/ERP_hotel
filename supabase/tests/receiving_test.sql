@@ -12,7 +12,7 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 set local search_path = public, extensions;
-select plan(89);
+select plan(91);
 
 -- 0. Fixture
 insert into public.organizations (id, name) values
@@ -499,6 +499,56 @@ select throws_ok(
   )$q$,
   'P0001', 'ERR_PHOTO_REQUIRED',
   'blank waiver reason does not bypass the photo rule'
+);
+
+-- Q277: hang hong MOT PHAN — THIT 5 kg, hong 1 kg: phan tot 4 kg, phieu tra 'recorded' 1 kg (khong move kho).
+do $$
+declare
+  v_line uuid;
+  v_ret_qty numeric;
+  v_rej numeric;
+  v_net numeric;
+begin
+  perform public.receiving_record_line(
+    p_gr_id := (select id from t023_ctx where key = 'gr1'),
+    p_po_line_id := 'd0230000-0000-4000-8000-000000000c02',
+    p_item_id := 'd0230000-0000-4000-8000-000000000502',
+    p_gross := 5, p_tare := 0, p_uom := 'kg',
+    p_qc := '{"status": "conditional", "rejected_qty": 1, "reject_reason": "Dap nat"}'::jsonb,
+    p_lot := 'LOT-T1', p_expiry := '2026-12-09',
+    p_photo_waived_reason := 'Thiet bi khong co camera'
+  );
+  execute 'reset role';
+  select id, rejected_qty_stock, net_qty_stock into v_line, v_rej, v_net
+  from public.goods_receipt_lines
+  where gr_id = (select id from t023_ctx where key = 'gr1')
+    and po_line_id = 'd0230000-0000-4000-8000-000000000c02';
+  select sum(srl.qty_stock) into v_ret_qty from public.supplier_return_lines srl
+  join public.supplier_returns sr on sr.id = srl.return_id
+  where srl.gr_line_id = v_line and sr.status = 'recorded';
+  execute 'set local role authenticated';
+  if v_rej <> 1 or v_net <> 4 or v_ret_qty <> 1 then
+    raise exception 'partial reject wrong: rej %, net %, ret %', v_rej, v_net, v_ret_qty;
+  end if;
+  raise exception 'Q277_OK';
+exception when others then
+  if sqlerrm <> 'Q277_OK' then
+    raise;
+  end if;
+end $$;
+select pass('partial reject: good 4 kg, 1 kg rejected, recorded supplier return for the rejected part (Q277)');
+select throws_ok(
+  $q$select public.receiving_record_line(
+    p_gr_id := (select id from t023_ctx where key = 'gr1'),
+    p_po_line_id := 'd0230000-0000-4000-8000-000000000c02',
+    p_item_id := 'd0230000-0000-4000-8000-000000000502',
+    p_gross := 5, p_tare := 0, p_uom := 'kg',
+    p_qc := '{"status": "conditional", "rejected_qty": 5}'::jsonb,
+    p_lot := 'LOT-T1', p_expiry := '2026-12-09',
+    p_photo_waived_reason := 'Thiet bi khong co camera'
+  )$q$,
+  'P0001', 'ERR_INVALID_VALUE',
+  'rejected quantity must be smaller than the net (whole-line rejection is QC fail)'
 );
 
 -- THIT co anh nhung thieu lot -> ERR_LOT_REQUIRED.

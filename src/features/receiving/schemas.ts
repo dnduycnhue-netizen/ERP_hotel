@@ -27,6 +27,9 @@ const qcSchema = z.object({
     .optional()
     .nullable(),
   supplier_signature_path: z.string().trim().max(500).optional().nullable(),
+  /** Hàng hỏng một phần (theo ĐVT ghi nhận, nhỏ hơn số thực nhận) — Q277. */
+  rejected_qty: z.number().positive().optional().nullable(),
+  reject_reason: z.string().trim().max(300).optional().nullable(),
 });
 
 /** Ghi 1 dong nhan hang; goi lan 2 cung dong = can lai (RPC `receiving_record_line`, T-023). */

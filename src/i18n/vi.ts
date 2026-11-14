@@ -1863,6 +1863,10 @@ export const vi = {
     reweighTitle: "Cân lại lần 2",
     weigh1Summary: "Lần 1",
     photoTaken: "Đã chụp ảnh",
+    rejectedQtyLabel: "Số lượng hỏng (nếu có)",
+    rejectedQtyInvalid: "Số hỏng phải lớn hơn 0 và nhỏ hơn số thực nhận. Hỏng cả dòng thì chọn QC \"Không đạt\".",
+    rejectReasonPlaceholder: "Lý do hỏng (ví dụ: dập nát, hết hạn)",
+    rejectedQtyHint: "Phần hỏng không nhập kho; hệ thống tự lập phiếu trả hàng NCC cho phần hỏng.",
     newReturnButton: "Lập phiếu trả hàng NCC",
     noCameraConfirm:
       "Thiết bị không có camera / không chụp được ảnh — xác nhận nhận hàng không kèm ảnh",

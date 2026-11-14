@@ -1871,6 +1871,8 @@ export type Database = {
           property_id: string
           qc_checklist: Json
           qc_status: string
+          reject_reason: string | null
+          rejected_qty_stock: number
           tare_qty: number
           temperature_c: number | null
           unit_cost: number | null
@@ -1907,6 +1909,8 @@ export type Database = {
           property_id: string
           qc_checklist?: Json
           qc_status: string
+          reject_reason?: string | null
+          rejected_qty_stock?: number
           tare_qty?: number
           temperature_c?: number | null
           unit_cost?: number | null
@@ -1943,6 +1947,8 @@ export type Database = {
           property_id?: string
           qc_checklist?: Json
           qc_status?: string
+          reject_reason?: string | null
+          rejected_qty_stock?: number
           tare_qty?: number
           temperature_c?: number | null
           unit_cost?: number | null

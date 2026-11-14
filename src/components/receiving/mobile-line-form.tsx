@@ -125,6 +125,9 @@ export function MobileLineForm({
   const [lot, setLot] = useState("");
   const [expiry, setExpiry] = useState("");
   const [failReason, setFailReason] = useState("");
+  // Hàng hỏng một phần (Q277): nhận phần tốt, phần hỏng thành phiếu trả NCC.
+  const [rejectedQty, setRejectedQty] = useState("");
+  const [rejectReason, setRejectReason] = useState("");
   const [photos, setPhotos] = useState<FormPhoto[]>([]);
   // Phương án 2 khi không có camera: tích xác nhận + lý do (Q274, quyết định Duy).
   const [noCamera, setNoCamera] = useState(false);
@@ -147,8 +150,17 @@ export function MobileLineForm({
   const tempNum = parseDecimal(temp);
   const netNum = grossNum !== null ? grossNum - tareNum : null;
 
+  const rejectedNum = parseDecimal(rejectedQty);
+  const rejectedOk =
+    rejectedQty.trim() === "" ||
+    (rejectedNum !== null &&
+      rejectedNum > 0 &&
+      netNum !== null &&
+      rejectedNum < netNum);
+
   const valid =
     canPerform &&
+    rejectedOk &&
     grossNum !== null &&
     grossNum > 0 &&
     tareNum >= 0 &&
@@ -252,6 +264,14 @@ export function MobileLineForm({
       checklist: checked,
       temperature_c: tempNum,
       reason: failReason.trim() || null,
+      rejected_qty:
+        qcStatus !== "fail" && rejectedNum !== null && rejectedNum > 0
+          ? rejectedNum
+          : null,
+      reject_reason:
+        qcStatus !== "fail" && rejectedNum !== null && rejectedNum > 0
+          ? rejectReason.trim() || null
+          : null,
     };
     // Offline (T-025): xếp hàng chờ đồng bộ với clientUuid cố định —
     // gửi lại cùng key, server (T-023) trả về dòng đã ghi thay vì tạo
@@ -693,6 +713,45 @@ export function MobileLineForm({
               className="rounded-lg border bg-background px-3 py-2 text-base outline-none focus:border-ring"
             />
           </label>
+        ) : null}
+        {qcStatus !== "fail" ? (
+          <div className="flex flex-col gap-2 rounded-lg border border-dashed p-3">
+            <label className="flex flex-col gap-1.5 text-sm font-medium">
+              {vi.receiving.rejectedQtyLabel}
+              {line.uom ? ` (${line.uom})` : ""}
+              <input
+                type="text"
+                inputMode="decimal"
+                value={rejectedQty}
+                onChange={(event) => setRejectedQty(event.target.value)}
+                placeholder="0"
+                disabled={submitting}
+                aria-invalid={!rejectedOk}
+                className="h-12 rounded-lg border bg-background px-3 text-base outline-none focus:border-ring"
+              />
+            </label>
+            {rejectedQty.trim() !== "" ? (
+              <>
+                {!rejectedOk ? (
+                  <p role="alert" className="text-sm text-destructive">
+                    {vi.receiving.rejectedQtyInvalid}
+                  </p>
+                ) : null}
+                <input
+                  value={rejectReason}
+                  onChange={(event) => setRejectReason(event.target.value)}
+                  placeholder={vi.receiving.rejectReasonPlaceholder}
+                  aria-label={vi.receiving.rejectReasonPlaceholder}
+                  maxLength={300}
+                  disabled={submitting}
+                  className="h-12 rounded-lg border bg-background px-3 text-base outline-none focus:border-ring"
+                />
+                <p className="text-xs text-muted-foreground">
+                  {vi.receiving.rejectedQtyHint}
+                </p>
+              </>
+            ) : null}
+          </div>
         ) : null}
         {checklistItems.length > 0 ? (
           <div className="flex flex-col gap-2">

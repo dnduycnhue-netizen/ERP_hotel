@@ -142,3 +142,31 @@ describe("awaitingReweigh (C2-N1)", () => {
     expect(awaitingReweigh(null)).toBe(false);
   });
 });
+
+describe("receivingRecordLineSchema.qc.rejected_qty (Q277)", () => {
+  it("giữ rejected_qty/reject_reason khi parse; từ chối số âm/0", async () => {
+    const { receivingRecordLineSchema } = await import("@/features/receiving/schemas");
+    const base = {
+      grId: P,
+      poLineId: W1,
+      itemId: I,
+      gross: 5,
+      tare: 0,
+    };
+    const ok = receivingRecordLineSchema.safeParse({
+      ...base,
+      qc: { status: "pass", rejected_qty: 1, reject_reason: "Dập nát" },
+    });
+    expect(ok.success).toBe(true);
+    if (ok.success) {
+      expect(ok.data.qc.rejected_qty).toBe(1);
+      expect(ok.data.qc.reject_reason).toBe("Dập nát");
+    }
+    expect(
+      receivingRecordLineSchema.safeParse({
+        ...base,
+        qc: { status: "pass", rejected_qty: 0 },
+      }).success,
+    ).toBe(false);
+  });
+});
