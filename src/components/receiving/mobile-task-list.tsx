@@ -118,7 +118,9 @@ export function MobileTaskList({
   );
   const receivableWarehouses = useMemo(
     () =>
-      warehouses.filter((w) => ["main", "outlet", "floor"].includes(w.kind)),
+      warehouses.filter((w) =>
+        ["main", "outlet", "floor", "minibar_main"].includes(w.kind),
+      ),
     [warehouses],
   );
   const directIssueOptions = useMemo(

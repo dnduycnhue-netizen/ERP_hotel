@@ -1488,6 +1488,7 @@ export const vi = {
   procurement: {
     title: "Thu mua",
     pr: {
+      noCreatePermission: "Bạn chưa được cấp quyền tạo yêu cầu mua.",
       title: "Yêu cầu mua",
       listTitle: "Danh sách yêu cầu mua",
       createTitle: "Tạo yêu cầu mua",
@@ -1862,6 +1863,7 @@ export const vi = {
     reweighTitle: "Cân lại lần 2",
     weigh1Summary: "Lần 1",
     photoTaken: "Đã chụp ảnh",
+    newReturnButton: "Lập phiếu trả hàng NCC",
     noCameraConfirm:
       "Thiết bị không có camera / không chụp được ảnh — xác nhận nhận hàng không kèm ảnh",
     noCameraReasonPlaceholder: "Lý do không chụp được (bắt buộc)",
@@ -3454,6 +3456,8 @@ export const vi = {
     notesTitle: "Ghi chú về nguồn số liệu",
     exportExcel: "Xuất Excel",
     exportHint: "Xuất bằng API kế toán T-043 (chỉ kỳ/ngày đã khóa sổ).",
+    refreshStockCard: "Làm mới số liệu thẻ kho",
+    refreshing: "Đang làm mới…",
     exporting: "Đang xuất…",
     exported: "Đã xuất file {name}.",
     exportFailed: "Không xuất được file Excel. Vui lòng thử lại.",

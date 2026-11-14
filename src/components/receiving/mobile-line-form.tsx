@@ -1,5 +1,6 @@
 "use client";
 
+import { awaitingReweigh } from "@/components/receiving/reweigh";
 import { X } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -137,9 +138,9 @@ export function MobileLineForm({
   const [overrideQueued, setOverrideQueued] = useState(false);
   const [shortWarning, setShortWarning] = useState(false);
 
-  const isReweigh = stored?.needs_reweigh === true;
+  const isReweigh = awaitingReweigh(stored);
   const isOverPo =
-    stored !== null && !stored.needs_reweigh && stored.over_po_qty_stock > 0;
+    stored !== null && !awaitingReweigh(stored) && stored.over_po_qty_stock > 0;
 
   const grossNum = parseDecimal(gross);
   const tareNum = parseDecimal(tare) ?? 0;
@@ -343,7 +344,7 @@ export function MobileLineForm({
       return;
     }
     const storedLine = refreshed.data;
-    if (storedLine.needs_reweigh) {
+    if (awaitingReweigh(storedLine)) {
       // Can lan 1 lech dung sai: xoa so da nhap de can lai lan 2.
       setGross("");
       setTare("");

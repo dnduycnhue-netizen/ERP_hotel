@@ -1,3 +1,4 @@
+import { createClient, getAuthenticatedUserId } from "@/lib/supabase/server";
 import Link from "next/link";
 import { AttachmentGallery } from "@/components/common/attachment-gallery";
 import { DocStatusBadge } from "@/components/common/doc-status-badge";
@@ -16,6 +17,7 @@ export default async function WasteDetailPage({
   params: Promise<{ property: string; id: string }>;
 }) {
   const { property: propertyId, id } = await params;
+  const me = await getAuthenticatedUserId(await createClient());
   const res = await getWasteAction(id);
 
   if (!res.ok) {
@@ -48,6 +50,7 @@ export default async function WasteDetailPage({
       />
 
       <StockDocActions
+        isCreator={me !== null && me === doc.proposed_by}
         kind="waste"
         propertyId={propertyId}
         doc={{

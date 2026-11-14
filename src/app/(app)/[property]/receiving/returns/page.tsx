@@ -1,3 +1,4 @@
+import { NewDocButton } from "@/components/inventory/new-doc-button";
 import Link from "next/link";
 import { ErrorState } from "@/components/common/error-state";
 import { EmptyState } from "@/components/common/empty-state";
@@ -52,7 +53,16 @@ export default async function DesktopReturnsPage({
 
   return (
     <div className="flex flex-col gap-4">
-      <PageHeader title={vi.receiving.returnsListTitle} />
+      <PageHeader
+        title={vi.receiving.returnsListTitle}
+        actions={
+          <NewDocButton
+            href={`/m/${propertyId}/receive/returns/new`}
+            label={vi.receiving.newReturnButton}
+            permission="supplier_return.post"
+          />
+        }
+      />
 
       <div className="flex flex-wrap gap-1.5">
         {(

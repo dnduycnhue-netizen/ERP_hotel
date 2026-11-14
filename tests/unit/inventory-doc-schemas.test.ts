@@ -132,3 +132,13 @@ describe("searchWords (V10-N1)", () => {
     expect(searchWords("   ")).toEqual([]);
   });
 });
+
+describe("awaitingReweigh (C2-N1)", () => {
+  it("chỉ còn phải cân lại khi lệch ở lần cân 1; sau lần cân 2 thì không", async () => {
+    const { awaitingReweigh } = await import("@/components/receiving/reweigh");
+    expect(awaitingReweigh({ needs_reweigh: true, weigh_count: 1 })).toBe(true);
+    expect(awaitingReweigh({ needs_reweigh: true, weigh_count: 2 })).toBe(false);
+    expect(awaitingReweigh({ needs_reweigh: false, weigh_count: 1 })).toBe(false);
+    expect(awaitingReweigh(null)).toBe(false);
+  });
+});

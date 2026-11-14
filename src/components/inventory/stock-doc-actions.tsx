@@ -52,11 +52,14 @@ export function StockDocActions({
   propertyId,
   doc,
   lines,
+  isCreator = false,
 }: {
   kind: DocKind;
   propertyId: string;
   doc: DocActionDoc;
   lines: DocActionLine[];
+  /** Người lập phiếu không tự duyệt phiếu của mình: ẩn nút Duyệt/Từ chối (server vẫn chặn). */
+  isCreator?: boolean;
 }) {
   const router = useRouter();
   const canWastePropose = useCan("waste.propose");
@@ -86,10 +89,11 @@ export function StockDocActions({
       (kind === "waste" && s === "draft" && canWastePropose) ||
       (kind === "requisition" && s === "draft" && canReqCreate),
     decide:
-      (kind === "waste" &&
+      !isCreator &&
+      ((kind === "waste" &&
         s === "submitted" &&
         (canWasteApprove || canWasteApproveLarge)) ||
-      (kind === "requisition" && s === "submitted" && canReqApprove),
+        (kind === "requisition" && s === "submitted" && canReqApprove)),
     cancel:
       (kind === "waste" && s === "draft" && canWastePropose) ||
       (kind === "requisition" && s === "draft" && canReqCreate) ||

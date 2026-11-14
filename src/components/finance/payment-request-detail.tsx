@@ -1,5 +1,6 @@
 "use client";
 
+import { formatDateTimeVn } from "@/features/export/hub";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -162,7 +163,7 @@ export function PaymentRequestDetailView({
             </p>
             {request.paid_at ? (
               <p>
-                {vi.finance.paidAt}: {request.paid_at}
+                {vi.finance.paidAt}: {formatDateTimeVn(request.paid_at)}
               </p>
             ) : null}
             {request.bank_ref ? (

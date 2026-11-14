@@ -1,5 +1,6 @@
 "use client";
 
+import { awaitingReweigh } from "@/components/receiving/reweigh";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -168,7 +169,7 @@ export function MobileReceiveWorkspace({
     storedByPoLine.has(line.po_line_id),
   ).length;
   const needsReweighCount = task.lines.filter(
-    (line) => storedByPoLine.get(line.po_line_id)?.needs_reweigh,
+    (line) => awaitingReweigh(storedByPoLine.get(line.po_line_id)),
   ).length;
   const queuedCount = Object.keys(queuedRecords).length;
   // Dong cho dong bo cung tinh la da ghi (server se kiem tra lai luc
@@ -184,7 +185,7 @@ export function MobileReceiveWorkspace({
     if (!stored) {
       return true;
     }
-    return stored.needs_reweigh || stored.over_po_qty_stock > 0;
+    return awaitingReweigh(stored) || stored.over_po_qty_stock > 0;
   }
 
   const nextActionLine = task.lines.find((line) =>
@@ -299,10 +300,10 @@ export function MobileReceiveWorkspace({
           // tom tat khi dong da ghi).
           const needsOverride =
             stored !== null &&
-            !stored.needs_reweigh &&
+            !awaitingReweigh(stored) &&
             stored.over_po_qty_stock > 0;
           const isRecorded =
-            stored !== null && !stored.needs_reweigh && !needsOverride;
+            stored !== null && !awaitingReweigh(stored) && !needsOverride;
           return (
             <li
               key={line.po_line_id}

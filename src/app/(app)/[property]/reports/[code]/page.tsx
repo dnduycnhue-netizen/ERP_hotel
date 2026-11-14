@@ -1,3 +1,4 @@
+import { RefreshStockCardButton } from "@/components/report/refresh-stock-card-button";
 import { notFound } from "next/navigation";
 import { EmptyState } from "@/components/common/empty-state";
 import { ErrorState } from "@/components/common/error-state";
@@ -100,6 +101,9 @@ export default async function ReportDetailPage({
         <h2 className="text-base font-semibold">{meta.title}</h2>
         <p className="text-sm text-muted-foreground">{meta.description}</p>
       </div>
+      {meta.code === "RPT_STOCK_CARD" ? (
+        <RefreshStockCardButton propertyId={property} />
+      ) : null}
       <ReportFilters
         paramKind={meta.paramKind}
         initial={initial}

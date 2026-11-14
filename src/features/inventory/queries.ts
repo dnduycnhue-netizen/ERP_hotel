@@ -1,3 +1,4 @@
+import { searchWords } from "@/lib/text/normalize";
 import "server-only";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
@@ -352,13 +353,15 @@ export async function listStock(
   let itemIds: string[] | null = null;
   const search = input.search?.trim() ?? "";
   if (search !== "") {
-    const pattern = `%${escapeIlike(search)}%`;
-    const { data: found, error: searchError } = await supabase
+    // Tìm không dấu, từng từ (AND) trên items.name_search (Q273/Q276, C6-N5).
+    let itemQuery = supabase
       .from("items")
       .select("id")
-      .eq("org_id", property.org_id)
-      .or(`code.ilike.${pattern},name.ilike.${pattern}`)
-      .limit(200);
+      .eq("org_id", property.org_id);
+    for (const word of searchWords(search)) {
+      itemQuery = itemQuery.ilike("name_search", `%${escapeIlike(word)}%`);
+    }
+    const { data: found, error: searchError } = await itemQuery.limit(200);
     if (searchError) {
       return { ok: false, error: vi.inventory.itemSearchFailed };
     }

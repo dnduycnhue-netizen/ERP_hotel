@@ -1,3 +1,4 @@
+import { createClient, getAuthenticatedUserId } from "@/lib/supabase/server";
 import Link from "next/link";
 import { DocStatusBadge } from "@/components/common/doc-status-badge";
 import { EmptyState } from "@/components/common/empty-state";
@@ -15,6 +16,7 @@ export default async function RequisitionDetailPage({
   params: Promise<{ property: string; id: string }>;
 }) {
   const { property: propertyId, id } = await params;
+  const me = await getAuthenticatedUserId(await createClient());
   const res = await getRequisitionAction(id);
 
   if (!res.ok) {
@@ -38,6 +40,7 @@ export default async function RequisitionDetailPage({
       />
 
       <StockDocActions
+        isCreator={me !== null && me === doc.created_by}
         kind="requisition"
         propertyId={propertyId}
         doc={{
