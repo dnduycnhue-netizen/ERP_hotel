@@ -1,5 +1,8 @@
 # Hướng dẫn UAT theo vai trò — ERP_hotel (khách sạn TEST47)
 
+> **Lưu ý (14/11/2026):** hướng dẫn chuẩn theo vai trò, phân hệ, luồng nghiệp vụ, SOP và quy tắc nghiệp vụ nay nằm **trong app** tại mục **Hướng dẫn** (`/<khách sạn>/help`). Các file `docs/go-live/user-guide-*.md` là bản nháp cũ.
+
+
 > **Dành cho người thử hệ thống (không cần rành kỹ thuật).** Đọc phần 1 trước, rồi làm
 > đúng phần của vai trò mình. Mỗi kịch bản đều có đường dẫn màn hình thật, các bước cụ thể,
 > kết quả mong đợi và chỗ điền kết quả.

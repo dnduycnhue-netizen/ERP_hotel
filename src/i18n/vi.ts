@@ -1927,6 +1927,39 @@ export const vi = {
     tareNonNegative: "Bì không được âm.",
     weighedQuantityPositive: "Số lượng cân phải lớn hơn 0.",
   },
+  help: {
+    title: "Hướng dẫn sử dụng",
+    nav: "Hướng dẫn",
+    intro:
+      "Hướng dẫn theo vai trò, theo phân hệ, luồng nghiệp vụ, quy trình chuẩn (SOP) và quy tắc nghiệp vụ của hệ thống.",
+    searchPlaceholder: "Tìm hướng dẫn (ví dụ: nhận hàng, kiểm kê, hóa đơn)…",
+    searchLabel: "Tìm hướng dẫn",
+    allKinds: "Tất cả",
+    kinds: {
+      role: "Theo vai trò",
+      module: "Theo phân hệ",
+      workflow: "Luồng nghiệp vụ",
+      sop: "Quy trình SOP",
+      rule: "Quy tắc nghiệp vụ",
+    },
+    kindHints: {
+      role: "Việc hằng ngày của từng vị trí.",
+      module: "Cách dùng từng nhóm chức năng.",
+      workflow: "Chứng từ đi qua những bước và người nào, từ đầu đến cuối.",
+      sop: "Quy trình chuẩn từng bước, kèm kiểm soát và bằng chứng.",
+      rule: "Những luật hệ thống tự thực thi và lý do tồn tại.",
+    },
+    forYou: "Dành cho bạn",
+    noResults: "Không có hướng dẫn nào khớp với tìm kiếm.",
+    notFoundTitle: "Không tìm thấy bài hướng dẫn",
+    backToList: "Tất cả hướng dẫn",
+    related: "Bài liên quan",
+    openScreen: "Mở màn hình",
+    onThisPage: "Trong bài này",
+    stepWho: "Người làm",
+    disclaimer:
+      "Hướng dẫn mô tả cách hệ thống đang chạy. Số ngưỡng (dung sai, hạn mức duyệt…) có thể được quản trị chỉnh trong Cài đặt — nếu khác với bài viết, lấy giá trị trên màn hình làm chuẩn.",
+  },
   inventory: {
     title: "Kho",
     doc: {
