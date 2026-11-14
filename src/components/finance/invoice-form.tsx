@@ -192,6 +192,11 @@ export function InvoiceForm({
               </option>
             ))}
           </select>
+          {selectedSupplierId === "" ? (
+            <span className="mt-1 block text-xs text-muted-foreground">
+              {vi.finance.selectSupplierFirst}
+            </span>
+          ) : null}
         </label>
         <label className="block text-sm">
           {vi.finance.invoiceSymbol}

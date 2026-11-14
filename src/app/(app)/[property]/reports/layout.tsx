@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { ErrorState } from "@/components/common/error-state";
+import { EmptyState } from "@/components/common/empty-state";
 import { ReportsNav } from "@/components/report/report-nav";
 import { getReportPerms, type ReportPerms } from "@/features/report/queries";
 import { REPORT_CODES } from "@/features/report/definitions";
@@ -25,7 +25,7 @@ export default async function ReportsLayout({
     return (
       <div className="space-y-4">
         <PageHeader title={vi.reports.title} />
-        <ErrorState title={vi.reports.noPermission} />
+        <EmptyState title={vi.reports.noPermission} />
       </div>
     );
   }

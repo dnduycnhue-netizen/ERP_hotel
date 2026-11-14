@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { ExportButton } from "@/components/report/export-button";
 import {
   DataTable,
   type DataTableColumn,
@@ -156,12 +156,7 @@ export function ReportView({
 
       {exportHref && (
         <div className="flex items-center gap-2">
-          <Link
-            href={exportHref}
-            className="inline-flex h-8 items-center justify-center rounded-lg border border-border bg-background px-2.5 text-sm font-medium hover:bg-muted"
-          >
-            {vi.reports.exportExcel}
-          </Link>
+          <ExportButton href={exportHref} />
           <p className="text-xs text-muted-foreground">
             {vi.reports.exportHint}
           </p>

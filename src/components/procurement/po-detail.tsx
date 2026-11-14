@@ -1,5 +1,6 @@
 "use client";
 
+import { InlineConfirmButton } from "@/components/common/inline-confirm-button";
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -87,7 +88,6 @@ export function PoDetail({
   const submitBlocked = overCeilingBlocked || manualPriceMissing;
 
   async function handleSubmit() {
-    if (!confirm(vi.procurement.detail.confirmSubmit)) return;
     setBusy(true);
     setError(null);
     const res = await submitPoAction({ propertyId, poId: po.id });
@@ -123,7 +123,6 @@ export function PoDetail({
   }
 
   async function handleSend() {
-    if (!confirm(vi.procurement.detail.confirmSend)) return;
     setBusy(true);
     setError(null);
     const res = await sendPoAction({ propertyId, poId: po.id });
@@ -242,9 +241,11 @@ export function PoDetail({
               >
                 {vi.procurement.detail.editDraft}
               </Button>
-              <Button
+              <InlineConfirmButton
                 size="sm"
-                onClick={handleSubmit}
+                label={vi.procurement.po.submit}
+                confirmText={vi.procurement.detail.confirmSubmit}
+                onConfirm={handleSubmit}
                 disabled={busy || submitBlocked}
                 title={
                   overCeilingBlocked
@@ -253,17 +254,19 @@ export function PoDetail({
                       ? vi.procurement.detail.priceNotSetWarning
                       : undefined
                 }
-              >
-                {vi.procurement.po.submit}
-              </Button>
+              />
             </>
           ) : null}
           {po.status === "approved" &&
           po.channel !== "market" &&
           canPoCreate ? (
-            <Button size="sm" onClick={handleSend} disabled={busy}>
-              {vi.procurement.po.send}
-            </Button>
+            <InlineConfirmButton
+              size="sm"
+              label={vi.procurement.po.send}
+              confirmText={vi.procurement.detail.confirmSend}
+              onConfirm={handleSend}
+              disabled={busy}
+            />
           ) : null}
           {canClose && canPoClose ? (
             <Button

@@ -96,11 +96,12 @@ describe("parseDecimal / calcUomTotal / calcBottleTotal (R30)", () => {
     expect(bad.total).toBeNull();
   });
 
-  it("normalizeSearch bỏ dấu tiếng Việt để tìm không dấu (chữ đ giữ nguyên vì không tách được bằng NFD)", () => {
+  it("normalizeSearch bỏ dấu tiếng Việt kể cả chữ đ/Đ để tìm không dấu", () => {
     expect(normalizeSearch("Bánh Bèo")).toBe("banh beo");
     expect(normalizeSearch("Ba chỉ nách")).toBe("ba chi nach");
-    // "Đường" → đ + uong (dấu trên ư/ờ bị lược, riêng chữ đ không tách được)
-    expect(normalizeSearch("Đường")).toBe("đ" + "uong");
+    // B-53: đ/Đ không tách được bằng NFD nên được thay riêng.
+    expect(normalizeSearch("Đường")).toBe("duong");
+    expect(normalizeSearch("đá viên")).toBe("da vien");
   });
 });
 

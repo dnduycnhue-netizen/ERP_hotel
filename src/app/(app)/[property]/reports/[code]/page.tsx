@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { EmptyState } from "@/components/common/empty-state";
 import { ErrorState } from "@/components/common/error-state";
 import { ReportFilters } from "@/components/report/report-filters";
 import { ReportView } from "@/components/report/report-view";
@@ -35,7 +36,17 @@ export default async function ReportDetailPage({
     return (
       <div className="space-y-4">
         <h2 className="text-base font-semibold">{meta.title}</h2>
-        <ErrorState title={vi.reports.noPermission} />
+        <EmptyState title={vi.reports.noPermission} />
+      </div>
+    );
+  }
+
+  // Khoảng ngày đảo ngược: báo lỗi thay vì lặng lẽ trả số liệu (B-44).
+  if (query.from && query.to && query.from > query.to) {
+    return (
+      <div className="space-y-4">
+        <h2 className="text-base font-semibold">{meta.title}</h2>
+        <ErrorState title={vi.reports.invalidRange} description="" />
       </div>
     );
   }

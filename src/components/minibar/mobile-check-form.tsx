@@ -51,6 +51,9 @@ function parseQty(raw: string): number {
  * được giá thì dòng hiện "Chưa có giá" và không nộp được (giữ đúng
  * phân quyền hiện có, không bịa mã quyền mới).
  */
+/** Quá ngưỡng này thì hiện cảnh báo (minibar phòng thường vài chai mỗi món). */
+const UNUSUAL_QTY = 20;
+
 export function MobileCheckForm({
   propertyId,
   check,
@@ -71,6 +74,8 @@ export function MobileCheckForm({
     },
   });
   const [qtyByItem, setQtyByItem] = useState<Record<string, string>>({});
+  // Phòng không dùng món nào: phải tick xác nhận rõ ràng mới gửi phiếu 0 dòng (B-39).
+  const [nothingUsed, setNothingUsed] = useState(false);
   const [nearExpiryByItem, setNearExpiryByItem] = useState<
     Record<string, boolean>
   >({});
@@ -119,7 +124,11 @@ export function MobileCheckForm({
   }
 
   const canSubmit =
-    !pending && missingLines.length > 0 && !estimatedTotal.missingPrice;
+    !pending &&
+    (missingLines.length > 0 || nothingUsed) &&
+    !estimatedTotal.missingPrice;
+  // Số lượng lớn bất thường: không chặn nhưng cảnh báo để người kiểm xem lại (B-38).
+  const unusualQty = missingLines.some((l) => l.qty > UNUSUAL_QTY);
 
   async function handleSubmit() {
     setPending(true);
@@ -307,10 +316,29 @@ export function MobileCheckForm({
           {vi.minibar.noPrice}
         </p>
       ) : null}
-      {missingLines.length === 0 && items.length > 0 ? (
-        <p className="text-base text-muted-foreground">
-          {vi.minibar.noMissingYet}
+      {unusualQty ? (
+        <p
+          role="alert"
+          className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-base text-amber-900"
+        >
+          {vi.minibar.unusualQty.replace("{max}", String(UNUSUAL_QTY))}
         </p>
+      ) : null}
+      {missingLines.length === 0 && items.length > 0 ? (
+        <>
+          <p className="text-base text-muted-foreground">
+            {vi.minibar.noMissingYet}
+          </p>
+          <label className="flex min-h-11 items-center gap-3 rounded-xl border bg-card p-3 text-base">
+            <input
+              type="checkbox"
+              checked={nothingUsed}
+              onChange={(e) => setNothingUsed(e.target.checked)}
+              className="size-5 accent-primary"
+            />
+            {vi.minibar.nothingUsed}
+          </label>
+        </>
       ) : null}
 
       <Button

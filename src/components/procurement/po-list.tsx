@@ -135,7 +135,14 @@ export function PoList({
       key: "total_amount",
       header: vi.procurement.po.totalAmount,
       align: "right",
-      cell: (row) => <MoneyText amount={row.total_amount} />,
+      cell: (row) =>
+        row.total_amount > 0 ? (
+          <MoneyText amount={row.total_amount} />
+        ) : (
+          <span className="text-xs text-muted-foreground">
+            {vi.procurement.list.priceNotSet}
+          </span>
+        ),
     },
     {
       key: "line_count",

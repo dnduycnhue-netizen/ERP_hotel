@@ -42,7 +42,7 @@
 
 | Tính năng | Cách thử | Kết quả mong đợi |
 |---|---|---|
-| Bật/tắt module (Q254) | `dnduy@hueic.edu.vn` → `/admin/modules` → tắt **Nhà hàng** ở TEST47 → vào `/b0000000-0000-4000-8000-000000000002/restaurant` và `/inventory` | "Module đang tắt"; menu POS biến mất; bật lại là dùng tiếp, dữ liệu còn nguyên |
+| Bật/tắt module (Q254) | `dnduy@hueic.edu.vn` → `/admin/modules` → tắt **Nhà hàng** ở TEST47 → vào `/b0000000-0000-4000-8000-000000000002/restaurant` (và `/inventory/pos-import`) | "Module đang tắt" ở `/restaurant` và `/inventory/pos-import`; `/inventory` vẫn mở bình thường (kho là lõi), chỉ mục "Nạp file POS" ẩn; bật lại là dùng tiếp, dữ liệu còn nguyên |
 | Cờ tự duyệt (Q258) | Chỉ còn ý nghĩa khi người tạo phiếu cũng là người được giao bước duyệt. Vì PR/phiếu lĩnh/phiếu hủy nay do **Quản lý duyệt** (Q263) mà Quản lý hầu như không tự tạo phiếu, cờ gần như không còn tác dụng. Vẫn có thể xem 3 cờ tại `/admin/settings` → "Bật/tắt ràng buộc" | Mặc định 1 (chặn). PO luôn bị chặn tự duyệt |
 | Nhật ký thay đổi (Q252) | `dnduy@` → `/admin/audit` → lọc bảng `purchase_orders` | Thấy từng bước của chu trình trên, đúng người và giờ |
 | Vai trò gọn (Q257) | `/admin/roles` → xem 7 vai trò `sm_*` | Mỗi vai trò đúng số quyền: 57 / 69 / 40 / 28 / 18 / 15 / 11 |

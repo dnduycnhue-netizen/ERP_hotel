@@ -1,5 +1,6 @@
 "use client";
 
+import { InlineConfirmButton } from "@/components/common/inline-confirm-button";
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -68,7 +69,6 @@ export function PrDetail({
   );
 
   async function handleSubmit() {
-    if (!confirm(vi.procurement.detail.confirmSubmit)) return;
     setBusy(true);
     setError(null);
     const res = await submitPrAction({ propertyId, prId: pr.id });
@@ -191,9 +191,13 @@ export function PrDetail({
               >
                 {vi.procurement.detail.editDraft}
               </Button>
-              <Button size="sm" onClick={handleSubmit} disabled={busy}>
-                {vi.procurement.pr.submit}
-              </Button>
+              <InlineConfirmButton
+                size="sm"
+                label={vi.procurement.pr.submit}
+                confirmText={vi.procurement.detail.confirmSubmit}
+                onConfirm={handleSubmit}
+                disabled={busy}
+              />
               <Button
                 size="sm"
                 variant="outline"

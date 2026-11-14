@@ -18,6 +18,17 @@ import type {
 } from "@/features/minibar/queries";
 import { vi } from "@/i18n/vi";
 
+/** Phiếu chưa được kiểm (checked_by null) chưa phải "Chờ thu tiền" (B-37). */
+function checkStatusLabel(c: {
+  status: MinibarCheckStatus;
+  checked_by: string | null;
+}): string {
+  if (c.status === "pending_charge" && !c.checked_by) {
+    return vi.minibar.notChecked;
+  }
+  return statusLabel(c.status);
+}
+
 function statusLabel(status: MinibarCheckStatus): string {
   switch (status) {
     case "pending_charge":
@@ -145,7 +156,7 @@ export function FrontdeskCheckList({
                         href={`/${propertyId}/frontdesk/minibar/${open.id}`}
                         className="text-sm font-medium text-primary underline"
                       >
-                        {open.doc_no} — {statusLabel(open.status)}
+                        {open.doc_no} — {checkStatusLabel(open)}
                         {open.checked_by ? (
                           <>
                             {" · "}
@@ -217,7 +228,7 @@ export function FrontdeskCheckList({
                     </span>
                     <span className="block text-sm text-muted-foreground">
                       {triggerLabel(check.trigger)} ·{" "}
-                      {statusLabel(check.status)}
+                      {checkStatusLabel(check)}
                       {check.is_loss ? ` · ${vi.minibar.isLoss}` : ""}
                     </span>
                   </span>
@@ -249,7 +260,7 @@ export function FrontdeskCheckList({
                       {vi.minibar.roomNo} {check.room_no} · {check.doc_no}
                     </span>
                     <span className="block text-sm text-muted-foreground">
-                      {statusLabel(check.status)}
+                      {checkStatusLabel(check)}
                       {check.folio_no
                         ? ` · ${vi.minibar.folioNo} ${check.folio_no}`
                         : ""}

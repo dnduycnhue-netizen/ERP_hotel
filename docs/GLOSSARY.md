@@ -20,7 +20,9 @@
 | Trừ bì | Tare | `tare_qty` |
 | Đối soát 3 chiều | 3-way match | `invoice_match` |
 | Phiếu lĩnh | Requisition | `requisitions` |
-| Xuất theo mục đích | Purpose issue | `purpose_issues` |
+| Xuất theo mục đích (giao diện: "Xuất mục đích", phiếu "Phiếu xuất mục đích") | Purpose issue | `purpose_issues` |
+| Điều chuyển (phiếu điều chuyển) | Transfer | `transfers` |
+| Phiếu trả hàng NCC | Supplier return | `supplier_returns` |
 | Hủy hàng | Waste / spoilage | `waste_reports` |
 | Sổ cái kho | Stock ledger | `stock_moves` |
 | Bút toán đảo | Reversal | `move_type = 'reversal'` |

@@ -16,7 +16,7 @@ export default function AdminError({
   }, [error]);
 
   return (
-    <main className="flex min-h-screen items-center justify-center px-6 py-10">
+    <div className="flex min-h-screen items-center justify-center px-6 py-10">
       <section className="w-full max-w-lg rounded-xl border bg-card p-6 shadow-sm">
         <h1 className="text-xl font-semibold">{vi.errors.pageTitle}</h1>
         <p className="mt-2 text-sm text-muted-foreground">
@@ -26,6 +26,6 @@ export default function AdminError({
           {vi.common.tryAgain}
         </Button>
       </section>
-    </main>
+    </div>
   );
 }

@@ -91,7 +91,10 @@ export function FrontdeskCheckDetail({
         title={`${vi.minibar.detailTitle} — ${vi.minibar.roomNo} ${check.room_no}`}
         description={
           <>
-            {check.doc_no} · {check.business_date} · {statusLabel(check.status)}
+            {check.doc_no} · {check.business_date} ·{" "}
+            {check.status === "pending_charge" && !check.checked_by
+              ? vi.minibar.notChecked
+              : statusLabel(check.status)}
             {check.is_loss ? ` · ${vi.minibar.isLoss}` : ""}
           </>
         }

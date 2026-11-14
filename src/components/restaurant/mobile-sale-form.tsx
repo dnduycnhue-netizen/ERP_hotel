@@ -1,5 +1,6 @@
 "use client";
 
+import { InlineConfirmButton } from "@/components/common/inline-confirm-button";
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -186,7 +187,6 @@ export function MobileVoidSaleButton({
   const [error, setError] = useState<string | null>(null);
 
   async function handleClick() {
-    if (!window.confirm(vi.restaurant.saleVoidConfirm)) return;
     setPending(true);
     setError(null);
     const res = await voidDishSaleAction({ propertyId, saleId });
@@ -200,15 +200,14 @@ export function MobileVoidSaleButton({
 
   return (
     <span className="inline-flex flex-col items-start gap-1">
-      <Button
-        type="button"
+      <InlineConfirmButton
         variant="outline"
         className="min-h-11 text-base"
+        label={vi.restaurant.voidSale}
+        confirmText={vi.restaurant.saleVoidConfirm}
+        onConfirm={handleClick}
         disabled={pending}
-        onClick={handleClick}
-      >
-        {vi.restaurant.voidSale}
-      </Button>
+      />
       {error ? (
         <span className="text-base text-destructive">{error}</span>
       ) : null}
