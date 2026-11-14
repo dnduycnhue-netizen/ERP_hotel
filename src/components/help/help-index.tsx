@@ -10,11 +10,15 @@ import { cn } from "@/lib/utils";
 
 /** Trang chỉ mục: lọc theo loại + tìm kiếm không dấu; bài "Dành cho bạn" lên đầu. */
 export function HelpIndex({
-  propertyId,
+  basePath,
   items,
+  suggested = [],
 }: {
-  propertyId: string;
+  /** `/<p>/help` (desktop) hoặc `/m/<p>/help` (mobile). */
+  basePath: string;
   items: HelpListItem[];
+  /** Bài gợi ý cho màn hình vừa xem (từ nút "?"). */
+  suggested?: HelpListItem[];
 }) {
   const [query, setQuery] = useState("");
   const [kind, setKind] = useState<HelpKind | "all">("all");
@@ -25,6 +29,27 @@ export function HelpIndex({
 
   return (
     <div className="flex flex-col gap-4">
+      {suggested.length > 0 ? (
+        <section
+          aria-label={vi.help.suggestedTitle}
+          className="rounded-xl border border-primary/30 bg-primary/5 p-4"
+        >
+          <h2 className="mb-2 text-sm font-semibold">{vi.help.suggestedTitle}</h2>
+          <ul className="flex flex-wrap gap-2">
+            {suggested.map((item) => (
+              <li key={item.slug}>
+                <Link
+                  href={`${basePath}/${item.slug}`}
+                  className="inline-flex min-h-10 items-center rounded-full border bg-background px-3.5 text-sm font-medium hover:bg-muted"
+                >
+                  {item.title}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
       <label className="relative block max-w-xl">
         <span className="sr-only">{vi.help.searchLabel}</span>
         <Search
@@ -74,7 +99,7 @@ export function HelpIndex({
           {shown.map((item) => (
             <li key={item.slug}>
               <Link
-                href={`/${propertyId}/help/${item.slug}`}
+                href={`${basePath}/${item.slug}`}
                 className="flex h-full flex-col gap-1.5 rounded-xl border bg-card p-4 transition-colors hover:border-primary/50 hover:bg-muted/40"
               >
                 <span className="flex flex-wrap items-center gap-1.5">

@@ -8,6 +8,7 @@ import { switchProperty } from "@/app/(app)/actions";
 import { signOut } from "@/app/(auth)/login/actions";
 import type { AccessibleProperty } from "@/lib/supabase/access";
 import { cn } from "@/lib/utils";
+import { ContextHelpLink } from "@/components/help/context-help-link";
 import { JumpSearch } from "./jump-search";
 
 /**
@@ -87,6 +88,10 @@ export function AppTopbar({
               ))}
             </select>
           </form>
+        ) : null}
+
+        {propertyId != null && showJumpSearch ? (
+          <ContextHelpLink basePath={`/${propertyId}/help`} />
         ) : null}
 
         {propertyId != null && showJumpSearch && canViewAlerts ? (

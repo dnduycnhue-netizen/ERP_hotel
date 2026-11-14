@@ -23,9 +23,11 @@ const TONE: Record<HelpTone, { cls: string; Icon: typeof Info }> = {
 function Block({
   block,
   propertyId,
+  showLinks,
 }: {
   block: HelpBlock;
   propertyId: string;
+  showLinks: boolean;
 }) {
   switch (block.t) {
     case "h":
@@ -67,7 +69,7 @@ function Block({
                 <p className="text-muted-foreground">
                   <InlineText text={step.text} />
                 </p>
-                {step.href ? (
+                {showLinks && step.href ? (
                   <Link
                     href={`/${propertyId}${step.href}`}
                     className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
@@ -135,14 +137,22 @@ function Block({
 export function HelpArticleView({
   article,
   propertyId,
+  showLinks = true,
 }: {
   article: HelpArticle;
   propertyId: string;
+  /** Bản mobile ẩn nút "Mở màn hình" (đường dẫn của bản máy tính). */
+  showLinks?: boolean;
 }) {
   return (
     <article className="max-w-3xl space-y-3">
       {article.blocks.map((block, i) => (
-        <Block key={i} block={block} propertyId={propertyId} />
+        <Block
+          key={i}
+          block={block}
+          propertyId={propertyId}
+          showLinks={showLinks}
+        />
       ))}
     </article>
   );

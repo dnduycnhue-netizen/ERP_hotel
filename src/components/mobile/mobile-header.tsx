@@ -3,6 +3,7 @@
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { ContextHelpLink } from "@/components/help/context-help-link";
 import { vi } from "@/i18n/vi";
 
 /**
@@ -22,6 +23,7 @@ const SECTION_TITLES: Record<string, string> = {
   count: vi.mobile.navCount,
   trolley: vi.mobile.navTrolley,
   minibar: vi.mobile.navMinibar,
+  help: vi.help.nav,
 };
 
 export function MobileHeader({
@@ -61,8 +63,12 @@ export function MobileHeader({
             {propertyName}
           </p>
         </div>
-        {/* Giữ tiêu đề cân giữa khi không có nút back. */}
-        <span className="min-w-11 shrink-0" aria-hidden />
+        <div className="flex min-w-11 shrink-0 items-center justify-center">
+          <ContextHelpLink
+            basePath={`/m/${propertyId}/help`}
+            className="size-11"
+          />
+        </div>
       </div>
     </header>
   );

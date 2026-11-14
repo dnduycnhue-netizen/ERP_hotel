@@ -80,3 +80,47 @@ describe("Trung tâm hướng dẫn: toàn vẹn nội dung", () => {
     expect(filterListItems(items, "zzzzkhongco", "all")).toEqual([]);
   });
 });
+
+import { HELP_SECTIONS, helpSectionForPath, isHelpSection } from "@/features/help/context";
+import { HELP_SECTION_SLUGS, suggestedItems } from "@/features/help/lib";
+
+describe("Ngữ cảnh hướng dẫn (nút ?)", () => {
+  it("đường dẫn desktop/mobile ánh xạ đúng mục", () => {
+    const P = "b0000000-0000-4000-8000-000000000002";
+    expect(helpSectionForPath(`/${P}/procurement/po`)).toBe("procurement");
+    expect(helpSectionForPath(`/${P}/inventory/waste/new`)).toBe("waste");
+    expect(helpSectionForPath(`/${P}/inventory/counts`)).toBe("count");
+    expect(helpSectionForPath(`/${P}/inventory/locks`)).toBe("locks");
+    expect(helpSectionForPath(`/${P}/inventory/receipts`)).toBe("receiving");
+    expect(helpSectionForPath(`/${P}/inventory/stock`)).toBe("inventory");
+    expect(helpSectionForPath(`/${P}/finance/invoices`)).toBe("finance");
+    expect(helpSectionForPath(`/${P}/frontdesk/minibar`)).toBe("minibar");
+    expect(helpSectionForPath(`/${P}/housekeeping/trolleys`)).toBe("trolley");
+    expect(helpSectionForPath(`/${P}/reports/stock-card`)).toBe("reports");
+    expect(helpSectionForPath(`/m/${P}/receive/abc`)).toBe("receiving");
+    expect(helpSectionForPath(`/m/${P}/count`)).toBe("count");
+    expect(helpSectionForPath(`/m/${P}/minibar/xyz`)).toBe("minibar");
+    expect(helpSectionForPath(`/${P}`)).toBeNull();
+    expect(helpSectionForPath(`/${P}/help`)).toBeNull();
+  });
+
+  it("mỗi mục có danh sách bài, mọi slug tồn tại; isHelpSection chặn giá trị lạ", () => {
+    const slugs = new Set(HELP_ARTICLES.map((a) => a.slug));
+    for (const section of HELP_SECTIONS) {
+      expect(HELP_SECTION_SLUGS[section].length, section).toBeGreaterThan(0);
+      for (const s of HELP_SECTION_SLUGS[section]) expect(slugs.has(s), `${section}:${s}`).toBe(true);
+    }
+    expect(isHelpSection("count")).toBe(true);
+    expect(isHelpSection("xyz")).toBe(false);
+    expect(isHelpSection(undefined)).toBe(false);
+  });
+
+  it("gợi ý giữ thứ tự và bỏ bài của module tắt", () => {
+    const off = toListItems(visibleArticles({ restaurant: false, hk_frontdesk: false }), new Set());
+    const res = suggestedItems("restaurant", off).map((i) => i.slug);
+    expect(res).not.toContain("phan-he-nha-hang");
+    expect(res).toContain("quy-tac-gia-von");
+    const on = toListItems(visibleArticles({ restaurant: true, hk_frontdesk: true }), new Set());
+    expect(suggestedItems("count", on).map((i) => i.slug)[0]).toBe("sop-kiem-ke-cuoi-thang");
+  });
+});
