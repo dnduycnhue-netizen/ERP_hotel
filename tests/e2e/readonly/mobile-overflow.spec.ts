@@ -36,6 +36,23 @@ const SCREENS: { path: string; name: string }[] = [
   { path: mobileUrl("/receive"), name: "nhan hang mobile" },
   { path: mobileUrl("/count"), name: "kiem ke mobile" },
   { path: mobileUrl("/minibar"), name: "minibar mobile" },
+  // Man chung tu kho moi Q270 (V10): form lap + trang chi tiet phieu linh.
+  { path: propertyUrl("/inventory/waste/new"), name: "lap phieu huy hang" },
+  {
+    path: propertyUrl("/inventory/requisitions/new"),
+    name: "lap phieu linh",
+  },
+  {
+    path: propertyUrl("/inventory/transfers/new"),
+    name: "lap phieu dieu chuyen",
+  },
+  { path: propertyUrl("/inventory/issues/new"), name: "lap phieu xuat muc dich" },
+  {
+    path: propertyUrl(
+      "/inventory/requisitions/d220983d-acf9-484f-9a6c-2c3aae12a930",
+    ),
+    name: "chi tiet phieu linh REQ-0002",
+  },
 ];
 
 for (const screen of SCREENS) {
