@@ -26,40 +26,64 @@ function center(n: FlowNode): { x: number; y: number } {
   return { x: LABEL_W + n.col * CW + CW / 2, y: n.lane * LH + LH / 2 };
 }
 
-type Path = { d: string; lx: number; ly: number };
+type Pt = { x: number; y: number };
+type Path = { d: string; lx: number; ly: number; anchor: "middle" | "start" };
+
+/** Chuyển danh sách điểm (chỉ đi ngang/dọc) thành chuỗi path H/V và vị trí nhãn trên đoạn dài nhất. */
+function toPath(pts: Pt[]): Path {
+  let d = `M ${pts[0].x} ${pts[0].y}`;
+  let best = { len: -1, i: 0 };
+  for (let k = 1; k < pts.length; k++) {
+    const a = pts[k - 1];
+    const b = pts[k];
+    d += a.y === b.y ? ` H ${b.x}` : ` V ${b.y}`;
+    const len = Math.abs(b.x - a.x) + Math.abs(b.y - a.y);
+    if (len > best.len) best = { len, i: k };
+  }
+  const a = pts[best.i - 1];
+  const b = pts[best.i];
+  if (a.y === b.y) {
+    return { d, lx: (a.x + b.x) / 2, ly: a.y - 6, anchor: "middle" };
+  }
+  return { d, lx: a.x + 6, ly: (a.y + b.y) / 2, anchor: "start" };
+}
 
 /** Đường nối giữa hai ô: thẳng, gấp khúc, hoặc vòng ngược (nét đứt). */
 export function edgePath(a: FlowNode, b: FlowNode): Path {
   const A = center(a);
   const B = center(b);
-  const forward = b.col > a.col;
-  if (forward) {
+  if (b.col > a.col) {
     const sx = A.x + NW / 2;
     const ex = B.x - NW / 2;
     if (a.lane === b.lane) {
-      return { d: `M ${sx} ${A.y} H ${ex}`, lx: (sx + ex) / 2, ly: A.y - 7 };
+      return toPath([
+        { x: sx, y: A.y },
+        { x: ex, y: A.y },
+      ]);
     }
     const mx = ex - 14 > sx ? ex - 14 : (sx + ex) / 2;
-    // Nhãn đặt ngay sau ô nguồn (trên đoạn ngang đầu) để biết nhánh nào đi đường nào.
-    return {
-      d: `M ${sx} ${A.y} H ${mx} V ${B.y} H ${ex}`,
-      lx: sx + Math.min(34, Math.max(14, (mx - sx) / 2)),
-      ly: A.y - 6,
-    };
+    return toPath([
+      { x: sx, y: A.y },
+      { x: mx, y: A.y },
+      { x: mx, y: B.y },
+      { x: ex, y: B.y },
+    ]);
   }
   if (b.col === a.col && a.lane !== b.lane) {
     const down = b.lane > a.lane;
-    const sy = A.y + (down ? NH / 2 : -NH / 2);
-    const ey = B.y + (down ? -NH / 2 : NH / 2);
-    return { d: `M ${A.x} ${sy} V ${ey}`, lx: A.x + 4, ly: (sy + ey) / 2 };
+    return toPath([
+      { x: A.x, y: A.y + (down ? NH / 2 : -NH / 2) },
+      { x: A.x, y: B.y + (down ? -NH / 2 : NH / 2) },
+    ]);
   }
   // Vòng ngược (quay lại bước trước): đi xuống dưới rồi lên.
   const yy = Math.max(A.y, B.y) + NH / 2 + 18;
-  return {
-    d: `M ${A.x} ${A.y + NH / 2} V ${yy} H ${B.x} V ${B.y + NH / 2}`,
-    lx: (A.x + B.x) / 2,
-    ly: yy - 5,
-  };
+  return toPath([
+    { x: A.x, y: A.y + NH / 2 },
+    { x: A.x, y: yy },
+    { x: B.x, y: yy },
+    { x: B.x, y: B.y + NH / 2 },
+  ]);
 }
 
 function NodeBox({ n, lanes }: { n: FlowNode; lanes: string[] }) {
@@ -250,7 +274,7 @@ export function WorkflowDiagram({ diagram }: { diagram: FlowDiagram }) {
                     <text
                       x={p.lx}
                       y={p.ly}
-                      textAnchor="middle"
+                      textAnchor={p.anchor}
                       fontSize={10}
                       fontWeight={600}
                       paintOrder="stroke"
