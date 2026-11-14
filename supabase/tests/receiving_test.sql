@@ -12,7 +12,7 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 set local search_path = public, extensions;
-select plan(87);
+select plan(89);
 
 -- 0. Fixture
 insert into public.organizations (id, name) values
@@ -455,6 +455,50 @@ select throws_ok(
   )$q$,
   'P0001', 'ERR_PHOTO_REQUIRED',
   'THIT without photo is rejected'
+);
+
+-- Q274: THIT khong anh nhung co xac nhan "khong co camera" + ly do -> ghi duoc va de lai vet.
+-- Chay trong khoi con roi hoan tac de khong anh huong cac buoc sau cua suite.
+do $$
+declare
+  v_n bigint;
+begin
+  perform public.receiving_record_line(
+    p_gr_id := (select id from t023_ctx where key = 'gr1'),
+    p_po_line_id := 'd0230000-0000-4000-8000-000000000c02',
+    p_item_id := 'd0230000-0000-4000-8000-000000000502',
+    p_gross := 5, p_tare := 0, p_uom := 'kg',
+    p_qc := '{"status": "pass"}'::jsonb,
+    p_lot := 'LOT-T1', p_expiry := '2026-12-09',
+    p_photo_waived_reason := 'Thiet bi khong co camera'
+  );
+  -- RLS: nguoi nhan khong co receiving.view nen doc bang vet bang vai tro goc.
+  execute 'reset role';
+  select count(*) into v_n from public.receiving_photo_waivers
+  where po_line_id = 'd0230000-0000-4000-8000-000000000c02';
+  execute 'set local role authenticated';
+  if v_n <> 1 then
+    raise exception 'waiver not recorded: %', v_n;
+  end if;
+  raise exception 'Q274_OK';
+exception when others then
+  if sqlerrm <> 'Q274_OK' then
+    raise;
+  end if;
+end $$;
+select pass('THIT without photo is accepted when waived with a reason, and the waiver is recorded (Q274)');
+select throws_ok(
+  $q$select public.receiving_record_line(
+    p_gr_id := (select id from t023_ctx where key = 'gr1'),
+    p_po_line_id := 'd0230000-0000-4000-8000-000000000c02',
+    p_item_id := 'd0230000-0000-4000-8000-000000000502',
+    p_gross := 5, p_tare := 0, p_uom := 'kg',
+    p_qc := '{"status": "pass"}'::jsonb,
+    p_lot := 'LOT-T1', p_expiry := '2026-12-09',
+    p_photo_waived_reason := '   '
+  )$q$,
+  'P0001', 'ERR_PHOTO_REQUIRED',
+  'blank waiver reason does not bypass the photo rule'
 );
 
 -- THIT co anh nhung thieu lot -> ERR_LOT_REQUIRED.

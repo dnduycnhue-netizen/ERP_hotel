@@ -120,6 +120,7 @@ export async function recordReceivingLineAction(
       p_expiry: parsed.data.expiry ?? null,
       p_photo_ids: parsed.data.photoIds ?? null,
       p_client_uuid: parsed.data.clientUuid ?? null,
+      p_photo_waived_reason: parsed.data.photoWaivedReason ?? null,
     },
   );
 }

@@ -4826,6 +4826,64 @@ export type Database = {
           },
         ]
       }
+      receiving_photo_waivers: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          gr_id: string
+          id: string
+          item_id: string
+          org_id: string
+          po_line_id: string
+          property_id: string
+          reason: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          gr_id: string
+          id?: string
+          item_id: string
+          org_id: string
+          po_line_id: string
+          property_id: string
+          reason: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          gr_id?: string
+          id?: string
+          item_id?: string
+          org_id?: string
+          po_line_id?: string
+          property_id?: string
+          reason?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "receiving_photo_waivers_gr_id_fkey"
+            columns: ["gr_id"]
+            isOneToOne: false
+            referencedRelation: "goods_receipts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "receiving_photo_waivers_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "receiving_photo_waivers_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       recipe_lines: {
         Row: {
           created_at: string
@@ -9212,6 +9270,7 @@ export type Database = {
           p_item_id: string
           p_lot?: string
           p_photo_ids?: string[]
+          p_photo_waived_reason?: string
           p_po_line_id: string
           p_qc?: Json
           p_tare?: number

@@ -125,6 +125,9 @@ export function MobileLineForm({
   const [expiry, setExpiry] = useState("");
   const [failReason, setFailReason] = useState("");
   const [photos, setPhotos] = useState<FormPhoto[]>([]);
+  // Phương án 2 khi không có camera: tích xác nhận + lý do (Q274, quyết định Duy).
+  const [noCamera, setNoCamera] = useState(false);
+  const [noCameraReason, setNoCameraReason] = useState("");
   const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -149,9 +152,17 @@ export function MobileLineForm({
     grossNum > 0 &&
     tareNum >= 0 &&
     (grossNum === null || tareNum <= grossNum) &&
-    (!line.photo_required || photos.length > 0) &&
+    (!line.photo_required ||
+      photos.length > 0 ||
+      (noCamera && noCameraReason.trim() !== "")) &&
     (!line.track_lot || (lot.trim() !== "" && expiry !== "")) &&
     (qcStatus !== "fail" || failReason.trim() !== "");
+
+  // Chỉ gửi lý do miễn ảnh khi thực sự không có ảnh nào.
+  const waivedReason =
+    line.photo_required && photos.length === 0 && noCamera
+      ? noCameraReason.trim() || null
+      : null;
 
   async function handleCaptured(photo: CapturedPhoto) {
     // Offline (T-025): giữ blob trên máy, tải lên lúc đồng bộ cùng job ghi
@@ -274,6 +285,7 @@ export function MobileLineForm({
               lot: lot.trim() || null,
               expiry: expiry || null,
               photoIds: [],
+              photoWaivedReason: waivedReason,
               clientUuid,
             },
             photos: queuedPhotos,
@@ -311,6 +323,7 @@ export function MobileLineForm({
       lot: lot.trim() || null,
       expiry: expiry || null,
       photoIds,
+      photoWaivedReason: waivedReason,
       clientUuid: crypto.randomUUID(),
     });
     if (!res.ok) {
@@ -611,6 +624,31 @@ export function MobileLineForm({
           onCaptured={(photo) => void handleCaptured(photo)}
           disabled={submitting || uploading}
         />
+        {line.photo_required && photos.length === 0 ? (
+          <div className="flex flex-col gap-2 rounded-md border border-dashed p-3">
+            <label className="flex min-h-11 items-center gap-3 text-sm">
+              <input
+                type="checkbox"
+                checked={noCamera}
+                onChange={(e) => setNoCamera(e.target.checked)}
+                disabled={submitting}
+                className="size-5 accent-primary"
+              />
+              {vi.receiving.noCameraConfirm}
+            </label>
+            {noCamera ? (
+              <input
+                value={noCameraReason}
+                onChange={(e) => setNoCameraReason(e.target.value)}
+                disabled={submitting}
+                maxLength={300}
+                placeholder={vi.receiving.noCameraReasonPlaceholder}
+                aria-label={vi.receiving.noCameraReasonPlaceholder}
+                className="h-11 w-full rounded-md border bg-background px-3 text-base"
+              />
+            ) : null}
+          </div>
+        ) : null}
       </div>
 
       <div className="flex flex-col gap-2">

@@ -46,6 +46,8 @@ export const receivingRecordLineSchema = z.object({
     .nullable(),
   expiry: dateSchema.optional().nullable(),
   photoIds: z.array(uuidSchema).optional().nullable(),
+  /** Thiết bị không có camera: xác nhận + lý do thay cho ảnh (Q274). */
+  photoWaivedReason: z.string().trim().max(300).optional().nullable(),
   clientUuid: uuidSchema.optional().nullable(),
 });
 

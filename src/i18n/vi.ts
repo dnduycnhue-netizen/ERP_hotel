@@ -1862,6 +1862,9 @@ export const vi = {
     reweighTitle: "Cân lại lần 2",
     weigh1Summary: "Lần 1",
     photoTaken: "Đã chụp ảnh",
+    noCameraConfirm:
+      "Thiết bị không có camera / không chụp được ảnh — xác nhận nhận hàng không kèm ảnh",
+    noCameraReasonPlaceholder: "Lý do không chụp được (bắt buộc)",
     photoMissing: "Chưa chụp ảnh",
     photoUploading: "Đang tải ảnh lên…",
     qcChecklistTitle: "Mục kiểm tra QC",

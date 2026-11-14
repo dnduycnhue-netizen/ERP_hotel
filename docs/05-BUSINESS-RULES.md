@@ -54,6 +54,7 @@ draft ──submit──▶ submitted ──approve (đủ bước)──▶ app
   - Thừa sau lần 2 → chỉ nhập đến `qty PO × (1 + dung sai)`; phần dư cần `storekeeper` hoặc `gm` override có lý do (hàng nguyên con).
 - QC `fail` → không nhập kho, sinh `supplier_returns` ngay. QC `conditional` → nhập vào kho `quarantine`, chờ quyết định trong 24h.
 - Ảnh bắt buộc: ≥ 1 ảnh/dòng cho nhóm `food` thịt, cá, hải sản và mọi dòng `is_key_item`; ≥ 1 ảnh/phiếu cho nhóm khác [cấu hình].
+  - **Ngoại lệ không có camera (quyết định Duy 14/11/2026, Q274):** thiết bị không có camera/không chụp được thì người nhận tích xác nhận + ghi lý do thay cho ảnh. Mỗi lần ghi vào `receiving_photo_waivers` (có nhật ký audit) để hậu kiểm; lý do trống vẫn bị chặn `ERR_PHOTO_REQUIRED`. Chỉ áp cho màn nhận hàng; hủy hàng vẫn bắt buộc ảnh.
 - `unit_cost` dòng nhận = đơn giá PO (quy đổi về đơn vị kho), **không** nhập tay.
 - Nhận thẳng vào bếp (`direct_issue_warehouse_id`): post ghi 2 cặp move: `receipt` vào kho tổng rồi `issue_out`/`issue_in` sang kho bếp, cùng `business_date`.
 
