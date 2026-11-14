@@ -1,4 +1,5 @@
 import { ArrowDown } from "lucide-react";
+import { FitToWidth } from "@/components/help/fit-to-width";
 import { vi } from "@/i18n/vi";
 import type { FlowDiagram, FlowNode } from "@/i18n/help/types";
 import { cn } from "@/lib/utils";
@@ -39,10 +40,11 @@ export function edgePath(a: FlowNode, b: FlowNode): Path {
       return { d: `M ${sx} ${A.y} H ${ex}`, lx: (sx + ex) / 2, ly: A.y - 7 };
     }
     const mx = ex - 14 > sx ? ex - 14 : (sx + ex) / 2;
+    // Nhãn đặt ngay sau ô nguồn (trên đoạn ngang đầu) để biết nhánh nào đi đường nào.
     return {
       d: `M ${sx} ${A.y} H ${mx} V ${B.y} H ${ex}`,
-      lx: mx,
-      ly: (A.y + B.y) / 2,
+      lx: sx + Math.min(34, Math.max(14, (mx - sx) / 2)),
+      ly: A.y - 6,
     };
   }
   if (b.col === a.col && a.lane !== b.lane) {
@@ -187,7 +189,8 @@ export function WorkflowDiagram({ diagram }: { diagram: FlowDiagram }) {
     <figure className="space-y-2">
       <figcaption className="text-sm font-semibold">{diagram.title}</figcaption>
 
-      <div className="hidden overflow-x-auto rounded-xl border bg-background p-2 md:block">
+      <div className="hidden rounded-xl border bg-background p-2 md:block">
+        <FitToWidth width={W} height={H}>
         <div className="relative" style={{ width: W, height: H }}>
           {/* Hàng bơi */}
           {diagram.lanes.map((name, i) => (
@@ -270,6 +273,7 @@ export function WorkflowDiagram({ diagram }: { diagram: FlowDiagram }) {
             <NodeBox key={n.id} n={n} lanes={diagram.lanes} />
           ))}
         </div>
+        </FitToWidth>
       </div>
 
       <div className="md:hidden">

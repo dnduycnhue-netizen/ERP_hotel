@@ -155,7 +155,7 @@ export function HelpArticleView({
             {vi.help.flowTitle}
           </h2>
           <ul className="flex flex-wrap gap-x-5 gap-y-1 text-xs text-muted-foreground">
-            <li>{vi.help.flowLegendLane}</li>
+            <li className="hidden md:list-item">{vi.help.flowLegendLane}</li>
             <li className="flex items-center gap-1">
               <span className="text-amber-500">◇</span>
               {vi.help.flowLegendDecision}
