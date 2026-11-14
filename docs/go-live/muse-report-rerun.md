@@ -73,4 +73,4 @@
 
 ## Lệnh đã chạy + kết quả thật
 - Nhánh `feat/muse-rerun` từ main `eefc372`; 5 commit báo cáo (R1 `9085a76`, R2 `3b31a8c`, R3 `5945993`, R5 `0a41f7d`, + commit báo cáo tổng này); gate `pnpm lint && pnpm typecheck && pnpm test` xanh ở mỗi commit.
-- Đẩy nhánh `feat/muse-rerun`: (ghi kết quả thật sau khi chạy — nếu push thất bại thì giao bundle thay thế).
+- Đẩy nhánh `feat/muse-rerun`: **push thất bại** (`fatal: could not read Username for 'https://github.com'` — VM không push được GitHub, như mọi lần). Giao bằng bundle `~/workspace/erp-hotel-rerun-r1-r5.bundle` (verify OK) — Duy fetch từ ~/Downloads rồi merge vào main, push, không cần db push / vercel (chỉ docs).
