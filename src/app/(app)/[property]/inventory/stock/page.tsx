@@ -33,7 +33,7 @@ export default async function StockPage({
     listInventoryWarehousesAction(propertyId),
     listStockAction({
       propertyId,
-      warehouseId: sp.warehouse ?? null,
+      warehouseId: sp.warehouse ? sp.warehouse : null,
       search: search === "" ? null : search,
       limit: pageSize,
       offset: (page - 1) * pageSize,

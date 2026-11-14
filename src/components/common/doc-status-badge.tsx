@@ -35,6 +35,7 @@ export type DocStatus =
   | "partially_received"
   | "received"
   | "closed"
+  | "completed"
   | "cancelled"
   | "posted"
   | "reversed"
@@ -230,6 +231,11 @@ const STATUS_META: Record<DocStatus, DocStatusMeta> = {
     label: vi.components.docStatus.confirmed,
     className:
       "bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-200",
+    Icon: CheckCircle2,
+  },
+  completed: {
+    label: vi.components.docStatus.completed,
+    className: "bg-muted text-muted-foreground",
     Icon: CheckCircle2,
   },
   in_progress: {

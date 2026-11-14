@@ -3,7 +3,7 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 set local search_path = public, extensions;
-select plan(17);
+select plan(19);
 
 insert into public.organizations (id, name) values ('a5400000-0000-4000-8000-000000000001', 'Q254 Org');
 insert into public.legal_entities (id, org_id, code, name) values
@@ -53,8 +53,12 @@ $$;
 -- Mac dinh: khong co dong = bat ca hai module.
 select is(public.module_enabled('a5400000-0000-4000-8000-000000000201', 'hk_frontdesk'), true, 'hk_frontdesk is on by default');
 select is(public.module_enabled('a5400000-0000-4000-8000-000000000201', 'restaurant'), true, 'restaurant is on by default');
-select is((select count(*) from pg_trigger where tgname like 'trg\_%\_module\_guard' and not tgisinternal), 13::bigint,
-  '13 module guard triggers are installed');
+select is((select count(*) from pg_trigger where tgname like 'trg\_%\_module\_guard' and not tgisinternal), 15::bigint,
+  '15 module guard triggers are installed (13 + 2 child tables, Q271)');
+select is((select count(*) from pg_trigger where tgname like 'trg\_%\_module\_guard' and not tgisinternal and (tgtype & 8) = 8), 15::bigint,
+  'every module guard trigger also fires on DELETE (Q271)');
+select is((select count(*) from pg_trigger where tgname in ('trg_banquet_dishes_module_guard','trg_buffet_session_dishes_module_guard') and not tgisinternal), 2::bigint,
+  'child tables banquet_dishes / buffet_session_dishes are guarded via their parent');
 
 set local role authenticated;
 select public._a54_as('a5400000-0000-4000-8000-000000000a02');

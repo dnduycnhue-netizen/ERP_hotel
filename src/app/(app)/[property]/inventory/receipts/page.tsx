@@ -169,9 +169,9 @@ export default async function InventoryReceiptsPage({
               {receipts.map((receipt) => (
                 <tr key={receipt.id} className="border-t hover:bg-muted/40">
                   <td className="px-3 py-3 align-middle">
-                    {receipt.po_id ? (
+                    {receipt.id ? (
                       <Link
-                        href={`/${propertyId}/procurement/po/${receipt.po_id}`}
+                        href={`/m/${propertyId}/receive/${receipt.id}`}
                         className="font-mono text-xs font-bold text-primary hover:underline"
                       >
                         {receipt.doc_no}

@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
@@ -63,6 +64,8 @@ export async function signIn(formData: FormData) {
     return signOutAndRedirect("inactive_account");
   }
 
+  // Xóa cache layout để menu/quyền của tài khoản trước không còn (B-22).
+  revalidatePath("/", "layout");
   redirect("/");
 }
 
@@ -74,5 +77,6 @@ export async function signOut() {
     throw error;
   }
 
+  revalidatePath("/", "layout");
   redirect("/login");
 }

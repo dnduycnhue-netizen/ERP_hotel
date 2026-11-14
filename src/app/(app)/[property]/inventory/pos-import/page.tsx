@@ -1,4 +1,6 @@
 import { ErrorState } from "@/components/common/error-state";
+import { ModuleDisabled } from "@/components/common/module-disabled";
+import { getPropertyModules } from "@/lib/modules/server";
 import { PosImportForm } from "@/components/inventory/pos-import-form";
 import { PageHeader } from "@/components/shell/page-header";
 import { vi } from "@/i18n/vi";
@@ -12,6 +14,11 @@ export default async function PosImportPage({
 }) {
   const { property: propertyId } = await params;
   const supabase = await createClient();
+  // Nạp POS thuộc module Nhà hàng: tắt module thì không hiện form (B-20).
+  const modules = await getPropertyModules(supabase, propertyId);
+  if (!modules.restaurant) {
+    return <ModuleDisabled name={vi.admin.modules.restaurant} />;
+  }
   const { data: allowed } = await supabase.rpc("has_perm", {
     p_property: propertyId,
     p_perm: "pos.import",
