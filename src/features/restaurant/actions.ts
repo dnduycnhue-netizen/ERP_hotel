@@ -35,7 +35,12 @@ export type RecipeSaveResult = {
   version_no: number;
 };
 
-export type IdResult = { ok: boolean; id: string };
+export type IdResult = {
+  ok: boolean;
+  id: string;
+  /** Số NVL của phiếu lĩnh tự sinh vượt tồn (dish_sale_record, B-31). */
+  stock_short_lines?: number;
+};
 
 export type BuffetCloseResult = {
   ok: boolean;

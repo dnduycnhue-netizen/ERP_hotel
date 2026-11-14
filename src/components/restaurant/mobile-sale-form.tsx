@@ -83,7 +83,12 @@ export function MobileSaleForm({
       setError(res.error);
       return;
     }
-    setMessage(vi.restaurant.saleRecorded);
+    const short = res.data.stock_short_lines ?? 0;
+    setMessage(
+      short > 0
+        ? `${vi.restaurant.saleRecorded} ${vi.restaurant.saleStockWarning.replace("{count}", String(short))}`
+        : vi.restaurant.saleRecorded,
+    );
     setQty("");
     router.refresh();
   }

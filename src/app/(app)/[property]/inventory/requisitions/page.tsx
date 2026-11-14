@@ -14,6 +14,7 @@ import { formatNumber } from "@/components/common/money-text";
 import { listRequisitionsAction } from "@/features/inventory/actions";
 import { vi } from "@/i18n/vi";
 import { PageHeader } from "@/components/shell/page-header";
+import { NewDocButton } from "@/components/inventory/new-doc-button";
 
 const STATUSES = [
   "draft",
@@ -70,7 +71,16 @@ export default async function RequisitionsPage({
 
   return (
     <div className="flex flex-col gap-4">
-      <PageHeader title={vi.inventory.requisitionsTitle} />
+      <PageHeader
+        title={vi.inventory.requisitionsTitle}
+        actions={
+          <NewDocButton
+            href={`/${propertyId}/inventory/requisitions/new`}
+            label={vi.inventory.doc.newRequisition}
+            permission="requisition.create"
+          />
+        }
+      />
 
       <StatusFilter
         status={status}

@@ -65,7 +65,12 @@ export function SaleForm({
       setError(res.error);
       return;
     }
-    setDone(vi.restaurant.saleRecorded);
+    const short = res.data.stock_short_lines ?? 0;
+    setDone(
+      short > 0
+        ? `${vi.restaurant.saleRecorded} ${vi.restaurant.saleStockWarning.replace("{count}", String(short))}`
+        : vi.restaurant.saleRecorded,
+    );
     setQty("");
     router.refresh();
   }

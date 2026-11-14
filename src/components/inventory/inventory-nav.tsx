@@ -43,7 +43,7 @@ export function InventoryNav({ propertyId }: { propertyId: string }) {
     canRequisitionApprove ||
     canRequisitionIssue ||
     canRequisitionReceive;
-  const canTransfer = canTransferSend || canTransferReceive;
+  const canTransfer = canTransferSend || canTransferReceive || canStockQty;
   const canIssue = canPurposeIssuePost || canPurposeIssueReverse;
   const canWaste = canWastePropose || canWasteApprove || canWasteApproveLarge;
   const canStock = canStockQty || canStockValue;

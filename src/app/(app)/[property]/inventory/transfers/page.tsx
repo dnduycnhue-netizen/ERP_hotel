@@ -14,6 +14,7 @@ import { formatNumber } from "@/components/common/money-text";
 import { listTransfersAction } from "@/features/inventory/actions";
 import { vi } from "@/i18n/vi";
 import { PageHeader } from "@/components/shell/page-header";
+import { NewDocButton } from "@/components/inventory/new-doc-button";
 
 const STATUSES = [
   "draft",
@@ -68,7 +69,16 @@ export default async function TransfersPage({
 
   return (
     <div className="flex flex-col gap-4">
-      <PageHeader title={vi.inventory.transfersTitle} />
+      <PageHeader
+        title={vi.inventory.transfersTitle}
+        actions={
+          <NewDocButton
+            href={`/${propertyId}/inventory/transfers/new`}
+            label={vi.inventory.doc.newTransfer}
+            permission="transfer.send"
+          />
+        }
+      />
 
       <StatusFilter
         status={status}

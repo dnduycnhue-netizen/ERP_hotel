@@ -14,6 +14,7 @@ import { MoneyText, formatNumber } from "@/components/common/money-text";
 import { listWasteAction } from "@/features/inventory/actions";
 import { vi } from "@/i18n/vi";
 import { PageHeader } from "@/components/shell/page-header";
+import { NewDocButton } from "@/components/inventory/new-doc-button";
 
 const STATUSES = [
   "draft",
@@ -77,7 +78,16 @@ export default async function WastePage({
 
   return (
     <div className="flex flex-col gap-4">
-      <PageHeader title={vi.inventory.wasteTitle} />
+      <PageHeader
+        title={vi.inventory.wasteTitle}
+        actions={
+          <NewDocButton
+            href={`/${propertyId}/inventory/waste/new`}
+            label={vi.inventory.doc.newWaste}
+            permission="waste.propose"
+          />
+        }
+      />
 
       <StatusFilter
         status={status}

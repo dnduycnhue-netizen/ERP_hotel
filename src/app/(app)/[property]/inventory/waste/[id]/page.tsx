@@ -7,6 +7,7 @@ import { MoneyText, formatNumber } from "@/components/common/money-text";
 import { getWasteAction } from "@/features/inventory/actions";
 import { vi } from "@/i18n/vi";
 import { PageHeader } from "@/components/shell/page-header";
+import { StockDocActions } from "@/components/inventory/stock-doc-actions";
 
 /** Chi tiết hủy hàng (T-031) — chỉ xem. Giá trị chỉ hiện khi RPC trả (có stock.view_value). */
 export default async function WasteDetailPage({
@@ -44,6 +45,29 @@ export default async function WasteDetailPage({
       <PageHeader
         title={doc.doc_no}
         description={<DocStatusBadge status={doc.status} />}
+      />
+
+      <StockDocActions
+        kind="waste"
+        propertyId={propertyId}
+        doc={{
+          id: doc.id,
+          status: doc.status,
+          businessDate: doc.business_date,
+          note: doc.note,
+          warehouseId: doc.warehouse_id,
+          reasonCode: doc.reason_code,
+          photoIds: doc.photo_ids,
+        }}
+        lines={doc.lines.map((l) => ({
+          id: l.id,
+          itemId: l.item_id,
+          itemName: l.item_name,
+          qtyStock: l.qty_stock,
+          doneOutQty: 0,
+          receivedQty: 0,
+          note: l.note,
+        }))}
       />
 
       <dl className="grid grid-cols-2 gap-x-6 gap-y-2 rounded-lg border bg-card p-4 text-sm sm:grid-cols-3">

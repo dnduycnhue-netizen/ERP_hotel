@@ -14,6 +14,7 @@ import { formatNumber } from "@/components/common/money-text";
 import { listPurposeIssuesAction } from "@/features/inventory/actions";
 import { vi } from "@/i18n/vi";
 import { PageHeader } from "@/components/shell/page-header";
+import { NewDocButton } from "@/components/inventory/new-doc-button";
 
 const STATUSES = ["draft", "posted", "reversed", "cancelled"] as const;
 
@@ -70,7 +71,16 @@ export default async function PurposeIssuesPage({
 
   return (
     <div className="flex flex-col gap-4">
-      <PageHeader title={vi.inventory.issuesTitle} />
+      <PageHeader
+        title={vi.inventory.issuesTitle}
+        actions={
+          <NewDocButton
+            href={`/${propertyId}/inventory/issues/new`}
+            label={vi.inventory.doc.newIssue}
+            permission="purpose_issue.post"
+          />
+        }
+      />
 
       <StatusFilter
         status={status}

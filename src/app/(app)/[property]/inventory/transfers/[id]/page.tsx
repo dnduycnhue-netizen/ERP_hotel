@@ -6,6 +6,7 @@ import { formatNumber } from "@/components/common/money-text";
 import { getTransferAction } from "@/features/inventory/actions";
 import { vi } from "@/i18n/vi";
 import { PageHeader } from "@/components/shell/page-header";
+import { StockDocActions } from "@/components/inventory/stock-doc-actions";
 
 /** Chi tiết điều chuyển (T-031) — chỉ xem. */
 export default async function TransferDetailPage({
@@ -34,6 +35,26 @@ export default async function TransferDetailPage({
       <PageHeader
         title={doc.doc_no}
         description={<DocStatusBadge status={doc.status} />}
+      />
+
+      <StockDocActions
+        kind="transfer"
+        propertyId={propertyId}
+        doc={{
+          id: doc.id,
+          status: doc.status,
+          businessDate: doc.business_date,
+          note: doc.note,
+        }}
+        lines={doc.lines.map((l) => ({
+          id: l.id,
+          itemId: l.item_id,
+          itemName: l.item_name,
+          qtyStock: l.qty_stock,
+          doneOutQty: l.sent_qty_stock,
+          receivedQty: l.received_qty_stock,
+          note: l.note,
+        }))}
       />
 
       <dl className="grid grid-cols-2 gap-x-6 gap-y-2 rounded-lg border bg-card p-4 text-sm sm:grid-cols-3">
