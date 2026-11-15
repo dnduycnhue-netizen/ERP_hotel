@@ -65,7 +65,7 @@ export const MODULE_ARTICLES: HelpArticle[] = [
       { t: "ul", items: [
         "**Nhận hàng (điện thoại):** nhận hàng mù — mọi thao tác nhận làm ở đây.",
         "**Danh sách phiếu nhận (máy tính):** xem các phiếu đã tạo; mã phiếu mở chi tiết phiếu nhận.",
-        "**Phiếu trả hàng NCC:** xem và lập phiếu trả cho hàng hỏng/thiếu. Bấm **Lập phiếu trả hàng NCC** (mở màn trên điện thoại).",
+        "**Phiếu trả hàng NCC:** xem và lập phiếu trả cho hàng hỏng/thiếu. Bấm **Lập phiếu trả hàng NCC** (ở trang Trả hàng NCC trên máy tính).",
         "**Duyệt ảnh:** người hậu kiểm xem lại ảnh nhận hàng, đánh dấu ảnh nghi ngờ.",
       ]},
       { t: "note", tone: "rule", text: "Phần hỏng khi nhận (lập ngay lúc nhận) tạo phiếu trả ở trạng thái **đã ghi nhận** và **không** trừ kho vì hàng chưa từng nhập. Phiếu trả lập sau cho hàng **đã nhập kho** mới xuất kho khi ghi sổ." },
@@ -86,7 +86,7 @@ export const MODULE_ARTICLES: HelpArticle[] = [
         ["Phiếu lĩnh", "Lập → Gửi duyệt → Duyệt → Xuất kho → Xác nhận nhận", "Lệch xuất ≠ nhận phải xử lý trước khi khóa ca"],
         ["Điều chuyển", "Lập → Chuyển hàng → Nhận", "Có thể hủy khi còn nháp"],
         ["Xuất mục đích", "Lập → Ghi sổ → (Đảo phiếu)", "Cost center + khoản mục bắt buộc; không tính vào giá vốn hàng bán"],
-        ["Hủy hàng", "Lập → Chụp ảnh → Gửi duyệt → Duyệt", "Từ 1.000.000 đ/phiếu có thể thêm bước duyệt"],
+        ["Hủy hàng", "Lập → Chụp ảnh → Gửi duyệt → Duyệt", "Chỉ một bước duyệt (Quản lý)"],
       ]},
       { t: "h", text: "Tồn kho và thẻ kho" },
       { t: "ul", items: [
@@ -187,7 +187,7 @@ export const MODULE_ARTICLES: HelpArticle[] = [
     slug: "phan-he-bao-cao-canh-bao",
     kind: "module",
     title: "Báo cáo & Cảnh báo",
-    summary: "12 báo cáo vận hành, bản tin 8h, cảnh báo theo mức, xuất Excel.",
+    summary: "11 báo cáo vận hành, bản tin 8h, cảnh báo theo mức, xuất Excel.",
     module: "core",
     perms: ["report.view.rpt_stock_card", "report.view.rpt_opex", "report.view.rpt_ap_aging", "report.view.rpt_fnb_revenue", "report.view.rpt_daily_brief"],
     related: ["quy-tac-khoa-so-ngay-nghiep-vu", "vai-tro-chu-dau-tu", "vai-tro-quan-ly"],
