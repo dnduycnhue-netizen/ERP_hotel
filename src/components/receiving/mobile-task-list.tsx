@@ -131,7 +131,11 @@ export function MobileTaskList({
   function openStart(task: ReceivingTaskRow) {
     setSelected(task);
     setStartError(null);
-    setWarehouseId(receivableWarehouses[0]?.id ?? "");
+    // Mặc định kho chính (R4-N6): tránh nhận nhầm vào kho đầu danh sách (vd. kho bếp).
+    setWarehouseId(
+      (receivableWarehouses.find((w) => w.kind === "main") ??
+        receivableWarehouses[0])?.id ?? "",
+    );
     setDirectIssueWarehouseId("");
   }
 

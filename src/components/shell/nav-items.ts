@@ -57,6 +57,42 @@ const REPORT_PERMISSIONS = REPORT_CODES.map(
   (code) => getReportMeta(code).permission,
 );
 
+/**
+ * Đích khi bấm mục Kho (R4-N5): vào phiếu lĩnh nếu có quyền lĩnh/duyệt/xuất/nhận,
+ * không thì vào màn đầu tiên người dùng thật sự mở được (tồn, hủy hàng, kiểm kê).
+ */
+export function resolveNavHref(
+  item: NavItem,
+  propertyId: string,
+  permissions: ReadonlySet<string>,
+): string {
+  if (item.key !== "inventory") {
+    return item.href(propertyId);
+  }
+  const has = (...codes: string[]): boolean =>
+    codes.some((code) => permissions.has(code));
+  if (
+    has(
+      "requisition.create",
+      "requisition.approve",
+      "requisition.issue",
+      "requisition.receive",
+      "transfer.send",
+      "transfer.receive",
+    )
+  ) {
+    return item.href(propertyId);
+  }
+  if (has("stock.view_qty")) return `/${propertyId}/inventory/stock`;
+  if (has("waste.propose", "waste.approve", "waste.approve.large")) {
+    return `/${propertyId}/inventory/waste`;
+  }
+  if (has("count.view_variance", "count.lock", "count.adjust.approve")) {
+    return `/${propertyId}/inventory/counts`;
+  }
+  return item.href(propertyId);
+}
+
 export const NAV_GROUPS: { id: NavGroupId; label: string }[] = [
   { id: "overview", label: vi.shell.groups.overview },
   { id: "operations", label: vi.shell.groups.operations },

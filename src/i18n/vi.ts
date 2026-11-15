@@ -1980,7 +1980,9 @@ export const vi = {
       needWarehouse: "Hãy chọn kho.",
       needReason: "Hãy chọn lý do.",
       needPurpose: "Hãy chọn mục đích.",
-      needCostCenter: "Hãy chọn cost center (xuất mục đích tính vào chi phí).",
+      needCostCenter: "Hãy chọn Trung tâm chi phí (xuất mục đích tính vào chi phí).",
+      draftMissingCostCenter:
+        "Phiếu nháp này thiếu Trung tâm chi phí hoặc Khoản mục nên không ghi sổ được. Hãy hủy phiếu và lập phiếu mới có đủ hai trường này.",
       needExpenseCategory: "Hãy chọn khoản mục chi phí.",
       needOutlet: "Hãy chọn bộ phận.",
       sameWarehouse: "Kho xuất và kho nhận phải khác nhau.",

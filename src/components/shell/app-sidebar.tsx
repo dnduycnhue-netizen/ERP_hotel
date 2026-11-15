@@ -10,6 +10,7 @@ import {
   ADMIN_NAV_ITEMS,
   NAV_GROUPS,
   NAV_ITEMS,
+  resolveNavHref,
   type AdminNavVisibility,
 } from "./nav-items";
 
@@ -100,7 +101,7 @@ export function AppSidebar({
         ).map((item) => ({
           key: item.key,
           label: item.label,
-          href: item.href(propertyId ?? ""),
+          href: resolveNavHref(item, propertyId ?? "", permissions),
           icon: item.icon,
           active: isActive(item),
         })),

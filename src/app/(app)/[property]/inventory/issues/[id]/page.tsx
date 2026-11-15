@@ -46,6 +46,16 @@ export default async function PurposeIssueDetailPage({
         description={<DocStatusBadge status={doc.status} />}
       />
 
+      {doc.status === "draft" &&
+      (!doc.cost_center_id || !doc.expense_category_id) ? (
+        <p
+          role="alert"
+          className="rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900"
+        >
+          {vi.inventory.doc.draftMissingCostCenter}
+        </p>
+      ) : null}
+
       <StockDocActions
         kind="purpose_issue"
         propertyId={propertyId}
