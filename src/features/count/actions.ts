@@ -142,7 +142,14 @@ export async function lockCountAction(
   const supabase = await createClient();
   return callCountRpc<CountLockResult>(supabase, "count_lock", {
     p_count_id: parsed.data.countId,
-    p_reasons: parsed.data.reasons ?? null,
+    // RPC doc khoa snake_case (line_id, reason_code), schema Zod dung camelCase.
+    p_reasons: parsed.data.reasons
+      ? parsed.data.reasons.map((r) => ({
+          line_id: r.lineId,
+          reason_code: r.reasonCode,
+          explanation: r.explanation ?? null,
+        }))
+      : null,
   });
 }
 
