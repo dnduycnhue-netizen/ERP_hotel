@@ -97,10 +97,13 @@ export default async function ProcurementApprovalsPage({
           doc.docId,
         );
         if (!stepsRes.ok) return null;
-        const step = stepsRes.data.find(
-          (s) => s.decision === "pending" && myPermSet.has(s.required_perm),
-        );
-        if (!step) return null;
+        // Chỉ bước đang chờ hiện tại (số bước nhỏ nhất còn pending) mới là việc
+        // của người duyệt; bước sau chưa tới lượt (H4-N2).
+        const current = stepsRes.data
+          .filter((s) => s.decision === "pending")
+          .sort((a, b) => a.step - b.step)[0];
+        if (!current || !myPermSet.has(current.required_perm)) return null;
+        const step = current;
         const item: PendingApprovalItem = {
           docType: doc.docType,
           docId: doc.docId,

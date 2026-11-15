@@ -21,7 +21,7 @@ select is((select count(*) from q257_perms), (select count(distinct (role_code, 
 
 select is((select count(*) from q257_perms where role_code = 'sm_owner'), 58::bigint, 'sm_owner has 58 permissions');
 select is((select count(*) from q257_perms where role_code = 'sm_manager'), 73::bigint, 'sm_manager has 73 permissions');
-select is((select count(*) from q257_perms where role_code = 'sm_accountant'), 43::bigint, 'sm_accountant has 43 permissions');
+select is((select count(*) from q257_perms where role_code = 'sm_accountant'), 44::bigint, 'sm_accountant has 44 permissions');
 select is((select count(*) from q257_perms where role_code = 'sm_purchasing_store'), 30::bigint, 'sm_purchasing_store has 30 permissions');
 
 -- Nhan hang mu: khong vai tro moi nao vua nhan hang vua xem PO.

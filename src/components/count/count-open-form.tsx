@@ -43,7 +43,9 @@ export function CountOpenForm({
     month: "2-digit",
     day: "2-digit",
   }).format(new Date());
-  const [warehouseId, setWarehouseId] = useState(warehouses[0]?.id ?? "");
+  const [warehouseId, setWarehouseId] = useState(
+    (warehouses.find((w) => w.kind === "main") ?? warehouses[0])?.id ?? "",
+  );
   const [kind, setKind] = useState<"monthly_full" | "cycle">("monthly_full");
   const [businessDate, setBusinessDate] = useState(today);
   const [counters, setCounters] = useState<CountCounter[]>([]);

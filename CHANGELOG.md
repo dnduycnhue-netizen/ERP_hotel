@@ -101,3 +101,8 @@ Ghi theo task. Mỗi dòng: ngày — mã task — agent — tóm tắt.
 - Trước lần thử tiếp theo, cấu hình SMTP production riêng hoặc kiểm tra giới hạn gửi email trong Supabase Auth; xác nhận sender/recipient policy, Site URL và allowlist có `https://erphotel.vercel.app/auth/callback`. Tham khảo https://supabase.com/docs/guides/auth/auth-smtp và https://supabase.com/docs/guides/auth/rate-limits.
 - Chỉ sau khi email sẵn sàng, triển khai lại Edge Function một lần với token ngẫu nhiên mới được lưu kín; dùng chính ba email đã được người dùng cung cấp trước đó trong lịch sử hội thoại (không chép thông tin nhạy cảm vào log/code), kiểm tra kết quả gửi và quyền role. Dù thành công hay thất bại, xóa token và function tạm sau đó; xác minh lại số user/property bằng truy vấn chỉ đọc.
 - Tài khoản kiểm thử được duyệt quyền rộng nhưng không có quyền quản trị hoặc quyền `critical`; hai admin là hai người riêng biệt. Không dùng user test để hoàn tất SoD thay cho cùng người tạo/duyệt chứng từ.
+
+## Q282 (15/11/2026) — Xử lý báo cáo Muse vòng Help
+- **X1-N1 (P0) bế tắc khóa đợt kiểm kê**: migration `586000` cấp `count.view_variance` cho `accountant`, `sm_accountant`, `gm` (Kế toán khóa đợt nay thấy dòng đỏ để nhập lý do; GM thấy chênh lệch). Người đếm vẫn mù nhờ RLS view. Cập nhật `seed_compact_roles` + pgTAP (sm_accountant 44 quyền).
+- **H4-N2**: Hộp "Chờ tôi duyệt" chỉ hiện đơn khi bước **hiện tại** (số bước nhỏ nhất còn chờ) thuộc quyền người xem.
+- **H4-N6/N7/N8**: nhãn "Trung tâm chi phí"; câu hướng dẫn người đếm thống nhất ("ít nhất 2 người, trong đó ≥1 độc lập"); form kiểm kê mặc định chọn kho chính thay vì kho chờ hủy.
