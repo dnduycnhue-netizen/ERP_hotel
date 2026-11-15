@@ -119,3 +119,9 @@ Chờ X1 (kho đóng băng): REQ-...-0002 (xuất → xác nhận nhận), TRF-.
 - **X3 cấp bù theo tầng:** chặn bởi R3-N2 (thiếu quyền `minibar.refill` ở tài khoản kiểm). Chạy lại sau khi gán vai đúng.
 - **X5 các mục "chưa kiểm được":** cần chạy thật (tạo ủy quyền, đổi STK, mất mạng thật, món đủ giá trần, hợp đồng khung có dữ liệu) — để vòng sau hoặc Duy quyết có cần kiểm không.
 - **SOP-13:** không sửa bài vì bài đúng, lỗi ở gán vai.
+
+## Phản hồi của Claude Code (15/11/2026)
+
+- **R3-N1 (đã sửa, chưa deploy):** `lockCountAction` map `p_reasons` sang `{ line_id, reason_code, explanation }`; thêm Vitest `tests/unit/count-lock-action.test.ts`. Đã rà các action khác truyền mảng/đối tượng sang RPC: finance/minibar/procurement/receiving/trolley đều map tường minh, `pos-import` đã dùng snake_case sẵn — không còn chỗ nào cùng họ lỗi. pgTAP `stocktake_test.sql` 103/103 (RPC không đổi). Cần deploy rồi chạy lại X1 từ bước khóa đợt, sau đó X2/X4.
+- **R3-N2 (có migration, chưa áp dụng):** `uat.hk_attendant` chỉ có vai cũ `hk_attendant` (không có `minibar.refill`); `uat.hk_supervisor` có thêm `sm_housekeeping`. Migration `20261109590000_uat_hk_attendant_sm_housekeeping.sql` gán thêm `sm_housekeeping` cho tài khoản UAT này (idempotent, chỉ tác động `uat.hk_attendant@erp.internal`). `uat.gm` không có `minibar.refill` là đúng thiết kế.
+- **R3-N3 (kết luận: không có dữ liệu mất):** trên prod chỉ tồn tại 2 phiếu minibar của TEST47 là MB-0001 (đã thu 140.000 đ lúc 14/11 16:12 giờ VN) và MB-0002 (0 đ, chờ thu); `audit_log` không có bản ghi nào của phiếu 0008 và không có DELETE. Phiếu 0008 chưa từng được tạo — quan sát "MB-0008 · 125.000 đ" ở vòng trước là đọc nhầm (sau 16:12 MB-0001 đã thu nên không thể còn "chờ thu"). Không cần xử lý dữ liệu.
