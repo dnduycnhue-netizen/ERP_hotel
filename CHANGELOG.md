@@ -106,3 +106,8 @@ Ghi theo task. Mỗi dòng: ngày — mã task — agent — tóm tắt.
 - **X1-N1 (P0) bế tắc khóa đợt kiểm kê**: migration `586000` cấp `count.view_variance` cho `accountant`, `sm_accountant`, `gm` (Kế toán khóa đợt nay thấy dòng đỏ để nhập lý do; GM thấy chênh lệch). Người đếm vẫn mù nhờ RLS view. Cập nhật `seed_compact_roles` + pgTAP (sm_accountant 44 quyền).
 - **H4-N2**: Hộp "Chờ tôi duyệt" chỉ hiện đơn khi bước **hiện tại** (số bước nhỏ nhất còn chờ) thuộc quyền người xem.
 - **H4-N6/N7/N8**: nhãn "Trung tâm chi phí"; câu hướng dẫn người đếm thống nhất ("ít nhất 2 người, trong đó ≥1 độc lập"); form kiểm kê mặc định chọn kho chính thay vì kho chờ hủy.
+
+## Q283 (15/11/2026) — Thu hẹp vai trò `owner` cũ (H1-N1)
+- Migration `587000`: `owner` từ 129 → 63 quyền = quyền `sm_owner` (59) + nhóm `admin.*` (quản trị). Bỏ toàn bộ quyền nghiệp vụ hằng ngày (nhận hàng, ghi sổ, lập/duyệt hóa đơn, khóa kiểm kê…) — đúng nguyên tắc SoD: chủ đầu tư giám sát/duyệt việc lớn, không làm thay. Mọi người đang giữ `owner` đều đã có `sm_owner` nên không ai mất truy cập.
+- `sm_owner` thêm `stock.view_qty` (giám sát tồn); cập nhật `seed_compact_roles` + pgTAP (59 quyền).
+- Hệ quả: "Dành cho bạn" của chủ đầu tư thu hẹp theo việc giám sát/duyệt; tài khoản test owner không còn làm được thao tác nghiệp vụ thay vai khác (dùng tài khoản uat. đúng vai).
