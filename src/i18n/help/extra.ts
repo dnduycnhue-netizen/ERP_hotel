@@ -24,7 +24,7 @@ export const EXTRA_ARTICLES: HelpArticle[] = [
       { who: "Quản lý / Chủ đầu tư", text: "Mở **Quản trị → Quy tắc duyệt** (địa chỉ /admin/approval-rules), kéo xuống mục **Ủy quyền duyệt**." },
       { who: "Quản lý / Chủ đầu tư", text: "Bấm **Thêm ủy quyền**. Chọn **Người ủy quyền** (người vắng) và **Người được ủy quyền**." },
       { who: "Quản lý / Chủ đầu tư", text: "Chọn **Khách sạn** (để trống = toàn chuỗi), **Hiệu lực từ** và **Hiệu lực đến**, nhập **Lý do**." },
-      { who: "Quản lý / Chủ đầu tư", text: "Bấm **Lưu ủy quyền**. Cần sửa ngày thì bấm **Sửa**; muốn dừng sớm thì bấm **Xóa**." },
+      { who: "Quản lý / Chủ đầu tư", text: "Bấm **Thêm ủy quyền**. Cần sửa ngày thì bấm **Sửa** (lúc sửa, nút hiện **Lưu ủy quyền**); muốn dừng sớm thì bấm **Xóa**." },
       { who: "Người được ủy quyền", text: "Vào **Chờ tôi duyệt**: các bước của người vắng hiện ra trong thời hạn, ghi **Được ủy quyền từ** tên người vắng." },
     ],
     controls: [
@@ -54,7 +54,7 @@ export const EXTRA_ARTICLES: HelpArticle[] = [
       { who: "Mọi người dùng", text: "Mở trang **Đổi mật khẩu** (địa chỉ /settings/password) từ menu tài khoản." },
       { who: "Mọi người dùng", text: "Nhập **Mật khẩu hiện tại**, **Mật khẩu mới** (tối thiểu **12 ký tự**, khác mật khẩu cũ) và **Nhập lại mật khẩu mới**, bấm **Đổi mật khẩu**. Sau khi đổi bạn vẫn ở lại phiên hiện tại." },
       { who: "Mọi người dùng", text: "**PIN** gồm 6 chữ số do quản trị viên đặt cho bạn; bạn nhập khi hộp **Nhập mã PIN để ghi sổ** hiện ra. Không chia sẻ PIN cho ai." },
-      { who: "Quản trị viên", text: "Quên mật khẩu/PIN: quản trị viên vào **Quản trị → Người dùng**, mở người đó và bấm **Đặt lại PIN** (hoặc đặt lại mật khẩu). Hệ thống không cho tự xem lại PIN cũ." },
+      { who: "Quản trị viên", text: "Quên mật khẩu/PIN: quản trị viên vào **Quản trị → Người dùng**, mở người đó, bấm **Quản lý quyền truy cập** rồi bấm **Đặt lại PIN** (hoặc đặt lại mật khẩu). Hệ thống không cho tự xem lại PIN cũ." },
     ],
     controls: [
       "Ghi sổ bằng PIN là chữ ký số: ai nhập PIN người đó chịu trách nhiệm.",
@@ -76,7 +76,7 @@ export const EXTRA_ARTICLES: HelpArticle[] = [
     related: ["phan-he-nha-hang", "luong-ban-hang-nha-hang", "quy-tac-gia-von"],
     purpose: "Đưa số liệu bán hàng của từng ca từ POS vào hệ thống để **đối chiếu với kho** (kiểm kê theo ca), không để nhập tay.",
     scope: "Quầy nhà hàng/bar dùng máy POS ngoài. File chỉ để đối chiếu: **không ghi tồn kho hay tiền**.",
-    roles: ["Người có quyền nạp POS (thủ kho/bếp/kế toán theo phân quyền)."],
+    roles: ["Người có quyền nạp POS (Quản lý/Kế toán theo phân quyền hiện hành)."],
     prerequisites: [
       "Đã xuất file **CSV hoặc Excel** của ca từ máy POS (Excel chỉ đọc sheet đầu tiên).",
       "Bạn có quyền nạp file POS.",
@@ -203,7 +203,7 @@ export const EXTRA_ARTICLES: HelpArticle[] = [
       ] },
       { t: "h", text: "Cách sửa" },
       { t: "steps", items: [
-        { who: "Thu mua", text: "Mở **Danh mục → Hợp đồng khung & Giá trần**, **Thêm giá trần** cho nguyên liệu còn thiếu (hoặc **Nhập giá trần hàng loạt**).", href: "/master/prices" },
+        { who: "Kế toán", text: "Mở **Danh mục → Hợp đồng khung & Giá trần**, **Thêm giá trần** cho nguyên liệu còn thiếu (hoặc **Nhập giá trần hàng loạt**). Nút này chỉ hiện với người có quyền quản lý giá trần.", href: "/master/prices" },
         { who: "Bếp", text: "Mở lại món ở **Nhà hàng → Món ăn**; foodcost hiện số khi mọi nguyên liệu đã có giá.", href: "/restaurant/dishes" },
       ] },
       { t: "h", text: "Liên quan lãi gộp" },
@@ -223,7 +223,7 @@ export const EXTRA_ARTICLES: HelpArticle[] = [
     related: ["phan-he-danh-muc", "sop-nha-cung-cap-doi-stk"],
     purpose: "Đưa danh mục vật tư hoặc nhà cung cấp vào hệ thống **nhanh và ít sai**, thay vì nhập từng dòng.",
     scope: "Danh mục dùng chung cả chuỗi — nhập sai ảnh hưởng mọi khách sạn, nên chỉ nhập khi đã soát file.",
-    roles: ["Người có quyền nhập danh mục (Thủ kho/Thu mua/Quản lý)."],
+    roles: ["Người có quyền nhập danh mục (Quản lý/Kế toán theo phân quyền hiện hành)."],
     prerequisites: ["File Excel đã soát cột bắt buộc.", "Bạn có quyền nhập danh mục."],
     steps: [
       { who: "Người nhập", text: "Mở **Danh mục → Nhập Excel**.", href: "/master/import" },
@@ -254,7 +254,7 @@ export const EXTRA_ARTICLES: HelpArticle[] = [
       { t: "table", head: ["Thứ tự ưu tiên", "Nguồn giá", "Tạo ở đâu"], rows: [
         ["1", "**Hợp đồng khung** còn hiệu lực", "Danh mục → Hợp đồng khung & Giá trần → **Thêm hợp đồng**, rồi **Thêm dòng giá**"],
         ["2", "**Báo giá** được chọn", "Khi lập yêu cầu mua/đơn mua theo kênh Báo giá"],
-        ["3", "**Giá trần** (hàng chợ)", "Cùng màn → **Thêm giá trần** (toàn chuỗi hoặc khách sạn này)"],
+        ["3", "**Giá trần** (hàng chợ)", "Cùng màn → **Thêm giá trần** (Kế toán/Kiểm soát chi phí; toàn chuỗi hoặc khách sạn này)"],
       ] },
       { t: "h", text: "Hợp đồng khung" },
       { t: "ul", items: [
@@ -281,8 +281,8 @@ export const EXTRA_ARTICLES: HelpArticle[] = [
     prerequisites: ["Có thông tin người bán: tên, địa chỉ, CMND/CCCD.", "Có danh sách hàng, ngày mua, số tiền."],
     steps: [
       { who: "Kế toán", text: "Mở **Tài chính → Bảng kê không hóa đơn**.", href: "/finance/no-invoice-listings" },
-      { who: "Kế toán", text: "Bấm **Nhập bảng kê mới**: nhập **Tên người bán**, **Địa chỉ**, **CMND/CCCD người bán**, **Ngày mua** và các dòng **Tên hàng**, số tiền." },
-      { who: "Kế toán", text: "Lưu bảng kê (hiện thông báo **Đã lưu bảng kê**)." },
+      { who: "Kế toán", text: "Điền form **Nhập bảng kê mới** (hiện sẵn trên trang): nhập **Tên người bán**, **Địa chỉ**, **CMND/CCCD người bán**, **Ngày mua** và các dòng **Tên hàng**, số tiền." },
+      { who: "Kế toán", text: "Bấm **Lưu**. Bảng kê mới xuất hiện trong danh sách ở trạng thái **Nháp**." },
       { who: "Người duyệt", text: "Mở bảng kê và duyệt (**Đã duyệt bảng kê**)." },
     ],
     controls: [
