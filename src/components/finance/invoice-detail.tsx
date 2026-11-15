@@ -4,11 +4,13 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { InlineConfirmButton } from "@/components/common/inline-confirm-button";
 import { DocStatusBadge } from "@/components/common/doc-status-badge";
 import { MoneyText, formatNumber } from "@/components/common/money-text";
 import { PageHeader } from "@/components/shell/page-header";
 import {
   approveInvoiceAction,
+  cancelInvoiceAction,
   matchInvoiceAction,
 } from "@/features/finance/actions";
 import type { InvoiceDetail } from "@/features/finance/queries";
@@ -35,6 +37,7 @@ export function InvoiceDetailView({
 }) {
   const router = useRouter();
   const [pending, setPending] = useState<"match" | "approve" | null>(null);
+  const [cancelReason, setCancelReason] = useState("");
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [errorCode, setErrorCode] = useState<string | null>(null);
@@ -44,6 +47,29 @@ export function InvoiceDetailView({
     canManageInvoice &&
     (invoice.status === "draft" || invoice.status === "on_hold");
   const canApprove = canApproveInvoice && invoice.status === "matched";
+  const canCancel =
+    canManageInvoice &&
+    (invoice.status === "draft" ||
+      invoice.status === "on_hold" ||
+      invoice.status === "matched");
+
+  async function handleCancel() {
+    setMessage(null);
+    setError(null);
+    setErrorCode(null);
+    const res = await cancelInvoiceAction({
+      propertyId,
+      invoiceId: invoice.id,
+      reason: cancelReason,
+    });
+    if (!res.ok) {
+      setError(res.error);
+      setErrorCode(res.code ?? null);
+      return;
+    }
+    setMessage(vi.finance.invoiceCancelled);
+    router.refresh();
+  }
 
   async function handleMatch() {
     setPending("match");
@@ -150,6 +176,30 @@ export function InvoiceDetailView({
             </Button>
           ) : null}
         </div>
+        {canCancel ? (
+          <div className="mt-4 flex flex-col gap-2 border-t pt-3">
+            <p className="text-xs text-muted-foreground">
+              {vi.finance.cancelInvoiceHint}
+            </p>
+            <input
+              type="text"
+              value={cancelReason}
+              onChange={(event) => setCancelReason(event.target.value)}
+              placeholder={vi.finance.cancelInvoiceReason}
+              aria-label={vi.finance.cancelInvoiceReason}
+              className="h-10 rounded-lg border bg-background px-3 text-sm outline-none focus:border-ring"
+            />
+            <div>
+              <InlineConfirmButton
+                label={vi.finance.cancelInvoiceButton}
+                confirmText={vi.finance.cancelInvoiceConfirm}
+                variant="outline"
+                disabled={pending !== null || cancelReason.trim() === ""}
+                onConfirm={handleCancel}
+              />
+            </div>
+          </div>
+        ) : null}
         {isCreator && invoice.status === "matched" ? (
           <p className="mt-3 text-sm text-muted-foreground">
             {vi.finance.sodApproveWarning}

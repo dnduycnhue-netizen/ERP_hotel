@@ -47,6 +47,14 @@ export const invoiceApproveSchema = z.object({
 });
 export type InvoiceApproveInput = z.infer<typeof invoiceApproveSchema>;
 
+/** Hủy hóa đơn chưa duyệt (RPC `invoice_cancel`). */
+export const invoiceCancelSchema = z.object({
+  propertyId: uuidSchema,
+  invoiceId: uuidSchema,
+  reason: z.string().trim().min(1, vi.finance.cancelInvoiceReason),
+});
+export type InvoiceCancelInput = z.infer<typeof invoiceCancelSchema>;
+
 /** 1 dòng quyết toán tạm ứng: { amount, gr_id?, receipt_photo_id? }. */
 export const advanceSettleLineSchema = z.object({
   amount: z.number().positive(vi.finance.amountPositive),

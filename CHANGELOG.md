@@ -111,3 +111,9 @@ Ghi theo task. Mỗi dòng: ngày — mã task — agent — tóm tắt.
 - Migration `587000`: `owner` từ 129 → 63 quyền = quyền `sm_owner` (59) + nhóm `admin.*` (quản trị). Bỏ toàn bộ quyền nghiệp vụ hằng ngày (nhận hàng, ghi sổ, lập/duyệt hóa đơn, khóa kiểm kê…) — đúng nguyên tắc SoD: chủ đầu tư giám sát/duyệt việc lớn, không làm thay. Mọi người đang giữ `owner` đều đã có `sm_owner` nên không ai mất truy cập.
 - `sm_owner` thêm `stock.view_qty` (giám sát tồn); cập nhật `seed_compact_roles` + pgTAP (59 quyền).
 - Hệ quả: "Dành cho bạn" của chủ đầu tư thu hẹp theo việc giám sát/duyệt; tài khoản test owner không còn làm được thao tác nghiệp vụ thay vai khác (dùng tài khoản uat. đúng vai).
+
+## Q284 (15/11/2026) — Hủy hóa đơn, phiếu trả hàng, 10 bài hướng dẫn, bàn giao Muse rerun3
+- Migration `588000`: `supplier_return_list/get` cho người có `stock.view_qty` (GM) xem chỉ đọc; người nhận hàng vẫn bị chặn (vai trò mù).
+- Migration `589000` + pgTAP `invoice_cancel_test` (7): RPC `invoice_cancel` (quyền `invoice.manage`, lý do bắt buộc) hủy hóa đơn Nháp/Tạm giữ/Đã khớp để lập hóa đơn thay thế; hóa đơn đã duyệt không hủy. UI: nút "Hủy hóa đơn" + ô lý do ở chi tiết hóa đơn. Cập nhật SOP-04 + luồng mua hàng.
+- 10 bài hướng dẫn mới (`src/i18n/help/extra.ts`): SOP-09 ủy quyền duyệt, SOP-10 mật khẩu/PIN, SOP-11 file POS, SOP-12 NCC + đổi STK, SOP-13 cấp bù minibar, SOP-14 nhập Excel, SOP-15 bảng kê không hóa đơn; quy tắc mất mạng, foodcost, hợp đồng khung/báo giá.
+- Bàn giao Muse `docs/go-live/muse-handoff-rerun3.md` (X1–X5).

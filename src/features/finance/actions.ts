@@ -7,6 +7,7 @@ import { callFinanceRpc, type FinanceActionResult } from "./rpc";
 import {
   advanceSettleSchema,
   invoiceApproveSchema,
+  invoiceCancelSchema,
   invoiceMatchSchema,
   invoiceSaveDraftSchema,
   noInvoiceListingApproveSchema,
@@ -16,6 +17,7 @@ import {
   paymentRequestDecideSchema,
   type AdvanceSettleInput,
   type InvoiceApproveInput,
+  type InvoiceCancelInput,
   type InvoiceMatchInput,
   type InvoiceSaveDraftInput,
   type NoInvoiceListingApproveInput,
@@ -216,6 +218,29 @@ export async function approveInvoiceAction(
     );
     revalidatePath(payablesPath(parsed.data.propertyId));
     revalidatePath(paymentRequestsPath(parsed.data.propertyId));
+  }
+  return res;
+}
+
+/** Hủy hóa đơn chưa duyệt để lập hóa đơn thay thế (RPC `invoice_cancel`). */
+export async function cancelInvoiceAction(
+  input: InvoiceCancelInput,
+): Promise<FinanceActionResult<{ id: string; status: string }>> {
+  const parsed = invoiceCancelSchema.safeParse(input);
+  if (!parsed.success) {
+    return validationError(parsed.error.issues);
+  }
+  const supabase = await createClient();
+  const res = await callFinanceRpc<{ id: string; status: string }>(
+    supabase,
+    "invoice_cancel",
+    { p_invoice_id: parsed.data.invoiceId, p_reason: parsed.data.reason },
+  );
+  if (res.ok) {
+    revalidatePath(invoicesPath(parsed.data.propertyId));
+    revalidatePath(
+      invoiceDetailPath(parsed.data.propertyId, parsed.data.invoiceId),
+    );
   }
   return res;
 }

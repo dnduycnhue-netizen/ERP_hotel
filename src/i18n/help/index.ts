@@ -1,3 +1,4 @@
+import { EXTRA_ARTICLES } from "./extra";
 import { MODULE_ARTICLES } from "./modules";
 import { ROLE_ARTICLES } from "./roles";
 import { RULE_ARTICLES } from "./rules";
@@ -11,5 +12,6 @@ export const HELP_ARTICLES: HelpArticle[] = [
   ...MODULE_ARTICLES,
   ...WORKFLOW_ARTICLES,
   ...SOP_ARTICLES,
+  ...EXTRA_ARTICLES,
   ...RULE_ARTICLES,
 ];

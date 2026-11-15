@@ -39,7 +39,7 @@ export const WORKFLOW_ARTICLES: HelpArticle[] = [
       { t: "ul", items: [
         "**Thiếu/thừa ngoài dung sai:** cân lại lần 2; thừa sau lần 2 chỉ nhận đến trần dung sai, phần dư cần người có quyền duyệt kèm lý do.",
         "**Hàng hỏng:** ghi số hỏng khi nhận → phiếu trả nhà cung cấp tự sinh.",
-        "**Hóa đơn Tạm giữ:** kiểm số lượng đã nhận/đơn giá; sửa hoặc trao đổi NCC rồi đối chiếu lại.",
+        "**Hóa đơn Tạm giữ:** kiểm số lượng đã nhận/đơn giá; trao đổi NCC rồi bấm Khớp 3 chiều lại; nhập sai số liệu thì **Hủy hóa đơn** (kèm lý do) và nhập hóa đơn thay thế.",
       ]},
     ],
   },

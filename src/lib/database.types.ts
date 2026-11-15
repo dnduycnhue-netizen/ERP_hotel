@@ -6609,6 +6609,9 @@ export type Database = {
       supplier_invoices: {
         Row: {
           amount_before_tax: number
+          cancel_reason: string | null
+          cancelled_at: string | null
+          cancelled_by: string | null
           created_at: string
           created_by: string | null
           doc_no: string
@@ -6629,6 +6632,9 @@ export type Database = {
         }
         Insert: {
           amount_before_tax?: number
+          cancel_reason?: string | null
+          cancelled_at?: string | null
+          cancelled_by?: string | null
           created_at?: string
           created_by?: string | null
           doc_no: string
@@ -6649,6 +6655,9 @@ export type Database = {
         }
         Update: {
           amount_before_tax?: number
+          cancel_reason?: string | null
+          cancelled_at?: string | null
+          cancelled_by?: string | null
           created_at?: string
           created_by?: string | null
           doc_no?: string
@@ -8935,6 +8944,10 @@ export type Database = {
       import_validate_batch: { Args: { p_batch_id: string }; Returns: Json }
       in_todo: { Args: never; Returns: boolean }
       invoice_approve: { Args: { p_invoice_id: string }; Returns: Json }
+      invoice_cancel: {
+        Args: { p_invoice_id: string; p_reason: string }
+        Returns: Json
+      }
       invoice_match: { Args: { p_invoice_id: string }; Returns: Json }
       invoice_save_draft: {
         Args: {

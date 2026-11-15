@@ -2794,6 +2794,14 @@ export const vi = {
     matchButton: "Khớp 3 chiều",
     matching: "Đang khớp…",
     approveButton: "Duyệt hóa đơn",
+    cancelInvoiceButton: "Hủy hóa đơn",
+    cancelInvoiceConfirm:
+      "Hủy hóa đơn này? Hóa đơn đã hủy không khôi phục được; bạn nhập lại hóa đơn mới với số liệu đúng.",
+    cancelInvoiceReason: "Lý do hủy (bắt buộc)",
+    cancelInvoiceHint:
+      "Hóa đơn Tạm giữ hoặc Nháp không sửa trực tiếp: hủy rồi nhập lại hóa đơn thay thế. Hóa đơn đã duyệt không hủy được tại đây.",
+    invoiceCancelled: "Đã hủy hóa đơn. Bạn có thể nhập hóa đơn thay thế.",
+    cancelledReason: "Lý do hủy",
     approving: "Đang duyệt…",
     matchedMessage: "Đã khớp đủ 3 chiều.",
     onHoldMessage:
