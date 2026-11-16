@@ -58,39 +58,59 @@ const REPORT_PERMISSIONS = REPORT_CODES.map(
 );
 
 /**
- * Đích khi bấm mục Kho (R4-N5): vào phiếu lĩnh nếu có quyền lĩnh/duyệt/xuất/nhận,
- * không thì vào màn đầu tiên người dùng thật sự mở được (tồn, hủy hàng, kiểm kê).
+ * Điểm đáp của khu Kho (R4-N5/R5-N5): phiếu lĩnh nếu có quyền lĩnh/duyệt/xuất/nhận,
+ * không thì màn đầu tiên người dùng thật sự mở được (khớp thứ tự tab InventoryNav).
+ * Dùng chung cho menu Kho và trang `/inventory`.
  */
-export function resolveNavHref(
-  item: NavItem,
+export function inventoryLandingPath(
   propertyId: string,
   permissions: ReadonlySet<string>,
 ): string {
-  if (item.key !== "inventory") {
-    return item.href(propertyId);
-  }
   const has = (...codes: string[]): boolean =>
     codes.some((code) => permissions.has(code));
+  const base = `/${propertyId}/inventory`;
   if (
     has(
       "requisition.create",
       "requisition.approve",
       "requisition.issue",
       "requisition.receive",
-      "transfer.send",
-      "transfer.receive",
     )
   ) {
-    return item.href(propertyId);
+    return `${base}/requisitions`;
   }
-  if (has("stock.view_qty")) return `/${propertyId}/inventory/stock`;
+  if (has("transfer.send", "transfer.receive", "stock.view_qty")) {
+    return `${base}/transfers`;
+  }
+  if (has("purpose_issue.post", "purpose_issue.reverse")) {
+    return `${base}/issues`;
+  }
   if (has("waste.propose", "waste.approve", "waste.approve.large")) {
-    return `/${propertyId}/inventory/waste`;
+    return `${base}/waste`;
   }
-  if (has("count.view_variance", "count.lock", "count.adjust.approve")) {
-    return `/${propertyId}/inventory/counts`;
+  if (
+    has(
+      "count.open",
+      "count.perform",
+      "count.view_variance",
+      "count.lock",
+      "count.adjust.approve",
+    )
+  ) {
+    return `${base}/counts`;
   }
-  return item.href(propertyId);
+  if (has("stock.view_qty", "stock.view_value")) return `${base}/stock`;
+  return `${base}/requisitions`;
+}
+
+export function resolveNavHref(
+  item: NavItem,
+  propertyId: string,
+  permissions: ReadonlySet<string>,
+): string {
+  return item.key === "inventory"
+    ? inventoryLandingPath(propertyId, permissions)
+    : item.href(propertyId);
 }
 
 export const NAV_GROUPS: { id: NavGroupId; label: string }[] = [
