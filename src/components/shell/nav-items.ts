@@ -103,13 +103,16 @@ export function inventoryLandingPath(
   return `${base}/requisitions`;
 }
 
+/**
+ * Menu Kho trỏ về `/inventory` — trang này redirect theo quyền phía máy chủ
+ * (nguồn sự thật duy nhất, R6-N1), không tự tính điểm đáp ở client.
+ */
 export function resolveNavHref(
   item: NavItem,
   propertyId: string,
-  permissions: ReadonlySet<string>,
 ): string {
   return item.key === "inventory"
-    ? inventoryLandingPath(propertyId, permissions)
+    ? `/${propertyId}/inventory`
     : item.href(propertyId);
 }
 

@@ -101,7 +101,7 @@ export function AppSidebar({
         ).map((item) => ({
           key: item.key,
           label: item.label,
-          href: resolveNavHref(item, propertyId ?? "", permissions),
+          href: resolveNavHref(item, propertyId ?? ""),
           icon: item.icon,
           active: isActive(item),
         })),
